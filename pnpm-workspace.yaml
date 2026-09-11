@@ -1,0 +1,6 @@
+allowBuilds:
+  esbuild: false
+  sharp: false
+  workerd: false
+patchedDependencies:
+  '@garmin/fitsdk@21.214.0': patches/@garmin__fitsdk@21.214.0.patch
