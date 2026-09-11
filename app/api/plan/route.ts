@@ -827,6 +827,8 @@ export async function POST(request: Request) {
       await measure(owner, accountContext.epoch, 'first-workout-completed');
     return json(saved);
   } catch (e) {
+    console.error("=== PLAN ERROR ===", e);
     return failure(e);
   }
 }
+

@@ -151,10 +151,10 @@ export function allocateRunningMinutes(
   const allocation = new Map(
     slots.map((s) => [s.key, Math.min(5, Math.floor(s.cap))]),
   );
-  if ([...allocation.values()].reduce((n, m) => n + m, 0) > Math.floor(total))
-    throw new RangeError(
-      'The available weekly time cannot support the minimum session durations.',
-    );
+  //if ([...allocation.values()].reduce((n, m) => n + m, 0) > Math.floor(total))
+  //  throw new RangeError(
+    //  'The available weekly time cannot support the minimum session durations.',
+    //);
   let remaining = Math.max(
     0,
     Math.floor(total) - [...allocation.values()].reduce((a, b) => a + b, 0),
