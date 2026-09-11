@@ -1,0 +1,24 @@
+diff --git a/src/output-stream.js b/src/output-stream.js
+index 3910f52264e455a2b482ede1f7a655c513681d8c..984c598c166a53f9e1197eff55cccdf2bd1b0f6a 100644
+--- a/src/output-stream.js
++++ b/src/output-stream.js
+@@ -15,7 +15,9 @@ import FIT from "./fit.js";
+ const ONE_MEGABYTE = 1048576;
+ const FIVE_HUNDRED_MEGABYTES = ONE_MEGABYTE * 500;
+ const HALF_MEGABYTE = ONE_MEGABYTE / 2;
+-const MAX_BYTE_LENGTH = FIVE_HUNDRED_MEGABYTES;
++// Stride exports bounded workout files, not recordings. Keep the resizable
++// allocation ceiling below the Cloudflare Worker memory budget.
++const MAX_BYTE_LENGTH = ONE_MEGABYTE;
+ 
+ class OutputStream {
+     #arrayBuffer = null;
+@@ -30,7 +32,7 @@ class OutputStream {
+      * @constructor
+      * @param {Object=} [options] - Read options (optional)
+      * @param {Number} [options.initialByteLength=0.5MB] - (optional, default 0.5 MB)
+-     * @param {Number} [options.maxByteLength=500MB] - (optional, default 500 MB)
++     * @param {Number} [options.maxByteLength=1MB] - (optional, default 1 MB)
+      * @param {Number} [options.resizeByBytes=0.5MB] - (optional, default 0.5 MB)
+      */
+     constructor({
