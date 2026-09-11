@@ -1,0 +1,5809 @@
+{
+  "id": "plan-2026-09-07-marathon",
+  "engineVersion": "stride-0.7.5",
+  "policyVersion": "provisional-2026-09-09-v13",
+  "profile": {
+    "name": "Synthetic variety route runner",
+    "goal": "marathon",
+    "raceName": "Synthetic marathon acceptance",
+    "startDate": "2026-09-10",
+    "raceDate": "2027-01-27",
+    "weeklyKm": 70,
+    "longestKm": 30,
+    "currentRuns": 5,
+    "days": [0, 1, 2, 4, 6],
+    "longDay": 6,
+    "weekdayMinutes": 90,
+    "longMinutes": 200,
+    "experience": "established",
+    "difficulty": "balanced",
+    "volume": "gradual",
+    "timezone": "Europe/Brussels",
+    "units": "km",
+    "easyPace": 5.5,
+    "recentQualitySessions": 2,
+    "recentQualityMinutes": 40,
+    "qualitySessions": 2,
+    "raceTerrain": "road",
+    "intent": "improve",
+    "recoveryWeeks": 4,
+    "terrain": "flat"
+  },
+  "weeks": [
+    {
+      "index": 0,
+      "start": "2026-09-07",
+      "phase": "Foundation",
+      "targetKm": 16.2,
+      "longKm": 7.2724637681159425,
+      "focus": "Establish a rhythm. Most of this week should feel comfortable.",
+      "raceKm": 0,
+      "trainingMinutes": 89,
+      "qualityMinutes": 16,
+      "rationale": [
+        "Establish a rhythm. Most of this week should feel comfortable.",
+        "2 sessions, 89 prescribed minutes; quality-work allocation 16 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage."
+      ]
+    },
+    {
+      "index": 1,
+      "start": "2026-09-14",
+      "phase": "Foundation",
+      "targetKm": 72.8,
+      "longKm": 31.455,
+      "focus": "Establish a rhythm. Most of this week should feel comfortable.",
+      "raceKm": 0,
+      "trainingMinutes": 400.5,
+      "qualityMinutes": 32,
+      "rationale": [
+        "Establish a rhythm. Most of this week should feel comfortable.",
+        "5 sessions, 401 prescribed minutes; quality-work allocation 32 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage."
+      ]
+    },
+    {
+      "index": 2,
+      "start": "2026-09-21",
+      "phase": "Build",
+      "targetKm": 76,
+      "longKm": 32,
+      "focus": "Build on what you can already do. Keep the easy days easy.",
+      "raceKm": 0,
+      "trainingMinutes": 418,
+      "qualityMinutes": 52,
+      "rationale": [
+        "Build on what you can already do. Keep the easy days easy.",
+        "5 sessions, 418 prescribed minutes; quality-work allocation 52 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage."
+      ]
+    },
+    {
+      "index": 3,
+      "start": "2026-09-28",
+      "phase": "Recovery",
+      "targetKm": 62.2,
+      "longKm": 25.455,
+      "focus": "A little less work. More room to absorb your training.",
+      "raceKm": 0,
+      "trainingMinutes": 342,
+      "qualityMinutes": 0,
+      "rationale": [
+        "A little less work. More room to absorb your training.",
+        "5 sessions, 342 prescribed minutes; quality-work allocation 0 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage."
+      ]
+    },
+    {
+      "index": 4,
+      "start": "2026-10-05",
+      "phase": "Build",
+      "targetKm": 78.9,
+      "longKm": 28,
+      "focus": "Build on what you can already do. Keep the easy days easy.",
+      "raceKm": 0,
+      "trainingMinutes": 434,
+      "qualityMinutes": 60,
+      "rationale": [
+        "Build on what you can already do. Keep the easy days easy.",
+        "5 sessions, 434 prescribed minutes; quality-work allocation 60 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage."
+      ]
+    },
+    {
+      "index": 5,
+      "start": "2026-10-12",
+      "phase": "Build",
+      "targetKm": 82,
+      "longKm": 32,
+      "focus": "Build on what you can already do. Keep the easy days easy.",
+      "raceKm": 0,
+      "trainingMinutes": 451,
+      "qualityMinutes": 60,
+      "rationale": [
+        "Build on what you can already do. Keep the easy days easy.",
+        "5 sessions, 451 prescribed minutes; quality-work allocation 60 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage."
+      ]
+    },
+    {
+      "index": 6,
+      "start": "2026-10-19",
+      "phase": "Build",
+      "targetKm": 81.6,
+      "longKm": 28,
+      "focus": "Build on what you can already do. Keep the easy days easy.",
+      "raceKm": 0,
+      "trainingMinutes": 449,
+      "qualityMinutes": 68,
+      "rationale": [
+        "Build on what you can already do. Keep the easy days easy.",
+        "5 sessions, 449 prescribed minutes; quality-work allocation 68 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage."
+      ]
+    },
+    {
+      "index": 7,
+      "start": "2026-10-26",
+      "phase": "Recovery",
+      "targetKm": 66.9,
+      "longKm": 24.18225,
+      "focus": "A little less work. More room to absorb your training.",
+      "raceKm": 0,
+      "trainingMinutes": 368,
+      "qualityMinutes": 0,
+      "rationale": [
+        "A little less work. More room to absorb your training.",
+        "5 sessions, 368 prescribed minutes; quality-work allocation 0 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage."
+      ]
+    },
+    {
+      "index": 8,
+      "start": "2026-11-02",
+      "phase": "Build",
+      "targetKm": 85.3,
+      "longKm": 32,
+      "focus": "Build on what you can already do. Keep the easy days easy.",
+      "raceKm": 0,
+      "trainingMinutes": 469,
+      "qualityMinutes": 68,
+      "rationale": [
+        "Build on what you can already do. Keep the easy days easy.",
+        "5 sessions, 469 prescribed minutes; quality-work allocation 68 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage."
+      ]
+    },
+    {
+      "index": 9,
+      "start": "2026-11-09",
+      "phase": "Build",
+      "targetKm": 82.7,
+      "longKm": 28,
+      "focus": "Build on what you can already do. Keep the easy days easy.",
+      "raceKm": 0,
+      "trainingMinutes": 455,
+      "qualityMinutes": 68,
+      "rationale": [
+        "Build on what you can already do. Keep the easy days easy.",
+        "5 sessions, 455 prescribed minutes; quality-work allocation 68 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage."
+      ]
+    },
+    {
+      "index": 10,
+      "start": "2026-11-16",
+      "phase": "Build",
+      "targetKm": 86.7,
+      "longKm": 32,
+      "focus": "Build on what you can already do. Keep the easy days easy.",
+      "raceKm": 0,
+      "trainingMinutes": 477,
+      "qualityMinutes": 68,
+      "rationale": [
+        "Build on what you can already do. Keep the easy days easy.",
+        "5 sessions, 477 prescribed minutes; quality-work allocation 68 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage."
+      ]
+    },
+    {
+      "index": 11,
+      "start": "2026-11-23",
+      "phase": "Recovery",
+      "targetKm": 71.1,
+      "longKm": 23.273142857142854,
+      "focus": "A little less work. More room to absorb your training.",
+      "raceKm": 0,
+      "trainingMinutes": 391,
+      "qualityMinutes": 0,
+      "rationale": [
+        "A little less work. More room to absorb your training.",
+        "5 sessions, 391 prescribed minutes; quality-work allocation 0 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage."
+      ]
+    },
+    {
+      "index": 12,
+      "start": "2026-11-30",
+      "phase": "Race preparation",
+      "targetKm": 82.7,
+      "longKm": 28,
+      "focus": "Practice controlled, sustained efforts for your race.",
+      "raceKm": 0,
+      "trainingMinutes": 455,
+      "qualityMinutes": 40,
+      "rationale": [
+        "Practice controlled, sustained efforts for your race.",
+        "5 sessions, 455 prescribed minutes; quality-work allocation 40 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage."
+      ]
+    },
+    {
+      "index": 13,
+      "start": "2026-12-07",
+      "phase": "Race preparation",
+      "targetKm": 84.7,
+      "longKm": 32,
+      "focus": "Practice controlled, sustained efforts for your race.",
+      "raceKm": 0,
+      "trainingMinutes": 466,
+      "qualityMinutes": 60,
+      "rationale": [
+        "Practice controlled, sustained efforts for your race.",
+        "5 sessions, 466 prescribed minutes; quality-work allocation 60 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage."
+      ]
+    },
+    {
+      "index": 14,
+      "start": "2026-12-14",
+      "phase": "Race preparation",
+      "targetKm": 82.7,
+      "longKm": 28,
+      "focus": "Practice controlled, sustained efforts for your race.",
+      "raceKm": 0,
+      "trainingMinutes": 455,
+      "qualityMinutes": 50,
+      "rationale": [
+        "Practice controlled, sustained efforts for your race.",
+        "5 sessions, 455 prescribed minutes; quality-work allocation 50 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage."
+      ]
+    },
+    {
+      "index": 15,
+      "start": "2026-12-21",
+      "phase": "Recovery",
+      "targetKm": 67.8,
+      "longKm": 21.27310714285714,
+      "focus": "A little less work. More room to absorb your training.",
+      "raceKm": 0,
+      "trainingMinutes": 373,
+      "qualityMinutes": 0,
+      "rationale": [
+        "A little less work. More room to absorb your training.",
+        "5 sessions, 373 prescribed minutes; quality-work allocation 0 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage."
+      ]
+    },
+    {
+      "index": 16,
+      "start": "2026-12-28",
+      "phase": "Race preparation",
+      "targetKm": 84.7,
+      "longKm": 32,
+      "focus": "Practice controlled, sustained efforts for your race.",
+      "raceKm": 0,
+      "trainingMinutes": 466,
+      "qualityMinutes": 60,
+      "rationale": [
+        "Practice controlled, sustained efforts for your race.",
+        "5 sessions, 466 prescribed minutes; quality-work allocation 60 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage."
+      ]
+    },
+    {
+      "index": 17,
+      "start": "2027-01-04",
+      "phase": "Taper",
+      "targetKm": 72.9,
+      "longKm": 27.091,
+      "focus": "Reduce the volume while keeping a little rhythm in your legs.",
+      "raceKm": 0,
+      "trainingMinutes": 401,
+      "qualityMinutes": 32,
+      "rationale": [
+        "Reduce the volume while keeping a little rhythm in your legs.",
+        "5 sessions, 401 prescribed minutes; quality-work allocation 32 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage.",
+        "Training totals exclude the race. Familiar work is reduced while recovery increases."
+      ]
+    },
+    {
+      "index": 18,
+      "start": "2027-01-11",
+      "phase": "Taper",
+      "targetKm": 53.8,
+      "longKm": 16.364,
+      "focus": "Reduce the volume while keeping a little rhythm in your legs.",
+      "raceKm": 0,
+      "trainingMinutes": 296,
+      "qualityMinutes": 14,
+      "rationale": [
+        "Reduce the volume while keeping a little rhythm in your legs.",
+        "5 sessions, 296 prescribed minutes; quality-work allocation 14 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage.",
+        "Training totals exclude the race. Familiar work is reduced while recovery increases."
+      ]
+    },
+    {
+      "index": 19,
+      "start": "2027-01-18",
+      "phase": "Taper",
+      "targetKm": 32.9,
+      "longKm": 0,
+      "focus": "Reduce the volume while keeping a little rhythm in your legs.",
+      "raceKm": 0,
+      "trainingMinutes": 181,
+      "qualityMinutes": 14,
+      "rationale": [
+        "Reduce the volume while keeping a little rhythm in your legs.",
+        "5 sessions, 181 prescribed minutes; quality-work allocation 14 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage.",
+        "Training totals exclude the race. Familiar work is reduced while recovery increases."
+      ]
+    },
+    {
+      "index": 20,
+      "start": "2027-01-25",
+      "phase": "Race week",
+      "targetKm": 6.2,
+      "longKm": 0,
+      "focus": "Arrive rested. Your preparation is already in the bank.",
+      "raceKm": 42.195,
+      "trainingMinutes": 34,
+      "qualityMinutes": 0,
+      "rationale": [
+        "Arrive rested. Your preparation is already in the bank.",
+        "2 sessions, 34 prescribed minutes; quality-work allocation 0 minutes.",
+        "Long and demanding work are separated by easy or rest days; there is no catch-up mileage.",
+        "Training totals exclude the race. Familiar work is reduced while recovery increases."
+      ]
+    }
+  ],
+  "workouts": [
+    {
+      "id": "2026-09-07-2026-09-11-tempo",
+      "date": "2026-09-11",
+      "originalDate": "2026-09-11",
+      "week": 0,
+      "title": "Marathon steady blocks",
+      "kind": "tempo",
+      "minutes": 49,
+      "estimatedKm": 8.909,
+      "hard": true,
+      "templateId": "marathon-steady",
+      "stimulus": "race-rhythm",
+      "qualityMinutes": 16,
+      "targetWorkMinutes": 16,
+      "distanceEstimate": {
+        "lowerKm": 7.6,
+        "upperKm": 10,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "race-rhythm",
+      "purpose": "Rehearse patient, steady running for a marathon without turning an ordinary training day into a race.",
+      "reason": "Foundation: Rehearse patient, steady running for a marathon without turning an ordinary training day into a race. The opening dose uses your declared recent work minutes, within this session’s limits. Foundation · race-rhythm session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 900,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 2",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 2",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-09-13-long",
+      "date": "2026-09-13",
+      "originalDate": "2026-09-13",
+      "week": 0,
+      "title": "Easy long run",
+      "kind": "long",
+      "minutes": 40,
+      "estimatedKm": 7.2724637681159425,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 6.3,
+        "upperKm": 7.7,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "long",
+      "purpose": "An easy alternative within the available time; there is no quality work to make up.",
+      "reason": " Foundation · Independent long-run progression. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "kind": "work",
+          "label": "Easy running",
+          "seconds": 2400,
+          "intensity": 3,
+          "effort": "Conversational · 2–3 / 10",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-09-14-easy",
+      "date": "2026-09-14",
+      "originalDate": "2026-09-14",
+      "week": 1,
+      "title": "Recovery run",
+      "kind": "easy",
+      "minutes": 43,
+      "estimatedKm": 7.818,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 6.7,
+        "upperKm": 8.3,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "recovery",
+      "purpose": "A shorter easy outing to recover between the week’s key sessions. Keep the effort relaxed.",
+      "reason": " Foundation · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 2580,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-09-15-easy",
+      "date": "2026-09-15",
+      "originalDate": "2026-09-15",
+      "week": 1,
+      "title": "Aerobic endurance run",
+      "kind": "easy",
+      "minutes": 80,
+      "estimatedKm": 14.545,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 12.6,
+        "upperKm": 15.4,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "medium-long",
+      "purpose": "A second aerobic endurance outing, funded by the week’s existing easy volume. Keep it fully conversational.",
+      "reason": " Foundation · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 4800,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-09-16-tempo",
+      "date": "2026-09-16",
+      "originalDate": "2026-09-16",
+      "week": 1,
+      "title": "Cruise intervals",
+      "kind": "tempo",
+      "minutes": 55.5,
+      "estimatedKm": 10.091,
+      "hard": true,
+      "templateId": "threshold-cruise",
+      "stimulus": "threshold",
+      "qualityMinutes": 16,
+      "targetWorkMinutes": 16,
+      "distanceEstimate": {
+        "lowerKm": 8.6,
+        "upperKm": 11.2,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "threshold",
+      "purpose": "Accumulate controlled, comfortably hard running with short easy breaks.",
+      "reason": "Foundation: Accumulate controlled, comfortably hard running with short easy breaks. The opening dose uses your declared recent work minutes, within this session’s limits. Foundation · threshold session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 1200,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 4",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 4",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 4",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 4",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-09-18-tempo",
+      "date": "2026-09-18",
+      "originalDate": "2026-09-18",
+      "week": 1,
+      "title": "Marathon steady blocks",
+      "kind": "tempo",
+      "minutes": 49,
+      "estimatedKm": 8.909,
+      "hard": true,
+      "templateId": "marathon-steady",
+      "stimulus": "race-rhythm",
+      "qualityMinutes": 16,
+      "targetWorkMinutes": 16,
+      "distanceEstimate": {
+        "lowerKm": 7.6,
+        "upperKm": 10,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "race-rhythm",
+      "purpose": "Rehearse patient, steady running for a marathon without turning an ordinary training day into a race.",
+      "reason": "Foundation: Rehearse patient, steady running for a marathon without turning an ordinary training day into a race. This is exposure 2 to the same session family; work increases only within its dose and recovery limits. Foundation · race-rhythm session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 900,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 2",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 2",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-09-20-long",
+      "date": "2026-09-20",
+      "originalDate": "2026-09-20",
+      "week": 1,
+      "title": "Easy long run",
+      "kind": "long",
+      "minutes": 173,
+      "estimatedKm": 31.455,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 27.3,
+        "upperKm": 33.2,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "long",
+      "purpose": "Build endurance at a pace you could happily hold a conversation.",
+      "reason": " Foundation · Independent long-run progression. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy long run",
+          "seconds": 10380,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-09-21-easy",
+      "date": "2026-09-21",
+      "originalDate": "2026-09-21",
+      "week": 2,
+      "title": "Recovery run",
+      "kind": "easy",
+      "minutes": 41,
+      "estimatedKm": 7.455,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 6.4,
+        "upperKm": 7.9,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "recovery",
+      "purpose": "A shorter easy outing to recover between the week’s key sessions. Keep the effort relaxed.",
+      "reason": " Build · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 2460,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-09-22-easy",
+      "date": "2026-09-22",
+      "originalDate": "2026-09-22",
+      "week": 2,
+      "title": "Aerobic endurance run",
+      "kind": "easy",
+      "minutes": 78,
+      "estimatedKm": 14.182,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 12.3,
+        "upperKm": 15,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "medium-long",
+      "purpose": "A second aerobic endurance outing, funded by the week’s existing easy volume. Keep it fully conversational.",
+      "reason": " Build · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 4680,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-09-23-tempo",
+      "date": "2026-09-23",
+      "originalDate": "2026-09-23",
+      "week": 2,
+      "title": "Cruise intervals",
+      "kind": "tempo",
+      "minutes": 61,
+      "estimatedKm": 11.091,
+      "hard": true,
+      "templateId": "threshold-cruise",
+      "stimulus": "threshold",
+      "qualityMinutes": 20,
+      "targetWorkMinutes": 20,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 12.4,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "threshold",
+      "purpose": "Accumulate controlled, comfortably hard running with short easy breaks.",
+      "reason": "Build: Accumulate controlled, comfortably hard running with short easy breaks. This is exposure 2 to the same session family; work increases only within its dose and recovery limits. Build · threshold session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 1200,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 5 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-09-25-tempo",
+      "date": "2026-09-25",
+      "originalDate": "2026-09-25",
+      "week": 2,
+      "title": "Marathon steady blocks",
+      "kind": "tempo",
+      "minutes": 62,
+      "estimatedKm": 11.273,
+      "hard": true,
+      "templateId": "marathon-steady",
+      "stimulus": "race-rhythm",
+      "qualityMinutes": 32,
+      "targetWorkMinutes": 32,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 13.1,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "race-rhythm",
+      "purpose": "Rehearse patient, steady running for a marathon without turning an ordinary training day into a race.",
+      "reason": "Build: Rehearse patient, steady running for a marathon without turning an ordinary training day into a race. This is exposure 3 to the same session family; work increases only within its dose and recovery limits. Build · race-rhythm session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 360,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 4",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 4",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 4",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 4",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-09-27-long",
+      "date": "2026-09-27",
+      "originalDate": "2026-09-27",
+      "week": 2,
+      "title": "Easy long run",
+      "kind": "long",
+      "minutes": 176,
+      "estimatedKm": 32,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 27.8,
+        "upperKm": 33.7,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "long",
+      "purpose": "Build endurance at a pace you could happily hold a conversation.",
+      "reason": " Build · Independent long-run progression. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy long run",
+          "seconds": 10560,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-09-28-easy",
+      "date": "2026-09-28",
+      "originalDate": "2026-09-28",
+      "week": 3,
+      "title": "Recovery run",
+      "kind": "easy",
+      "minutes": 37,
+      "estimatedKm": 6.727,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 5.8,
+        "upperKm": 7.1,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "recovery",
+      "purpose": "A shorter easy outing to recover between the week’s key sessions. Keep the effort relaxed.",
+      "reason": " Recovery · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 2220,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-09-29-easy",
+      "date": "2026-09-29",
+      "originalDate": "2026-09-29",
+      "week": 3,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 51,
+      "estimatedKm": 9.273,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 8,
+        "upperKm": 9.8,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "easy",
+      "purpose": "Comfortable running that builds your aerobic base and leaves room to recover.",
+      "reason": " Recovery · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 3060,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-09-30-easy",
+      "date": "2026-09-30",
+      "originalDate": "2026-09-30",
+      "week": 3,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 57,
+      "estimatedKm": 10.364,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 9,
+        "upperKm": 11,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "easy",
+      "purpose": "Comfortable running that builds your aerobic base and leaves room to recover.",
+      "reason": " Recovery · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 3420,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-02-easy",
+      "date": "2026-10-02",
+      "originalDate": "2026-10-02",
+      "week": 3,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 57,
+      "estimatedKm": 10.364,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 9,
+        "upperKm": 11,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "easy",
+      "purpose": "Comfortable running that builds your aerobic base and leaves room to recover.",
+      "reason": " Recovery · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 3420,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-04-long",
+      "date": "2026-10-04",
+      "originalDate": "2026-10-04",
+      "week": 3,
+      "title": "Easy long run",
+      "kind": "long",
+      "minutes": 140,
+      "estimatedKm": 25.455,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 22.1,
+        "upperKm": 26.8,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "long",
+      "purpose": "Build endurance at a pace you could happily hold a conversation.",
+      "reason": " Recovery · Independent long-run progression. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy long run",
+          "seconds": 8400,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-05-easy",
+      "date": "2026-10-05",
+      "originalDate": "2026-10-05",
+      "week": 4,
+      "title": "Recovery run",
+      "kind": "easy",
+      "minutes": 57,
+      "estimatedKm": 10.364,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 9,
+        "upperKm": 11,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "recovery",
+      "purpose": "A shorter easy outing to recover between the week’s key sessions. Keep the effort relaxed.",
+      "reason": " Build · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 3420,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-06-easy",
+      "date": "2026-10-06",
+      "originalDate": "2026-10-06",
+      "week": 4,
+      "title": "Aerobic endurance run",
+      "kind": "easy",
+      "minutes": 90,
+      "estimatedKm": 16.364,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 14.2,
+        "upperKm": 17.3,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "medium-long",
+      "purpose": "A second aerobic endurance outing, funded by the week’s existing easy volume. Keep it fully conversational.",
+      "reason": " Build · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 5400,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-07-tempo",
+      "date": "2026-10-07",
+      "originalDate": "2026-10-07",
+      "week": 4,
+      "title": "Cruise intervals",
+      "kind": "tempo",
+      "minutes": 61,
+      "estimatedKm": 11.091,
+      "hard": true,
+      "templateId": "threshold-cruise",
+      "stimulus": "threshold",
+      "qualityMinutes": 20,
+      "targetWorkMinutes": 20,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 12.4,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "threshold",
+      "purpose": "Accumulate controlled, comfortably hard running with short easy breaks.",
+      "reason": "Build: Accumulate controlled, comfortably hard running with short easy breaks. This is exposure 3 to the same session family; work increases only within its dose and recovery limits. Build · threshold session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 1200,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 5 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-09-tempo",
+      "date": "2026-10-09",
+      "originalDate": "2026-10-09",
+      "week": 4,
+      "title": "Marathon steady blocks",
+      "kind": "tempo",
+      "minutes": 72,
+      "estimatedKm": 13.091,
+      "hard": true,
+      "templateId": "marathon-steady",
+      "stimulus": "race-rhythm",
+      "qualityMinutes": 40,
+      "targetWorkMinutes": 40,
+      "distanceEstimate": {
+        "lowerKm": 10.9,
+        "upperKm": 15.3,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "race-rhythm",
+      "purpose": "Rehearse patient, steady running for a marathon without turning an ordinary training day into a race.",
+      "reason": "Build: Rehearse patient, steady running for a marathon without turning an ordinary training day into a race. This is exposure 4 to the same session family; work increases only within its dose and recovery limits. Build · race-rhythm session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 300,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 5",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 5",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 5",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 5",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 5 of 5",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-11-long",
+      "date": "2026-10-11",
+      "originalDate": "2026-10-11",
+      "week": 4,
+      "title": "Easy long run",
+      "kind": "long",
+      "minutes": 154,
+      "estimatedKm": 28,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 24.3,
+        "upperKm": 29.5,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "long",
+      "purpose": "Build endurance at a pace you could happily hold a conversation.",
+      "reason": " Build · Independent long-run progression. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy long run",
+          "seconds": 9240,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-12-easy",
+      "date": "2026-10-12",
+      "originalDate": "2026-10-12",
+      "week": 5,
+      "title": "Recovery run",
+      "kind": "easy",
+      "minutes": 53,
+      "estimatedKm": 9.636,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 8.3,
+        "upperKm": 10.2,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "recovery",
+      "purpose": "A shorter easy outing to recover between the week’s key sessions. Keep the effort relaxed.",
+      "reason": " Build · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 3180,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-13-easy",
+      "date": "2026-10-13",
+      "originalDate": "2026-10-13",
+      "week": 5,
+      "title": "Aerobic endurance run",
+      "kind": "easy",
+      "minutes": 90,
+      "estimatedKm": 16.364,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 14.2,
+        "upperKm": 17.3,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "medium-long",
+      "purpose": "A second aerobic endurance outing, funded by the week’s existing easy volume. Keep it fully conversational.",
+      "reason": " Build · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 5400,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-14-tempo",
+      "date": "2026-10-14",
+      "originalDate": "2026-10-14",
+      "week": 5,
+      "title": "Cruise intervals",
+      "kind": "tempo",
+      "minutes": 61,
+      "estimatedKm": 11.091,
+      "hard": true,
+      "templateId": "threshold-cruise",
+      "stimulus": "threshold",
+      "qualityMinutes": 20,
+      "targetWorkMinutes": 20,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 12.4,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "threshold",
+      "purpose": "Accumulate controlled, comfortably hard running with short easy breaks.",
+      "reason": "Build: Accumulate controlled, comfortably hard running with short easy breaks. This is exposure 4 to the same session family; work increases only within its dose and recovery limits. Build · threshold session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 1200,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 5 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-16-tempo",
+      "date": "2026-10-16",
+      "originalDate": "2026-10-16",
+      "week": 5,
+      "title": "Marathon steady blocks",
+      "kind": "tempo",
+      "minutes": 71,
+      "estimatedKm": 12.909,
+      "hard": true,
+      "templateId": "marathon-steady",
+      "stimulus": "race-rhythm",
+      "qualityMinutes": 40,
+      "targetWorkMinutes": 48,
+      "distanceEstimate": {
+        "lowerKm": 10.7,
+        "upperKm": 15.1,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "race-rhythm",
+      "purpose": "Rehearse patient, steady running for a marathon without turning an ordinary training day into a race.",
+      "reason": "Build: Rehearse patient, steady running for a marathon without turning an ordinary training day into a race. This is exposure 5 to the same session family; work increases only within its dose and recovery limits. Build · race-rhythm session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 240,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 5",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 5",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 5",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 5",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 5 of 5",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-18-long",
+      "date": "2026-10-18",
+      "originalDate": "2026-10-18",
+      "week": 5,
+      "title": "Easy long run",
+      "kind": "long",
+      "minutes": 176,
+      "estimatedKm": 32,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 27.8,
+        "upperKm": 33.7,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "long",
+      "purpose": "Build endurance at a pace you could happily hold a conversation.",
+      "reason": " Build · Independent long-run progression. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy long run",
+          "seconds": 10560,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-19-easy",
+      "date": "2026-10-19",
+      "originalDate": "2026-10-19",
+      "week": 6,
+      "title": "Recovery run",
+      "kind": "easy",
+      "minutes": 60,
+      "estimatedKm": 10.909,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 11.5,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "recovery",
+      "purpose": "A shorter easy outing to recover between the week’s key sessions. Keep the effort relaxed.",
+      "reason": " Build · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 3600,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-20-easy",
+      "date": "2026-10-20",
+      "originalDate": "2026-10-20",
+      "week": 6,
+      "title": "Aerobic endurance run",
+      "kind": "easy",
+      "minutes": 90,
+      "estimatedKm": 16.364,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 14.2,
+        "upperKm": 17.3,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "medium-long",
+      "purpose": "A second aerobic endurance outing, funded by the week’s existing easy volume. Keep it fully conversational.",
+      "reason": " Build · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 5400,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-21-tempo",
+      "date": "2026-10-21",
+      "originalDate": "2026-10-21",
+      "week": 6,
+      "title": "Cruise intervals",
+      "kind": "tempo",
+      "minutes": 61,
+      "estimatedKm": 11.091,
+      "hard": true,
+      "templateId": "threshold-cruise",
+      "stimulus": "threshold",
+      "qualityMinutes": 20,
+      "targetWorkMinutes": 20,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 12.4,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "threshold",
+      "purpose": "Accumulate controlled, comfortably hard running with short easy breaks.",
+      "reason": "Build: Accumulate controlled, comfortably hard running with short easy breaks. This is exposure 5 to the same session family; work increases only within its dose and recovery limits. Build · threshold session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 1200,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 5 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-23-tempo",
+      "date": "2026-10-23",
+      "originalDate": "2026-10-23",
+      "week": 6,
+      "title": "Marathon steady blocks",
+      "kind": "tempo",
+      "minutes": 84,
+      "estimatedKm": 15.273,
+      "hard": true,
+      "templateId": "marathon-steady",
+      "stimulus": "race-rhythm",
+      "qualityMinutes": 48,
+      "targetWorkMinutes": 48,
+      "distanceEstimate": {
+        "lowerKm": 12.7,
+        "upperKm": 17.8,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "race-rhythm",
+      "purpose": "Rehearse patient, steady running for a marathon without turning an ordinary training day into a race.",
+      "reason": "Build: Rehearse patient, steady running for a marathon without turning an ordinary training day into a race. This is exposure 6 to the same session family; work increases only within its dose and recovery limits. Build · race-rhythm session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 360,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 5 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 6 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-25-long",
+      "date": "2026-10-25",
+      "originalDate": "2026-10-25",
+      "week": 6,
+      "title": "Easy long run",
+      "kind": "long",
+      "minutes": 154,
+      "estimatedKm": 28,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 24.3,
+        "upperKm": 29.5,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "long",
+      "purpose": "Build endurance at a pace you could happily hold a conversation.",
+      "reason": " Build · Independent long-run progression. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy long run",
+          "seconds": 9240,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-26-easy",
+      "date": "2026-10-26",
+      "originalDate": "2026-10-26",
+      "week": 7,
+      "title": "Recovery run",
+      "kind": "easy",
+      "minutes": 45,
+      "estimatedKm": 8.182,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 7.1,
+        "upperKm": 8.7,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "recovery",
+      "purpose": "A shorter easy outing to recover between the week’s key sessions. Keep the effort relaxed.",
+      "reason": " Recovery · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 2700,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-27-easy",
+      "date": "2026-10-27",
+      "originalDate": "2026-10-27",
+      "week": 7,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 60,
+      "estimatedKm": 10.909354838709678,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 11.5,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "easy",
+      "purpose": "A shorter easy session to absorb your recent training. Keep the effort comfortable.",
+      "reason": "Recovery · Reduced from the preceding full training week, using the running time that fits your session limits.",
+      "steps": [
+        {
+          "kind": "work",
+          "label": "Easy running",
+          "seconds": 3600,
+          "intensity": 3,
+          "effort": "Conversational · 2–3 / 10",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-28-easy",
+      "date": "2026-10-28",
+      "originalDate": "2026-10-28",
+      "week": 7,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 65,
+      "estimatedKm": 11.818529411764708,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 10.2,
+        "upperKm": 12.5,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "easy",
+      "purpose": "A shorter easy session to absorb your recent training. Keep the effort comfortable.",
+      "reason": "Recovery · Reduced from the preceding full training week, using the running time that fits your session limits.",
+      "steps": [
+        {
+          "kind": "work",
+          "label": "Easy running",
+          "seconds": 3900,
+          "intensity": 3,
+          "effort": "Conversational · 2–3 / 10",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-10-30-easy",
+      "date": "2026-10-30",
+      "originalDate": "2026-10-30",
+      "week": 7,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 65,
+      "estimatedKm": 11.818529411764708,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 10.2,
+        "upperKm": 12.5,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "easy",
+      "purpose": "A shorter easy session to absorb your recent training. Keep the effort comfortable.",
+      "reason": "Recovery · Reduced from the preceding full training week, using the running time that fits your session limits.",
+      "steps": [
+        {
+          "kind": "work",
+          "label": "Easy running",
+          "seconds": 3900,
+          "intensity": 3,
+          "effort": "Conversational · 2–3 / 10",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-01-long",
+      "date": "2026-11-01",
+      "originalDate": "2026-11-01",
+      "week": 7,
+      "title": "Easy long run",
+      "kind": "long",
+      "minutes": 133,
+      "estimatedKm": 24.18225,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 21,
+        "upperKm": 25.5,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "long",
+      "purpose": "A shorter easy session to absorb your recent training. Keep the effort comfortable.",
+      "reason": "Recovery · Reduced from the preceding full training week, using the running time that fits your session limits.",
+      "steps": [
+        {
+          "kind": "work",
+          "label": "Easy running",
+          "seconds": 7980,
+          "intensity": 3,
+          "effort": "Conversational · 2–3 / 10",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-02-easy",
+      "date": "2026-11-02",
+      "originalDate": "2026-11-02",
+      "week": 8,
+      "title": "Recovery run",
+      "kind": "easy",
+      "minutes": 60,
+      "estimatedKm": 10.909,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 11.5,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "recovery",
+      "purpose": "A shorter easy outing to recover between the week’s key sessions. Keep the effort relaxed.",
+      "reason": " Build · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 3600,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-03-easy",
+      "date": "2026-11-03",
+      "originalDate": "2026-11-03",
+      "week": 8,
+      "title": "Aerobic endurance run",
+      "kind": "easy",
+      "minutes": 90,
+      "estimatedKm": 16.364,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 14.2,
+        "upperKm": 17.3,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "medium-long",
+      "purpose": "A second aerobic endurance outing, funded by the week’s existing easy volume. Keep it fully conversational.",
+      "reason": " Build · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 5400,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-04-tempo",
+      "date": "2026-11-04",
+      "originalDate": "2026-11-04",
+      "week": 8,
+      "title": "Cruise intervals",
+      "kind": "tempo",
+      "minutes": 61,
+      "estimatedKm": 11.091,
+      "hard": true,
+      "templateId": "threshold-cruise",
+      "stimulus": "threshold",
+      "qualityMinutes": 20,
+      "targetWorkMinutes": 20,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 12.4,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "threshold",
+      "purpose": "Accumulate controlled, comfortably hard running with short easy breaks.",
+      "reason": "Build: Accumulate controlled, comfortably hard running with short easy breaks. This is exposure 6 to the same session family; work increases only within its dose and recovery limits. Build · threshold session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 1200,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 5 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-06-tempo",
+      "date": "2026-11-06",
+      "originalDate": "2026-11-06",
+      "week": 8,
+      "title": "Marathon steady blocks",
+      "kind": "tempo",
+      "minutes": 82,
+      "estimatedKm": 14.909,
+      "hard": true,
+      "templateId": "marathon-steady",
+      "stimulus": "race-rhythm",
+      "qualityMinutes": 48,
+      "targetWorkMinutes": 48,
+      "distanceEstimate": {
+        "lowerKm": 12.4,
+        "upperKm": 17.5,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "race-rhythm",
+      "purpose": "Rehearse patient, steady running for a marathon without turning an ordinary training day into a race.",
+      "reason": "Build: Rehearse patient, steady running for a marathon without turning an ordinary training day into a race. This is exposure 7 to the same session family; work increases only within its dose and recovery limits. Build · race-rhythm session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 240,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 5 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 6 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-08-long",
+      "date": "2026-11-08",
+      "originalDate": "2026-11-08",
+      "week": 8,
+      "title": "Easy long run",
+      "kind": "long",
+      "minutes": 176,
+      "estimatedKm": 32,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 27.8,
+        "upperKm": 33.7,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "long",
+      "purpose": "Build endurance at a pace you could happily hold a conversation.",
+      "reason": " Build · Independent long-run progression. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy long run",
+          "seconds": 10560,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-09-easy",
+      "date": "2026-11-09",
+      "originalDate": "2026-11-09",
+      "week": 9,
+      "title": "Recovery run",
+      "kind": "easy",
+      "minutes": 60,
+      "estimatedKm": 10.909,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 11.5,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "recovery",
+      "purpose": "A shorter easy outing to recover between the week’s key sessions. Keep the effort relaxed.",
+      "reason": " Build · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 3600,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-10-easy",
+      "date": "2026-11-10",
+      "originalDate": "2026-11-10",
+      "week": 9,
+      "title": "Aerobic endurance run",
+      "kind": "easy",
+      "minutes": 90,
+      "estimatedKm": 16.364,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 14.2,
+        "upperKm": 17.3,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "medium-long",
+      "purpose": "A second aerobic endurance outing, funded by the week’s existing easy volume. Keep it fully conversational.",
+      "reason": " Build · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 5400,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-11-tempo",
+      "date": "2026-11-11",
+      "originalDate": "2026-11-11",
+      "week": 9,
+      "title": "Cruise intervals",
+      "kind": "tempo",
+      "minutes": 61,
+      "estimatedKm": 11.091,
+      "hard": true,
+      "templateId": "threshold-cruise",
+      "stimulus": "threshold",
+      "qualityMinutes": 20,
+      "targetWorkMinutes": 20,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 12.4,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "threshold",
+      "purpose": "Accumulate controlled, comfortably hard running with short easy breaks.",
+      "reason": "Build: Accumulate controlled, comfortably hard running with short easy breaks. This is exposure 7 to the same session family; work increases only within its dose and recovery limits. Build · threshold session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 1200,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 5 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-13-tempo",
+      "date": "2026-11-13",
+      "originalDate": "2026-11-13",
+      "week": 9,
+      "title": "Marathon steady blocks",
+      "kind": "tempo",
+      "minutes": 90,
+      "estimatedKm": 16.364,
+      "hard": true,
+      "templateId": "marathon-steady",
+      "stimulus": "race-rhythm",
+      "qualityMinutes": 48,
+      "targetWorkMinutes": 48,
+      "distanceEstimate": {
+        "lowerKm": 13.6,
+        "upperKm": 19,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "race-rhythm",
+      "purpose": "Rehearse patient, steady running for a marathon without turning an ordinary training day into a race.",
+      "reason": "Build: Rehearse patient, steady running for a marathon without turning an ordinary training day into a race. This is exposure 8 to the same session family; work increases only within its dose and recovery limits. Build · race-rhythm session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 720,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 5 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 6 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-15-long",
+      "date": "2026-11-15",
+      "originalDate": "2026-11-15",
+      "week": 9,
+      "title": "Easy long run",
+      "kind": "long",
+      "minutes": 154,
+      "estimatedKm": 28,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 24.3,
+        "upperKm": 29.5,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "long",
+      "purpose": "Build endurance at a pace you could happily hold a conversation.",
+      "reason": " Build · Independent long-run progression. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy long run",
+          "seconds": 9240,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-16-easy",
+      "date": "2026-11-16",
+      "originalDate": "2026-11-16",
+      "week": 10,
+      "title": "Recovery run",
+      "kind": "easy",
+      "minutes": 60,
+      "estimatedKm": 10.909,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 11.5,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "recovery",
+      "purpose": "A shorter easy outing to recover between the week’s key sessions. Keep the effort relaxed.",
+      "reason": " Build · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 3600,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-17-easy",
+      "date": "2026-11-17",
+      "originalDate": "2026-11-17",
+      "week": 10,
+      "title": "Aerobic endurance run",
+      "kind": "easy",
+      "minutes": 90,
+      "estimatedKm": 16.364,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 14.2,
+        "upperKm": 17.3,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "medium-long",
+      "purpose": "A second aerobic endurance outing, funded by the week’s existing easy volume. Keep it fully conversational.",
+      "reason": " Build · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 5400,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-18-tempo",
+      "date": "2026-11-18",
+      "originalDate": "2026-11-18",
+      "week": 10,
+      "title": "Cruise intervals",
+      "kind": "tempo",
+      "minutes": 61,
+      "estimatedKm": 11.091,
+      "hard": true,
+      "templateId": "threshold-cruise",
+      "stimulus": "threshold",
+      "qualityMinutes": 20,
+      "targetWorkMinutes": 20,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 12.4,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "threshold",
+      "purpose": "Accumulate controlled, comfortably hard running with short easy breaks.",
+      "reason": "Build: Accumulate controlled, comfortably hard running with short easy breaks. This is exposure 8 to the same session family; work increases only within its dose and recovery limits. Build · threshold session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 1200,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 5 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-20-tempo",
+      "date": "2026-11-20",
+      "originalDate": "2026-11-20",
+      "week": 10,
+      "title": "Marathon steady blocks",
+      "kind": "tempo",
+      "minutes": 90,
+      "estimatedKm": 16.364,
+      "hard": true,
+      "templateId": "marathon-steady",
+      "stimulus": "race-rhythm",
+      "qualityMinutes": 48,
+      "targetWorkMinutes": 48,
+      "distanceEstimate": {
+        "lowerKm": 13.6,
+        "upperKm": 19,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "race-rhythm",
+      "purpose": "Rehearse patient, steady running for a marathon without turning an ordinary training day into a race.",
+      "reason": "Build: Rehearse patient, steady running for a marathon without turning an ordinary training day into a race. This is exposure 9 to the same session family; work increases only within its dose and recovery limits. Build · race-rhythm session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 720,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 5 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 6 of 6",
+          "seconds": 480,
+          "effort": "Steady and sustainable · 4–5 / 10 · well below an all-out effort",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-22-long",
+      "date": "2026-11-22",
+      "originalDate": "2026-11-22",
+      "week": 10,
+      "title": "Easy long run",
+      "kind": "long",
+      "minutes": 176,
+      "estimatedKm": 32,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 27.8,
+        "upperKm": 33.7,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "long",
+      "purpose": "Build endurance at a pace you could happily hold a conversation.",
+      "reason": " Build · Independent long-run progression. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy long run",
+          "seconds": 10560,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-23-easy",
+      "date": "2026-11-23",
+      "originalDate": "2026-11-23",
+      "week": 11,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 49,
+      "estimatedKm": 8.90951923076923,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 7.7,
+        "upperKm": 9.4,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "recovery",
+      "purpose": "A shorter easy session to absorb your recent training. Keep the effort comfortable.",
+      "reason": "Recovery · Reduced from the preceding full training week, using the running time that fits your session limits.",
+      "steps": [
+        {
+          "kind": "work",
+          "label": "Easy running",
+          "seconds": 2940,
+          "intensity": 3,
+          "effort": "Conversational · 2–3 / 10",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-24-easy",
+      "date": "2026-11-24",
+      "originalDate": "2026-11-24",
+      "week": 11,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 67,
+      "estimatedKm": 12.181902777777777,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 10.5,
+        "upperKm": 12.9,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "easy",
+      "purpose": "A shorter easy session to absorb your recent training. Keep the effort comfortable.",
+      "reason": "Recovery · Reduced from the preceding full training week, using the running time that fits your session limits.",
+      "steps": [
+        {
+          "kind": "work",
+          "label": "Easy running",
+          "seconds": 4020,
+          "intensity": 3,
+          "effort": "Conversational · 2–3 / 10",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-25-easy",
+      "date": "2026-11-25",
+      "originalDate": "2026-11-25",
+      "week": 11,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 74,
+      "estimatedKm": 13.454125,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 11.6,
+        "upperKm": 14.2,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "easy",
+      "purpose": "A shorter easy session to absorb your recent training. Keep the effort comfortable.",
+      "reason": "Recovery · Reduced from the preceding full training week, using the running time that fits your session limits.",
+      "steps": [
+        {
+          "kind": "work",
+          "label": "Easy running",
+          "seconds": 4440,
+          "intensity": 3,
+          "effort": "Conversational · 2–3 / 10",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-27-easy",
+      "date": "2026-11-27",
+      "originalDate": "2026-11-27",
+      "week": 11,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 73,
+      "estimatedKm": 13.273063291139241,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 11.5,
+        "upperKm": 14,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "easy",
+      "purpose": "A shorter easy session to absorb your recent training. Keep the effort comfortable.",
+      "reason": "Recovery · Reduced from the preceding full training week, using the running time that fits your session limits.",
+      "steps": [
+        {
+          "kind": "work",
+          "label": "Easy running",
+          "seconds": 4380,
+          "intensity": 3,
+          "effort": "Conversational · 2–3 / 10",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-29-long",
+      "date": "2026-11-29",
+      "originalDate": "2026-11-29",
+      "week": 11,
+      "title": "Easy long run",
+      "kind": "long",
+      "minutes": 128,
+      "estimatedKm": 23.273142857142854,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 20.2,
+        "upperKm": 24.5,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "long",
+      "purpose": "A shorter easy session to absorb your recent training. Keep the effort comfortable.",
+      "reason": "Recovery · Reduced from the preceding full training week, using the running time that fits your session limits.",
+      "steps": [
+        {
+          "kind": "work",
+          "label": "Easy running",
+          "seconds": 7680,
+          "intensity": 3,
+          "effort": "Conversational · 2–3 / 10",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-11-30-easy",
+      "date": "2026-11-30",
+      "originalDate": "2026-11-30",
+      "week": 12,
+      "title": "Recovery run",
+      "kind": "easy",
+      "minutes": 60,
+      "estimatedKm": 10.909,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 11.5,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "recovery",
+      "purpose": "A shorter easy outing to recover between the week’s key sessions. Keep the effort relaxed.",
+      "reason": " Race preparation · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 3600,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-01-easy",
+      "date": "2026-12-01",
+      "originalDate": "2026-12-01",
+      "week": 12,
+      "title": "Aerobic endurance run",
+      "kind": "easy",
+      "minutes": 90,
+      "estimatedKm": 16.364,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 14.2,
+        "upperKm": 17.3,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "medium-long",
+      "purpose": "A second aerobic endurance outing, funded by the week’s existing easy volume. Keep it fully conversational.",
+      "reason": " Race preparation · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 5400,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-02-easy",
+      "date": "2026-12-02",
+      "originalDate": "2026-12-02",
+      "week": 12,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 90,
+      "estimatedKm": 16.364,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 14.2,
+        "upperKm": 17.3,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "easy",
+      "purpose": "Comfortable running that builds your aerobic base and leaves room to recover.",
+      "reason": " Race preparation · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 5400,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-04-tempo",
+      "date": "2026-12-04",
+      "originalDate": "2026-12-04",
+      "week": 12,
+      "title": "Cruise intervals",
+      "kind": "tempo",
+      "minutes": 61,
+      "estimatedKm": 11.091,
+      "hard": true,
+      "templateId": "threshold-cruise",
+      "stimulus": "threshold",
+      "qualityMinutes": 20,
+      "targetWorkMinutes": 20,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 12.4,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "threshold",
+      "purpose": "Accumulate controlled, comfortably hard running with short easy breaks.",
+      "reason": "Race preparation: Accumulate controlled, comfortably hard running with short easy breaks. This is exposure 9 to the same session family; work increases only within its dose and recovery limits. Race preparation · threshold session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 1200,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 5 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-06-long",
+      "date": "2026-12-06",
+      "originalDate": "2026-12-06",
+      "week": 12,
+      "title": "Long run with marathon effort",
+      "kind": "long",
+      "minutes": 154,
+      "estimatedKm": 28,
+      "hard": true,
+      "templateId": "marathon-long-run",
+      "stimulus": "race-rhythm",
+      "qualityMinutes": 20,
+      "targetWorkMinutes": 20,
+      "distanceEstimate": {
+        "lowerKm": 24.2,
+        "upperKm": 30.2,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "long",
+      "purpose": "Run mostly easy, then rehearse controlled marathon effort in the later part of the run. This replaces a weekday quality session.",
+      "reason": "Marathon effort replaces one weekday quality session this week. Most of this long run stays easy; the aim is controlled race practice, not racing tired legs. Race preparation · Independent long-run progression. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Easy endurance running",
+          "seconds": 6960,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 2",
+          "seconds": 600,
+          "effort": "Patient marathon effort · 4–5 / 10 · ease off if it stops feeling controlled",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 2",
+          "seconds": 600,
+          "effort": "Patient marathon effort · 4–5 / 10 · ease off if it stops feeling controlled",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-07-easy",
+      "date": "2026-12-07",
+      "originalDate": "2026-12-07",
+      "week": 13,
+      "title": "Recovery run",
+      "kind": "easy",
+      "minutes": 60,
+      "estimatedKm": 10.909,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 11.5,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "recovery",
+      "purpose": "A shorter easy outing to recover between the week’s key sessions. Keep the effort relaxed.",
+      "reason": " Race preparation · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 3600,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-08-easy",
+      "date": "2026-12-08",
+      "originalDate": "2026-12-08",
+      "week": 13,
+      "title": "Aerobic endurance run",
+      "kind": "easy",
+      "minutes": 90,
+      "estimatedKm": 16.364,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 14.2,
+        "upperKm": 17.3,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "medium-long",
+      "purpose": "A second aerobic endurance outing, funded by the week’s existing easy volume. Keep it fully conversational.",
+      "reason": " Race preparation · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 5400,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-09-tempo",
+      "date": "2026-12-09",
+      "originalDate": "2026-12-09",
+      "week": 13,
+      "title": "Sustained marathon blocks",
+      "kind": "tempo",
+      "minutes": 79,
+      "estimatedKm": 14.364,
+      "hard": true,
+      "templateId": "marathon-long-blocks",
+      "stimulus": "race-rhythm",
+      "qualityMinutes": 40,
+      "targetWorkMinutes": 40,
+      "distanceEstimate": {
+        "lowerKm": 12.1,
+        "upperKm": 16.6,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "race-rhythm",
+      "purpose": "Extend continuous, controlled marathon-effort running after shorter steady blocks have become familiar.",
+      "reason": "Race preparation: Extend continuous, controlled marathon-effort running after shorter steady blocks have become familiar. Begin with an introductory dose; missing recent work minutes have not been assumed. Race preparation · race-rhythm session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 900,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 4",
+          "seconds": 600,
+          "effort": "Patient marathon effort · 4–5 / 10 · finish with reserve",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 4",
+          "seconds": 600,
+          "effort": "Patient marathon effort · 4–5 / 10 · finish with reserve",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 4",
+          "seconds": 600,
+          "effort": "Patient marathon effort · 4–5 / 10 · finish with reserve",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 4",
+          "seconds": 600,
+          "effort": "Patient marathon effort · 4–5 / 10 · finish with reserve",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-11-tempo",
+      "date": "2026-12-11",
+      "originalDate": "2026-12-11",
+      "week": 13,
+      "title": "Cruise intervals",
+      "kind": "tempo",
+      "minutes": 61,
+      "estimatedKm": 11.091,
+      "hard": true,
+      "templateId": "threshold-cruise",
+      "stimulus": "threshold",
+      "qualityMinutes": 20,
+      "targetWorkMinutes": 20,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 12.4,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "threshold",
+      "purpose": "Accumulate controlled, comfortably hard running with short easy breaks.",
+      "reason": "Race preparation: Accumulate controlled, comfortably hard running with short easy breaks. This is exposure 10 to the same session family; work increases only within its dose and recovery limits. Race preparation · threshold session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 1200,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 5 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-13-long",
+      "date": "2026-12-13",
+      "originalDate": "2026-12-13",
+      "week": 13,
+      "title": "Easy long run",
+      "kind": "long",
+      "minutes": 176,
+      "estimatedKm": 32,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 27.8,
+        "upperKm": 33.7,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "long",
+      "purpose": "Build endurance at a pace you could happily hold a conversation.",
+      "reason": " Race preparation · Independent long-run progression. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy long run",
+          "seconds": 10560,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-14-easy",
+      "date": "2026-12-14",
+      "originalDate": "2026-12-14",
+      "week": 14,
+      "title": "Recovery run",
+      "kind": "easy",
+      "minutes": 60,
+      "estimatedKm": 10.909,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 11.5,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "recovery",
+      "purpose": "A shorter easy outing to recover between the week’s key sessions. Keep the effort relaxed.",
+      "reason": " Race preparation · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 3600,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-15-easy",
+      "date": "2026-12-15",
+      "originalDate": "2026-12-15",
+      "week": 14,
+      "title": "Aerobic endurance run",
+      "kind": "easy",
+      "minutes": 90,
+      "estimatedKm": 16.364,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 14.2,
+        "upperKm": 17.3,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "medium-long",
+      "purpose": "A second aerobic endurance outing, funded by the week’s existing easy volume. Keep it fully conversational.",
+      "reason": " Race preparation · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 5400,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-16-easy",
+      "date": "2026-12-16",
+      "originalDate": "2026-12-16",
+      "week": 14,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 90,
+      "estimatedKm": 16.364,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 14.2,
+        "upperKm": 17.3,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "easy",
+      "purpose": "Comfortable running that builds your aerobic base and leaves room to recover.",
+      "reason": " Race preparation · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 5400,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-18-tempo",
+      "date": "2026-12-18",
+      "originalDate": "2026-12-18",
+      "week": 14,
+      "title": "Cruise intervals",
+      "kind": "tempo",
+      "minutes": 61,
+      "estimatedKm": 11.091,
+      "hard": true,
+      "templateId": "threshold-cruise",
+      "stimulus": "threshold",
+      "qualityMinutes": 20,
+      "targetWorkMinutes": 20,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 12.4,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "threshold",
+      "purpose": "Accumulate controlled, comfortably hard running with short easy breaks.",
+      "reason": "Race preparation: Accumulate controlled, comfortably hard running with short easy breaks. This is exposure 11 to the same session family; work increases only within its dose and recovery limits. Race preparation · threshold session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 1200,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 5 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-20-long",
+      "date": "2026-12-20",
+      "originalDate": "2026-12-20",
+      "week": 14,
+      "title": "Long run with marathon effort",
+      "kind": "long",
+      "minutes": 154,
+      "estimatedKm": 28,
+      "hard": true,
+      "templateId": "marathon-long-run",
+      "stimulus": "race-rhythm",
+      "qualityMinutes": 30,
+      "targetWorkMinutes": 30,
+      "distanceEstimate": {
+        "lowerKm": 24.1,
+        "upperKm": 30.6,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "long",
+      "purpose": "Run mostly easy, then rehearse controlled marathon effort in the later part of the run. This replaces a weekday quality session.",
+      "reason": "Marathon effort replaces one weekday quality session this week. Most of this long run stays easy; the aim is controlled race practice, not racing tired legs. Race preparation · Independent long-run progression. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Easy endurance running",
+          "seconds": 6180,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 3",
+          "seconds": 600,
+          "effort": "Patient marathon effort · 4–5 / 10 · ease off if it stops feeling controlled",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 3",
+          "seconds": 600,
+          "effort": "Patient marathon effort · 4–5 / 10 · ease off if it stops feeling controlled",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 3",
+          "seconds": 600,
+          "effort": "Patient marathon effort · 4–5 / 10 · ease off if it stops feeling controlled",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-21-easy",
+      "date": "2026-12-21",
+      "originalDate": "2026-12-21",
+      "week": 15,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 48,
+      "estimatedKm": 8.727272727272727,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 7.5,
+        "upperKm": 9.2,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "recovery",
+      "purpose": "A shorter easy session to absorb your recent training. Keep the effort comfortable.",
+      "reason": "Recovery · Reduced from the preceding full training week, using the running time that fits your session limits.",
+      "steps": [
+        {
+          "kind": "work",
+          "label": "Easy running",
+          "seconds": 2880,
+          "intensity": 3,
+          "effort": "Conversational · 2–3 / 10",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-22-easy",
+      "date": "2026-12-22",
+      "originalDate": "2026-12-22",
+      "week": 15,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 65,
+      "estimatedKm": 11.818181818181818,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 10.2,
+        "upperKm": 12.5,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "easy",
+      "purpose": "A shorter easy session to absorb your recent training. Keep the effort comfortable.",
+      "reason": "Recovery · Reduced from the preceding full training week, using the running time that fits your session limits.",
+      "steps": [
+        {
+          "kind": "work",
+          "label": "Easy running",
+          "seconds": 3900,
+          "intensity": 3,
+          "effort": "Conversational · 2–3 / 10",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-23-easy",
+      "date": "2026-12-23",
+      "originalDate": "2026-12-23",
+      "week": 15,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 72,
+      "estimatedKm": 13.091294117647058,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 11.3,
+        "upperKm": 13.8,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "easy",
+      "purpose": "A shorter easy session to absorb your recent training. Keep the effort comfortable.",
+      "reason": "Recovery · Reduced from the preceding full training week, using the running time that fits your session limits.",
+      "steps": [
+        {
+          "kind": "work",
+          "label": "Easy running",
+          "seconds": 4320,
+          "intensity": 3,
+          "effort": "Conversational · 2–3 / 10",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-25-easy",
+      "date": "2026-12-25",
+      "originalDate": "2026-12-25",
+      "week": 15,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 71,
+      "estimatedKm": 12.90932142857143,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 11.2,
+        "upperKm": 13.6,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "easy",
+      "purpose": "A shorter easy session to absorb your recent training. Keep the effort comfortable.",
+      "reason": "Recovery · Reduced from the preceding full training week, using the running time that fits your session limits.",
+      "steps": [
+        {
+          "kind": "work",
+          "label": "Easy running",
+          "seconds": 4260,
+          "intensity": 3,
+          "effort": "Conversational · 2–3 / 10",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-27-long",
+      "date": "2026-12-27",
+      "originalDate": "2026-12-27",
+      "week": 15,
+      "title": "Easy long run",
+      "kind": "long",
+      "minutes": 117,
+      "estimatedKm": 21.27310714285714,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 18.4,
+        "upperKm": 22.4,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "long",
+      "purpose": "A shorter easy session to absorb your recent training. Keep the effort comfortable.",
+      "reason": "Recovery · Reduced from the preceding full training week, using the running time that fits your session limits.",
+      "steps": [
+        {
+          "kind": "work",
+          "label": "Easy running",
+          "seconds": 7020,
+          "intensity": 3,
+          "effort": "Conversational · 2–3 / 10",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-28-easy",
+      "date": "2026-12-28",
+      "originalDate": "2026-12-28",
+      "week": 16,
+      "title": "Recovery run",
+      "kind": "easy",
+      "minutes": 60,
+      "estimatedKm": 10.909,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 11.5,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "recovery",
+      "purpose": "A shorter easy outing to recover between the week’s key sessions. Keep the effort relaxed.",
+      "reason": " Race preparation · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 3600,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-29-easy",
+      "date": "2026-12-29",
+      "originalDate": "2026-12-29",
+      "week": 16,
+      "title": "Aerobic endurance run",
+      "kind": "easy",
+      "minutes": 90,
+      "estimatedKm": 16.364,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 14.2,
+        "upperKm": 17.3,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "medium-long",
+      "purpose": "A second aerobic endurance outing, funded by the week’s existing easy volume. Keep it fully conversational.",
+      "reason": " Race preparation · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 5400,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2026-12-30-tempo",
+      "date": "2026-12-30",
+      "originalDate": "2026-12-30",
+      "week": 16,
+      "title": "Sustained marathon blocks",
+      "kind": "tempo",
+      "minutes": 79,
+      "estimatedKm": 14.364,
+      "hard": true,
+      "templateId": "marathon-long-blocks",
+      "stimulus": "race-rhythm",
+      "qualityMinutes": 40,
+      "targetWorkMinutes": 40,
+      "distanceEstimate": {
+        "lowerKm": 12.1,
+        "upperKm": 16.6,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "race-rhythm",
+      "purpose": "Extend continuous, controlled marathon-effort running after shorter steady blocks have become familiar.",
+      "reason": "Race preparation: Extend continuous, controlled marathon-effort running after shorter steady blocks have become familiar. This is exposure 2 to the same session family; work increases only within its dose and recovery limits. Race preparation · race-rhythm session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 900,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 4",
+          "seconds": 600,
+          "effort": "Patient marathon effort · 4–5 / 10 · finish with reserve",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 4",
+          "seconds": 600,
+          "effort": "Patient marathon effort · 4–5 / 10 · finish with reserve",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 4",
+          "seconds": 600,
+          "effort": "Patient marathon effort · 4–5 / 10 · finish with reserve",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 4",
+          "seconds": 600,
+          "effort": "Patient marathon effort · 4–5 / 10 · finish with reserve",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2027-01-01-tempo",
+      "date": "2027-01-01",
+      "originalDate": "2027-01-01",
+      "week": 16,
+      "title": "Cruise intervals",
+      "kind": "tempo",
+      "minutes": 61,
+      "estimatedKm": 11.091,
+      "hard": true,
+      "templateId": "threshold-cruise",
+      "stimulus": "threshold",
+      "qualityMinutes": 20,
+      "targetWorkMinutes": 20,
+      "distanceEstimate": {
+        "lowerKm": 9.4,
+        "upperKm": 12.4,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "threshold",
+      "purpose": "Accumulate controlled, comfortably hard running with short easy breaks.",
+      "reason": "Race preparation: Accumulate controlled, comfortably hard running with short easy breaks. This is exposure 12 to the same session family; work increases only within its dose and recovery limits. Race preparation · threshold session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 1200,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 4 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 5 of 5",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2027-01-03-long",
+      "date": "2027-01-03",
+      "originalDate": "2027-01-03",
+      "week": 16,
+      "title": "Easy long run",
+      "kind": "long",
+      "minutes": 176,
+      "estimatedKm": 32,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 27.8,
+        "upperKm": 33.7,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "long",
+      "purpose": "Build endurance at a pace you could happily hold a conversation.",
+      "reason": " Race preparation · Independent long-run progression. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy long run",
+          "seconds": 10560,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2027-01-04-easy",
+      "date": "2027-01-04",
+      "originalDate": "2027-01-04",
+      "week": 17,
+      "title": "Recovery run",
+      "kind": "easy",
+      "minutes": 59,
+      "estimatedKm": 10.727,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 9.3,
+        "upperKm": 11.3,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "recovery",
+      "purpose": "A shorter easy outing to recover between the week’s key sessions. Keep the effort relaxed.",
+      "reason": " Taper · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 3540,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2027-01-05-easy",
+      "date": "2027-01-05",
+      "originalDate": "2027-01-05",
+      "week": 17,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 90,
+      "estimatedKm": 16.364,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 14.2,
+        "upperKm": 17.3,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "easy",
+      "purpose": "Comfortable running that builds your aerobic base and leaves room to recover.",
+      "reason": " Taper · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 5400,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2027-01-06-tempo",
+      "date": "2027-01-06",
+      "originalDate": "2027-01-06",
+      "week": 17,
+      "title": "Sustained marathon blocks",
+      "kind": "tempo",
+      "minutes": 53,
+      "estimatedKm": 9.636,
+      "hard": true,
+      "templateId": "marathon-long-blocks",
+      "stimulus": "race-rhythm",
+      "qualityMinutes": 20,
+      "targetWorkMinutes": 26,
+      "distanceEstimate": {
+        "lowerKm": 8.2,
+        "upperKm": 10.9,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "race-rhythm",
+      "purpose": "Extend continuous, controlled marathon-effort running after shorter steady blocks have become familiar.",
+      "reason": "A reduced dose of familiar sustained marathon blocks preserves rhythm while overall running falls. Taper · race-rhythm session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 900,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 2",
+          "seconds": 600,
+          "effort": "Patient marathon effort · 4–5 / 10 · finish with reserve",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 180,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 2",
+          "seconds": 600,
+          "effort": "Patient marathon effort · 4–5 / 10 · finish with reserve",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2027-01-08-tempo",
+      "date": "2027-01-08",
+      "originalDate": "2027-01-08",
+      "week": 17,
+      "title": "Cruise intervals",
+      "kind": "tempo",
+      "minutes": 50,
+      "estimatedKm": 9.091,
+      "hard": true,
+      "templateId": "threshold-cruise",
+      "stimulus": "threshold",
+      "qualityMinutes": 12,
+      "targetWorkMinutes": 13,
+      "distanceEstimate": {
+        "lowerKm": 7.7,
+        "upperKm": 10,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "threshold",
+      "purpose": "Accumulate controlled, comfortably hard running with short easy breaks.",
+      "reason": "A reduced dose of familiar cruise intervals preserves rhythm while overall running falls. Taper · threshold session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 1200,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 1 of 3",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 2 of 3",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Easy recovery",
+          "seconds": 90,
+          "effort": "Easy jog; let breathing settle",
+          "intensity": 2,
+          "kind": "recovery",
+          "movement": "run"
+        },
+        {
+          "label": "Effort 3 of 3",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2027-01-10-long",
+      "date": "2027-01-10",
+      "originalDate": "2027-01-10",
+      "week": 17,
+      "title": "Easy long run",
+      "kind": "long",
+      "minutes": 149,
+      "estimatedKm": 27.091,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 23.5,
+        "upperKm": 28.6,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "long",
+      "purpose": "Build endurance at a pace you could happily hold a conversation.",
+      "reason": " Taper · Independent long-run progression. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy long run",
+          "seconds": 8940,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2027-01-11-easy",
+      "date": "2027-01-11",
+      "originalDate": "2027-01-11",
+      "week": 18,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 51,
+      "estimatedKm": 9.272727272727273,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 8,
+        "upperKm": 9.8,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "recovery",
+      "purpose": "An easy alternative within the available time; there is no quality work to make up.",
+      "reason": " Taper · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "kind": "work",
+          "label": "Easy running",
+          "seconds": 3060,
+          "intensity": 3,
+          "effort": "Conversational · 2–3 / 10",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2027-01-12-easy",
+      "date": "2027-01-12",
+      "originalDate": "2027-01-12",
+      "week": 18,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 76,
+      "estimatedKm": 13.818358974358976,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 12,
+        "upperKm": 14.6,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "easy",
+      "purpose": "An easy alternative within the available time; there is no quality work to make up.",
+      "reason": " Taper · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "kind": "work",
+          "label": "Easy running",
+          "seconds": 4560,
+          "intensity": 3,
+          "effort": "Conversational · 2–3 / 10",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2027-01-13-tempo",
+      "date": "2027-01-13",
+      "originalDate": "2027-01-13",
+      "week": 18,
+      "title": "Sustained marathon blocks",
+      "kind": "tempo",
+      "minutes": 40,
+      "estimatedKm": 7.273,
+      "hard": true,
+      "templateId": "marathon-long-blocks",
+      "stimulus": "race-rhythm",
+      "qualityMinutes": 10,
+      "targetWorkMinutes": 13,
+      "distanceEstimate": {
+        "lowerKm": 6.3,
+        "upperKm": 8.1,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "race-rhythm",
+      "purpose": "Extend continuous, controlled marathon-effort running after shorter steady blocks have become familiar.",
+      "reason": "A reduced dose of familiar sustained marathon blocks preserves rhythm while overall running falls. Taper · race-rhythm session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 900,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Controlled effort",
+          "seconds": 600,
+          "effort": "Patient marathon effort · 4–5 / 10 · finish with reserve",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2027-01-15-tempo",
+      "date": "2027-01-15",
+      "originalDate": "2027-01-15",
+      "week": 18,
+      "title": "Cruise intervals",
+      "kind": "tempo",
+      "minutes": 39,
+      "estimatedKm": 7.091,
+      "hard": true,
+      "templateId": "threshold-cruise",
+      "stimulus": "threshold",
+      "qualityMinutes": 4,
+      "targetWorkMinutes": 7.800000000000001,
+      "distanceEstimate": {
+        "lowerKm": 6.1,
+        "upperKm": 7.7,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "threshold",
+      "purpose": "Accumulate controlled, comfortably hard running with short easy breaks.",
+      "reason": "A reduced dose of familiar cruise intervals preserves rhythm while overall running falls. Taper · threshold session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 1200,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Controlled effort",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2027-01-17-long",
+      "date": "2027-01-17",
+      "originalDate": "2027-01-17",
+      "week": 18,
+      "title": "Easy long run",
+      "kind": "long",
+      "minutes": 90,
+      "estimatedKm": 16.364,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 14.2,
+        "upperKm": 17.3,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "long",
+      "purpose": "Build endurance at a pace you could happily hold a conversation.",
+      "reason": " Taper · Independent long-run progression. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy long run",
+          "seconds": 5400,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2027-01-18-easy",
+      "date": "2027-01-18",
+      "originalDate": "2027-01-18",
+      "week": 19,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 39,
+      "estimatedKm": 7.091066666666667,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 6.1,
+        "upperKm": 7.5,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "recovery",
+      "purpose": "An easy alternative within the available time; there is no quality work to make up.",
+      "reason": " Taper · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "kind": "work",
+          "label": "Easy running",
+          "seconds": 2340,
+          "intensity": 3,
+          "effort": "Conversational · 2–3 / 10",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2027-01-19-easy",
+      "date": "2027-01-19",
+      "originalDate": "2027-01-19",
+      "week": 19,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 58,
+      "estimatedKm": 10.54568888888889,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 9.1,
+        "upperKm": 11.2,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "easy",
+      "purpose": "An easy alternative within the available time; there is no quality work to make up.",
+      "reason": " Taper · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "kind": "work",
+          "label": "Easy running",
+          "seconds": 3480,
+          "intensity": 3,
+          "effort": "Conversational · 2–3 / 10",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2027-01-20-tempo",
+      "date": "2027-01-20",
+      "originalDate": "2027-01-20",
+      "week": 19,
+      "title": "Sustained marathon blocks",
+      "kind": "tempo",
+      "minutes": 31,
+      "estimatedKm": 5.636575,
+      "hard": true,
+      "templateId": "marathon-long-blocks",
+      "stimulus": "race-rhythm",
+      "qualityMinutes": 10,
+      "targetWorkMinutes": 10,
+      "distanceEstimate": {
+        "lowerKm": 4.9,
+        "upperKm": 6.3,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "race-rhythm",
+      "purpose": "Extend continuous, controlled marathon-effort running after shorter steady blocks have become familiar.",
+      "reason": "A reduced dose of familiar sustained marathon blocks preserves rhythm while overall running falls. Taper · race-rhythm session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 360,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Controlled effort",
+          "seconds": 600,
+          "effort": "Patient marathon effort · 4–5 / 10 · finish with reserve",
+          "intensity": 5,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2027-01-22-tempo",
+      "date": "2027-01-22",
+      "originalDate": "2027-01-22",
+      "week": 19,
+      "title": "Cruise intervals",
+      "kind": "tempo",
+      "minutes": 24,
+      "estimatedKm": 4.3636923076923075,
+      "hard": true,
+      "templateId": "threshold-cruise",
+      "stimulus": "threshold",
+      "qualityMinutes": 4,
+      "targetWorkMinutes": 4,
+      "distanceEstimate": {
+        "lowerKm": 3.7,
+        "upperKm": 4.8,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "threshold",
+      "purpose": "Accumulate controlled, comfortably hard running with short easy breaks.",
+      "reason": "A reduced dose of familiar cruise intervals preserves rhythm while overall running falls. Taper · threshold session chosen for your MARATHON phase, within a separate quality-work budget. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Warm up",
+          "seconds": 600,
+          "effort": "Start gently · full sentences · 2–3 / 10",
+          "intensity": 2,
+          "kind": "warmup",
+          "movement": "run"
+        },
+        {
+          "label": "Aerobic running before the main set",
+          "seconds": 300,
+          "effort": "Comfortable aerobic running · 2–3 / 10",
+          "intensity": 3,
+          "kind": "aerobic",
+          "movement": "run"
+        },
+        {
+          "label": "Controlled effort",
+          "seconds": 240,
+          "effort": "Comfortably hard · 6–7 / 10 · short phrases",
+          "intensity": 6,
+          "kind": "work",
+          "movement": "run"
+        },
+        {
+          "label": "Cool down",
+          "seconds": 300,
+          "effort": "Easy running · finish relaxed",
+          "intensity": 2,
+          "kind": "cooldown",
+          "movement": "run"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2027-01-24-easy",
+      "date": "2027-01-24",
+      "originalDate": "2027-01-24",
+      "week": 19,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 29,
+      "estimatedKm": 5.273,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 4.5,
+        "upperKm": 5.6,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "easy",
+      "purpose": "Comfortable running that builds your aerobic base and leaves room to recover.",
+      "reason": " Taper · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 1740,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2027-01-25-easy",
+      "date": "2027-01-25",
+      "originalDate": "2027-01-25",
+      "week": 20,
+      "title": "Recovery run",
+      "kind": "easy",
+      "minutes": 14,
+      "estimatedKm": 2.545,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 2.2,
+        "upperKm": 2.7,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "recovery",
+      "purpose": "A shorter easy outing to recover between the week’s key sessions. Keep the effort relaxed.",
+      "reason": " Race week · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 840,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-2027-01-26-easy",
+      "date": "2027-01-26",
+      "originalDate": "2027-01-26",
+      "week": 20,
+      "title": "Easy run",
+      "kind": "easy",
+      "minutes": 20,
+      "estimatedKm": 3.636,
+      "hard": false,
+      "stimulus": "aerobic",
+      "qualityMinutes": 0,
+      "distanceEstimate": {
+        "lowerKm": 3.1,
+        "upperKm": 3.9,
+        "basis": "Broad estimate from declared easy pace; faster work, recoveries and walking are uncertain."
+      },
+      "role": "easy",
+      "purpose": "Comfortable running that builds your aerobic base and leaves room to recover.",
+      "reason": " Race week · Easy volume within your weekly and time limits. Distance estimated from your easy pace.",
+      "steps": [
+        {
+          "label": "Easy run",
+          "seconds": 1200,
+          "effort": "Conversational · 2–3 / 10",
+          "intensity": 3,
+          "kind": "work"
+        }
+      ],
+      "status": "planned"
+    },
+    {
+      "id": "2026-09-07-race",
+      "date": "2027-01-27",
+      "originalDate": "2027-01-27",
+      "week": 20,
+      "title": "Synthetic marathon acceptance",
+      "kind": "race",
+      "minutes": 232,
+      "estimatedKm": 42.195,
+      "hard": true,
+      "purpose": "Start with patience, settle into your effort, and use what you have left at the finish.",
+      "reason": "Your race date anchors the taper. Race duration is an estimate, not a prediction.",
+      "steps": [
+        {
+          "label": "Race",
+          "seconds": 13920,
+          "effort": "Start controlled, finish by feel",
+          "intensity": 7,
+          "kind": "work",
+          "metres": 42195
+        }
+      ],
+      "status": "planned"
+    }
+  ],
+  "notes": [
+    "Training duration and effort are prescribed. Distance estimates are uncertain; event distance is exact and race duration is not a prediction.",
+    "Progression is a forecast. Missed sessions are never added to later workouts.",
+    "Independent training rules; coaching review and real-watch validation are still pending."
+  ],
+  "createdAt": "2026-09-10",
+  "feasibility": {
+    "status": "forecast",
+    "reasons": [],
+    "asOf": "2026-09-10"
+  },
+  "constraintsFrom": "2026-09-10"
+}
