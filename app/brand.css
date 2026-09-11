@@ -1,0 +1,33 @@
+.stride-logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  flex-shrink: 0;
+}
+.athletic-topbar.topbar .wordmark {
+  width: 132px;
+  flex-shrink: 0;
+  letter-spacing: normal;
+}
+.access-wordmark {
+  display: flex;
+  align-items: center;
+  width: 196px;
+  min-height: 44px;
+  letter-spacing: normal;
+}
+.connection-path .path-brand {
+  display: inline-flex;
+  align-items: center;
+  width: 104px;
+  flex-shrink: 0;
+}
+@media (max-width: 520px) {
+  .access-wordmark {
+    width: 160px;
+  }
+  .connection-path .path-brand {
+    width: 86px;
+  }
+}

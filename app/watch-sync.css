@@ -1,0 +1,194 @@
+/* Everyday watch controls use the shared athletic palette. */
+.stride-modal:has(> .watch-segments) {
+  gap: 20px;
+}
+.stride-modal:has(> .watch-segments) .modal-heading {
+  margin-bottom: 0;
+}
+.stride-modal:has(> .watch-segments) > .watch-connected {
+  padding: 4px 0;
+}
+.watch-segments {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin: 0;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  border-radius: 9999px;
+}
+.watch-segments button {
+  flex: 1;
+  min-height: 44px;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--text-label);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.watch-segments button[aria-pressed='true'] {
+  background: var(--text-main);
+  color: var(--canvas);
+}
+.watch-segments button:disabled {
+  cursor: wait;
+}
+.watch-week {
+  display: grid;
+  gap: 16px;
+}
+.watch-week-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+.watch-week-heading h3 {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+}
+.watch-week-heading p {
+  margin: 0;
+  max-width: 46ch;
+  color: var(--text-label);
+  line-height: 1.6;
+  font-size: 0.9375rem;
+}
+.watch-week-heading > svg {
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.watch-week-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--surface-raised);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.watch-week-summary strong {
+  font:
+    800 1.75rem/1.1 var(--font-journal-sans),
+    sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.watch-week-summary strong span {
+  color: var(--text-label);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+.watch-week-summary > span {
+  color: var(--text-label);
+  font-size: 0.875rem;
+}
+.watch-week-summary > svg {
+  margin-left: auto;
+}
+.watch-sync-button {
+  width: 100%;
+  justify-content: center;
+  min-height: 48px;
+}
+.watch-sync-explainer {
+  margin: -4px 0 0;
+  color: var(--text-label);
+  font-size: 0.875rem;
+  text-align: center;
+}
+.watch-sync-progress {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  background: var(--surface-raised);
+  border-radius: 12px;
+  font-size: 0.875rem;
+}
+.watch-sync-progress progress {
+  width: 100%;
+  height: 8px;
+  appearance: none;
+  border: 0;
+  border-radius: 9999px;
+  overflow: hidden;
+  background: var(--border);
+  accent-color: var(--text-main);
+}
+.watch-sync-progress progress::-webkit-progress-bar {
+  background: var(--border);
+}
+.watch-sync-progress progress::-webkit-progress-value {
+  background: var(--text-main);
+  border-radius: 9999px;
+}
+.watch-sync-result {
+  font-size: 0.875rem;
+  color: var(--text-label);
+  line-height: 1.6;
+}
+.garmin-handoff {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.garmin-handoff > svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.garmin-handoff > div {
+  min-width: 0;
+  flex: 1;
+}
+.garmin-handoff h4 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  font-weight: 800;
+}
+.garmin-handoff p {
+  margin: 0 0 16px;
+  font-size: 0.9375rem;
+  color: var(--text-label);
+  line-height: 1.6;
+}
+.garmin-handoff .primary-button {
+  width: 100%;
+  min-height: 48px;
+  justify-content: center;
+}
+.garmin-handoff small {
+  display: block;
+  margin-top: 12px;
+  font-size: 0.8125rem;
+  color: var(--text-label);
+  line-height: 1.6;
+}
+.watch-single > .primary-button,
+.watch-single > .secondary-button {
+  width: 100%;
+  margin: 16px 0;
+  justify-content: center;
+}
+.watch-single .garmin-handoff {
+  margin: 16px 0;
+}
+.watch-single .reason-details .secondary-button {
+  margin: 12px 0;
+}
+.watch-week .watch-workout-list button > span {
+  font-size: 0.8125rem;
+}
+@media (max-width: 520px) {
+  .garmin-handoff {
+    padding: 16px;
+    gap: 12px;
+  }
+  .watch-week-summary {
+    padding: 12px;
+  }
+}

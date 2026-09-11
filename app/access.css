@@ -1,0 +1,275 @@
+.access-shell {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  background: var(--canvas);
+  color: var(--text-main);
+  font-family: var(--font-journal-sans), sans-serif;
+}
+.access-story {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background: #172b25;
+  color: #fff;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.access-photo {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+.access-story::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, #0005, transparent 30%, #0001 48%, #000b);
+}
+.access-wordmark {
+  width: fit-content;
+  font:
+    700 2.5rem/1 var(--font-spatial-display),
+    sans-serif;
+  letter-spacing: -0.09em;
+  color: #fff;
+  text-decoration: none;
+}
+.access-story-caption p {
+  margin: 0 0 20px;
+  font:
+    600 clamp(2.5rem, 4.8vw, 5rem)/1.04 var(--font-spatial-display),
+    sans-serif;
+  letter-spacing: -0.055em;
+}
+.access-story-caption span {
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+.access-panel {
+  min-width: 0;
+  padding: 40px clamp(24px, 5vw, 88px) 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+.access-tabs {
+  align-self: flex-start;
+  display: flex;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  background: var(--surface);
+  gap: 4px;
+}
+.access-tabs a {
+  min-height: 44px;
+  min-width: 110px;
+  display: grid;
+  place-items: center;
+  padding: 8px 20px;
+  border-radius: 9999px;
+  color: var(--text-label);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.access-tabs a[aria-current] {
+  color: var(--canvas);
+  background: var(--text-main);
+}
+.access-content {
+  width: 100%;
+  max-width: 440px;
+  margin: auto 0;
+  padding: 32px 0;
+}
+.access-content h1 {
+  margin: 0 0 16px;
+  font:
+    600 clamp(2rem, 3vw, 3rem)/1.1 var(--font-spatial-display),
+    sans-serif;
+  letter-spacing: -0.055em;
+  color: var(--text-main);
+}
+.access-intro {
+  margin: 0 0 32px;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--text-label);
+  max-width: 36ch;
+}
+.access-benefits {
+  list-style: none;
+  margin: 0 0 32px;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+}
+.access-benefits li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.access-benefits svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+.access-identity {
+  margin: 0 0 24px;
+  display: grid;
+  gap: 4px;
+  font-size: 0.875rem;
+}
+.access-identity span {
+  color: var(--text-label);
+}
+.access-identity strong {
+  overflow-wrap: anywhere;
+}
+.access-primary {
+  min-height: 56px;
+  width: 100%;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--ath-volt, #d9f99d);
+  color: #0f1115;
+  border: 1px solid #93ac6a;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+.access-primary:hover {
+  filter: brightness(0.94);
+}
+.access-primary[aria-disabled] {
+  cursor: progress;
+}
+.access-note {
+  display: block;
+  margin: 16px 0 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-label);
+}
+.access-retry,
+.access-switch {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 12px;
+  padding: 4px 0;
+  font-size: 0.875rem;
+  color: var(--text-main);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.access-alternate {
+  margin: 28px 0 0;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: var(--text-label);
+}
+.access-alternate a {
+  color: var(--text-main);
+  font-weight: 700;
+  display: inline-block;
+  padding: 8px 0;
+  text-underline-offset: 4px;
+}
+.access-footer {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 0.8125rem;
+  color: var(--text-label);
+}
+.access-footer span {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+.access-footer a {
+  color: inherit;
+  text-underline-offset: 4px;
+}
+.access-shell :is(a, button):focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 4px;
+}
+.access-spinner {
+  animation: access-spin 1s linear infinite;
+}
+@keyframes access-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (max-width: 760px) {
+  .access-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+  .access-story {
+    min-height: 230px;
+    height: 28svh;
+    max-height: 320px;
+    padding: 24px;
+  }
+  .access-photo {
+    object-position: 50% 52%;
+  }
+  .access-wordmark {
+    font-size: 2.25rem;
+  }
+  .access-story-caption p {
+    font-size: 2.25rem;
+    margin: 0;
+  }
+  .access-story-caption span {
+    display: none;
+  }
+  .access-panel {
+    padding: 24px 24px max(24px, env(safe-area-inset-bottom));
+    gap: 24px;
+  }
+  .access-content {
+    max-width: none;
+    padding: 8px 0 16px;
+  }
+  .access-content h1 {
+    font-size: 2rem;
+  }
+  .access-intro {
+    margin-bottom: 24px;
+  }
+  .access-alternate {
+    margin-top: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .access-spinner {
+    animation: none;
+  }
+}
+:root.no-motion .access-spinner {
+  animation: none;
+}

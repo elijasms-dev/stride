@@ -1,0 +1,661 @@
+/* Colour follows workout purpose across Today, the date rail and the schedule.
+ * Labels, icons and selection outlines remain usable without colour perception. */
+.athletic-shell [data-tone='easy'] {
+  --workout-paint: var(--run-easy);
+  --workout-tint: var(--run-easy-surface);
+}
+.athletic-shell [data-tone='quality'] {
+  --workout-paint: var(--run-quality);
+  --workout-tint: var(--run-quality-surface);
+}
+.athletic-shell [data-tone='long'] {
+  --workout-paint: var(--run-long);
+  --workout-tint: var(--run-long-surface);
+}
+.athletic-shell [data-tone='race'] {
+  --workout-paint: var(--ath-volt);
+  --workout-tint: var(--surface-raised);
+}
+.athletic-shell .workout-card[data-tone] {
+  background: var(--workout-tint);
+  border-inline-start: 6px solid var(--workout-paint);
+}
+.athletic-shell .workout-card[data-tone] .eyebrow::before,
+.athletic-shell .run-dot[data-tone],
+.athletic-shell .calendar-run[data-tone] .calendar-run-kind i {
+  background: var(--workout-paint);
+}
+.athletic-shell .calendar-run[data-tone] {
+  border-inline-start: 4px solid var(--workout-paint);
+  padding-inline-start: 12px;
+}
+.athletic-shell .calendar-run[data-tone] .calendar-run-kind {
+  color: var(--text-label);
+}
+.athletic-shell .upcoming-session[data-tone] .upcoming-date {
+  background: var(--workout-tint);
+  border-bottom: 4px solid var(--workout-paint);
+}
+.athletic-shell .calendar-run[data-tone]:hover {
+  background: var(--workout-tint);
+}
+
+/* The working screens share explicit text roles in both themes. */
+.athletic-shell .workout-card {
+  min-height: 0;
+  padding: 24px;
+  box-shadow: var(--surface-shadow);
+}
+.athletic-shell .workout-card h2 {
+  font-size: 1.75rem;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+.athletic-shell .workout-card .card-topline {
+  margin-bottom: 12px;
+}
+.athletic-shell .workout-card .workout-stats {
+  margin: 24px 0 0;
+  padding: 20px 0;
+  gap: 20px;
+  grid-template-columns: minmax(64px, 0.6fr) minmax(110px, 1fr) minmax(
+      180px,
+      1.5fr
+    );
+}
+.athletic-shell .workout-card .workout-stats[data-metrics='2'] {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+.athletic-shell .workout-card .workout-stats strong,
+.athletic-shell .workout-card .workout-stats > div:first-child strong {
+  font-size: 1.875rem;
+  line-height: 1.2;
+  color: var(--text-main);
+  font-weight: 800;
+}
+.athletic-shell .workout-card .workout-stats > div > span {
+  font-size: 0.875rem;
+  font-weight: 650;
+  color: var(--text-label);
+  margin-top: 8px;
+}
+.athletic-shell .workout-card .workout-stats .stat-small {
+  font-size: 1rem;
+  color: var(--text-label);
+}
+.athletic-shell .workout-card .workout-purpose {
+  margin: 20px 0 0;
+  max-width: 60ch;
+  color: var(--text-label);
+}
+.athletic-shell .workout-card .card-footer {
+  margin-top: 24px;
+  justify-content: flex-end;
+}
+.athletic-shell .today-run-actions {
+  width: 100%;
+  justify-content: flex-end;
+  flex-direction: row-reverse;
+}
+.athletic-shell .today-run-actions .primary-button {
+  width: auto;
+  min-width: 176px;
+  padding-inline: 24px;
+}
+.athletic-shell .primary-button,
+.stride-modal .primary-button {
+  background: var(--ath-volt);
+  color: #0f172a;
+  border-color: #667f00;
+}
+.athletic-shell .primary-button:not(:disabled):hover,
+.stride-modal .primary-button:not(:disabled):hover {
+  background: #d6ff33;
+  color: #0f172a;
+}
+.athletic-shell .secondary-button {
+  background: var(--surface-raised);
+  color: var(--text-main);
+  border-color: var(--border);
+}
+.athletic-shell .secondary-button:not(:disabled):hover {
+  background: var(--selection-surface);
+  color: var(--selection-ink);
+}
+.athletic-shell .journal-upcoming {
+  margin: 0;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--surface-shadow);
+}
+.athletic-shell .journal-section-heading {
+  margin-bottom: 8px;
+}
+.athletic-shell .journal-section-heading .text-button {
+  min-height: 44px;
+  font-size: 0.875rem;
+}
+.athletic-shell .session-contact-sheet {
+  display: flex;
+  gap: 0;
+}
+.athletic-shell .upcoming-session {
+  grid-template-columns: 56px minmax(0, 1fr) 16px;
+  min-height: 96px;
+  gap: 12px;
+  padding: 16px 0;
+}
+.athletic-shell .upcoming-session:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.athletic-shell .upcoming-date {
+  padding: 8px 4px;
+  align-items: center;
+  background: var(--surface-raised);
+  border-radius: var(--radius-sm);
+}
+.athletic-shell .upcoming-date strong {
+  color: var(--text-main);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.athletic-shell .upcoming-body > strong {
+  font-family: var(--font-journal-sans), sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.athletic-shell .upcoming-body > span {
+  color: var(--text-label);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.athletic-shell .plan-heading-actions {
+  flex-wrap: nowrap;
+}
+.athletic-shell .plan-options {
+  min-width: 44px;
+  min-height: 44px;
+  background: var(--surface);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.plan-options-menu {
+  min-width: 220px;
+  padding: 6px;
+}
+.plan-options-menu [role='menuitem'] {
+  min-height: 44px;
+  padding: 12px;
+  gap: 12px;
+  font-size: 0.875rem;
+}
+.athletic-shell .plan-overview {
+  padding: 24px;
+  margin-bottom: 24px;
+  background: var(--surface);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  border-top: 4px solid var(--run-long);
+}
+.athletic-shell .plan-overview-title {
+  min-height: 0;
+  gap: 24px;
+}
+.athletic-shell .plan-overview-title h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+  margin: 8px 0;
+}
+.athletic-shell .plan-overview :is(.eyebrow, .chart-meta, .chart-legend),
+.athletic-shell .plan-overview-title p {
+  color: var(--text-label);
+}
+.athletic-shell .plan-endpoint {
+  flex-shrink: 0;
+  align-items: center;
+  padding-left: 24px;
+  border-color: var(--border);
+}
+.athletic-shell .plan-endpoint > svg {
+  color: var(--success);
+  margin: 0;
+}
+.athletic-shell .plan-endpoint > span {
+  color: var(--text-main);
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+.athletic-shell .plan-endpoint small {
+  color: var(--text-label);
+  font-size: 0.875rem;
+}
+.athletic-shell .block-timeline {
+  margin-top: 24px;
+}
+.athletic-shell .block-timeline > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+  color: var(--text-label);
+}
+.athletic-shell .block-timeline strong {
+  font-weight: 650;
+  color: var(--text-main);
+}
+.athletic-shell .block-timeline [data-slot='progress-track'] {
+  height: 6px;
+  background: var(--surface-raised);
+}
+.athletic-shell .block-timeline [data-slot='progress-indicator'] {
+  background: var(--ath-emerald);
+}
+.athletic-shell .plan-overview .block-overview {
+  border-color: var(--border);
+  margin-top: 20px;
+  padding-top: 16px;
+}
+.athletic-shell .plan-overview .block-overview > summary,
+.athletic-shell .plan-overview .plan-bars button small {
+  color: var(--text-main);
+}
+.athletic-shell .plan-overview .plan-bars button.selected {
+  background: var(--selection-surface);
+  outline-color: var(--success);
+}
+.athletic-shell .plan-overview .plan-bars button.selected small {
+  color: var(--selection-ink);
+}
+.athletic-shell .plan-overview .plan-bars i,
+.athletic-shell .plan-overview .chart-legend i {
+  background: var(--success);
+}
+.athletic-shell .plan-overview .plan-bars i.recovery,
+.athletic-shell .plan-overview .chart-legend i.recovery {
+  background: var(--text-label);
+}
+.athletic-shell .plan-week-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+.athletic-shell .plan-week-controls .icon-button {
+  min-height: 44px;
+  min-width: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--text-main);
+}
+.athletic-shell .plan-week-controls .icon-button:hover:not(:disabled) {
+  background: var(--surface-raised);
+}
+.athletic-shell .week-position {
+  font-size: 0.875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  padding: 0 8px;
+}
+.athletic-shell .week-detail-heading {
+  margin-top: 24px;
+  align-items: center;
+}
+.athletic-shell .week-detail-heading h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+.athletic-shell .progress-metrics {
+  gap: 16px;
+  margin: 24px 0;
+}
+.athletic-shell .progress-metrics > div {
+  padding: 20px;
+  gap: 12px;
+  background: var(--surface);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  box-shadow: var(--surface-shadow);
+}
+.athletic-shell .progress-metrics > div:first-child {
+  --text-main: var(--ink-text);
+  --text-label: var(--ink-muted);
+  background: var(--ink-surface);
+  border-color: var(--ink-border);
+}
+.athletic-shell .progress-metrics > div:nth-child(2) {
+  --text-main: #09090b;
+  --text-label: #09090b;
+  --success: #065637;
+  background: var(--ath-volt);
+  border-color: #667f00;
+}
+.athletic-shell .progress-metrics > div > strong {
+  font-size: 2rem;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  color: var(--text-main);
+}
+.athletic-shell .progress-metrics :is(span, small) {
+  color: var(--text-label);
+}
+.athletic-shell .progress-metrics > div > span {
+  font-size: 0.875rem;
+  font-weight: 650;
+}
+.athletic-shell .progress-metrics > div:nth-child(2) > span::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--success);
+}
+.athletic-shell .progress-metrics > div > small {
+  font-size: 0.875rem;
+}
+.athletic-shell .progress-empty {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 24px;
+  min-height: 0;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.athletic-shell .empty-run-chart {
+  width: 140px;
+  height: 104px;
+  flex-shrink: 0;
+  color: var(--success);
+}
+.athletic-shell .progress-empty-copy {
+  min-width: 0;
+}
+.athletic-shell .progress-empty h2 {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.025em;
+}
+.athletic-shell .progress-empty p {
+  margin: 0 0 16px;
+  max-width: 56ch;
+  font-size: 1rem;
+  color: var(--text-label);
+}
+.athletic-shell .progress-empty .primary-button {
+  margin: 0;
+}
+.athletic-shell .settings-page {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+  max-width: 100%;
+}
+.athletic-shell
+  .settings-page
+  > :not(.settings-watch-card):not(.settings-profile) {
+  grid-column: 1 / -1;
+}
+.athletic-shell
+  :is(.settings-watch-card, .settings-profile, .settings-section) {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-main);
+  margin: 0;
+  min-width: 0;
+  box-shadow: var(--surface-shadow);
+}
+.athletic-shell :is(.settings-watch-card, .settings-profile) {
+  min-height: 144px;
+}
+.athletic-shell :is(.settings-watch-card, .settings-profile):hover {
+  background: var(--surface-raised);
+}
+.athletic-shell .settings-watch-card {
+  grid-template-columns: 44px minmax(0, 1fr) 20px;
+  gap: 16px;
+}
+.athletic-shell .settings-watch-icon {
+  display: grid;
+  width: 44px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--selection-surface);
+  color: var(--selection-ink);
+}
+.athletic-shell .settings-watch-copy strong,
+.athletic-shell .settings-link strong {
+  font-family: var(--font-journal-sans), sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+}
+.athletic-shell .settings-watch-copy :is(small, span),
+.athletic-shell .settings-link small {
+  color: var(--text-label);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.athletic-shell .settings-section h2 {
+  font-family: var(--font-journal-sans), sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: 700;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+.athletic-shell .settings-section .setting-row {
+  padding: 16px 0;
+  gap: 24px;
+}
+.athletic-shell .settings-section .setting-row > div {
+  max-width: 64ch;
+}
+.athletic-shell .settings-section .setting-row small {
+  font-size: 0.875rem;
+  color: var(--text-label);
+}
+.athletic-shell .settings-section .setting-row strong {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.athletic-shell .settings-section [data-slot='select-trigger'] {
+  min-height: 44px;
+  background: var(--surface);
+  border: 1px solid var(--input);
+  color: var(--text-main);
+  border-radius: var(--radius-sm);
+}
+.athletic-shell .settings-section [data-slot='select-trigger']:hover {
+  background: var(--surface-raised);
+}
+@media (max-width: 1180px) {
+  .athletic-shell .today-composition {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+}
+@media (max-width: 560px) {
+  .athletic-shell .workout-card {
+    padding: 20px;
+  }
+  .athletic-shell .workout-card .workout-stats,
+  .athletic-shell .workout-card .workout-stats[data-metrics='2'] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .athletic-shell
+    .workout-card
+    .workout-stats[data-metrics='3']
+    > div:last-child {
+    grid-column: 1/-1;
+    flex-direction: column;
+    gap: 0;
+  }
+  .athletic-shell .workout-card .workout-stats strong,
+  .athletic-shell .workout-card .workout-stats > div:first-child strong {
+    font-size: 1.75rem;
+  }
+  .athletic-shell .today-run-actions .primary-button {
+    width: 100%;
+  }
+  .athletic-shell .today-run-actions {
+    justify-content: center;
+    gap: 12px;
+  }
+  .athletic-shell .journal-upcoming {
+    padding: 16px;
+  }
+  .athletic-shell .plan-overview {
+    padding: 20px;
+  }
+  .athletic-shell .plan-endpoint {
+    padding: 16px 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--border);
+  }
+  .athletic-shell .plan-endpoint > span {
+    gap: 12px;
+  }
+  .athletic-shell .week-detail-heading {
+    flex-wrap: wrap;
+  }
+  .athletic-shell .plan-week-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .athletic-shell .progress-metrics {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .athletic-shell .progress-metrics > div {
+    padding: 16px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px 16px;
+  }
+  .athletic-shell .progress-metrics > div > strong {
+    grid-column: 2;
+    grid-row: 1/3;
+    font-size: 1.75rem;
+    text-align: right;
+  }
+  .athletic-shell .progress-metrics > div > span {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .athletic-shell .progress-metrics > div > small {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .athletic-shell .progress-empty {
+    gap: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+  }
+  .athletic-shell .empty-run-chart {
+    width: 96px;
+    height: 64px;
+  }
+  .athletic-shell .settings-page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .athletic-shell
+    :is(.settings-watch-card, .settings-profile, .settings-section) {
+    grid-column: 1;
+    padding: 16px;
+  }
+  .athletic-shell :is(.settings-watch-card, .settings-profile) {
+    min-height: 112px;
+  }
+  .athletic-shell .settings-section .setting-row {
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+}
+
+.athletic-shell .progress-view .page-heading {
+  justify-content: space-between;
+  text-align: left;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.athletic-shell .progress-view .page-heading > div {
+  text-align: left;
+}
+
+/* Cards respond to the available workspace, including a narrow desktop sidebar layout. */
+@container workspace (max-width: 600px) {
+  .athletic-shell .settings-page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .athletic-shell :is(.settings-watch-card, .settings-profile) {
+    grid-column: 1;
+    min-height: 112px;
+  }
+  .athletic-shell .progress-metrics {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .athletic-shell .progress-metrics > div {
+    padding: 16px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px 16px;
+  }
+  .athletic-shell .progress-metrics > div > strong {
+    grid-column: 2;
+    grid-row: 1/3;
+    font-size: 1.75rem;
+    text-align: right;
+  }
+  .athletic-shell .progress-metrics > div > span {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .athletic-shell .progress-metrics > div > small {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .athletic-shell .workout-card .workout-stats,
+  .athletic-shell .workout-card .workout-stats[data-metrics='2'] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .athletic-shell
+    .workout-card
+    .workout-stats[data-metrics='3']
+    > div:last-child {
+    grid-column: 1/-1;
+    flex-direction: column;
+    gap: 0;
+  }
+}

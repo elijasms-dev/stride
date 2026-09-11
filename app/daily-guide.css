@@ -1,0 +1,159 @@
+/* Quiet calendar surfaces; advice belongs inside the day, not on the overview. */
+.daily-rest-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 104px;
+  padding: 24px;
+  border: 1px solid #667f00;
+  border-radius: var(--radius-lg);
+  color: var(--primary-foreground);
+  background: var(--ath-volt);
+  text-align: left;
+}
+.daily-rest-card > span {
+  flex: 1;
+  font-size: 1.25rem;
+  font-weight: 650;
+}
+.daily-rest-card > svg:first-child {
+  color: inherit;
+}
+.daily-rest-card:hover {
+  background: #d6ff33;
+}
+.calendar-day-link:hover {
+  background: var(--surface-raised);
+}
+.calendar-day-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 12px;
+  color: var(--text-label);
+  text-align: left;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+}
+.calendar-day-link > span {
+  flex: 1;
+}
+.calendar-day-link strong {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 550;
+  color: var(--text-main);
+}
+.calendar-day-link small {
+  display: block;
+  margin-top: 4px;
+}
+.calendar-day-link > svg {
+  flex: 0 0 auto;
+}
+.calendar-week-notes {
+  margin-top: 20px;
+}
+.calendar-week-notes .week-rhythm {
+  margin-top: 16px;
+}
+.daily-guide {
+  margin: 24px 0;
+  padding: 24px 0 0;
+  border-top: 1px solid var(--border);
+}
+.modal-heading + .daily-guide {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+.daily-guide > h3,
+.day-records > h3 {
+  margin: 0 0 12px;
+  font-size: 1.0625rem;
+  font-weight: 650;
+}
+.daily-guide-tabs {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-height: 48px;
+}
+.daily-guide-tabs [data-slot='tabs-trigger'] {
+  min-width: 0;
+  min-height: 40px;
+  font-size: 0.875rem;
+  padding: 8px;
+}
+.daily-guide-tabs [data-slot='tabs-trigger'][data-active] {
+  background: var(--ath-volt);
+  color: var(--primary-foreground);
+  border-color: #667f00;
+  font-weight: 700;
+}
+.daily-guide-panel {
+  margin-top: 20px;
+}
+.daily-guide-panel h4 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  font-size: 1rem;
+  font-weight: 650;
+}
+.daily-guide-panel h4 svg {
+  flex: 0 0 auto;
+  color: var(--success);
+}
+.daily-guide-panel p {
+  max-width: 66ch;
+  margin: 12px 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--text-label);
+}
+.guide-sources {
+  margin-top: 20px;
+  color: var(--text-label);
+  font-size: 0.8125rem;
+}
+.guide-sources summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.guide-sources ul {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+.guide-sources li {
+  margin: 8px 0;
+}
+.guide-sources a {
+  color: var(--link);
+}
+.day-records > div {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.day-records p {
+  margin: 4px 0 0;
+  color: var(--text-label);
+}
+@media (max-width: 420px) {
+  .daily-rest-card {
+    padding: 20px;
+    min-height: 88px;
+  }
+  .daily-guide-tabs [data-slot='tabs-trigger'] {
+    padding-inline: 4px;
+    font-size: 0.8125rem;
+  }
+}

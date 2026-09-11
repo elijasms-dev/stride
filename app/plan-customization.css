@@ -1,0 +1,304 @@
+/* Training choices: a compact control surface, with detail revealed on demand. */
+.plan-customization {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+}
+.plan-customization fieldset {
+  min-width: 0;
+}
+.plan-customization .frequency-field > legend,
+.plan-choice-field > legend {
+  font-size: 1rem;
+  font-weight: 750;
+  letter-spacing: -0.025em;
+  margin-bottom: 8px;
+}
+.plan-customization .frequency-field > p,
+.plan-control-hint {
+  color: var(--text-label);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 6px 0 0;
+}
+.plan-customization .frequency-options {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+.plan-customization .frequency-options button {
+  min-height: 60px;
+  border-radius: 12px;
+  background: var(--surface-raised);
+  border: 1px solid transparent;
+  padding: 8px 4px;
+}
+.plan-customization .frequency-options button strong {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+.plan-customization .frequency-options button span {
+  font-size: 0.75rem;
+  margin: 2px 0 0;
+}
+.plan-customization .frequency-options button[aria-pressed='true'] {
+  background: var(--ath-volt);
+  color: #09090b;
+  border-color: #09090b;
+}
+.plan-choice-field {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.plan-choice-grid {
+  gap: 8px;
+}
+.plan-choice {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  gap: 4px;
+  min-width: 0;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 14px 12px;
+  background: var(--surface-raised);
+  color: var(--text-main);
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+.plan-choice strong {
+  font-size: 1rem;
+  font-weight: 750;
+  line-height: 1.3;
+}
+.plan-choice > span {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--text-label);
+}
+.plan-choice[data-selected='true'] {
+  border-color: var(--text-main);
+  box-shadow: inset 0 0 0 1px var(--text-main);
+}
+.plan-choice-check {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  opacity: 0;
+}
+.plan-choice[data-selected='true'] .plan-choice-check {
+  opacity: 1;
+}
+.plan-choice[data-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.plan-choice:focus-within {
+  outline: 3px solid var(--ring);
+  outline-offset: 3px;
+}
+.plan-choice .plan-choice-radio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  padding: 0;
+  border: 0;
+}
+.plan-workout-choice {
+  padding: 20px;
+  background: var(--run-quality-surface);
+  border-radius: 16px;
+  border-left: 4px solid var(--run-quality);
+}
+.plan-workout-choice .plan-choice {
+  background: var(--surface);
+}
+.plan-workout-choice .plan-choice strong {
+  font-size: 1.375rem;
+}
+.plan-workout-choice .plan-choice[data-selected='true'] {
+  background: var(--text-main);
+  color: var(--canvas);
+  border-color: var(--text-main);
+}
+.plan-workout-choice .plan-choice[data-selected='true'] > span {
+  color: inherit;
+}
+.plan-history-check {
+  margin-top: 16px;
+}
+.plan-review-choice {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 16px;
+  border-left: 4px solid var(--run-quality);
+  background: var(--surface-raised);
+}
+.plan-review-choice strong {
+  font-size: 1.125rem;
+}
+.plan-review-choice span {
+  font-size: 0.9375rem;
+}
+.plan-review-choice p {
+  font-size: 0.875rem;
+  color: var(--text-label);
+  line-height: 1.5;
+  margin: 4px 0 0;
+}
+.plan-schedule-picker,
+.plan-advanced {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  min-width: 0;
+}
+.plan-schedule-picker > summary,
+.plan-advanced > summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 16px;
+  list-style: none;
+}
+.plan-schedule-picker > summary::-webkit-details-marker,
+.plan-advanced > summary::-webkit-details-marker {
+  display: none;
+}
+.plan-schedule-picker > summary > span,
+.plan-advanced > summary > span {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+.plan-schedule-picker summary strong,
+.plan-advanced summary strong {
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+.plan-schedule-picker summary small,
+.plan-advanced summary small {
+  color: var(--text-label);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+.plan-schedule-picker[open] > summary > svg:last-child,
+.plan-advanced[open] > summary > svg:last-child {
+  transform: rotate(180deg);
+}
+.plan-options-body {
+  padding: 4px 16px 20px;
+  display: grid;
+  gap: 20px;
+}
+.plan-customization .availability button {
+  min-height: 44px;
+  font-size: 0.8125rem;
+  padding-inline: 2px;
+}
+.plan-customization .training-pattern {
+  margin: 0;
+  border-radius: 16px;
+  padding: 16px;
+}
+.plan-customization .pattern-heading {
+  margin-bottom: 16px;
+}
+.plan-customization .training-pattern > p {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+.plan-customization .training-pattern li[data-role='workout'] > i {
+  background: var(--run-quality);
+}
+.plan-customization .training-pattern li[data-role='long'] > i {
+  background: var(--run-long);
+}
+.plan-customization .training-pattern li[data-role='easy'] > i,
+.plan-customization .training-pattern li[data-role='endurance'] > i {
+  background: var(--run-easy);
+}
+.plan-customization summary:focus-visible,
+.plan-customization button:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 3px;
+}
+@media (max-width: 480px) {
+  .plan-workout-choice {
+    padding: 16px 12px;
+  }
+  .plan-choice {
+    padding: 14px 8px 12px;
+  }
+  .plan-choice-grid {
+    gap: 6px;
+  }
+  .plan-customization .frequency-options {
+    gap: 6px;
+  }
+  .plan-choice-check {
+    top: 6px;
+    right: 5px;
+    width: 11px;
+  }
+  .plan-customization .training-pattern ol {
+    gap: 3px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .plan-choice {
+    transition: none;
+  }
+}
+:root[data-motion='reduced'] .plan-choice {
+  transition: none;
+}
+
+.plan-distance-start {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+}
+.plan-distance-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.plan-distance-metrics span {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-label);
+}
+.plan-distance-metrics strong {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.plan-distance-metrics small {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.plan-distance-limits {
+  margin-top: 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+.plan-distance-limits p {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0 0 12px;
+}
+.plan-distance-limits button {
+  width: 100%;
+}

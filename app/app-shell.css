@@ -1,0 +1,565 @@
+/* One scroll owner and one responsive navigation list: sidebar on desktop, dock on mobile. */
+.app-sidebar-provider {
+  display: contents;
+}
+.athletic-nav-overlay .responsive-navigation {
+  display: flex;
+  flex-direction: row;
+  width: min(100%, 28rem);
+  height: auto;
+  background: transparent;
+}
+.sidebar-collapse {
+  display: none;
+}
+html:has(.athletic-shell),
+body:has(.athletic-shell) {
+  height: 100%;
+  overflow: hidden;
+}
+.athletic-shell.app-shell {
+  --content-bottom-inset: max(var(--nav-min-inset), var(--nav-occlusion));
+  width: 100%;
+  min-height: 100svh;
+  height: 100dvh;
+  margin: 0;
+  overflow: clip;
+  isolation: isolate;
+  background: var(--canvas);
+  color: var(--text-main);
+}
+.athletic-shell .athletic-tabs.app-tabs {
+  display: grid;
+  grid-template-rows: calc(
+      var(--header-height) + env(safe-area-inset-top, 0px)
+    ) minmax(0, 1fr);
+  gap: 0;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+}
+.athletic-shell .athletic-topbar.topbar {
+  position: sticky;
+  inset: 0 0 auto;
+  z-index: var(--z-header);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 0;
+  height: calc(var(--header-height) + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px)
+    max(1rem, env(safe-area-inset-right, 0px)) 0
+    max(1rem, env(safe-area-inset-left, 0px));
+  gap: 1rem;
+  border-radius: 0;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--header-surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--text-main);
+}
+.athletic-topbar.topbar .wordmark {
+  font-size: 30px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.075em;
+  color: var(--text-main);
+  padding-block: 0.25rem;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.athletic-topbar.topbar .top-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  min-width: 0;
+}
+.athletic-topbar.topbar .avatar-button {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background: var(--surface-raised);
+  border: 1px solid var(--input);
+  color: var(--text-main);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+.athletic-topbar.topbar .journal-sync {
+  color: var(--text-label);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  opacity: 1;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.athletic-shell .athletic-main {
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  overflow: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable both-edges;
+  margin-bottom: var(--content-bottom-inset);
+  padding-bottom: 0;
+  scroll-padding-block: 1rem calc(var(--content-bottom-inset) + 1rem);
+  scroll-behavior: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.athletic-main > .workspace {
+  container: workspace / inline-size;
+  width: 100%;
+  max-width: 1152px;
+  margin: 0 auto;
+  padding: 1.5rem max(16px, env(safe-area-inset-right, 0px))
+    var(--content-bottom-inset) max(16px, env(safe-area-inset-left, 0px));
+}
+.athletic-main :where(button, a, input, select, textarea, summary, [tabindex]) {
+  scroll-margin-block: 1rem;
+}
+.athletic-nav-overlay {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: var(--z-navigation);
+  display: flex;
+  justify-content: center;
+  padding: 16px max(16px, env(safe-area-inset-right, 0px))
+    calc(16px + env(safe-area-inset-bottom, 0px))
+    max(16px, env(safe-area-inset-left, 0px));
+  pointer-events: none;
+}
+.athletic-nav-overlay .athletic-nav {
+  position: static;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 4px;
+  width: min(100%, 28rem);
+  height: auto;
+  min-height: 64px;
+  padding: 8px;
+  margin: 0;
+  border: 1px solid var(--dock-border);
+  border-radius: var(--radius-full);
+  background: var(--dock-surface);
+  color: var(--dock-ink);
+  box-shadow: 0 8px 32px #00000038;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  pointer-events: auto;
+  transform: none;
+}
+.athletic-nav [role='tab'] {
+  display: flex;
+  flex: 1 0 max-content;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  min-height: 44px;
+  height: auto;
+  min-width: 44px;
+  max-width: 100%;
+  padding: 0 4px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--dock-muted);
+  font-size: 0.875rem;
+  line-height: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+  overflow-wrap: anywhere;
+  text-align: center;
+  opacity: 1;
+  box-shadow: none;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+.athletic-nav [role='tab'] > span {
+  max-width: 100%;
+  min-width: 0;
+}
+.athletic-nav [role='tab'] svg {
+  display: block;
+  height: 20px;
+  width: 20px;
+  flex: 0 0 20px;
+}
+.athletic-nav [role='tab']::before,
+.athletic-nav [role='tab']::after {
+  content: none;
+}
+.athletic-nav [role='tab'][data-active] {
+  background: var(--selection-surface);
+  color: var(--selection-ink);
+  border-color: #667f00;
+  box-shadow: 0 1px 3px #00000030;
+  font-weight: 800;
+}
+.athletic-nav [role='tab']:not([data-active]):not(:disabled):hover {
+  background: var(--dock-active);
+  color: var(--dock-ink);
+}
+.athletic-nav [role='tab']:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.athletic-shell .athletic-skip-link {
+  position: fixed;
+  z-index: var(--z-skip-link);
+  top: max(0.5rem, env(safe-area-inset-top, 0px));
+  left: max(1rem, env(safe-area-inset-left, 0px));
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  color: #09090b;
+  background: var(--ath-volt);
+  transform: translateY(-200%);
+}
+.athletic-shell .athletic-skip-link:focus {
+  transform: translateY(0);
+}
+.athletic-shell .toast-message {
+  position: fixed;
+  z-index: var(--z-toast);
+  bottom: calc(var(--content-bottom-inset) + 0.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(36rem, calc(100vw - 2rem));
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-main);
+  font-size: 1rem;
+  line-height: 1.5;
+  box-shadow: var(--shadow);
+  pointer-events: none;
+}
+/* Portals use root tokens and live above both the sticky bar and navigation. */
+[data-slot='dialog-portal'] {
+  position: relative;
+  z-index: var(--z-modal);
+  isolation: isolate;
+}
+[data-slot='dialog-overlay'] {
+  z-index: var(--z-overlay);
+}
+[data-slot='dialog-content'] {
+  z-index: var(--z-modal);
+}
+[data-slot='select-positioner'],
+[data-slot='popover-positioner'],
+[data-slot='menu-positioner'],
+[data-slot='tooltip-positioner'] {
+  z-index: var(--z-popover);
+}
+/* Foundation type and geometry apply immediately without changing screen behavior. */
+.athletic-shell .page-heading,
+.athletic-shell .page-heading.daily-heading {
+  min-height: 0;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  align-items: center;
+}
+.athletic-shell .page-heading h1,
+.athletic-shell .daily-heading h1,
+.athletic-shell .settings-page .page-heading h1,
+.athletic-shell .journal-loading h1 {
+  font-family: var(--font-journal-sans), sans-serif;
+  font-size: 1.25rem;
+  line-height: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--foreground);
+  margin: 0;
+}
+.athletic-shell .workout-card h2,
+.modal-title {
+  font-size: 1.5rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  max-width: none;
+}
+.athletic-shell .workout-stats strong,
+.stride-modal .workout-stats strong,
+.athletic-shell .progress-metrics strong,
+.session-step .step-time,
+.session-step .step-target {
+  font-size: 1.5rem;
+  line-height: 1.75rem;
+  font-weight: 800;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.025em;
+  opacity: 1;
+}
+.athletic-shell .workout-stats span,
+.athletic-shell .eyebrow,
+.athletic-shell .subtle,
+.athletic-shell .rail-month {
+  color: var(--muted-foreground);
+  opacity: 1;
+}
+.athletic-shell
+  :is(
+    .workout-card,
+    .settings-section,
+    .preview-card,
+    .onboarding-summary,
+    .target-sample,
+    .training-pattern,
+    .session-briefing
+  ) {
+  border-radius: var(--radius-lg);
+}
+.athletic-shell :is(.primary-button, .secondary-button, .outline-button),
+.stride-modal :is(.primary-button, .secondary-button, .outline-button) {
+  min-height: 44px;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 700;
+}
+.athletic-shell .primary-button,
+.stride-modal .primary-button {
+  background: var(--ath-volt);
+  color: #09090b;
+  border: 1px solid #667f00;
+}
+.athletic-shell .primary-button:not(:disabled):hover,
+.stride-modal .primary-button:not(:disabled):hover {
+  background: #d6ff33;
+  color: #09090b;
+}
+.athletic-shell :where(input, select, textarea),
+.stride-modal :where(input, select, textarea) {
+  font-size: 1rem;
+  border-radius: var(--radius-sm);
+}
+.athletic-shell .journal-loading {
+  min-height: 12rem;
+  padding-top: 1.5rem;
+}
+.athletic-shell .workout-photograph {
+  display: none;
+}
+.athletic-shell .workout-card:has(.workout-photograph) {
+  padding-right: 1.5rem;
+}
+@media (max-width: 560px) {
+  .stride-modal,
+  .stride-modal.wide {
+    padding: max(1rem, env(safe-area-inset-top, 0px))
+      max(1rem, env(safe-area-inset-right, 0px))
+      max(1rem, env(safe-area-inset-bottom, 0px))
+      max(1rem, env(safe-area-inset-left, 0px));
+  }
+  .stride-modal > [data-slot='dialog-close'] {
+    top: max(1rem, env(safe-area-inset-top, 0px));
+    right: max(1rem, env(safe-area-inset-right, 0px));
+  }
+  .athletic-main > .workspace {
+    padding-top: 1rem;
+  }
+  .athletic-topbar.topbar .journal-sync {
+    font-size: 0.875rem;
+  }
+  .athletic-shell .workout-card {
+    min-height: 0;
+    padding: 1rem;
+  }
+  .athletic-shell
+    :is(.settings-watch-card, .settings-profile, .settings-section) {
+    padding: 16px;
+  }
+  .athletic-shell .settings-watch-card {
+    grid-template-columns: minmax(0, 1fr) 20px;
+    gap: 12px;
+  }
+  .athletic-shell .settings-watch-icon {
+    display: none;
+  }
+  .athletic-shell :is(.settings-watch-copy, .settings-link > span) {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .athletic-shell *,
+  .athletic-shell *::before,
+  .athletic-shell *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+.no-motion .athletic-shell *,
+.no-motion .athletic-shell *::before,
+.no-motion .athletic-shell *::after {
+  scroll-behavior: auto !important;
+  transition-duration: 0.01ms !important;
+  animation-duration: 0.01ms !important;
+}
+
+/* The same navigation nodes become a sidebar; no duplicate landmarks or tab IDs. */
+@media (min-width: 768px) {
+  .athletic-shell.app-shell {
+    --app-sidebar-width: calc(224px + env(safe-area-inset-left, 0px));
+    --content-bottom-inset: 0px;
+  }
+  .athletic-shell[data-sidebar='collapsed'] {
+    --app-sidebar-width: calc(80px + env(safe-area-inset-left, 0px));
+  }
+  .athletic-shell .athletic-tabs.app-tabs {
+    grid-template-columns: var(--app-sidebar-width) minmax(0, 1fr);
+  }
+  .athletic-shell .athletic-topbar.topbar {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    padding-inline: max(32px, env(safe-area-inset-left, 0px))
+      max(32px, env(safe-area-inset-right, 0px));
+  }
+  .athletic-shell .athletic-main {
+    grid-column: 2;
+    grid-row: 2;
+    margin-bottom: 0;
+    scroll-padding-block: 24px;
+  }
+  .athletic-main > .workspace {
+    max-width: 1280px;
+    padding: 32px max(32px, env(safe-area-inset-right, 0px)) 32px 32px;
+  }
+  .athletic-shell .athletic-nav-overlay {
+    position: static;
+    grid-column: 1;
+    grid-row: 2;
+    inset: auto;
+    display: flex;
+    padding: 24px 12px max(24px, env(safe-area-inset-bottom, 0px))
+      calc(12px + env(safe-area-inset-left, 0px));
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    pointer-events: auto;
+  }
+  .athletic-nav-overlay .responsive-navigation {
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-height: min-content;
+  }
+  .athletic-nav-overlay .athletic-nav {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    gap: 8px;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+  .athletic-nav [role='tab'] {
+    flex: 0 0 auto;
+    flex-direction: row;
+    justify-content: flex-start;
+    min-height: 48px;
+    width: 100%;
+    gap: 12px;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    color: var(--text-label);
+    font-size: 1rem;
+    line-height: 1.5rem;
+    text-align: left;
+    white-space: normal;
+  }
+  .athletic-nav [role='tab'][data-active],
+  .athletic-nav [role='tab']:not([data-active]):not(:disabled):hover {
+    background: var(--selection-surface);
+    color: var(--selection-ink);
+    border-color: transparent;
+    box-shadow: none;
+  }
+  .athletic-nav [role='tab']:focus-visible {
+    outline-color: var(--ring);
+  }
+  .sidebar-collapse {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: auto;
+    min-height: 44px;
+    flex-shrink: 0;
+    padding: 12px;
+    color: var(--text-label);
+    font-size: 0.875rem;
+    text-align: left;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+  }
+  .sidebar-collapse:hover {
+    background: var(--surface-raised);
+    color: var(--text-main);
+  }
+  .sidebar-collapse:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  .sidebar-collapse svg {
+    flex-shrink: 0;
+  }
+  .athletic-shell[data-sidebar='collapsed'] .athletic-nav [role='tab'],
+  .athletic-shell[data-sidebar='collapsed'] .sidebar-collapse {
+    justify-content: center;
+  }
+  .athletic-shell[data-sidebar='collapsed']
+    :is(.athletic-nav [role='tab'] > span, .sidebar-collapse > span) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .athletic-shell .toast-message {
+    bottom: 24px;
+  }
+}
+
+@media (forced-colors: active) {
+  .athletic-nav-overlay .athletic-nav {
+    border-color: CanvasText;
+    background: Canvas;
+    box-shadow: none;
+  }
+  .athletic-nav [role='tab'] {
+    color: CanvasText;
+  }
+  .athletic-nav [role='tab'][data-active] {
+    color: HighlightText;
+    background: Highlight;
+    border-color: Highlight;
+    forced-color-adjust: none;
+  }
+  .athletic-nav [role='tab']:focus-visible {
+    outline-color: Highlight;
+  }
+}

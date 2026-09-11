@@ -1,0 +1,2688 @@
+/* Stride spatial journal. Presentation only; the running model is unchanged. */
+:root,
+:root[data-accent] {
+  --background: #f0f0e9;
+  --foreground: #151916;
+  --paper: #fafaf6;
+  --card: #fafaf6;
+  --card-foreground: #151916;
+  --popover: #fafaf6;
+  --popover-foreground: #151916;
+  --primary: #202a22;
+  --primary-foreground: #f5f5ed;
+  --secondary: #e5e7df;
+  --secondary-foreground: #151916;
+  --soft: #e5e7df;
+  --muted: #e5e7df;
+  --muted-foreground: #626a5f;
+  --accent: #dde3d5;
+  --accent-foreground: #151916;
+  --border: #cdd2c6;
+  --input: #b9c2b1;
+  --ring: #44613d;
+  --navigation: #344b32;
+  --navigation-soft: #d9e0d0;
+  --navigation-ink: #f6f7f0;
+  --chart-1: #465d39;
+  --chart-2: #8e9d78;
+  --chart-3: #b5bda7;
+  --chart-4: #d9dfd0;
+  --chart-5: #9c8c6f;
+  --easy-tone: #5f794b;
+  --quality-tone: #293b30;
+  --long-tone: #9c8966;
+  --shadow: 0 30px 70px #18201310;
+  --surface-shadow: none;
+}
+:root.dark,
+:root.dark[data-accent] {
+  --background: #171c18;
+  --foreground: #eeeee6;
+  --paper: #1e261f;
+  --card: #1e261f;
+  --card-foreground: #eeeee6;
+  --popover: #202921;
+  --popover-foreground: #eeeee6;
+  --primary: #dce2d0;
+  --primary-foreground: #1a211b;
+  --secondary: #2b352b;
+  --secondary-foreground: #eeeee6;
+  --soft: #2b352b;
+  --muted: #2b352b;
+  --muted-foreground: #aab3a1;
+  --accent: #344432;
+  --accent-foreground: #eeeee6;
+  --border: #3a4538;
+  --input: #53644b;
+  --ring: #c6d3b7;
+  --navigation: #cfdbbe;
+  --navigation-soft: #374532;
+  --navigation-ink: #192518;
+  --chart-1: #b8cba2;
+  --chart-2: #8e9d78;
+  --chart-3: #5d6f4e;
+  --chart-4: #384832;
+  --easy-tone: #a0ba86;
+  --quality-tone: #e1e6d5;
+  --long-tone: #cabb9b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not(.light),
+  :root:not(.light)[data-accent] {
+    --background: #171c18;
+    --foreground: #eeeee6;
+    --paper: #1e261f;
+    --card: #1e261f;
+    --card-foreground: #eeeee6;
+    --popover: #202921;
+    --popover-foreground: #eeeee6;
+    --primary: #dce2d0;
+    --primary-foreground: #1a211b;
+    --secondary: #2b352b;
+    --secondary-foreground: #eeeee6;
+    --soft: #2b352b;
+    --muted: #2b352b;
+    --muted-foreground: #aab3a1;
+    --accent: #344432;
+    --accent-foreground: #eeeee6;
+    --border: #3a4538;
+    --input: #53644b;
+    --ring: #c6d3b7;
+    --navigation: #cfdbbe;
+    --navigation-soft: #374532;
+    --navigation-ink: #192518;
+    --chart-1: #b8cba2;
+    --chart-2: #8e9d78;
+    --chart-3: #5d6f4e;
+    --chart-4: #384832;
+    --easy-tone: #a0ba86;
+    --quality-tone: #e1e6d5;
+    --long-tone: #cabb9b;
+  }
+}
+body {
+  --spatial-display: var(--font-spatial-display), sans-serif;
+  --font-journal-display: var(--font-spatial-display);
+}
+::selection {
+  background: #bac8aa;
+  color: #111b13;
+}
+.topbar {
+  position: relative;
+  inset: auto;
+  width: auto;
+  height: 92px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1660px;
+  margin: 0 auto;
+  padding: 0 48px;
+  border-radius: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: var(--foreground);
+  gap: 24px;
+  z-index: 30;
+}
+.topbar .wordmark,
+.wordmark {
+  font-family: var(--spatial-display);
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--foreground);
+  letter-spacing: -0.085em;
+  padding: 0;
+  line-height: 1;
+}
+
+.topbar .main-nav {
+  position: static;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: auto;
+  height: 56px;
+  padding: 5px;
+  gap: 3px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--paper);
+  box-shadow: 0 2px 5px #15221705;
+}
+.topbar .main-nav [role='tab'] {
+  display: flex;
+  width: auto;
+  flex: none;
+  height: 44px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 14px;
+  padding: 10px 17px;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  transition:
+    background-color 160ms,
+    color 160ms;
+}
+.topbar .main-nav [role='tab'] svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.7;
+}
+.topbar .main-nav [role='tab'][data-active] {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  box-shadow:
+    inset 0 1px 0 #ffffff12,
+    0 2px 5px #15221712;
+}
+.topbar .main-nav [role='tab']:not([data-active]):hover {
+  background: var(--secondary);
+  color: var(--foreground);
+}
+.topbar .main-nav [role='tab']:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 3px;
+}
+.topbar .top-actions {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  flex-wrap: nowrap;
+  width: auto;
+  gap: 9px;
+}
+.topbar .journal-sync {
+  width: auto;
+  margin: 0 10px 0 0;
+  color: var(--muted-foreground);
+}
+.topbar .icon-button {
+  background: transparent;
+  color: var(--foreground);
+  border-color: var(--border);
+}
+.topbar .avatar-button {
+  background: var(--foreground);
+  color: var(--background);
+}
+.workspace {
+  max-width: 1536px;
+  margin: 0 auto;
+  padding: 34px 48px 0;
+}
+.primary-button,
+.secondary-button,
+.login-panel .primary-button {
+  border-radius: 14px;
+  min-height: 48px;
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.primary-button {
+  box-shadow: inset 0 1px 0 #ffffff18;
+}
+.primary-button:not(:disabled):hover {
+  box-shadow:
+    inset 0 1px 0 #ffffff18,
+    0 6px 18px #151c171c;
+}
+.primary-button svg,
+.secondary-button svg {
+  transition: transform 200ms;
+}
+.primary-button:hover svg:last-child,
+.secondary-button:hover svg:last-child {
+  transform: none;
+}
+.secondary-button {
+  background: transparent;
+  border-color: var(--input);
+}
+.icon-button,
+.avatar-button {
+  border-radius: 12px;
+  min-width: 44px;
+  min-height: 44px;
+}
+.page-heading {
+  align-items: flex-end;
+  margin-bottom: 30px;
+}
+.page-heading h1,
+.today-panel > .page-heading h1 {
+  font-family: var(--spatial-display);
+  font-size: clamp(62px, 7.3vw, 106px);
+  font-weight: 500;
+  letter-spacing: -0.075em;
+  line-height: 0.97;
+}
+.soft-dot {
+  color: var(--navigation);
+}
+.daily-heading > div:first-child {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 32px;
+}
+.daily-kicker {
+  flex-basis: 100%;
+  margin-bottom: 17px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+.selected-date {
+  font-size: 13px;
+  margin: 0;
+}
+.daily-controls {
+  padding-bottom: 5px;
+}
+.day-navigation {
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+}
+.day-navigation .icon-button {
+  border: 1px solid var(--border);
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+}
+.today-layout {
+  display: block;
+}
+.today-layout > section > .week-heading {
+  background: transparent;
+  padding: 17px 0 11px;
+  border: 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+}
+.week-context > span {
+  border-radius: 3px;
+  padding: 3px 8px;
+}
+.today-layout > section > .week-rhythm {
+  padding: 0 0 13px;
+  background: transparent;
+  border: 0;
+}
+.today-layout > section > .week-rhythm > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 16px;
+  align-items: baseline;
+}
+.today-layout > section > .week-rhythm p {
+  margin: 0;
+}
+.day-strip {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: transparent;
+}
+.day-button {
+  min-height: 66px;
+  border-radius: 3px;
+  flex-direction: row;
+  gap: 12px;
+  padding: 10px;
+}
+.day-button > strong {
+  font-family: var(--spatial-display);
+  font-size: 28px;
+  font-weight: 400;
+}
+.day-button > span:first-child {
+  font-size: 11px;
+}
+.day-button.selected {
+  background: var(--foreground);
+  color: var(--background);
+  box-shadow: none;
+}
+.day-session-markers {
+  position: absolute;
+  right: 9px;
+  bottom: 9px;
+}
+.focus-deck {
+  margin-top: 17px;
+}
+.focus-deck .adjacent-week {
+  filter: blur(0.3px);
+  opacity: 0.65;
+}
+.week-focus {
+  border-radius: 4px;
+}
+.upcoming-sessions {
+  margin-top: 30px;
+}
+.upcoming-heading h3,
+.section-heading h3 {
+  font-family: var(--spatial-display);
+  font-weight: 500;
+}
+.upcoming-session,
+.upcoming-row {
+  border-radius: 4px;
+}
+.right-rail {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1fr;
+  gap: 32px;
+  margin-top: 42px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+.goal-scene {
+  min-height: 280px;
+  border-radius: 5px;
+  background: #20291f;
+}
+.goal-scene .journal-photograph {
+  opacity: 0.35;
+}
+.goal-scene .race-card {
+  padding: 28px;
+  min-height: 280px;
+  background: linear-gradient(90deg, #162117dd, #16211730);
+}
+.goal-scene .race-distance {
+  font-family: var(--spatial-display);
+  font-size: 50px;
+}
+.goal-scene h3 {
+  font-family: var(--spatial-display);
+  font-size: 24px;
+}
+.rail-section {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.rail-section .section-heading {
+  margin-bottom: 16px;
+}
+.plan-overview {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 38px;
+  background: #182119;
+  color: #f1f2e8;
+  border: 1px solid #3b4933;
+  border-radius: 6px;
+  min-height: 285px;
+}
+.plan-overview-title {
+  position: relative;
+  z-index: 2;
+  width: 64%;
+  min-height: 170px;
+}
+.plan-overview-title > div:first-child {
+  max-width: 60%;
+}
+.plan-overview h2 {
+  font-family: var(--spatial-display);
+  font-size: clamp(30px, 3.5vw, 48px);
+  font-weight: 400;
+  line-height: 1.04;
+}
+.plan-overview .eyebrow,
+.plan-overview p {
+  color: #b7c3ac;
+}
+.plan-endpoint {
+  color: #e0e6d4;
+}
+.plan-endpoint span {
+  font-family: var(--spatial-display);
+  font-weight: 400;
+  font-size: 50px;
+}
+.plan-endpoint small {
+  font-family: var(--font-journal-sans);
+  color: #b7c3ac;
+}
+.plan-overview .block-overview {
+  position: relative;
+  z-index: 2;
+  border-color: #495640;
+  margin-top: 12px;
+}
+.block-overview summary {
+  width: 60%;
+  color: #d9e1cd;
+}
+.block-overview[open] {
+  background: #182119;
+}
+.plan-overview .chart-meta,
+.plan-overview .chart-legend,
+.plan-overview .plan-bars small {
+  color: #b7c3ac;
+}
+.plan-overview .plan-bars i {
+  background: #a5b594;
+  border-radius: 1px;
+}
+.plan-overview .plan-bars i.recovery {
+  background: #657957;
+}
+.plan-overview .plan-bars button.selected i {
+  background: #e0e7d5;
+}
+.week-detail-heading {
+  border-top: 0;
+  margin-top: 34px;
+}
+.week-detail-heading h2 {
+  font-family: var(--spatial-display);
+  font-size: 38px;
+  font-weight: 500;
+  letter-spacing: -0.06em;
+}
+.plan-calendar {
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.calendar-day {
+  border: 0;
+  border-right: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+}
+.calendar-day:last-child {
+  border-right: 0;
+}
+.calendar-run {
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+.calendar-date strong {
+  font-family: var(--spatial-display);
+}
+.progress-metrics,
+.history-metrics {
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.progress-metrics > div,
+.history-metrics > div {
+  border: 0;
+  border-right: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+}
+.progress-metrics strong,
+.history-metrics strong {
+  font-family: var(--spatial-display);
+  font-size: 48px;
+  font-weight: 400;
+}
+.training-subnav {
+  background: transparent;
+  padding: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  gap: 14px;
+}
+.training-subnav button {
+  border-radius: 3px 3px 0 0;
+}
+.training-baseline,
+.method-summary,
+.training-section,
+.method-card,
+.library-card,
+.run-entry,
+.journal-entry {
+  border-radius: 5px;
+  box-shadow: none;
+}
+.training-baseline h2,
+.training-section h2,
+.method-summary h2 {
+  font-family: var(--spatial-display);
+  font-weight: 500;
+}
+.stride-modal {
+  border-radius: 9px;
+  background: var(--paper);
+  box-shadow: 0 50px 140px #08140f40;
+}
+.modal-heading {
+  padding-bottom: 25px;
+}
+.modal-title {
+  font-family: var(--spatial-display);
+  font-weight: 500;
+  font-size: 38px;
+  letter-spacing: -0.065em;
+}
+.stride-modal [data-slot='dialog-close'] {
+  border-radius: 5px;
+}
+input:not([type='radio']):not([type='checkbox']):not([type='hidden']),
+textarea,
+.choice-trigger {
+  border-radius: 4px;
+  background: transparent;
+  border: 1px solid var(--input);
+}
+[data-slot='select-content'],
+[data-slot='dropdown-menu-content'],
+[data-slot='dropdown-menu-sub-content'] {
+  border-radius: 6px;
+}
+[data-slot='select-item'],
+[data-slot='dropdown-menu-item'],
+[data-slot='dropdown-menu-checkbox-item'] {
+  border-radius: 3px;
+}
+.goal-option,
+.frequency-options button,
+.availability button,
+.ultra-distance-choices button {
+  border-radius: 4px;
+}
+.goal-option > span:first-child,
+.frequency-options button strong {
+  font-family: var(--spatial-display);
+  font-weight: 500;
+}
+.goal-option {
+  background: transparent;
+  border-color: var(--border);
+}
+.goal-option.selected {
+  border-color: var(--foreground);
+  background: var(--foreground);
+  color: var(--background);
+}
+.goal-option.selected > span {
+  color: inherit;
+}
+.training-pattern,
+.preview-card,
+.plan-preview,
+.setting-group,
+.profile-intro,
+.profile-monogram,
+.onboarding-summary,
+.method-options button,
+.notice,
+.insight-panel,
+.demo-banner {
+  border-radius: 5px;
+}
+.profile-monogram {
+  background: var(--foreground);
+  color: var(--background);
+  font-family: var(--spatial-display);
+  font-weight: 400;
+}
+.profile-intro h3 {
+  font-family: var(--spatial-display);
+  font-size: 32px;
+  font-weight: 500;
+}
+.week-move-card,
+.week-move-slot {
+  border-radius: 5px;
+}
+.session-switcher,
+.session-switcher button {
+  border-radius: 4px;
+}
+.app-footer {
+  margin-top: 64px;
+  padding-bottom: 35px;
+}
+.footer-wordmark {
+  font-family: var(--spatial-display);
+  font-size: 33px;
+}
+.login-story {
+  border-radius: 0;
+}
+.login-story h1,
+.login-panel h2 {
+  font-family: var(--spatial-display);
+  font-weight: 500;
+}
+.login-story h1 {
+  font-size: clamp(52px, 5.8vw, 88px);
+}
+@media (min-width: 761px) and (max-width: 1100px) {
+  .topbar {
+    padding-inline: 24px;
+  }
+  .topbar .main-nav [role='tab'] {
+    padding-inline: 14px;
+  }
+  .workspace {
+    padding-inline: 24px;
+  }
+  .topbar .journal-sync {
+    display: none;
+  }
+  .right-rail {
+    gap: 22px;
+    grid-template-columns: 1fr 1fr;
+  }
+  .right-rail > :last-child {
+    grid-column: 2;
+  }
+  .plan-overview-title {
+    width: 72%;
+  }
+}
+@media (max-width: 760px) {
+  .topbar {
+    height: 70px;
+    padding: 0 20px;
+    margin: 0 0 4px;
+    gap: 12px;
+  }
+  .topbar .wordmark {
+    font-size: 42px;
+  }
+  .topbar .top-actions {
+    margin-left: auto;
+    gap: 8px;
+  }
+  .workspace {
+    margin: 0;
+    padding: 22px 20px 100px;
+  }
+  .page-heading,
+  .view-wrapper > .page-heading {
+    margin-bottom: 23px;
+    gap: 18px;
+  }
+  .page-heading h1,
+  .today-panel > .page-heading h1 {
+    font-size: clamp(50px, 13.8vw, 80px);
+    letter-spacing: -0.075em;
+  }
+  .daily-heading {
+    align-items: flex-end;
+  }
+  .daily-heading > div:first-child {
+    display: block;
+  }
+  .daily-kicker {
+    display: block;
+    font-size: 10px;
+    margin-bottom: 13px;
+  }
+  .selected-date {
+    font-size: 11px;
+    margin-top: 13px;
+    max-width: none;
+  }
+  .daily-controls {
+    padding: 0;
+    gap: 8px;
+  }
+  .day-navigation {
+    gap: 5px;
+  }
+  .day-navigation .icon-button {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+  }
+  .today-layout > section > .week-heading {
+    padding: 13px 0 9px;
+  }
+  .week-context strong {
+    font-size: 12px;
+  }
+  .week-context > span {
+    font-size: 10px;
+  }
+  .today-layout > section > .week-rhythm {
+    padding: 0 0 12px;
+  }
+  .today-layout > section > .week-rhythm > div > strong {
+    font-size: 11px;
+  }
+  .today-layout > section > .week-rhythm p {
+    font-size: 10px;
+  }
+  .day-strip {
+    padding: 3px;
+    gap: 2px;
+    margin-bottom: 15px;
+  }
+  .day-button {
+    min-height: 64px;
+    flex-direction: column;
+    gap: 3px;
+    padding: 6px 2px 11px;
+  }
+  .day-button > strong {
+    font-size: 23px;
+  }
+  .day-button > span:first-child {
+    font-size: 10px;
+  }
+  .day-session-markers {
+    bottom: 4px;
+    left: 0;
+    right: 0;
+    justify-content: center;
+  }
+  .focus-deck {
+    margin-top: 12px;
+  }
+  .right-rail {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 30px;
+    padding-top: 25px;
+    gap: 25px;
+  }
+  .goal-scene,
+  .goal-scene .race-card {
+    min-height: 240px;
+  }
+  .goal-scene .race-card {
+    padding: 25px;
+  }
+  .right-rail > :last-child {
+    grid-column: auto;
+  }
+  .plan-heading-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .plan-heading-actions .secondary-button {
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  .plan-overview {
+    padding: 25px;
+    min-height: 0;
+    display: block;
+  }
+  .plan-overview-title {
+    width: 100%;
+    display: block;
+    min-height: 0;
+  }
+  .plan-overview-title > div:first-child {
+    max-width: 100%;
+  }
+  .plan-overview h2 {
+    max-width: 80%;
+    font-size: 34px;
+  }
+  .plan-overview p {
+    font-size: 11px;
+  }
+  .plan-endpoint {
+    margin-top: 21px;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+  .plan-endpoint span {
+    font-size: 35px;
+  }
+  .plan-overview {
+    display: flex;
+    flex-direction: column;
+  }
+  .plan-overview .plan-overview-title {
+    order: 0;
+  }
+  .plan-overview .block-overview {
+    order: 2;
+    margin-top: 12px;
+  }
+  .block-overview summary {
+    width: 100%;
+  }
+  .week-detail-heading h2 {
+    font-size: 32px;
+  }
+  .plan-calendar {
+    border: 0;
+    border-top: 1px solid var(--border);
+    border-radius: 0;
+    overflow: visible;
+  }
+  .calendar-day {
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+    padding-block: 13px;
+  }
+  .calendar-run {
+    border-radius: 4px;
+  }
+  .progress-metrics strong,
+  .history-metrics strong {
+    font-size: 32px;
+  }
+  .progress-metrics > div,
+  .history-metrics > div {
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+  }
+  .training-subnav {
+    gap: 3px;
+    border-radius: 0;
+  }
+  .training-subnav button {
+    font-size: 11px;
+    border-radius: 3px;
+  }
+  .training-baseline,
+  .method-summary {
+    border-radius: 5px;
+  }
+  .stride-modal,
+  .stride-modal.wide {
+    border-radius: 0;
+  }
+  .modal-title {
+    font-size: 32px;
+  }
+  .action-progress-modal {
+    border-radius: 8px;
+  }
+  .goal-option {
+    border-radius: 4px;
+  }
+  .goal-options.expanded-goals {
+    gap: 7px;
+  }
+  .availability button,
+  .frequency-options button,
+  .training-pattern,
+  .profile-monogram {
+    border-radius: 4px;
+  }
+  .week-move-card,
+  .week-move-slot {
+    border-radius: 5px;
+  }
+  .app-footer {
+    margin-top: 42px;
+  }
+}
+@media (max-width: 370px) {
+  .workspace {
+    padding-inline: 14px;
+  }
+  .topbar {
+    padding-inline: 14px;
+  }
+  .page-heading h1,
+  .today-panel > .page-heading h1 {
+    font-size: 49px;
+  }
+  .daily-kicker {
+    font-size: 9px;
+  }
+  .day-navigation .icon-button {
+    width: 30px;
+    min-width: 30px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .primary-button svg,
+  .secondary-button svg {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* Keep compact summaries legible on the dark plan surface. */
+.plan-overview .block-overview > summary {
+  background: transparent;
+  color: #d9e1cd;
+  border: 1px solid #59664e;
+  border-radius: 4px;
+  padding: 13px 16px;
+  min-height: 46px;
+}
+.plan-overview .block-overview > summary:hover {
+  background: #ffffff0a;
+}
+.today-layout > section > .week-rhythm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 20px;
+}
+.today-layout > section > .week-rhythm > p:not(:first-of-type) {
+  flex-basis: 100%;
+}
+.journal-upcoming {
+  margin-top: 32px;
+}
+.journal-section-heading h2,
+.journal-section-heading h3 {
+  font-family: var(--spatial-display);
+  font-weight: 500;
+}
+.session-contact-sheet {
+  gap: 0;
+  border-top: 1px solid var(--border);
+}
+.upcoming-session {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding-inline: 0;
+}
+.upcoming-session:hover {
+  background: var(--soft);
+}
+.upcoming-date {
+  border-radius: 3px;
+  background: var(--soft);
+}
+.upcoming-date strong {
+  font-family: var(--spatial-display);
+  font-weight: 400;
+}
+.block-volume {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+.volume-columns button,
+.volume-columns i {
+  border-radius: 2px;
+}
+@media (max-width: 760px) {
+  .plan-overview {
+    min-height: 310px;
+  }
+  .plan-overview-title {
+    padding-bottom: 5px;
+  }
+  .plan-overview h2 {
+    max-width: 100%;
+  }
+  .plan-overview .plan-endpoint {
+    margin-top: 30px;
+    margin-bottom: 20px;
+  }
+  .plan-overview .block-overview {
+    width: 100%;
+  }
+  .today-layout > section > .week-rhythm {
+    gap: 1px 8px;
+  }
+}
+.plan-overview .block-overview {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+.plan-overview .block-overview[open] {
+  background: #182119;
+}
+.plan-overview .block-overview > summary > svg {
+  color: #b7c3ac;
+}
+.goal-option.selected > small {
+  color: inherit;
+  opacity: 0.85;
+}
+.goal-option > small {
+  font-size: 12px;
+  line-height: 1.4;
+}
+.profile-intro {
+  padding: 24px;
+  background: var(--soft);
+  border-left: 3px solid var(--navigation);
+}
+@media (max-width: 760px) {
+  .goal-option > small {
+    font-size: 11px;
+  }
+  .profile-intro {
+    padding: 20px 16px;
+  }
+}
+@media (max-width: 760px) {
+}
+.calendar-day {
+  border-right: 0;
+  border-bottom: 1px solid var(--border);
+}
+.calendar-day:last-child {
+  border-bottom: 0;
+}
+.preview-summary,
+.preview-metrics > div,
+.watch-delivery,
+.change-list > div,
+.journal-chart-disclosure,
+.choice-tile {
+  border-radius: 5px;
+}
+@media (max-width: 760px) {
+}
+.plan-overview .plan-bars i.recovery {
+  opacity: 1;
+}
+.plan-overview .chart-legend i {
+  background: #a5b594;
+}
+.plan-overview .chart-legend i.recovery {
+  background: #657957;
+}
+.plan-overview .plan-endpoint > svg {
+  color: #b7c3ac;
+}
+
+/* Reference revision: the session is the visual material. */
+.topbar .wordmark,
+.wordmark {
+  letter-spacing: -0.075em;
+}
+.topbar .main-nav [role='tab'] {
+  font-size: 14px;
+}
+.today-panel > .daily-heading h1 {
+  font-size: clamp(34px, 4vw, 54px);
+  letter-spacing: -0.055em;
+}
+.today-panel > .daily-heading {
+  margin-bottom: 22px;
+}
+.daily-heading .selected-date {
+  font-size: 13px;
+}
+.day-strip {
+  gap: 0;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  margin-bottom: 0;
+  background: var(--paper);
+}
+.day-button {
+  position: relative;
+  border: 0;
+  border-right: 1px solid var(--border);
+  border-radius: 0;
+  min-height: 76px;
+}
+.day-button:last-child {
+  border-right: 0;
+}
+.day-button > span:first-child {
+  font-size: 12px;
+}
+.day-button.selected {
+  background: var(--foreground);
+  color: var(--background);
+}
+.day-button::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+  opacity: 0;
+  border: 1px solid currentColor;
+  clip-path: polygon(
+    0 0,
+    12px 0,
+    12px 1px,
+    calc(100% - 12px) 1px,
+    calc(100% - 12px) 0,
+    100% 0,
+    100% 12px,
+    calc(100% - 1px) 12px,
+    calc(100% - 1px) calc(100% - 12px),
+    100% calc(100% - 12px),
+    100% 100%,
+    calc(100% - 12px) 100%,
+    calc(100% - 12px) calc(100% - 1px),
+    12px calc(100% - 1px),
+    12px 100%,
+    0 100%,
+    0 calc(100% - 12px),
+    1px calc(100% - 12px),
+    1px 12px,
+    0 12px
+  );
+}
+.day-button:hover::after,
+.day-button:focus-visible::after {
+  opacity: 0.7;
+}
+.workout-card,
+.workout-card[data-tone] {
+  --session-inset: 36px;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 0.48fr);
+  column-gap: 48px;
+  padding: var(--session-inset) var(--session-inset) 0;
+  min-height: 0;
+  border: 0;
+  border-radius: 0 0 5px 5px;
+  background: var(--paper);
+  color: var(--foreground);
+  box-shadow: none;
+  overflow: hidden;
+  isolation: isolate;
+  animation: session-reveal 300ms ease-out both;
+}
+.workout-card::after {
+  display: none;
+}
+.workout-card > * {
+  position: relative;
+  min-width: 0;
+  z-index: 1;
+}
+.workout-card > .card-topline {
+  grid-column: 1 / -1;
+  margin: 0 0 28px;
+}
+.workout-card .eyebrow {
+  font-size: 13px;
+  letter-spacing: 0;
+  color: var(--muted-foreground);
+}
+.workout-card .eyebrow::before {
+  background: var(--navigation);
+  border-radius: 0;
+}
+.workout-card > .session-heading {
+  grid-column: 1;
+  width: auto;
+}
+.workout-card h2 {
+  font-family: var(--spatial-display);
+  font-size: clamp(48px, 6.5vw, 88px);
+  font-weight: 400;
+  line-height: 0.99;
+  letter-spacing: -0.07em;
+  max-width: 17ch;
+  overflow-wrap: break-word;
+}
+.workout-card .session-date-stamp {
+  display: none;
+}
+.workout-card > .workout-purpose {
+  grid-column: 1;
+  width: auto;
+  max-width: 55ch;
+  margin: 22px 0;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--muted-foreground);
+}
+.workout-card > .card-footer {
+  grid-column: 1;
+  width: auto;
+  margin: 0 0 34px;
+  padding: 0;
+  align-self: end;
+}
+.workout-card .today-run-actions {
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.workout-card .today-run-actions > button {
+  min-width: 150px;
+  flex: 0 1 auto;
+  font-size: 14px;
+}
+.workout-card .primary-button {
+  background: var(--foreground);
+  border-color: var(--foreground);
+  color: var(--background);
+}
+.workout-card .primary-button:hover {
+  background: var(--navigation);
+  border-color: var(--navigation);
+  color: var(--navigation-ink);
+}
+.workout-card .secondary-button,
+.workout-card .icon-button {
+  background: transparent;
+  color: var(--foreground);
+  border-color: var(--input);
+}
+.workout-card > .workout-stats {
+  grid-column: 2;
+  grid-row: 2 / 5;
+  width: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-content: end;
+  gap: 26px 18px;
+  padding: 0 0 34px 32px;
+  margin: 0;
+  border-left: 1px solid var(--border);
+  box-shadow: none;
+  outline: 0;
+}
+.workout-card .workout-stats > div {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  gap: 10px;
+  border: 0;
+  justify-content: end;
+}
+.workout-card .workout-stats > div:first-child {
+  grid-column: 1 / -1;
+}
+.workout-card .workout-stats strong {
+  font-family: var(--spatial-display);
+  font-size: clamp(26px, 2.8vw, 38px);
+  font-weight: 400;
+  letter-spacing: -0.06em;
+  line-height: 1;
+}
+.workout-card .workout-stats > div:first-child strong {
+  font-size: clamp(60px, 7vw, 94px);
+}
+.workout-card .workout-stats > div > span {
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--muted-foreground);
+}
+.workout-card .stat-small {
+  font-family: var(--font-journal-sans);
+  font-size: 12px;
+  letter-spacing: 0;
+  color: var(--muted-foreground);
+}
+.workout-card > .session-preview {
+  grid-column: 1 / -1;
+  width: auto;
+  border-color: var(--border);
+  margin: 0;
+  padding: 0;
+}
+.workout-card .session-preview summary {
+  min-height: 52px;
+  padding: 14px 0;
+  color: var(--foreground);
+  font-size: 14px;
+}
+.workout-card .session-preview .session-structure {
+  padding: 6px 0 22px;
+}
+.workout-card .session-structure strong,
+.workout-card .session-structure span {
+  color: var(--foreground);
+}
+.workout-card .session-structure > div {
+  border-color: var(--border);
+}
+.session-score {
+  grid-column: 1 / -1;
+  margin: 0 calc(-1 * var(--session-inset));
+  padding: 24px var(--session-inset) 18px;
+  background: #202922;
+  color: #ecf0e5;
+}
+.score-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-bottom: 18px;
+}
+.score-heading h3 {
+  font-size: 14px;
+  font-weight: 500;
+}
+.score-heading > span,
+.score-caption {
+  font-size: 12px;
+  color: #bac6b3;
+}
+.score-tabs {
+  display: block;
+}
+.score-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-color: #6f8266 #202922;
+  scrollbar-width: thin;
+}
+.score-bars {
+  display: flex;
+  height: 135px;
+  width: 100%;
+  align-items: end;
+  justify-content: stretch;
+  gap: 5px;
+  padding: 5px 2px 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+.score-bars .score-step {
+  position: relative;
+  flex-basis: 0;
+  min-width: 39px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0;
+  gap: 7px;
+  background: transparent;
+  color: #bfccb7;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  outline-offset: -2px;
+  transition: none;
+}
+.score-bars .score-step::after {
+  display: none;
+}
+.score-bar {
+  display: block;
+  flex: none;
+  width: 100%;
+  height: var(--step-height);
+  max-height: calc(100% - 25px);
+  background: #687e5e;
+  border-top: 1px solid #8a9c7d;
+  transition:
+    background-color 180ms,
+    clip-path 240ms;
+  clip-path: inset(0 0 0 0 round 2px 2px 0 0);
+}
+.score-bar[data-kind='work'] {
+  background: #a4b58f;
+  border-top-color: #d6dfc9;
+}
+.score-bar[data-kind='recovery'] {
+  background: #43553d;
+  border-top-color: #7d926f;
+}
+.score-bars .score-step[data-active] {
+  background: transparent;
+  color: #f0f4e9;
+  box-shadow: none;
+}
+.score-step[data-active] .score-bar {
+  background: #dce6ce;
+  border-top-color: #fff;
+}
+.score-step:hover .score-bar {
+  background: #bdcda8;
+  clip-path: inset(0 2px 0 2px round 2px 2px 0 0);
+}
+.score-step-number {
+  font-family: var(--spatial-display);
+  font-size: 12px;
+  line-height: 18px;
+}
+.score-bars .score-step:focus-visible {
+  outline: 2px solid #f0f4e9;
+  box-shadow: none;
+}
+.score-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 24px;
+  row-gap: 10px;
+  margin-top: 19px;
+  padding-top: 18px;
+  border-top: 1px solid #4d5e45;
+  min-height: 120px;
+}
+.score-detail[hidden] {
+  display: none;
+}
+.score-step-title > span {
+  display: block;
+  font-size: 12px;
+  color: #b6c5aa;
+  margin-bottom: 5px;
+}
+.score-step-title h4 {
+  font-family: var(--spatial-display);
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+.score-duration {
+  font-family: var(--spatial-display);
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: -0.05em;
+  align-self: center;
+  white-space: nowrap;
+}
+.score-detail > p {
+  grid-column: 1 / -1;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #d0dac6;
+  max-width: 70ch;
+  margin: 0;
+}
+.score-caption {
+  margin: 14px 0 0;
+}
+.workout-card.rest-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 400px;
+  background: #17241d;
+  color: #f5f6ef;
+  padding-bottom: var(--session-inset);
+}
+.workout-card.rest-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 0 48%;
+  background: url('/images/stride-coast.jpg') center / cover;
+  opacity: 0.85;
+  z-index: 0;
+}
+.workout-card.rest-card .card-topline {
+  margin-bottom: 28px;
+}
+.workout-card.rest-card h2 {
+  max-width: 10ch;
+  width: 47%;
+  font-size: clamp(44px, 5.5vw, 76px);
+}
+.workout-card.rest-card > .workout-purpose {
+  width: 43%;
+  color: #c5d0bd;
+}
+.workout-card.rest-card .eyebrow {
+  color: #c5d0bd;
+}
+.workout-card.rest-card .card-footer {
+  margin: 10px 0 0;
+}
+.workout-card.rest-card .secondary-button {
+  color: #f5f6ef;
+  border-color: #748568;
+}
+.plan-overview {
+  min-height: 0;
+  padding: 34px;
+}
+.plan-overview-title {
+  width: 100%;
+  min-height: 150px;
+}
+.plan-overview-title > div:first-child {
+  max-width: 72%;
+}
+.plan-overview h2 {
+  font-size: clamp(38px, 4.5vw, 64px);
+  letter-spacing: -0.06em;
+}
+.plan-endpoint span {
+  font-size: 72px;
+}
+.plan-overview .block-overview > summary {
+  width: 100%;
+  font-size: 14px;
+}
+@keyframes session-reveal {
+  from {
+    opacity: 0.65;
+    clip-path: inset(0 0 14px);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0);
+  }
+}
+@media (max-width: 1000px) {
+  .workout-card,
+  .workout-card[data-tone] {
+    column-gap: 30px;
+    grid-template-columns: minmax(0, 1fr) minmax(215px, 0.48fr);
+  }
+  .workout-card > .workout-stats {
+    padding-left: 25px;
+  }
+  .workout-card .workout-stats strong {
+    font-size: 27px;
+  }
+}
+@media (max-width: 760px) {
+  .today-panel > .daily-heading h1 {
+    font-size: 38px;
+  }
+  .today-panel > .daily-heading {
+    margin-bottom: 18px;
+  }
+  .topbar .main-nav [role='tab'] {
+    font-size: 12px;
+  }
+  .day-button {
+    min-height: 70px;
+  }
+  .day-button > span:first-child {
+    font-size: 12px;
+  }
+  .today-layout > section > .week-rhythm p,
+  .week-context > span {
+    font-size: 12px;
+  }
+  .workout-card,
+  .workout-card[data-tone] {
+    --session-inset: 22px;
+    grid-template-columns: minmax(0, 1fr);
+    padding-top: 22px;
+  }
+  .workout-card > .card-topline {
+    margin-bottom: 22px;
+  }
+  .workout-card h2 {
+    font-size: clamp(43px, 10.6vw, 64px);
+    max-width: 18ch;
+  }
+  .workout-card > .workout-purpose {
+    font-size: 15px;
+    margin: 18px 0 22px;
+  }
+  .workout-card > .card-footer {
+    margin-bottom: 26px;
+  }
+  .workout-card .today-run-actions > button {
+    flex: 1 1 140px;
+    padding-inline: 14px;
+    font-size: 14px;
+  }
+  .workout-card > .workout-stats {
+    grid-column: 1;
+    grid-row: auto;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 23px 0 26px;
+    border: 0;
+    border-top: 1px solid var(--border);
+  }
+  .workout-card .workout-stats > div:first-child,
+  .workout-card .workout-stats > div:last-child {
+    grid-column: auto;
+    align-items: flex-start;
+  }
+  .workout-card .workout-stats > div:first-child strong {
+    font-size: 46px;
+  }
+  .workout-card .workout-stats strong {
+    font-size: clamp(22px, 6.1vw, 34px);
+  }
+  .workout-card .workout-stats > div > span,
+  .workout-card .stat-small {
+    font-size: 12px;
+  }
+  .session-score {
+    padding-top: 22px;
+  }
+  .score-bars {
+    height: 112px;
+  }
+  .score-heading {
+    margin-bottom: 12px;
+  }
+  .score-detail {
+    min-height: 145px;
+    column-gap: 12px;
+  }
+  .score-step-title h4 {
+    font-size: 24px;
+  }
+  .score-duration {
+    font-size: 27px;
+  }
+  .workout-card.rest-card {
+    min-height: 0;
+    padding-bottom: 22px;
+  }
+  .workout-card.rest-card::before {
+    inset: 0;
+    opacity: 0.18;
+  }
+  .workout-card.rest-card h2 {
+    max-width: 12ch;
+    width: 100%;
+    font-size: 54px;
+  }
+  .workout-card.rest-card > .workout-purpose {
+    width: 100%;
+    font-size: 16px;
+  }
+  .workout-card.rest-card .card-footer {
+    order: initial;
+  }
+  .plan-overview {
+    padding: 26px;
+    min-height: 0;
+  }
+  .plan-overview-title {
+    min-height: 0;
+  }
+  .plan-overview-title > div:first-child {
+    max-width: 100%;
+  }
+  .plan-overview h2 {
+    font-size: 38px;
+  }
+  .plan-overview p {
+    font-size: 13px;
+  }
+  .plan-overview .plan-endpoint {
+    margin: 25px 0;
+  }
+  .plan-endpoint span {
+    font-size: 56px;
+  }
+}
+@media (max-width: 370px) {
+  .workout-card,
+  .workout-card[data-tone] {
+    --session-inset: 18px;
+  }
+  .workout-card .workout-stats strong {
+    font-size: 22px;
+  }
+  .workout-card .workout-stats > div:first-child strong {
+    font-size: 39px;
+  }
+  .workout-card .stat-small {
+    font-size: 11px;
+  }
+  .score-detail {
+    grid-template-columns: 1fr;
+  }
+  .score-duration {
+    font-size: 24px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .workout-card {
+    animation: none;
+  }
+  .score-bar {
+    transition: none;
+  }
+}
+.no-motion .workout-card {
+  animation: none;
+}
+.no-motion .score-bar {
+  transition: none;
+}
+
+.score-detail:focus-visible {
+  outline: 2px solid #ecf0e5;
+  outline-offset: 4px;
+}
+
+/* Today: one run in focus, with deeper context a deliberate step away. */
+.today-panel {
+  max-width: 1080px;
+  margin-inline: auto;
+}
+.today-focus-layout {
+  display: block;
+}
+.today-focus-layout > section {
+  width: 100%;
+  min-width: 0;
+}
+.today-focus-layout .workout-card h2 {
+  font-size: clamp(44px, 5.6vw, 72px);
+}
+.today-focus-layout .workout-card > .card-topline {
+  margin-bottom: 22px;
+}
+.today-focus-layout .workout-card > .workout-purpose {
+  max-width: 45ch;
+}
+.today-focus-layout .workout-card > .card-footer {
+  margin-bottom: 28px;
+}
+.today-focus-layout .workout-stats > div:first-child strong {
+  font-size: clamp(56px, 6.4vw, 80px);
+}
+.today-focus-layout .session-preview .session-score {
+  margin: 0 calc(-1 * var(--session-inset));
+}
+.today-focus-layout .today-tools {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border);
+}
+.today-tools .week-focus {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  flex: 1;
+  min-width: 0;
+}
+.today-tools .week-focus summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-size: 14px;
+  cursor: pointer;
+  list-style: none;
+}
+.today-tools .week-focus summary::-webkit-details-marker {
+  display: none;
+}
+.today-tools .week-focus[open] summary > svg {
+  transform: rotate(90deg);
+}
+.today-tools .week-focus p {
+  font-size: 14px;
+  max-width: 55ch;
+}
+.today-tools .home-watch-link {
+  min-height: 44px;
+  padding-inline: 0;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.today-focus-layout .journal-upcoming {
+  margin-top: 24px;
+}
+.today-focus-layout .journal-section-heading h2 {
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: -0.035em;
+}
+.today-focus-layout .session-contact-sheet {
+  grid-template-columns: 1fr;
+}
+.today-focus-layout .upcoming-session {
+  min-height: 82px;
+}
+@media (max-width: 760px) {
+  .today-focus-layout .workout-card {
+    padding-top: 24px;
+  }
+  .today-focus-layout .workout-card h2 {
+    font-size: clamp(40px, 10.5vw, 58px);
+  }
+  .today-focus-layout .workout-stats > div:first-child strong {
+    font-size: 40px;
+  }
+  .today-focus-layout .workout-card > .card-topline {
+    margin-bottom: 18px;
+  }
+  .today-focus-layout .workout-card > .workout-purpose {
+    margin-block: 16px;
+  }
+  .today-focus-layout .workout-card > .card-footer {
+    margin-bottom: 18px;
+  }
+  .today-focus-layout .workout-card > .workout-stats {
+    padding: 18px 0;
+  }
+  .today-focus-layout .today-tools {
+    gap: 10px;
+    padding-block: 10px;
+    flex-wrap: wrap;
+  }
+  .today-tools .week-focus {
+    flex-basis: 170px;
+  }
+  .today-focus-layout .journal-upcoming {
+    margin-top: 18px;
+  }
+}
+
+.connection-disclosure {
+  border-block-end: 1px solid var(--border);
+  padding-block: 10px;
+}
+.connection-disclosure > summary,
+.connection-history > summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  list-style: none;
+}
+.connection-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+.connection-disclosure[open] > summary svg {
+  transform: rotate(90deg);
+}
+.connection-disclosure .watch-test {
+  margin-block: 14px;
+}
+.watch-workout-list {
+  display: grid;
+  margin-top: 12px;
+}
+.watch-workout-list > button {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr) auto 16px;
+  gap: 14px;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
+}
+.watch-workout-list > button:hover {
+  background: var(--soft);
+}
+.watch-workout-list > button > span {
+  font-size: 13px;
+  color: var(--muted-foreground);
+}
+.watch-workout-list strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 500;
+}
+.watch-workout-list small {
+  display: block;
+  font-size: 13px;
+  color: var(--muted-foreground);
+  margin-top: 4px;
+  font-weight: 400;
+}
+@media (max-width: 500px) {
+  .watch-workout-list > button {
+    grid-template-columns: 58px minmax(0, 1fr) 16px;
+    gap: 10px;
+  }
+  .watch-workout-list > button > span:nth-last-child(2) {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  .watch-workout-list > button > svg {
+    grid-column: 3;
+    grid-row: 1 / 3;
+  }
+}
+
+.watch-connected {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 0;
+  color: var(--green);
+  font-size: 13px;
+}
+.watch-connected svg {
+  flex-shrink: 0;
+}
+
+@media (max-width: 380px) {
+  .app-footer {
+    flex-wrap: wrap;
+  }
+  .app-footer nav {
+    flex-wrap: wrap;
+    max-width: 100%;
+  }
+}
+
+.form-field .field-error {
+  color: var(--destructive);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Everyday home: one week picker, tappable days and a clear next action. */
+.date-rail-wrap {
+  min-width: 0;
+  margin-bottom: 16px;
+}
+.date-rail-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+.date-rail-hint {
+  color: var(--muted-foreground);
+  font-size: 13px;
+}
+.day-strip.date-rail {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x pan-y;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  gap: 6px;
+  margin: 0;
+  padding: 4px 3px 10px;
+  cursor: grab;
+  user-select: none;
+}
+.day-strip.date-rail[data-dragging] {
+  cursor: grabbing;
+  scroll-snap-type: none;
+}
+.date-rail .day-button,
+.date-rail .day-button:last-child {
+  flex: 0 0 72px;
+  width: 72px;
+  min-height: 100px;
+  scroll-snap-align: center;
+  cursor: inherit;
+  padding: 10px 4px 18px;
+  gap: 3px;
+}
+.date-rail .rail-month {
+  font-size: 12px;
+  opacity: 0.75;
+}
+.date-rail .day-button[data-gap] {
+  margin-left: 24px;
+}
+.date-rail .day-button[data-gap]::before {
+  content: '···';
+  position: absolute;
+  right: calc(100% + 7px);
+  color: var(--muted-foreground);
+}
+@media (max-width: 500px) {
+  .date-rail .day-button,
+  .date-rail .day-button:last-child {
+    flex-basis: 62px;
+    width: 62px;
+    min-height: 96px;
+  }
+}
+.variety-review-list > div {
+  display: grid;
+  grid-template-columns: 65px minmax(0, 1fr) 65px;
+  gap: 14px;
+}
+.variety-review-list > div > span:last-child {
+  text-align: right;
+  white-space: nowrap;
+}
+.variety-review-list strong small {
+  display: block;
+  margin-top: 6px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+.variety-review-list + .form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.action-progress-modal {
+  inset: auto;
+  top: 50%;
+  left: 50%;
+  transform: none;
+  translate: -50% -50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(440px, calc(100vw - 32px));
+  border-radius: 20px;
+}
+.today-panel {
+  max-width: 880px;
+}
+.today-panel > .daily-heading {
+  align-items: center;
+  margin-bottom: 24px;
+}
+.today-panel > .daily-heading h1 {
+  font-size: clamp(30px, 4vw, 40px);
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+}
+.daily-heading .selected-date {
+  font-size: 15px;
+  margin-top: 8px;
+}
+.daily-controls .text-button {
+  min-height: 44px;
+  border-radius: 12px;
+  background: var(--secondary);
+  padding: 10px 14px;
+  font-size: 14px;
+}
+.today-layout > section > .simple-week-heading {
+  display: block;
+  margin: 0 0 14px;
+  padding: 0;
+  border: 0;
+}
+.week-picker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.week-picker > span {
+  flex-shrink: 0;
+  font-size: 14px;
+  color: var(--muted-foreground);
+}
+.week-picker .choice-trigger {
+  min-width: 245px;
+  max-width: 100%;
+  border-radius: 12px;
+  min-height: 44px;
+  padding: 10px 14px;
+  font-size: 14px;
+  background: var(--paper);
+}
+.day-strip {
+  gap: 6px;
+  padding: 0;
+  margin-bottom: 16px;
+  background: transparent;
+  border: 0;
+}
+.day-button,
+.day-button:last-child {
+  border: 0;
+  border-radius: 14px;
+  background: var(--paper);
+  min-height: 88px;
+  padding: 12px 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.day-button > span:first-child {
+  font-size: 13px;
+}
+.day-button > strong {
+  font-size: 23px;
+  line-height: 1.1;
+}
+.day-button .day-session-markers {
+  bottom: 8px;
+  left: 0;
+  right: 0;
+  justify-content: center;
+}
+.day-button::after {
+  display: none;
+}
+.day-button.selected {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  box-shadow: none;
+  transform: none;
+}
+.day-button.selected > span:first-child {
+  color: inherit;
+  opacity: 0.85;
+}
+.day-button.is-today:not(.selected) {
+  box-shadow: inset 0 0 0 2px var(--navigation);
+}
+.today-focus-layout .workout-card,
+.today-focus-layout .workout-card[data-tone] {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  animation: none;
+}
+.today-focus-layout .workout-card > .card-topline {
+  margin: 0 0 16px;
+  padding: 0;
+}
+.today-focus-layout .workout-card .eyebrow {
+  font-size: 14px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.today-focus-layout .workout-card > .session-heading {
+  padding: 0;
+}
+.today-focus-layout .workout-card h2 {
+  font-size: clamp(28px, 3.8vw, 40px);
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+  max-width: none;
+}
+.today-focus-layout .workout-card > .workout-purpose {
+  margin: 12px 0 22px;
+  padding: 0;
+  max-width: 62ch;
+  font-size: 16px;
+  line-height: 1.65;
+}
+.today-focus-layout .workout-card > .workout-stats {
+  order: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 0;
+  border-radius: 14px;
+  background: var(--soft);
+  padding: 16px;
+  gap: 12px;
+  width: 100%;
+  margin: 0 0 20px;
+}
+.today-focus-layout .workout-card .workout-stats > div,
+.today-focus-layout .workout-card .workout-stats > div:first-child {
+  grid-column: auto;
+  grid-row: auto;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+.today-focus-layout .workout-card .workout-stats strong,
+.today-focus-layout .workout-card .workout-stats > div:first-child strong {
+  font-size: clamp(24px, 3.5vw, 34px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+.today-focus-layout .workout-card .workout-stats > div > span {
+  font-size: 13px;
+  line-height: 1.4;
+}
+.today-focus-layout .workout-card > .card-footer {
+  order: 2;
+  width: 100%;
+  align-self: stretch;
+  padding: 0;
+  margin: 0;
+}
+.today-focus-layout .workout-card .today-run-actions {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 12px;
+}
+.today-focus-layout .workout-card .today-run-actions > button {
+  flex: 1;
+  border-radius: 14px;
+  min-height: 48px;
+  font-size: 15px;
+}
+.today-focus-layout .workout-card .today-run-actions > .text-button {
+  flex: 0 0 auto;
+  padding: 12px 18px;
+  color: var(--foreground);
+}
+.today-focus-layout .workout-card > .session-preview {
+  order: 3;
+  padding: 0;
+  margin: 18px 0 0;
+  border-top: 1px solid var(--border);
+}
+.today-focus-layout .workout-card .session-preview summary {
+  padding: 14px 0 0;
+  min-height: 44px;
+  font-size: 14px;
+}
+.today-tools {
+  margin: 12px 0 0;
+  padding: 0 0 12px;
+  gap: 12px;
+}
+.today-tools .text-button,
+.today-tools summary {
+  font-size: 14px;
+  min-height: 44px;
+}
+.today-focus-layout .workout-card.rest-card h2 {
+  font-size: clamp(28px, 3.8vw, 40px);
+}
+.today-focus-layout .workout-card.rest-card .card-topline {
+  margin-bottom: 16px;
+}
+.text-button,
+.settings-link {
+  touch-action: manipulation;
+}
+.choice-trigger {
+  border-radius: 12px;
+  min-height: 48px;
+  font-size: 15px;
+}
+:where(
+  .primary-button,
+  .secondary-button,
+  .text-button,
+  .icon-button,
+  .day-button,
+  .settings-watch-card,
+  .settings-link
+):focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 3px;
+}
+@media (max-width: 760px) {
+  .today-panel > .daily-heading {
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .daily-controls {
+    width: auto;
+    padding: 0;
+  }
+  .daily-heading > div:first-child {
+    max-width: none;
+  }
+  .week-picker {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .week-picker > span {
+    display: none;
+  }
+  .week-picker .choice-trigger {
+    width: 100%;
+    min-width: 0;
+  }
+  .day-strip {
+    gap: 4px;
+  }
+  .day-button {
+    min-height: 78px;
+    border-radius: 12px;
+  }
+  .day-button > strong {
+    font-size: 21px;
+  }
+  .today-focus-layout .workout-card,
+  .today-focus-layout .workout-card[data-tone] {
+    padding: 20px;
+    border-radius: 20px;
+  }
+  .today-focus-layout .workout-card > .workout-stats {
+    padding: 14px 10px;
+    gap: 8px;
+  }
+  .today-focus-layout .workout-card .workout-stats strong,
+  .today-focus-layout .workout-card .workout-stats > div:first-child strong {
+    font-size: 25px;
+  }
+  .today-focus-layout .workout-card > .workout-purpose {
+    font-size: 16px;
+  }
+  .today-focus-layout .workout-card .today-run-actions > .text-button {
+    padding-inline: 10px;
+  }
+}
+
+/* Daily navigation and its Settings destination share the date controls' shapes. */
+.settings-page {
+  max-width: 760px;
+  margin: 0 auto;
+}
+.settings-page .page-heading h1 {
+  font-size: clamp(30px, 4vw, 40px);
+  letter-spacing: -0.04em;
+}
+.settings-watch-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  color: var(--foreground);
+  background: var(--paper);
+  text-align: left;
+}
+.settings-watch-card:hover {
+  border-color: var(--input);
+  background: color-mix(in srgb, var(--paper) 80%, var(--accent));
+}
+.settings-watch-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 62px;
+  height: 72px;
+  border-radius: 20px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.settings-watch-copy {
+  display: grid;
+  gap: 7px;
+  flex: 1;
+  min-width: 0;
+}
+.settings-watch-copy strong {
+  font-size: 22px;
+  letter-spacing: -0.035em;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.settings-watch-copy > span {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+.settings-watch-copy small {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.settings-watch-copy .status-dot {
+  flex-shrink: 0;
+}
+.settings-watch-card > svg {
+  flex-shrink: 0;
+}
+.settings-page .settings-section {
+  margin-top: 32px;
+}
+.settings-page .settings-section h2 {
+  font-size: 18px;
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  margin-bottom: 12px;
+}
+.settings-page .settings-link {
+  border-radius: 16px;
+  padding: 18px 20px;
+}
+.settings-page .settings-link strong {
+  font-size: 16px;
+}
+.settings-page .settings-link small,
+.settings-page .setting-row small {
+  font-size: 14px;
+}
+.settings-page .settings-profile {
+  margin-top: 12px;
+}
+.settings-profile > span {
+  flex: 1;
+}
+.settings-page .setting-row {
+  border: 0;
+  background: var(--paper);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-top: 8px;
+  gap: 20px;
+}
+.settings-page .reason-details {
+  margin-top: 28px;
+}
+.watch-workout-picker {
+  margin-top: 24px;
+}
+.watch-workout-picker .form-field {
+  margin-top: 16px;
+}
+.watch-workout-picker .choice-trigger {
+  width: 100%;
+}
+.watch-workout-picker .secondary-button {
+  margin-top: 12px;
+}
+@media (max-width: 1000px) {
+  .topbar .main-nav {
+    position: fixed;
+    left: 50%;
+    right: auto;
+    translate: -50% 0;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    width: min(600px, calc(100% - 24px));
+    height: auto;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 3px;
+    padding: 7px;
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--paper) 94%, transparent);
+    backdrop-filter: blur(18px);
+    box-shadow:
+      0 10px 36px #111c171a,
+      0 2px 6px #111c1708;
+  }
+  .topbar .main-nav [role='tab'] {
+    display: flex;
+    width: 100%;
+    height: auto;
+    min-height: 60px;
+    min-width: 0;
+    padding: 8px 2px;
+    border-radius: 17px;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 12px;
+    line-height: 1.25;
+  }
+  .topbar .main-nav [role='tab'] svg {
+    width: 21px;
+    height: 21px;
+  }
+  .workspace {
+    padding-bottom: calc(118px + env(safe-area-inset-bottom));
+  }
+}
+@media (max-width: 500px) {
+  .settings-watch-card {
+    padding: 18px;
+    gap: 12px;
+  }
+  .settings-watch-icon {
+    flex-basis: 48px;
+    height: 60px;
+    border-radius: 16px;
+  }
+  .settings-watch-copy strong {
+    font-size: 20px;
+  }
+  .settings-page .setting-row {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .settings-page .setting-row > div:first-child {
+    flex: 1 1 150px;
+  }
+  .settings-page .setting-row:has(.choice-trigger) .choice-trigger {
+    width: 100%;
+  }
+  .settings-page .settings-link {
+    padding: 16px;
+  }
+}
+
+.settings-hint {
+  margin: -4px 0 16px;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.55;
+}
+.settings-page .setting-row > div:first-child {
+  min-width: 0;
+}
+.settings-page .setting-row .choice-trigger {
+  width: 210px;
+  flex-shrink: 0;
+}
+.settings-page .setting-row [data-slot='switch'] {
+  flex-shrink: 0;
+}
+.settings-reset {
+  margin-top: 12px;
+  min-height: 44px;
+  font-size: 14px;
+}
+.settings-policy-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-top: 20px;
+  font-size: 14px;
+}
+.settings-policy-links a {
+  padding-block: 8px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.today-focus-layout .workout-card > .workout-stats[data-metrics='2'] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (max-width: 600px) {
+  .settings-page .setting-row:has(.choice-trigger) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .settings-page .setting-row:has(.choice-trigger) > div:first-child {
+    flex-basis: auto;
+  }
+  .settings-page .setting-row .choice-trigger {
+    width: 100%;
+  }
+}
+
+/* Quiet, on-demand detail keeps the journal and daily run in focus. */
+.progress-disclosure {
+  margin-block: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 1.2rem;
+}
+.progress-disclosure > summary {
+  cursor: pointer;
+  font-weight: 650;
+  font-size: 1rem;
+}
+.progress-disclosure > summary > span {
+  display: block;
+  padding-top: 0.3rem;
+  font-weight: 400;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+}
+.target-mode-picker {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 1.5rem 0;
+}
+.target-mode-picker button {
+  min-height: 80px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 0.8rem 0.4rem;
+  font-size: 1rem;
+  background: var(--secondary);
+  color: var(--foreground);
+}
+.target-mode-picker button[aria-pressed='true'] {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.target-mode-picker button small {
+  display: block;
+  font-size: 0.875rem;
+  opacity: 0.7;
+  margin-top: 0.25rem;
+}
+.target-range-row {
+  padding-block: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.target-range-row h3 {
+  font-size: 1rem;
+  margin-bottom: 0.7rem;
+}
+.target-range-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.target-range-fields input {
+  min-width: 0;
+  width: 100%;
+}
+.target-sample {
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  padding: 1rem;
+  margin-block: 0.75rem;
+}
+.target-sample > strong,
+.target-sample > small {
+  display: block;
+}
+.step-target {
+  display: block;
+  font-size: 1rem;
+  font-weight: 650;
+  color: var(--primary);
+  margin-block: 0.3rem;
+}
+
+.target-form-actions {
+  gap: 0.75rem;
+}
