@@ -1,0 +1,686 @@
+{
+  "schemaVersion": "1.0",
+  "title": "Stride race research — organizer-verified upcoming editions",
+  "asOf": "2026-09-07",
+  "verifiedAt": "2026-09-07",
+  "conventions": {
+    "dates": "ISO 8601 date-only values in the event's local calendar. Dates are announcements, not availability or entry guarantees.",
+    "dateStatus": "confirmed means an organizer source states the date. tba means no next-edition date was verified; never infer an annual date.",
+    "multipleDays": "Use distanceOptions dates. London additionally requires the runner's assigned-day selection from dateOptions.",
+    "distances": "Marathon = 42.195 km; half marathon = 21.0975 km. Rounded organizer displays are retained separately when relevant. Trail categories such as 50K are not exact distances.",
+    "pendingDistances": "Null distanceKm and empty distancesKm mean a next-edition exact distance was not verified; do not silently substitute a category or prior-edition distance.",
+    "planWindow": "Keep real upcoming dates even when fewer than four weeks away. The app should separately apply its 4–52-week goal window and leave these entries visible with a timing explanation.",
+    "sourcePolicy": "Only organizer-owned pages and organizer-hosted documents substantiate entries. No registration, pricing or entry availability claims are made."
+  },
+  "races": [
+    {
+      "id": "boston-marathon",
+      "name": "Boston Marathon presented by Bank of America",
+      "city": "Boston",
+      "country": "United States",
+      "countryCode": "US",
+      "terrain": "road",
+      "date": "2027-04-19",
+      "dateStatus": "confirmed",
+      "editionYear": 2027,
+      "distanceKm": 42.195,
+      "distancesKm": [42.195],
+      "distanceBasis": "standard_marathon",
+      "officialUrl": "https://www.baa.org/races/boston-marathon/",
+      "source": "https://www.baa.org/races/boston-marathon/",
+      "sources": [
+        {
+          "url": "https://www.baa.org/races/boston-marathon/",
+          "sourceType": "official_organizer",
+          "supports": "upcoming date and event identity"
+        },
+        {
+          "url": "https://www.baa.org/wp-content/uploads/2026/04/April14-BM26-Media-Guide-Pages_UPDATE-ForOnlineL.pdf",
+          "sourceType": "official_organizer",
+          "supports": "standard distance, organizer and Hopkinton-to-Boston route; 2027 future date"
+        }
+      ],
+      "verifiedAt": "2026-09-07",
+      "distanceOptions": [
+        {
+          "label": "Marathon",
+          "distanceKm": 42.195,
+          "date": "2027-04-19"
+        }
+      ],
+      "aliases": ["Boston", "BAA", "B.A.A."],
+      "locationNote": "Starts in Hopkinton and finishes in Boston, Massachusetts."
+    },
+    {
+      "id": "london-marathon",
+      "name": "TCS London Marathon",
+      "city": "London",
+      "country": "United Kingdom",
+      "countryCode": "GB",
+      "terrain": "road",
+      "date": "2027-04-24",
+      "dateStatus": "confirmed",
+      "editionYear": 2027,
+      "distanceKm": 42.195,
+      "distancesKm": [42.195],
+      "distanceBasis": "standard_marathon",
+      "officialUrl": "https://www.londonmarathonevents.co.uk/london-marathon/event-overview",
+      "source": "https://www.londonmarathonevents.co.uk/london-marathon/event-overview",
+      "sources": [
+        {
+          "url": "https://www.londonmarathonevents.co.uk/london-marathon/event-overview",
+          "sourceType": "official_organizer",
+          "supports": "24–25 April 2027; road terrain; Greenwich/Blackheath start"
+        },
+        {
+          "url": "https://www.londonmarathonevents.co.uk/london-marathon/2027-tcs-london-marathon-double-faqs",
+          "sourceType": "official_organizer",
+          "supports": "one-off two-day format; runners take part on one assigned day"
+        }
+      ],
+      "verifiedAt": "2026-09-07",
+      "distanceOptions": [
+        {
+          "label": "Marathon — Saturday",
+          "distanceKm": 42.195,
+          "date": "2027-04-24"
+        },
+        {
+          "label": "Marathon — Sunday",
+          "distanceKm": 42.195,
+          "date": "2027-04-25"
+        }
+      ],
+      "aliases": ["London", "TCS London"],
+      "dateEnd": "2027-04-25",
+      "dateOptions": ["2027-04-24", "2027-04-25"],
+      "requiresDateSelection": true,
+      "dateNote": "The 2027 event runs on two days. The event date is the opening day, not a default runner assignment. Select the runner's confirmed day."
+    },
+    {
+      "id": "berlin-marathon",
+      "name": "BMW BERLIN-MARATHON",
+      "city": "Berlin",
+      "country": "Germany",
+      "countryCode": "DE",
+      "terrain": "road",
+      "date": "2026-09-27",
+      "dateStatus": "confirmed",
+      "editionYear": 2026,
+      "distanceKm": 42.195,
+      "distancesKm": [42.195, 5],
+      "distanceBasis": "standard_marathon",
+      "officialUrl": "https://www.bmw-berlin-marathon.com/en/",
+      "source": "https://www.bmw-berlin-marathon.com/en/",
+      "sources": [
+        {
+          "url": "https://www.bmw-berlin-marathon.com/en/",
+          "sourceType": "official_organizer",
+          "supports": "27 September 2026; marathon distance 42.195 km; 5K on 26 September"
+        }
+      ],
+      "verifiedAt": "2026-09-07",
+      "distanceOptions": [
+        {
+          "label": "Marathon",
+          "distanceKm": 42.195,
+          "date": "2026-09-27"
+        },
+        {
+          "label": "GENERALI 5K",
+          "distanceKm": 5,
+          "date": "2026-09-26"
+        }
+      ],
+      "aliases": ["Berlin", "BMW Berlin"]
+    },
+    {
+      "id": "chicago-marathon",
+      "name": "Bank of America Chicago Marathon",
+      "city": "Chicago",
+      "country": "United States",
+      "countryCode": "US",
+      "terrain": "road",
+      "date": "2026-10-11",
+      "dateStatus": "confirmed",
+      "editionYear": 2026,
+      "distanceKm": 42.195,
+      "distancesKm": [42.195],
+      "distanceBasis": "standard_marathon",
+      "officialUrl": "https://www.chicagomarathon.com/event-info/event-faqs/",
+      "source": "https://www.chicagomarathon.com/event-info/event-faqs/",
+      "sources": [
+        {
+          "url": "https://www.chicagomarathon.com/event-info/event-faqs/",
+          "sourceType": "official_organizer",
+          "supports": "11 October 2026; organizer event FAQs updated 23 July 2026"
+        }
+      ],
+      "verifiedAt": "2026-09-07",
+      "distanceOptions": [
+        {
+          "label": "Marathon",
+          "distanceKm": 42.195,
+          "date": "2026-10-11"
+        }
+      ],
+      "aliases": ["Chicago", "Bank of America Chicago"],
+      "distanceNote": "42.195 km is the standard marathon convention; organizer commonly markets the race as 26.2 miles."
+    },
+    {
+      "id": "new-york-city-marathon",
+      "name": "TCS New York City Marathon",
+      "city": "New York City",
+      "country": "United States",
+      "countryCode": "US",
+      "terrain": "road",
+      "date": "2026-11-01",
+      "dateStatus": "confirmed",
+      "editionYear": 2026,
+      "distanceKm": 42.195,
+      "distancesKm": [42.195],
+      "distanceBasis": "standard_marathon",
+      "officialUrl": "https://www.nyrr.org/tcsnycmarathon",
+      "source": "https://www.nyrr.org/tcsnycmarathon",
+      "sources": [
+        {
+          "url": "https://testcache.nyrr.org/tcsnycmarathon",
+          "sourceType": "official_organizer",
+          "supports": "1 November 2026; organizer-hosted current event page",
+          "notes": "Canonical www.nyrr.org URL produced a redirect loop during verification; the organizer's testcache subdomain was readable."
+        },
+        {
+          "url": "https://webassets.nyrr.org/nyrrwebsiteassets/2026TCSNewYorkCityMarathonDuoTeamsApplication.pdf",
+          "sourceType": "official_organizer",
+          "supports": "Sunday 1 November 2026 race date in official participation form"
+        }
+      ],
+      "verifiedAt": "2026-09-07",
+      "distanceOptions": [
+        {
+          "label": "Marathon",
+          "distanceKm": 42.195,
+          "date": "2026-11-01"
+        }
+      ],
+      "aliases": ["NYC", "New York", "NYRR"],
+      "distanceNote": "42.195 km uses the standard marathon convention."
+    },
+    {
+      "id": "tokyo-marathon",
+      "name": "Tokyo Marathon",
+      "city": "Tokyo",
+      "country": "Japan",
+      "countryCode": "JP",
+      "terrain": "road",
+      "date": "2027-03-07",
+      "dateStatus": "confirmed",
+      "editionYear": 2027,
+      "distanceKm": 42.195,
+      "distancesKm": [42.195],
+      "distanceBasis": "standard_marathon",
+      "officialUrl": "https://www.marathon.tokyo/en/participants/guideline/",
+      "source": "https://www.marathon.tokyo/en/participants/guideline/",
+      "sources": [
+        {
+          "url": "https://www.marathon.tokyo/en/participants/guideline/",
+          "sourceType": "official_organizer",
+          "supports": "7 March 2027; Tokyo road course; marathon distance 42.195 km"
+        }
+      ],
+      "verifiedAt": "2026-09-07",
+      "distanceOptions": [
+        {
+          "label": "Marathon",
+          "distanceKm": 42.195,
+          "date": "2027-03-07"
+        }
+      ],
+      "aliases": ["Tokyo", "東京マラソン"]
+    },
+    {
+      "id": "sydney-marathon",
+      "name": "TCS Sydney Marathon presented by ASICS",
+      "city": "Sydney",
+      "country": "Australia",
+      "countryCode": "AU",
+      "terrain": "road",
+      "date": null,
+      "dateStatus": "tba",
+      "editionYear": 2027,
+      "distanceKm": 42.195,
+      "distancesKm": [42.195],
+      "distanceBasis": "standard_marathon",
+      "officialUrl": "https://www.tcssydneymarathon.com/sign-up",
+      "source": "https://www.tcssydneymarathon.com/sign-up",
+      "sources": [
+        {
+          "url": "https://www.tcssydneymarathon.com/sign-up",
+          "sourceType": "official_organizer",
+          "supports": "2027 ballot updates; no 2027 race date published in the reviewed page"
+        },
+        {
+          "url": "https://www.tcssydneymarathon.com/",
+          "sourceType": "official_organizer",
+          "supports": "event identity, Sydney route, prior 2026 event date and standard marathon format"
+        }
+      ],
+      "verifiedAt": "2026-09-07",
+      "distanceOptions": [
+        {
+          "label": "Marathon",
+          "distanceKm": 42.195,
+          "date": null
+        }
+      ],
+      "aliases": ["Sydney", "TCS Sydney"],
+      "dateNote": "2027 date not confirmed in organizer pages reviewed. The displayed Sunday 30 August belongs to the completed 2026 event.",
+      "lastVerifiedEdition": {
+        "year": 2026,
+        "date": "2026-08-30",
+        "distanceKm": 42.195
+      },
+      "distanceNote": "Standard marathon distance; next-edition detailed course not yet verified."
+    },
+    {
+      "id": "valencia-marathon",
+      "name": "Valencia Marathon Trinidad Alfonso Zurich",
+      "city": "Valencia",
+      "country": "Spain",
+      "countryCode": "ES",
+      "terrain": "road",
+      "date": "2026-12-06",
+      "dateStatus": "confirmed",
+      "editionYear": 2026,
+      "distanceKm": 42.195,
+      "distancesKm": [42.195],
+      "distanceBasis": "standard_marathon",
+      "officialUrl": "https://www.valenciaciudaddelrunning.com/en/marathon/regulations-valencia-marathon/",
+      "source": "https://www.valenciaciudaddelrunning.com/en/marathon/regulations-valencia-marathon/",
+      "sources": [
+        {
+          "url": "https://www.valenciaciudaddelrunning.com/en/marathon/regulations-valencia-marathon/",
+          "sourceType": "official_organizer",
+          "supports": "6 December 2026, urban marathon event and organizer"
+        }
+      ],
+      "verifiedAt": "2026-09-07",
+      "distanceOptions": [
+        {
+          "label": "Marathon",
+          "distanceKm": 42.195,
+          "date": "2026-12-06"
+        }
+      ],
+      "aliases": ["Valencia", "València", "Maratón Valencia"],
+      "distanceNote": "Standard marathon distance is stored as 42.195 km; branded 42K."
+    },
+    {
+      "id": "copenhagen-marathon",
+      "name": "Copenhagen Marathon",
+      "city": "Copenhagen",
+      "country": "Denmark",
+      "countryCode": "DK",
+      "terrain": "road",
+      "date": "2027-05-09",
+      "dateStatus": "confirmed",
+      "editionYear": 2027,
+      "distanceKm": 42.195,
+      "distancesKm": [42.195],
+      "distanceBasis": "standard_marathon",
+      "officialUrl": "https://copenhagenmarathon.dk/en/",
+      "source": "https://copenhagenmarathon.dk/en/",
+      "sources": [
+        {
+          "url": "https://copenhagenmarathon.dk/en/",
+          "sourceType": "official_organizer",
+          "supports": "9 May 2027 and 42.195 km"
+        },
+        {
+          "url": "https://copenhagenmarathon.dk/en/entries-for-copenhagen-marathon-2027-will-be-allocated-through-a-lottery/",
+          "sourceType": "official_organizer",
+          "supports": "2027 event date and streets-of-Copenhagen location"
+        }
+      ],
+      "verifiedAt": "2026-09-07",
+      "distanceOptions": [
+        {
+          "label": "Marathon",
+          "distanceKm": 42.195,
+          "date": "2027-05-09"
+        }
+      ],
+      "aliases": ["Copenhagen", "København", "CPH Marathon"]
+    },
+    {
+      "id": "stockholm-marathon",
+      "name": "adidas Stockholm Marathon",
+      "city": "Stockholm",
+      "country": "Sweden",
+      "countryCode": "SE",
+      "terrain": "road",
+      "date": "2027-05-29",
+      "dateStatus": "confirmed",
+      "editionYear": 2027,
+      "distanceKm": 42.195,
+      "distancesKm": [42.195],
+      "distanceBasis": "standard_marathon",
+      "officialUrl": "https://www.stockholmmarathon.se/start/lopare/",
+      "source": "https://www.stockholmmarathon.se/start/lopare/",
+      "sources": [
+        {
+          "url": "https://www.stockholmmarathon.se/start/lopare/",
+          "sourceType": "official_organizer",
+          "supports": "29 May 2027; 42,195 metres; start/finish in Stockholm"
+        },
+        {
+          "url": "https://stockholmmarathon.se/eng/",
+          "sourceType": "official_organizer",
+          "supports": "2027 date independently repeated on organizer English landing page"
+        }
+      ],
+      "verifiedAt": "2026-09-07",
+      "distanceOptions": [
+        {
+          "label": "Marathon",
+          "distanceKm": 42.195,
+          "date": "2027-05-29"
+        }
+      ],
+      "aliases": ["Stockholm", "Stockholms maraton"]
+    },
+    {
+      "id": "helsinki-city-run",
+      "name": "Helsinki City Run",
+      "city": "Helsinki",
+      "country": "Finland",
+      "countryCode": "FI",
+      "terrain": "road",
+      "date": "2027-05-08",
+      "dateStatus": "confirmed",
+      "editionYear": 2027,
+      "distanceKm": 42.195,
+      "distancesKm": [42.195, 21.0975, 5],
+      "distanceBasis": "standard_marathon",
+      "officialUrl": "https://helsinkicityrun.fi/en/",
+      "source": "https://helsinkicityrun.fi/en/",
+      "sources": [
+        {
+          "url": "https://helsinkicityrun.fi/en/",
+          "sourceType": "official_organizer",
+          "supports": "7–8 May 2027 event weekend; marathon, half marathon and 5 km disciplines"
+        },
+        {
+          "url": "https://helsinkicityrun.fi/en/helsinkicitymarathon/",
+          "sourceType": "official_organizer",
+          "supports": "marathon on 8 May 2027"
+        },
+        {
+          "url": "https://helsinkicityrun.fi/helsinkicity5/",
+          "sourceType": "official_organizer",
+          "supports": "5 km on Friday 7 May 2027"
+        },
+        {
+          "url": "https://helsinkicityrun.fi/info/",
+          "sourceType": "official_organizer",
+          "supports": "half marathon scheduled on 8 May 2027; start times described as provisional"
+        }
+      ],
+      "verifiedAt": "2026-09-07",
+      "distanceOptions": [
+        {
+          "label": "Saucony Helsinki City Marathon",
+          "distanceKm": 42.195,
+          "date": "2027-05-08",
+          "distanceBasis": "standard_marathon"
+        },
+        {
+          "label": "OP Uusimaa Helsinki City Half",
+          "distanceKm": 21.0975,
+          "date": "2027-05-08",
+          "distanceBasis": "standard_half_marathon"
+        },
+        {
+          "label": "Saucony Helsinki City 5",
+          "distanceKm": 5,
+          "date": "2027-05-07"
+        }
+      ],
+      "aliases": [
+        "Helsinki",
+        "Helsinki City Marathon",
+        "Helsinki City Half",
+        "Helsinki City 5",
+        "HCR",
+        "HCM"
+      ],
+      "eventStartDate": "2027-05-07",
+      "eventEndDate": "2027-05-08",
+      "dateNote": "Primary date is the marathon/half-marathon day. The 5K is the previous evening; use distanceOptions when selecting.",
+      "distanceNote": "Relay, walking, children's and combined double events are intentionally excluded from individual running-plan options."
+    },
+    {
+      "id": "vilnius-marathon",
+      "name": "Swedbank Vilnius Marathon",
+      "city": "Vilnius",
+      "country": "Lithuania",
+      "countryCode": "LT",
+      "terrain": "road",
+      "date": "2026-09-13",
+      "dateStatus": "confirmed",
+      "editionYear": 2026,
+      "distanceKm": 42.195,
+      "distancesKm": [42.195, 21.0975, 10, 5],
+      "distanceBasis": "standard_marathon",
+      "officialUrl": "https://www.vilniausmaratonas.lt/en/informacija/nuostatai/",
+      "source": "https://www.vilniausmaratonas.lt/en/informacija/nuostatai/",
+      "sources": [
+        {
+          "url": "https://www.vilniausmaratonas.lt/en/informacija/nuostatai/",
+          "sourceType": "official_organizer",
+          "supports": "13 September 2026; organizer; 42.195 km, half marathon advertised as 21.098 km, 10 km and 5 km"
+        },
+        {
+          "url": "https://www.vilniausmaratonas.lt/en/programa/",
+          "sourceType": "official_organizer",
+          "supports": "all selected running distances take place on Sunday 13 September"
+        }
+      ],
+      "verifiedAt": "2026-09-07",
+      "distanceOptions": [
+        {
+          "label": "Marathon",
+          "distanceKm": 42.195,
+          "date": "2026-09-13",
+          "distanceBasis": "organizer_exact"
+        },
+        {
+          "label": "Half Marathon",
+          "distanceKm": 21.0975,
+          "date": "2026-09-13",
+          "distanceBasis": "standard_half_marathon",
+          "organizerAdvertisedDistanceKm": 21.098
+        },
+        {
+          "label": "10 km",
+          "distanceKm": 10,
+          "date": "2026-09-13"
+        },
+        {
+          "label": "5 km",
+          "distanceKm": 5,
+          "date": "2026-09-13"
+        }
+      ],
+      "aliases": ["Vilnius", "Vilniaus maratonas"],
+      "distanceNote": "Half-marathon arithmetic uses the exact standard 21.0975 km; organizer rounds its display to 21.098 km. Walking and children's events omitted."
+    },
+    {
+      "id": "riga-marathon",
+      "name": "Rimi Riga Marathon",
+      "city": "Riga",
+      "country": "Latvia",
+      "countryCode": "LV",
+      "terrain": "road",
+      "date": "2027-05-16",
+      "dateStatus": "confirmed",
+      "editionYear": 2027,
+      "distanceKm": 42.195,
+      "distancesKm": [42.195, 21.0975, 10],
+      "distanceBasis": "standard_marathon",
+      "officialUrl": "https://rimirigamarathon.com/en/registration/",
+      "source": "https://rimirigamarathon.com/en/registration/",
+      "sources": [
+        {
+          "url": "https://rimirigamarathon.com/en/news/have-you-saved-the-rimi-riga-marathon-2027-dates-yet/",
+          "sourceType": "official_organizer",
+          "supports": "official announcement dated 4 June 2026 confirms 15–16 May 2027"
+        },
+        {
+          "url": "https://rimirigamarathon.com/en/registration/",
+          "sourceType": "official_organizer",
+          "supports": "marathon, half marathon and 10 km scheduled for 16 May 2027"
+        },
+        {
+          "url": "https://rimirigamarathon.com/en/meet-riga/",
+          "sourceType": "official_organizer",
+          "supports": "Riga, Latvia; road course through the city"
+        }
+      ],
+      "verifiedAt": "2026-09-07",
+      "distanceOptions": [
+        {
+          "label": "Marathon",
+          "distanceKm": 42.195,
+          "date": "2027-05-16",
+          "distanceBasis": "standard_marathon"
+        },
+        {
+          "label": "Half Marathon",
+          "distanceKm": 21.0975,
+          "date": "2027-05-16",
+          "distanceBasis": "standard_half_marathon"
+        },
+        {
+          "label": "10 km",
+          "distanceKm": 10,
+          "date": "2027-05-16"
+        }
+      ],
+      "aliases": ["Riga", "Rīga", "Rīgas maratons"],
+      "eventStartDate": "2027-05-15",
+      "eventEndDate": "2027-05-16",
+      "distanceNote": "Only unambiguous individual running options included. Registration text says 5km while the 2027 programme says 6km; that option is withheld pending clarification. Relays, mile and children's events omitted."
+    },
+    {
+      "id": "comrades-marathon",
+      "name": "Comrades Marathon",
+      "aliases": ["Comrades", "The Ultimate Human Race"],
+      "city": "Pietermaritzburg → Durban",
+      "country": "South Africa",
+      "countryCode": "ZA",
+      "terrain": "road",
+      "date": "2027-06-13",
+      "dateStatus": "confirmed",
+      "editionYear": 2027,
+      "distanceKm": null,
+      "distancesKm": [],
+      "distanceOptions": [],
+      "distanceStatus": "awaiting_final_measurement",
+      "approximateDistanceRangeKm": [89, 91],
+      "officialUrl": "https://comrades.com/race-information",
+      "source": "https://comrades.com/race-information",
+      "verifiedAt": "2026-09-07",
+      "sources": [
+        {
+          "url": "https://comrades.com/blogs/2027-comrades-marathon-date-announced",
+          "sourceType": "official_organizer",
+          "supports": "official 13 June 2027 announcement"
+        },
+        {
+          "url": "https://comrades.com/race-information",
+          "sourceType": "official_organizer",
+          "supports": "Pietermaritzburg-to-Durban Down Run; distance approximate pending final instructions"
+        },
+        {
+          "url": "https://comrades.com/comrades-race-rules",
+          "sourceType": "official_organizer",
+          "supports": "date confirmed; approximate 89 km pending measurement"
+        },
+        {
+          "url": "https://comrades.com/blogs/the-greatest-story-ever-run-comrades-marathon-launches-2027-centenary-edition",
+          "sourceType": "official_organizer",
+          "supports": "approximately 91 km estimate; official measurement still pending"
+        }
+      ],
+      "notes": "Do not substitute a marathon or 50 km goal: this is a road ultra. Organizer pages currently give approximate 89, 90 and 91 km values; no exact 2027 distance is asserted."
+    },
+    {
+      "id": "occ-utmb-mont-blanc",
+      "name": "OCC — UTMB Mont-Blanc",
+      "aliases": ["OCC", "UTMB 50K", "Orsières Champex Chamonix"],
+      "city": "Orsières → Chamonix",
+      "country": "Switzerland / France",
+      "countryCode": "CH",
+      "countryCodes": ["CH", "FR"],
+      "terrain": "trail",
+      "date": null,
+      "dateStatus": "tba",
+      "editionYear": 2027,
+      "distanceKm": null,
+      "distancesKm": [],
+      "distanceOptions": [],
+      "distanceStatus": "next_edition_not_confirmed",
+      "category": "50K",
+      "officialUrl": "https://montblanc.utmb.world/races/OCC",
+      "source": "https://montblanc.utmb.world/races/OCC",
+      "verifiedAt": "2026-09-07",
+      "sources": [
+        {
+          "url": "https://montblanc.utmb.world/races/OCC",
+          "sourceType": "official_organizer",
+          "supports": "reviewed page describes completed 2026 edition: 27 August, 60 km, 3,500 m ascent; 50K is category, not exact course length"
+        }
+      ],
+      "lastVerifiedEdition": {
+        "year": 2026,
+        "date": "2026-08-27",
+        "distanceKm": 60,
+        "elevationGainM": 3500
+      },
+      "notes": "No official 2027 OCC date or course distance verified. Retain TBA. Do not turn the 50K category into an exact 50 km goal."
+    },
+    {
+      "id": "valencia-half-marathon",
+      "name": "Valencia Half Marathon Trinidad Alfonso Zurich",
+      "aliases": ["Valencia Half", "Medio Maratón Valencia", "València Half"],
+      "city": "Valencia",
+      "country": "Spain",
+      "countryCode": "ES",
+      "terrain": "road",
+      "date": "2026-10-25",
+      "dateStatus": "confirmed",
+      "editionYear": 2026,
+      "distanceKm": 21.0975,
+      "distancesKm": [21.0975],
+      "distanceBasis": "organizer_exact",
+      "distanceOptions": [
+        {
+          "label": "Half Marathon",
+          "distanceKm": 21.0975,
+          "date": "2026-10-25"
+        }
+      ],
+      "officialUrl": "https://www.valenciaciudaddelrunning.com/en/half/regulations-valencia-half-marathon/",
+      "source": "https://www.valenciaciudaddelrunning.com/en/half/regulations-valencia-half-marathon/",
+      "verifiedAt": "2026-09-07",
+      "sources": [
+        {
+          "url": "https://www.valenciaciudaddelrunning.com/en/half/regulations-valencia-half-marathon/",
+          "sourceType": "official_organizer",
+          "supports": "25 October 2026; certified 21,097.5-metre urban asphalt course"
+        }
+      ]
+    }
+  ]
+}
