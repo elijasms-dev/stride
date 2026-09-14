@@ -1,3 +1,5 @@
+import { usesMarathonRhythm } from './training-structure.ts';
+import { schedulingEasyPace } from './fitness-pacing.ts';
 import { STRUCTURED_FORMATS } from './workout-formats.ts';
 import { MARATHON_WORKOUTS } from './marathon-workouts.ts';
 import { usesMarathonBook, marathonTaperFraction } from './marathon-book.ts';
@@ -822,13 +824,18 @@ function resolveDistanceTemplate(
     savedPace ??
     (t.id.startsWith('marathon-book-')
       ? slowPace
-      : Math.max(slowPace, (p?.easyPace ?? 7) * 60));
+      : Math.max(slowPace, schedulingEasyPace(p) * 60));
   const floatPace = t.floatMetres
     ? (existingSteps?.find((s) => s.kind === 'aerobic' && s.metres)
         ?.planningPaceSecondsPerKm ??
-      (p?.workoutTargets?.mode === 'pace'
-        ? p.workoutTargets.pace?.easy?.high
-        : undefined))
+      (() => {
+        const target = workoutStepTarget(
+          { kind: t.kind, stimulus: t.stimulus, templateId: t.id },
+          { kind: 'aerobic', seconds: 300, effort: 'Easy', intensity: 2 },
+          p ?? { goal: t.goals[0] },
+        );
+        return target?.mode === 'pace' ? target.high : undefined;
+      })())
     : undefined;
   if (t.floatMetres && !floatPace) return null;
   return {
@@ -862,6 +869,7 @@ export const stimulusLabel: Record<Stimulus, string> = {
   'race-rhythm': 'Race-specific rhythm',
 };
 export type SelectionContext = {
+  excludeTemplateIds?: ReadonlySet<string>;
   previous: Workout[];
   availableMinutes: number;
   slot: number;
@@ -1184,6 +1192,7 @@ function selectMarathonBookTemplate(
   }
   if (
     phase === 'Race preparation' &&
+    !usesMarathonRhythm(p) &&
     !(p.qualityMode === 'custom' && p.qualitySessions === 2) &&
     p.marathonApproach !== 'endurance' &&
     (tempo.length >= 2 || familiar >= 20) &&
@@ -1307,6 +1316,37 @@ export function selectTemplate(
   phase: Phase,
   context: SelectionContext,
 ): TemplateDecision {
+  if (
+    usesMarathonRhythm(p) &&
+    !['Recovery', 'Taper', 'Race week'].includes(phase)
+  ) {
+    const decision = selectMarathonBookTemplate(
+      { ...p, goal: 'marathon', intent: 'improve' },
+      phase,
+      { ...context, introduction: false, slot: 0 },
+    );
+    if (decision.template.stimulus === 'threshold') return decision;
+    const prior = context.previous.filter(
+      (w) =>
+        w.stimulus === 'threshold' &&
+        w.kind !== 'long' &&
+        w.status !== 'skipped',
+    );
+    const target = Math.min(
+      p.difficulty === 'gentle' || phase === 'Maintenance' ? 12 : 30,
+      6 + prior.length * 3,
+    );
+    const dose = [6, 9, 12, 15, 20, 25, 30].filter((n) => n <= target).at(-1)!;
+    return {
+      template: WORKOUT_LIBRARY.find(
+        (t) => t.id === `marathon-book-lt-${dose}`,
+      )!,
+      exposure: prior.length + 1,
+      targetWorkMinutes: dose,
+      reason:
+        'One controlled tempo session and one long run anchor every standard marathon week. The tempo dose fits the existing weekly allowance.',
+    };
+  }
   if (usesMarathonBook(p) && context.marathonModel !== false)
     return selectMarathonBookTemplate(p, phase, context);
   const secondEconomy =
@@ -1672,12 +1712,18 @@ export function scaleTemplate(
     profile !== undefined &&
     usesMarathonBook(profile) &&
     ['marathon-book-steady-intro', 'threshold-cruise'].includes(t.id);
-  const retainMarathonAerobic =
-    profile !== undefined && usesMarathonBook(profile);
+  const retainAllocatedAerobic =
+    profile !== undefined &&
+    (usesMarathonBook(profile) ||
+      (!taper &&
+        !gentle &&
+        profile.experience === 'established' &&
+        ['5k', '10k', 'half'].includes(profile.goal)));
+
   // A strides day ends with brief accelerations. Other workout families retain
   // their existing bounded aerobic lead-in.
   const aerobic =
-    t.kind === 'long' || retainGentleMarathonAerobic || retainMarathonAerobic
+    t.kind === 'long' || retainGentleMarathonAerobic || retainAllocatedAerobic
       ? spare - splitEasy * (sequence.length - 1)
       : Math.min(
           spare,
@@ -1871,7 +1917,7 @@ export function resizeWorkout(
       ceilingMinutes,
       (w.kind === 'long'
         ? (p.longLimitKm ?? Infinity)
-        : (p.easyLimitKm ?? Infinity)) * (p.easyPace ?? 7),
+        : (p.easyLimitKm ?? Infinity)) * schedulingEasyPace(p),
     ),
   );
   const runWalk =
@@ -2123,7 +2169,7 @@ export function variedWorkoutPrescription(
         n +
         (s.metres !== undefined
           ? s.metres / 1000
-          : s.seconds / 60 / (profile.easyPace ?? 7)),
+          : s.seconds / 60 / schedulingEasyPace(profile)),
       0,
     );
     if (

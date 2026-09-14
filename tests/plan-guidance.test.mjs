@@ -16,6 +16,8 @@ import {
 import { exportProgram } from '../lib/program-export.ts';
 import { intervalsWorkoutText } from '../lib/intervals-workout.ts';
 import { changeEvent } from '../lib/event-transition.ts';
+import { assertMarathonWeek } from './marathon-contract.mjs';
+import { WORKOUT_LIBRARY, scaleTemplate } from '../lib/workout-library.ts';
 
 const start = '2026-09-07';
 const build = (patch = {}) =>
@@ -60,7 +62,7 @@ test('restarting a marathon does not count the previous block as one enormous qu
     next.workouts.filter((w) => w.week === -1 && w.hard && w.kind !== 'race')
       .length > 2,
   );
-  assert.match(marathonPlanDescription(next), /up to 1 main workout per week/);
+  assert.match(marathonPlanDescription(next), /two quality sessions/);
   assert.equal(
     marathonScheduleFacts(next.workouts.filter((w) => w.week === -1))
       .maximumQuality,
@@ -68,25 +70,24 @@ test('restarting a marathon does not count the previous block as one enormous qu
   );
 });
 
-test('book plan summary counts one actual quality session, including a marathon long run', () => {
+test('book plan summary counts the weekday workout and marathon long run as two quality sessions', () => {
   const p = build();
-  assert.equal(p.profile.qualitySessions, 2);
+  assert.equal(p.profile.qualitySessions, 1);
   assert.ok(!p.notes.some((n) => n.includes('1 of 2 requested quality')));
-  assert.match(marathonPlanDescription(p), /up to 1 main workout per week/);
-  assert.match(
-    marathonPlanDescription(p),
-    /tempo.*faster repetitions.*sustained marathon effort/,
-  );
+  assert.match(marathonPlanDescription(p), /two quality sessions/);
+  assert.match(marathonPlanDescription(p), /tempo.*sustained marathon effort/);
+  assert.doesNotMatch(marathonPlanDescription(p), /faster repetitions/);
   const long = p.workouts.find((w) => w.kind === 'long' && w.hard);
   const f = marathonScheduleFacts(
     p.workouts.filter((w) => w.week === long.week),
   );
-  assert.equal(f.maximumQuality, 1);
+  assert.equal(f.maximumQuality, 2);
   assert.equal(f.marathonPace, true);
-  assert.equal(f.tempo, false);
+  assert.equal(f.tempo, true);
   const focus = planWeekFocus(p, p.weeks[long.week]);
   assert.match(focus, /long run includes sustained marathon effort/);
-  assert.doesNotMatch(focus, /tempo is included|Faster repetitions/);
+  assert.match(focus, /Controlled tempo is included/);
+  assert.doesNotMatch(focus, /Faster repetitions/);
 });
 
 test('endurance preference describes tempo and marathon work without promising faster repetitions', () => {
@@ -128,6 +129,8 @@ test('saved steady threshold adaptations are not described as threshold or race 
   assert.equal(f.repetitions, false);
   assert.equal(f.marathonPace, false);
   assert.match(marathonPlanDescription(p), /Steady, comfortable efforts/);
+  assert.match(marathonPlanDescription(p), /one controlled steady workout/);
+  assert.doesNotMatch(marathonPlanDescription(p), /tempo|threshold/);
   assert.doesNotMatch(
     allFocus(p),
     /tempo is included|Faster repetitions|sustained marathon effort/,
@@ -148,14 +151,12 @@ for (const patch of [
   { qualityMode: 'custom', qualitySessions: 0 },
   { intent: 'finish' },
 ])
-  test(`easy marathon guidance does not promise hard sessions: ${JSON.stringify(patch)}`, () => {
+  test(`legacy preferences describe the actual two-session marathon rhythm: ${JSON.stringify(patch)}`, () => {
     const p = build(patch);
-    assert.equal(marathonScheduleFacts(p.workouts).maximumQuality, 0);
-    assert.match(marathonPlanDescription(p), /no hard training sessions/);
-    assert.doesNotMatch(
-      allFocus(p),
-      /tempo is included|Faster repetitions|sustained marathon effort/,
-    );
+    for (const week of p.weeks) assertMarathonWeek(p, week);
+    assert.match(marathonPlanDescription(p), /two quality sessions/);
+    assert.match(allFocus(p), /Controlled tempo is included/);
+    assert.doesNotMatch(allFocus(p), /Faster repetitions/);
   });
 
 test('busy-day summary shows the real small outing, not a full medium-long run', () => {
@@ -225,8 +226,28 @@ test('race-only short blocks do not claim tempo or extra endurance preparation',
 
 test('retained completed prescriptions are described independently of changed preferences', () => {
   const p = build();
-  const speed = p.workouts.find((w) => w.stimulus === 'aerobic-power');
-  speed.status = 'completed';
+  const original = p.workouts.find((w) => w.stimulus === 'threshold');
+  const recipe = WORKOUT_LIBRARY.find((t) => t.id === 'power-ninety');
+  const dose = scaleTemplate(
+    recipe,
+    original.minutes,
+    false,
+    'Build',
+    12,
+    12,
+    p.profile,
+  );
+  assert.ok(dose);
+  const speed = {
+    ...original,
+    ...dose,
+    kind: recipe.kind,
+    stimulus: recipe.stimulus,
+    templateId: recipe.id,
+    title: recipe.title,
+    status: 'completed',
+  };
+  p.workouts[p.workouts.indexOf(original)] = speed;
   p.profile.marathonApproach = 'endurance';
   assert.match(
     planWeekFocus(p, p.weeks[speed.week]),

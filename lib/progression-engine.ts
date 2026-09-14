@@ -26,6 +26,10 @@ export function peakLongRunKm(
   currentLongRun: number,
   intent?: Profile['intent'],
 ): number {
+  if (family === 'marathon')
+    return intent === 'finish'
+      ? Math.min(35, Math.max(currentLongRun, 32))
+      : 35;
   const [low, high] = peakLongRunRange(family);
   const target = intent === 'finish' ? low : high;
   return Math.max(currentLongRun, target);
@@ -71,6 +75,9 @@ export function longRunForWeek(options: {
   recovery: boolean;
   taper: boolean;
   taperFraction: number;
+  wholeKilometres?: boolean;
+  recoveryEveryWeeks?: number;
+  recoveryOffset?: number;
 }): number {
   const {
     weekIndex,
@@ -81,6 +88,29 @@ export function longRunForWeek(options: {
     taper,
     taperFraction,
   } = options;
+  if (options.wholeKilometres) {
+    const start = Math.min(35, Math.ceil(startLongKm));
+    const peak = Math.max(start, Math.min(35, Math.floor(peakKm)));
+    const every = options.recoveryEveryWeeks ?? 4;
+    const offset = options.recoveryOffset ?? 0;
+    const builds = (end: number) =>
+      Math.max(
+        0,
+        end -
+          Math.floor((end + offset + 1) / every) +
+          Math.floor((offset + 1) / every),
+      );
+    const available = builds(peakWeekIndex);
+    const ordinal = builds(Math.min(weekIndex, peakWeekIndex));
+    const reachable = Math.min(peak, start + available * 2);
+    const steps = Math.ceil((reachable - start) / 2);
+    const advances =
+      available > 0 ? Math.floor((ordinal * steps) / available) : 0;
+    const progressed = Math.min(reachable, start + advances * 2);
+    if (taper) return Math.max(1, Math.floor(progressed * taperFraction));
+    if (recovery) return Math.max(1, Math.floor(progressed * 0.8));
+    return progressed;
+  }
   const span = Math.max(1, peakWeekIndex);
   const progressed =
     weekIndex >= peakWeekIndex
@@ -146,11 +176,13 @@ export function reconcileDailySplits(
   const nextKm = Math.max(0.5, target.estimatedKm + remainder);
   const deltaKm = nextKm - target.estimatedKm;
   target.estimatedKm = Math.round(nextKm * 1000) / 1000;
-  const nextMinutes = Math.max(5, Math.round(target.estimatedKm * paceMinPerKm));
+  const nextMinutes = Math.max(
+    5,
+    Math.round(target.estimatedKm * paceMinPerKm),
+  );
   const deltaSeconds = Math.round((nextMinutes - target.minutes) * 60);
   target.minutes = nextMinutes;
   const last = target.steps.at(-1);
-  if (last && last.seconds + deltaSeconds >= 60)
-    last.seconds += deltaSeconds;
+  if (last && last.seconds + deltaSeconds >= 60) last.seconds += deltaSeconds;
   return deltaKm;
 }

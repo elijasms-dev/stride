@@ -8,7 +8,14 @@ import {
   revisePreferences,
   addDays,
 } from '../lib/engine.ts';
-import { selectTemplate, scaleTemplate } from '../lib/workout-library.ts';
+import {
+  selectTemplate,
+  scaleTemplate,
+  WORKOUT_LIBRARY,
+} from '../lib/workout-library.ts';
+import { withWorkoutTargets } from '../lib/workout-targets.ts';
+import { withSpecificWorkoutName } from '../lib/workout-names.ts';
+import { assertMarathonWeek } from './marathon-contract.mjs';
 import { qualityWorkMinutes } from '../lib/prescription.ts';
 import { encodeWorkout } from '../lib/fit.ts';
 import { intervalsWorkoutText } from '../lib/intervals-workout.ts';
@@ -40,18 +47,67 @@ const input = (patch = {}) => ({
 const build = (patch = {}) => makePlan(input(patch), start, false);
 const main = (w) => w.hard && w.kind !== 'race';
 
-test('existing two-workout routine starts with a substantial tempo and a distinct interval session', () => {
+function assertFundedBaseline(plan, weekIndex, expectedKm) {
+  const runs = plan.workouts.filter(
+    (w) => w.week === weekIndex && w.kind !== 'race',
+  );
+  assert.equal(
+    runs.reduce((sum, w) => sum + w.minutes, 0),
+    expectedKm * (plan.profile.easyPace ?? 6),
+  );
+  const actualKm = runs.reduce((sum, w) => sum + w.estimatedKm, 0);
+  assert.equal(plan.weeks[weekIndex].targetKm, Math.round(actualKm * 10) / 10);
+  assert.ok(actualKm <= expectedKm + 0.001);
+  assert.ok(
+    expectedKm - actualKm < runs.length * 0.1,
+    'rounding distance prescriptions must not remove more than 100 m per run',
+  );
+}
+
+function recipeWorkout(plan, family, cap = 30) {
+  const template = WORKOUT_LIBRARY.find(
+    (t) => t.id === `marathon-book-${family}`,
+  );
+  assert.ok(template, family);
+  const dose = scaleTemplate(
+    template,
+    75,
+    false,
+    'Build',
+    cap,
+    cap,
+    plan.profile,
+  );
+  assert.ok(dose, `${family} must fit its work allowance`);
+  const original = plan.workouts.find((w) => w.stimulus === 'threshold');
+  return withWorkoutTargets(
+    withSpecificWorkoutName({
+      ...original,
+      ...dose,
+      id: `saved-${family}`,
+      title: template.title,
+      kind: template.kind,
+      stimulus: template.stimulus,
+      templateId: template.id,
+      estimatedKm: dose.minutes / (plan.profile.easyPace ?? 6),
+    }),
+    plan.profile,
+  );
+}
+
+test('existing marathon routine starts with a substantial tempo and one long run', () => {
   const p = build();
   const week = p.workouts.filter((w) => w.week === 0);
-  assert.equal(p.weeks[0].targetKm, 60);
+  assertFundedBaseline(p, 0, 60);
   assert.equal(p.weeks[0].longKm, 26);
   assert.equal(week.length, 5);
-  const quality = week.filter(main);
+  const quality = week.filter((w) => main(w) || w.kind === 'long');
   assert.equal(quality.length, 2);
   assert.equal(quality[0].stimulus, 'threshold');
   assert.ok(qualityWorkMinutes(quality[0]) >= 20);
-  assert.equal(quality[1].stimulus, 'aerobic-power');
-  assert.ok(qualityWorkMinutes(quality[1]) >= 12);
+  assert.equal(quality[1].kind, 'long');
+  assert.equal(quality[1].estimatedKm, 26);
+  assertMarathonWeek(p, p.weeks[0]);
   assert.equal(
     p.profile.recentQualityMinutes ?? null,
     null,
@@ -63,28 +119,30 @@ test('existing two-workout routine starts with a substantial tempo and a distinc
 test('partial opening week does not permanently replace the recent long-run baseline', () => {
   const p = build({ startDate: '2026-09-08' });
   assert.ok(p.weeks[0].targetKm < 60);
-  assert.equal(p.weeks[1].targetKm, 60);
+  assertFundedBaseline(p, 1, 60);
   assert.equal(p.weeks[1].longKm, 26);
   assert.ok(p.workouts.every((w) => w.date >= p.profile.startDate));
   assert.deepEqual(validatePlan(p), []);
 });
 
-test('variety changes actual main sets, with different stimuli in every two-workout week', () => {
+test('variety changes tempo main sets while preserving one weekday workout and one long run', () => {
   const p = build();
   const sessions = p.workouts.filter(main);
-  for (const text of [
-    'Pyramid intervals',
-    'into',
-    'Cut-down tempo',
-    'on / off',
-  ])
+  for (const text of ['min tempo', 'Cut-down tempo', 'on / off'])
     assert.ok(
       sessions.some((w) => w.title.includes(text)),
       text,
     );
+  const explicitIntervals = [
+    'pyramid-timed',
+    'long-into-short-timed',
+    'split-repeats-timed',
+  ].map((family) => recipeWorkout(p, family));
+  assert.match(explicitIntervals[0].title, /Pyramid intervals/);
+  assert.match(explicitIntervals[1].title, /into/);
   assert.ok(
-    sessions.some((w) =>
-      w.steps.some((s) => s.label === 'Extra recovery between sets'),
+    explicitIntervals[2].steps.some(
+      (s) => s.label === 'Extra recovery between sets',
     ),
   );
   for (const k of p.weeks) {
@@ -92,6 +150,7 @@ test('variety changes actual main sets, with different stimuli in every two-work
       (w) => w.week === k.index && w.kind !== 'race',
     );
     const hard = runs.filter(main);
+    assertMarathonWeek(p, k);
     assert.ok(hard.length <= 2);
     if (hard.length === 2) assert.notEqual(hard[0].stimulus, hard[1].stimulus);
     assert.ok(
@@ -143,7 +202,7 @@ test('saved time limits remain real constraints and lifting them restores the en
     { weekdayMinutes: 120, longMinutes: 300 },
     start,
   );
-  assert.equal(revised.weeks[0].targetKm, 60);
+  assertFundedBaseline(revised, 0, 60);
   assert.equal(revised.weeks[0].longKm, 26);
   assert.deepEqual(validatePlan(revised), []);
 });
@@ -174,8 +233,14 @@ for (const mode of ['effort', 'pace', 'heart-rate'])
               },
             }
           : { mode };
-    const p = build({ workoutTargets });
-    const workouts = p.workouts.filter(main);
+    // Keep the maintained weekly budget consistent with the supplied easy pace.
+    const p = build({ workoutTargets, easyPace: mode === 'pace' ? 6.5 : 6 });
+    const unit = mode === 'pace' ? 'metres' : 'timed';
+    const workouts = [
+      ...p.workouts.filter(main),
+      recipeWorkout(p, `six-hundred-${unit}`, 16),
+      recipeWorkout(p, `marathon-blocks-${unit}`, 30),
+    ];
     if (mode !== 'effort') {
       const ranges =
         mode === 'pace' ? workoutTargets.pace : workoutTargets.heartRate;
@@ -239,7 +304,7 @@ for (const mode of ['effort', 'pace', 'heart-rate'])
       );
   });
 
-test('taper retains a reduced familiar session after a complete pyramid', () => {
+test('taper retains a reduced familiar tempo after the build progression', () => {
   const p = build({
     weeklyKm: 70,
     longestKm: 30,
@@ -253,7 +318,7 @@ test('taper retains a reduced familiar session after a complete pyramid', () => 
 });
 
 for (const mode of ['effort', 'heart-rate'])
-  test(`a pace-authored taper remains executable after switching to ${mode}`, () => {
+  test(`a saved pace-authored interval can be reduced for taper after switching to ${mode}`, () => {
     const p = build({
       workoutTargets: {
         mode: 'pace',
@@ -264,7 +329,7 @@ for (const mode of ['effort', 'heart-rate'])
         },
       },
     });
-    const previous = p.workouts.filter((w) => w.week < 14);
+    const saved = recipeWorkout(p, 'six-hundred-metres', 16);
     const profile = {
       ...p.profile,
       workoutTargets:
@@ -272,22 +337,24 @@ for (const mode of ['effort', 'heart-rate'])
           ? { mode }
           : { mode, heartRate: { easy: { low: 120, high: 140 } } },
     };
-    const choice = selectTemplate(profile, 'Taper', {
-      previous,
-      availableMinutes: 60,
-      slot: 0,
-      week: 15,
-    });
+    const template = WORKOUT_LIBRARY.find((t) => t.id === saved.templateId);
     const dose = scaleTemplate(
-      choice.template,
+      template,
       60,
       false,
       'Taper',
       12,
-      choice.targetWorkMinutes,
+      12,
       profile,
+      saved.steps,
     );
     assert.ok(dose);
     assert.ok(dose.qualityMinutes > 0 && dose.qualityMinutes <= 12);
     assert.ok(dose.steps.some((s) => s.kind === 'work' && s.metres));
+    assert.ok(dose.qualityMinutes < saved.qualityMinutes);
+    assert.ok(
+      dose.steps
+        .filter((s) => s.kind === 'work')
+        .every((s) => s.metres === 600),
+    );
   });

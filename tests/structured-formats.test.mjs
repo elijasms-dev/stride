@@ -1,3 +1,4 @@
+import { assertMarathonWeek } from './marathon-contract.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Decoder, Stream } from '@garmin/fitsdk';
@@ -258,7 +259,7 @@ void test('slower easy target converts alternating distance pairs together into 
 });
 for (const mode of ['effort', 'pace', 'heart-rate'])
   for (const days of [4, 5, 6])
-    void test(`${days} days, ${mode}: genuine marathon speed is scheduled within classic frequency and workload`, () => {
+    void test(`${days} days, ${mode}: marathon threshold work fits the guaranteed rhythm and workload`, () => {
       const p = profile({ currentRuns: days, runsPerWeek: days });
       if (mode === 'effort') p.workoutTargets = { mode };
       if (mode === 'heart-rate')
@@ -271,14 +272,10 @@ for (const mode of ['effort', 'pace', 'heart-rate'])
         };
       const plan = makePlan(p, start);
       assert.deepEqual(validatePlan(plan), []);
-      const speed = plan.workouts.filter((w) => w.stimulus === 'aerobic-power');
+      const speed = plan.workouts.filter((w) => w.stimulus === 'threshold');
       assert.ok(speed.length >= (days === 4 ? 1 : 2));
-      assert.ok(
-        speed.every((w) =>
-          ['Race preparation', 'Taper'].includes(plan.weeks[w.week].phase),
-        ),
-      );
-      assert.ok(speed.every((w) => w.qualityMinutes <= 24));
+      assert.ok(speed.every((w) => plan.weeks[w.week].phase !== 'Recovery'));
+      assert.ok(speed.every((w) => w.qualityMinutes <= 40));
       if (mode !== 'pace')
         assert.ok(speed.every((w) => work(w).every((s) => !s.metres)));
       for (const week of plan.weeks) {
@@ -286,7 +283,7 @@ for (const mode of ['effort', 'pace', 'heart-rate'])
           (w) => w.week === week.index && w.kind !== 'race',
         );
         assert.ok(new Set(runs.map((w) => w.date)).size <= days);
-        assert.ok(runs.filter((w) => w.hard).length <= 1);
+        assertMarathonWeek(plan, week);
         assert.ok(
           runs.reduce((n, w) => n + qualityWorkMinutes(w), 0) <=
             runs.reduce((n, w) => n + w.minutes, 0) * 0.22 + 0.1,

@@ -166,7 +166,14 @@ async function fixture(options = {}) {
     sqlite.exec(readFileSync(new URL(filename, migrationDir), 'utf8'));
   }
   globalThis.integrationAcceptanceEnv.DB = d1(sqlite, options);
-  const plan = makePlan({ ...demoProfile(today), startDate: today }, today);
+  const plan = makePlan(
+    {
+      ...demoProfile(today),
+      startDate: today,
+      runMeasure: options.runMeasure ?? 'distance',
+    },
+    today,
+  );
   plan.profile.timezone = 'UTC';
   const w = {
     ...plan.workouts[0],
@@ -387,8 +394,13 @@ void test('E01: unchanged prescription should clear obsolete receipt version aft
   );
 });
 void test('E02: time prescription must reject a distance-terminated provider step', async (t) => {
-  const f = await fixture({ absent: true });
+  const f = await fixture({ absent: true, runMeasure: 'time' });
   t.after(() => f.sqlite.close());
+  assert.equal(
+    f.w.steps[0].metres,
+    undefined,
+    'The saved prescription must end on time.',
+  );
   const providerFetch = globalThis.integrationAcceptanceFetch;
   globalThis.integrationAcceptanceFetch = async (url, init) => {
     const response = await providerFetch(url, init);
@@ -503,8 +515,13 @@ void test('E07: connection rotation during cached-receipt readback must not cert
   );
 });
 void test('E08: computed_distance may coexist with a genuinely timed provider step', async (t) => {
-  const f = await fixture({ absent: true });
+  const f = await fixture({ absent: true, runMeasure: 'time' });
   t.after(() => f.sqlite.close());
+  assert.equal(
+    f.w.steps[0].metres,
+    undefined,
+    'The saved prescription must end on time.',
+  );
   const providerFetch = globalThis.integrationAcceptanceFetch;
   globalThis.integrationAcceptanceFetch = async (url, init) => {
     const r = await providerFetch(url, init);

@@ -1,3 +1,4 @@
+import { schedulingEasyPace } from './fitness-pacing.ts';
 import {
   FIFTY_MILES_KM,
   LONG_ULTRA_POLICY,
@@ -151,7 +152,7 @@ export function changeEvent(plan: Plan, patch: EventPatch, asOf: string): Plan {
             r.minutes <
               Math.max(
                 45,
-                plan.profile.longestKm * (plan.profile.easyPace ?? 7) * 0.9,
+                plan.profile.longestKm * schedulingEasyPace(plan.profile) * 0.9,
               ))
         );
       }),
@@ -217,7 +218,7 @@ export function avoidRecordedOverlap(
             Math.max(
               45,
               previous.profile.longestKm *
-                (previous.profile.easyPace ?? 7) *
+                schedulingEasyPace(previous.profile) *
                 0.9,
             ),
       )

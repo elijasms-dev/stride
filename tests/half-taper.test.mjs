@@ -139,7 +139,7 @@ test('short blocks enter taper by date without compressing training or imposing 
         );
         if (dayDiff(w.date, profile.raceDate) <= 21)
           assert.ok(['Taper', 'Race week'].includes(phase));
-        else assert.equal(phase, 'Foundation');
+        else assert.equal(phase, 'Race preparation');
       }
     }
 });
@@ -157,7 +157,7 @@ test('explicit edits of a legacy boundary week do not retain its premature taper
       'Taper',
       '2026-11-03',
     ),
-    'Foundation',
+    'Race preparation',
   );
 });
 

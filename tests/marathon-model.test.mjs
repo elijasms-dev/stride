@@ -1,3 +1,4 @@
+import { assertMarathonWeek } from './marathon-contract.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -68,8 +69,7 @@ for (const weeks of [16, 20, 24])
             ).size <= days,
           );
           if (week.phase !== 'Race week') assert.equal(ss.length, days);
-          const maximum = recent < 2 || days < 5 ? 1 : 2;
-          assert.ok(ss.filter((w) => w.hard).length <= maximum);
+          assertMarathonWeek(p, week);
           assert.ok(
             ss.reduce((n, w) => n + qualityWorkMinutes(w), 0) <=
               ss.reduce((n, w) => n + w.minutes, 0) * 0.22 + 0.1,
@@ -85,7 +85,7 @@ for (const weeks of [16, 20, 24])
         }
       });
 
-void test('sustained tempo and marathon long work develop with a distinct late speed phase', () => {
+void test('sustained tempo and marathon long work develop together throughout the build', () => {
   const p = makePlan(input({ weeklyKm: 80, recentQualityMinutes: 50 }), start);
   const tempo = runs(p).filter(
     (w) =>
@@ -109,13 +109,8 @@ void test('sustained tempo and marathon long work develop with a distinct late s
   );
   assert.match(mainSetSummary(specific.at(-1)), /km/);
   assert.ok(specific.at(-1).steps.find((s) => s.kind === 'work').metres > 0);
-  const speed = runs(p).filter((w) => w.stimulus === 'aerobic-power');
-  assert.ok(speed.length >= 2);
-  assert.ok(
-    speed.every((w) =>
-      ['Race preparation', 'Taper'].includes(p.weeks[w.week].phase),
-    ),
-  );
+  assert.ok(!runs(p).some((w) => w.stimulus === 'aerobic-power'));
+  for (const week of p.weeks) assertMarathonWeek(p, week);
 });
 
 void test('developing runner alternates tempo and marathon work despite a second strides slot', () => {
@@ -148,7 +143,7 @@ void test('marathon variety advances through feasible recipes without repeating 
       ['Build', 'Race preparation'].includes(p.weeks[w.week].phase),
   );
   const shapes = tempo.map(mainSetSummary);
-  // Speed now replaces some tempo slots; require diversity relative to the tempo sessions actually scheduled.
+  // Weekly threshold work still rotates complete feasible main sets.
   assert.ok(
     new Set(shapes).size >= Math.min(7, Math.ceil(shapes.length * 0.8)),
     shapes.join('; '),
@@ -166,7 +161,7 @@ void test('completion and gentle marathon plans do not inherit the demanding rec
     }),
     start,
   );
-  assert.ok(runs(finish).every((w) => !w.hard));
+  for (const week of finish.weeks) assertMarathonWeek(finish, week);
   const gentle = makePlan(input({ difficulty: 'gentle' }), start);
   assert.ok(
     runs(gentle).every(
@@ -188,7 +183,8 @@ void test('long-run peaks wait for race preparation and recovery reduces the exe
     const gap = dayDiff(w.date, p.profile.raceDate);
     if (gap > 84) assert.ok(w.estimatedKm <= 26.001);
     else if (gap > 56) assert.ok(w.estimatedKm <= 28.001);
-    assert.ok(w.estimatedKm <= 32.001);
+    assert.ok(Number.isInteger(w.estimatedKm));
+    assert.ok(w.estimatedKm <= 35);
     const prior = longs
       .slice(0, i)
       .filter((s) => p.weeks[s.week].phase !== 'Recovery');
@@ -196,7 +192,13 @@ void test('long-run peaks wait for race preparation and recovery reduces the exe
       assert.ok(w.minutes <= prior.at(-1).minutes * 0.8 + 0.01);
   }
   assert.ok(longs.some((w) => w.estimatedKm >= 30));
-  assert.ok(longs.filter((w) => w.estimatedKm >= 31.9).length <= 3);
+  const ordinary = longs.filter(
+    (w) =>
+      !['Recovery', 'Taper', 'Race week'].includes(p.weeks[w.week].phase) &&
+      taperFactor(p.profile, w.date) === 1,
+  );
+  for (let i = 1; i < ordinary.length; i++)
+    assert.ok(ordinary[i].estimatedKm >= ordinary[i - 1].estimatedKm);
 });
 
 void test('post-allocation long-run growth uses the recent executable prescription', () => {
@@ -212,7 +214,7 @@ void test('post-allocation long-run growth uses the recent executable prescripti
         .filter((s) => dayDiff(s.date, w.date) <= 30);
       const base = dayDiff(start, w.date) <= 30 ? 30 : 0;
       const prior = Math.max(base, 0, ...recent.map((s) => s.estimatedKm));
-      assert.ok(w.estimatedKm <= prior + Math.min(1.5, prior * 0.08) + 0.01);
+      assert.ok(w.estimatedKm <= Math.min(35, Math.floor(prior) + 2) + 0.01);
     }
   }
 });

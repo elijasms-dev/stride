@@ -1,7 +1,7 @@
 import { recordedWorkoutDate } from '@/lib/training-history';
 import { addDays, kmDisplay, type Plan } from '@/lib/engine';
 import { runDuration } from '@/lib/journal-view';
-import { desiredRuns } from '@/lib/training-structure';
+import { usesMarathonRhythm, desiredRuns } from '@/lib/training-structure';
 import { weeklyRhythm } from '@/lib/weekly-rhythm';
 
 export function WeekRhythm({ plan, week }: { plan: Plan; week: number }) {
@@ -16,10 +16,16 @@ export function WeekRhythm({ plan, week }: { plan: Plan; week: number }) {
           recordedWorkoutDate(w) <= addDays(start, 6),
       ).length
     : 0;
+  const standardMarathon =
+    usesMarathonRhythm(plan.profile) && plan.engineVersion === 'stride-0.10.0';
   const items = [
     rhythm.easy ? `${rhythm.easy} easy` : '',
-    rhythm.quality ? `${rhythm.quality} quality` : '',
-    rhythm.long ? `${rhythm.long} long` : '',
+    standardMarathon
+      ? `${rhythm.keySessions.length} quality (${rhythm.quality} workout + ${rhythm.long} long)`
+      : rhythm.quality
+        ? `${rhythm.quality} quality`
+        : '',
+    !standardMarathon && rhythm.long ? `${rhythm.long} long` : '',
     rhythm.race ? `${rhythm.race} race` : '',
   ].filter(Boolean);
   return (
@@ -47,7 +53,10 @@ export function WeekRhythm({ plan, week }: { plan: Plan; week: number }) {
       {rhythm.marathonMinutes > 0 && (
         <p>
           Includes {runDuration(rhythm.marathonMinutes)} at marathon effort
-          inside the long run. This replaces a weekday quality session.
+          inside the long run.{' '}
+          {standardMarathon
+            ? 'It shares the weekly work allowance with the tempo session.'
+            : 'This replaces a weekday quality session.'}
         </p>
       )}
       {rhythm.quality === 0 &&

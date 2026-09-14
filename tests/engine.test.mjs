@@ -291,7 +291,7 @@ void test('Garmin exports respect server memory limits and preserve each prescri
     );
     assert.ok(messages.workoutStepMesgs.every((s) => s.targetType === 'open'));
     assert.ok(Math.max(...allocations) <= 1024 * 1024);
-    // Exercise SDK growth, not just its initial half-megabyte allocation.
+    // Exercise bounded output growth beyond the SDK's former initial allocation.
     const large = {
       ...w,
       steps: Array.from({ length: 3000 }, () => ({
@@ -308,4 +308,101 @@ void test('Garmin exports respect server memory limits and preserve each prescri
   } finally {
     globalThis.ArrayBuffer = NativeArrayBuffer;
   }
+});
+
+void test('FIT exports preserve Unicode cues, mixed endpoints and target ranges', () => {
+  const workout = {
+    id: 'mixed-unicode-workout',
+    originalDate: '2026-09-14',
+    title: 'Lämmittele – marathon 🏃',
+    steps: [
+      {
+        kind: 'warmup',
+        label: 'Lämmittely',
+        seconds: 600,
+        effort: 'Aloita rauhassa · 2–3 / 10',
+      },
+      {
+        kind: 'work',
+        label: 'Race rhythm',
+        seconds: 300.125,
+        metres: 1200,
+        effort: 'Contrôlé · reste détendu',
+        target: { mode: 'pace', low: 250, high: 280 },
+      },
+      {
+        kind: 'recovery',
+        label: 'Recovery',
+        seconds: 90.125,
+        effort: 'ゆっくり · recover',
+        target: { mode: 'heart-rate', low: 130, high: 150 },
+      },
+      {
+        kind: 'cooldown',
+        label: 'Cool down 🏃',
+        seconds: 180,
+        effort: 'Finish relaxed',
+      },
+    ],
+  };
+  const before = structuredClone(workout);
+  const decoder = new Decoder(Stream.fromByteArray(encodeWorkout(workout)));
+  assert.equal(decoder.checkIntegrity(), true);
+  const { messages, errors } = decoder.read();
+  assert.deepEqual(errors, []);
+  assert.equal(messages.fileIdMesgs[0].type, 'workout');
+  assert.equal(
+    messages.fileIdMesgs[0].timeCreated.toISOString(),
+    '2026-09-14T12:00:00.000Z',
+  );
+  assert.equal(messages.workoutMesgs[0].numValidSteps, workout.steps.length);
+  assert.equal(messages.workoutMesgs[0].wktName, workout.title);
+  const steps = messages.workoutStepMesgs;
+  assert.deepEqual(
+    steps.map((s) => s.messageIndex),
+    [0, 1, 2, 3],
+  );
+  assert.deepEqual(
+    steps.map((s) => s.wktStepName),
+    workout.steps.map((s) => s.label),
+  );
+  assert.deepEqual(
+    steps.map((s) => s.notes),
+    workout.steps.map((s) => s.effort),
+  );
+  assert.deepEqual(
+    steps.map((s) => s.intensity),
+    ['warmup', 'active', 'recovery', 'cooldown'],
+  );
+  assert.equal(steps[0].durationTime, 600);
+  assert.equal(steps[1].durationDistance, 1200);
+  assert.equal(steps[2].durationTime, 90.125);
+  assert.equal(steps[3].durationTime, 180);
+  assert.equal(steps[1].customTargetSpeedLow, 3.571);
+  assert.equal(steps[1].customTargetSpeedHigh, 4);
+  assert.equal(steps[2].customTargetHeartRateLow, 230);
+  assert.equal(steps[2].customTargetHeartRateHigh, 250);
+  assert.deepEqual(workout, before);
+});
+
+void test('FIT exports reject unrepresentable text instead of truncating prescribed cues', () => {
+  const workout = {
+    id: 'fit-field-capacity',
+    originalDate: '2026-09-14',
+    title: 'Controlled workout',
+    steps: [{ kind: 'work', label: 'Run', seconds: 300, effort: '' }],
+  };
+  for (const effort of ['x'.repeat(255), 'é'.repeat(128), 'Easy\0Sprint']) {
+    workout.steps[0].effort = effort;
+    assert.throws(() => encodeWorkout(workout), {
+      name: 'FitExportError',
+      code: 'FIT_STEPS',
+    });
+    assert.equal(workout.steps[0].effort, effort);
+  }
+  workout.steps[0].effort = 'é'.repeat(127);
+  const decoder = new Decoder(Stream.fromByteArray(encodeWorkout(workout)));
+  const { messages, errors } = decoder.read();
+  assert.deepEqual(errors, []);
+  assert.equal(messages.workoutStepMesgs[0].notes, workout.steps[0].effort);
 });

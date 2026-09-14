@@ -1,3 +1,4 @@
+import { schedulingEasyPace } from './fitness-pacing.ts';
 import { isLongUltra } from './ultra-policy.ts';
 import type { Profile } from './engine';
 import { runningDayLimit } from './runner-customization.ts';
@@ -24,8 +25,20 @@ export function classicQualityCount(
         : 1;
 }
 
-/** Automatic book plans keep one main workout; only an explicit choice adds a second. */
+export function usesMarathonRhythm(
+  p: Pick<Profile, 'goal' | 'raceDistanceKm' | 'method'>,
+): boolean {
+  const marathon =
+    p.goal === 'marathon' ||
+    (['custom', 'ultra'].includes(p.goal) &&
+      (p.raceDistanceKm ?? 0) > 30 &&
+      (p.raceDistanceKm ?? 0) <= 45);
+  return marathon && (!p.method || p.method === 'balanced');
+}
+
+/** Number of weekday quality slots; standard marathon longs supply the second session. */
 export function requestedQualityCount(p: Profile): 0 | 1 | 2 {
+  if (usesMarathonRhythm(p)) return 1;
   if (p.goal === 'base' || desiredRuns(p) === 2) return 0;
   const requested =
     p.qualityMode === 'automatic'
@@ -148,13 +161,22 @@ export function allocateRunningMinutes(
   total: number,
   slots: { key: string; weight: number; cap: number }[],
 ): Map<string, number> {
+  // The allocator never creates minutes, even for an underfunded budget.
+  if (!Number.isFinite(total) || total <= 0)
+    return new Map(slots.map((s) => [s.key, 0]));
+  slots = slots.map((s) => ({
+    ...s,
+    cap: Math.max(0, Number.isNaN(s.cap) ? 0 : Math.floor(s.cap)),
+    weight: Number.isFinite(s.weight) && s.weight > 0 ? s.weight : 1,
+  }));
+  let initial = Math.floor(total);
   const allocation = new Map(
-    slots.map((s) => [s.key, Math.min(5, Math.floor(s.cap))]),
+    slots.map((s) => {
+      const minutes = Math.min(initial, 5, s.cap);
+      initial -= minutes;
+      return [s.key, minutes];
+    }),
   );
-  //if ([...allocation.values()].reduce((n, m) => n + m, 0) > Math.floor(total))
-  //  throw new RangeError(
-    //  'The available weekly time cannot support the minimum session durations.',
-    //);
   let remaining = Math.max(
     0,
     Math.floor(total) - [...allocation.values()].reduce((a, b) => a + b, 0),
@@ -265,7 +287,7 @@ export function suggestedSessionLimits(
   plannedRuns = p.currentRuns,
   longShare = 0.45,
 ) {
-  const pace = p.easyPace ?? 7;
+  const pace = schedulingEasyPace(p);
   const ordinary =
     p.currentRuns > 1
       ? Math.max(0, p.weeklyKm - p.longestKm) / (p.currentRuns - 1)

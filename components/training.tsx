@@ -579,7 +579,14 @@ export function PlanPreferences({
 }) {
   const flight = useRef(false);
   const [submitted, setSubmitted] = useState<Profile | null>(null);
-  const [p, setP] = useState({ ...plan.profile, ...initialPatch }),
+  const [p, setP] = useState<Profile>({
+      ...plan.profile,
+      ...initialPatch,
+      recentRace:
+        initialPatch.recentRace === null
+          ? undefined
+          : (initialPatch.recentRace ?? plan.profile.recentRace),
+    }),
     [previewVersion, setPreviewVersion] = useState(version),
     [effectiveDate, setEffectiveDate] = useState(today),
     [showAll, setShowAll] = useState(false),
@@ -645,7 +652,10 @@ export function PlanPreferences({
                 body: JSON.stringify({
                   action: 'preferencesPreview',
                   version,
-                  preferences: snapshot,
+                  preferences: {
+                    ...snapshot,
+                    recentRace: snapshot.recentRace ?? null,
+                  },
                 }),
               });
               setSubmitted(snapshot);
@@ -820,7 +830,10 @@ export function PlanPreferences({
               onClick={async () => {
                 try {
                   await onAction('preferences', {
-                    preferences: submitted,
+                    preferences: {
+                      ...submitted,
+                      recentRace: submitted?.recentRace ?? null,
+                    },
                     version: previewVersion,
                     effectiveDate,
                   });

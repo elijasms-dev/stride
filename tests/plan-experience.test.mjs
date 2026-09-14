@@ -75,9 +75,11 @@ void test('weekly rhythm counts actual days, strides, mixed longs, doubles and r
   const r = weeklyRhythm(p, mixed.week);
   assert.equal(r.days, 5);
   assert.equal(r.sessions, 5);
-  assert.equal(r.quality, 0);
+  assert.equal(r.quality, 1);
   assert.equal(r.long, 1);
-  assert.equal(r.easy, 4);
+  assert.equal(r.easy, 3);
+  assert.equal(r.keySessions.length, 2);
+  assert.equal(new Set(r.keySessions.map((w) => w.id)).size, 2);
   assert.equal(r.marathonMinutes, mixed.qualityMinutes);
   const copy = structuredClone(p),
     extra = structuredClone(

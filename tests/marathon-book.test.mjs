@@ -1,3 +1,6 @@
+import { WORKOUT_LIBRARY, scaleTemplate } from '../lib/workout-library.ts';
+import { withWorkoutTargets } from '../lib/workout-targets.ts';
+import { assertMarathonWeek } from './marathon-contract.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -87,7 +90,7 @@ for (const [days, weeklyKm, longestKm] of [
             p.workouts.filter((w) => w.week === week.index).map((w) => w.date),
           ).size <= days,
         );
-        assert.ok(runs.filter((w) => w.hard).length <= 1);
+        assertMarathonWeek(p, week);
         assert.ok(
           runs.reduce((n, w) => n + qualityWorkMinutes(w), 0) <=
             runs.reduce((n, w) => n + w.minutes, 0) * 0.22 + 0.1,
@@ -108,8 +111,10 @@ for (const [days, weeklyKm, longestKm] of [
           );
         if (w.kind === 'long' && w.hard)
           assert.equal(
-            training(p, w.week).filter((s) => s.hard && s.id !== w.id).length,
-            0,
+            training(p, w.week).filter(
+              (s) => s.hard && s.id !== w.id && s.stimulus === 'threshold',
+            ).length,
+            1,
           );
       }
     });
@@ -143,7 +148,7 @@ void test('12- and 18-week phase calendars follow their distinct book structures
   );
 });
 
-void test('the standard established plan progresses sustained tempo, four selective marathon rehearsals and later repetitions', () => {
+void test('the standard established plan progresses sustained tempo and four selective marathon rehearsals', () => {
   const p = build();
   const tempo = training(p).filter(
     (w) =>
@@ -166,7 +171,8 @@ void test('the standard established plan progresses sustained tempo, four select
     training(p).some((w) => w.role === 'medium-long' && w.estimatedKm >= 18),
   );
   assert.ok(training(p).some((w) => w.stimulus === 'economy'));
-  assert.ok(training(p).some((w) => w.stimulus === 'aerobic-power'));
+  assert.ok(!training(p).some((w) => w.stimulus === 'aerobic-power'));
+  for (const week of p.weeks) assertMarathonWeek(p, week);
 });
 
 void test('introductory tempo advances beyond 15 minutes instead of stalling at a missing ladder rung', () => {
@@ -234,7 +240,7 @@ void test('continuous prescriptions survive refresh, harmless preference edits, 
   );
 });
 
-void test('distance repetitions use supplied current pace and proportional jogging; unknown pace stays timed', () => {
+void test('explicit distance repetitions use current pace and proportional jogging; unknown pace requires a timed recipe', () => {
   const p = build({
     workoutFormat: 'distance',
     workoutTargets: {
@@ -245,11 +251,40 @@ void test('distance repetitions use supplied current pace and proportional joggi
       },
     },
   });
-  const speed = training(p).filter((w) => w.stimulus === 'aerobic-power');
-  assert.ok(speed.some((w) => work(w).some((s) => s.metres)));
-  for (const w of speed) {
-    for (const s of work(w)) assert.ok(s.seconds >= 120 && s.seconds <= 360);
+  // Standard marathon generation keeps threshold plus long. Exercise interval
+  // serialization directly so its coverage does not depend on a third session.
+  for (const metres of [600, 800, 1000, 1200]) {
+    const template = WORKOUT_LIBRARY.find(
+      (t) => t.id === `marathon-book-vo2-${metres}m`,
+    );
+    const dose = scaleTemplate(
+      template,
+      60,
+      false,
+      'Race preparation',
+      18,
+      18,
+      p.profile,
+    );
+    assert.ok(dose);
+    const w = withWorkoutTargets(
+      {
+        ...p.workouts.find((w) => w.kind === 'tempo'),
+        ...dose,
+        templateId: template.id,
+        stimulus: template.stimulus,
+        kind: template.kind,
+      },
+      p.profile,
+    );
+    assert.ok(work(w).length > 0);
+    assert.ok(
+      work(w).every(
+        (s) => s.metres === metres && s.seconds >= 120 && s.seconds <= 360,
+      ),
+    );
     const recovery = w.steps.filter((s) => s.kind === 'recovery');
+    assert.ok(recovery.length > 0);
     assert.ok(
       recovery.every(
         (s) =>
@@ -260,12 +295,21 @@ void test('distance repetitions use supplied current pace and proportional joggi
     );
     assert.ok(encodeWorkout(w).length > 100);
     assert.ok(intervalsWorkoutText(w).length > 20);
+    assert.equal(
+      scaleTemplate(template, 60, false, 'Race preparation', 18, 18, {
+        ...p.profile,
+        workoutTargets: undefined,
+      }),
+      null,
+    );
   }
-  assert.ok(
-    training(build({ workoutFormat: 'distance' }))
-      .filter((w) => w.stimulus === 'aerobic-power')
-      .every((w) => work(w).every((s) => s.metres === undefined)),
-  );
+  const timed = WORKOUT_LIBRARY.find((t) => t.id === 'marathon-book-vo2-180s');
+  const fallback = scaleTemplate(timed, 60, false, 'Race preparation', 18, 18, {
+    ...p.profile,
+    workoutTargets: undefined,
+  });
+  assert.ok(fallback && fallback.steps.some((s) => s.kind === 'work'));
+  assert.ok(fallback.steps.every((s) => s.metres === undefined));
 });
 
 void test('distance-ended quality completion uses executable saved pace, preserving partial-work and feedback gates', () => {
@@ -313,7 +357,9 @@ void test('distance-ended quality completion uses executable saved pace, preserv
     );
   const timed = {
     ...original,
-    steps: original.steps.map(({ metres, target, ...s }) => s),
+    steps: original.steps.map(
+      ({ metres: _metres, target: _target, ...s }) => s,
+    ),
   };
   assert.equal(executableQualityMinutes(timed), qualityWorkMinutes(timed));
   assert.deepEqual(original, snapshot);
@@ -370,7 +416,7 @@ void test('book taper preserves the last three endurance Sundays and applies vol
     assert.ok(volume <= peak * high + 0.1);
   }
   for (const [days, low, high] of [
-    [21, 26, 32],
+    [21, 26, 35],
     [14, 21, 26],
     [7, 16, 21],
   ]) {
@@ -382,7 +428,7 @@ void test('book taper preserves the last three endurance Sundays and applies vol
     assert.ok(long.estimatedKm >= low && long.estimatedKm <= high);
   }
   const taperedSpeed = training(p).filter(
-    (w) => w.stimulus === 'aerobic-power' && taperFactor(p.profile, w.date) < 1,
+    (w) => w.stimulus === 'threshold' && p.weeks[w.week].phase === 'Taper',
   );
   assert.equal(taperedSpeed.length, 2);
   assert.equal(

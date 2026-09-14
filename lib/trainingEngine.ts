@@ -3,6 +3,11 @@
  * Cloudflare Workers compatible: standard TypeScript only (no fs, path, or Node APIs).
  */
 
+import {
+  calculateTrainingPaces,
+  validateRecentRace,
+} from './fitness-pacing.ts';
+
 import type {
   DailyWorkout,
   DaysPerWeek,
@@ -197,20 +202,26 @@ function clampRatio(
 }
 
 export function week1LongRunKm(input: UserTrainingInput): number {
-  return Math.max(input.currentLongRun, MINIMUM_LONG_RUN_KM[input.goal]);
+  return input.goal === 'marathon'
+    ? Math.min(35, Math.ceil(input.currentLongRun))
+    : Math.max(input.currentLongRun, MINIMUM_LONG_RUN_KM[input.goal]);
 }
 
 export function peakLongRunTargetKm(
   goal: Goal,
   currentLongRun: number,
 ): number {
+  if (goal === 'marathon') return 35;
   const band = PEAK_LONG_RUN_KM[goal];
   if (currentLongRun >= band.high) return currentLongRun;
   if (currentLongRun >= band.low) return band.high;
   return band.high;
 }
 
-export function safeLongRunStep(currentLongKm: number, remainingToPeak: number): number {
+export function safeLongRunStep(
+  currentLongKm: number,
+  remainingToPeak: number,
+): number {
   const cap = Math.min(
     MAX_WEEKLY_LONG_STEP_KM,
     currentLongKm * MAX_WEEKLY_LONG_GAIN,
@@ -230,7 +241,10 @@ export function taperWeekCount(goal: Goal, weeksUntilRace: number): number {
   return 2;
 }
 
-export function peakWeekIndex(weeksUntilRace: number, taperWeeks: number): number {
+export function peakWeekIndex(
+  weeksUntilRace: number,
+  taperWeeks: number,
+): number {
   return Math.max(0, weeksUntilRace - taperWeeks - 1);
 }
 
@@ -256,7 +270,8 @@ export function volumeFractionForWeek(
 ): number {
   const taperWeeks = taperWeekCount(goal, weeksUntilRace);
   const fromEnd = weeksUntilRace - 1 - weekIndex;
-  if (fromEnd === 0) return goal === 'marathon' || goal === 'ultra' ? 0.35 : 0.4;
+  if (fromEnd === 0)
+    return goal === 'marathon' || goal === 'ultra' ? 0.35 : 0.4;
   if (taperWeeks >= 3 && fromEnd === 1) return 0.4;
   if (taperWeeks >= 3 && fromEnd === 2) return 0.65;
   if (taperWeeks === 2 && fromEnd === 1) return 0.4;
@@ -291,7 +306,10 @@ export function reconcileDailySplits(
       next.reduce((sum, value) => sum + value, 0),
       KM_DIGITS,
     );
-    next[next.length - 1] = roundKm(total - (repaired - next[next.length - 1]), KM_DIGITS);
+    next[next.length - 1] = roundKm(
+      total - (repaired - next[next.length - 1]),
+      KM_DIGITS,
+    );
   }
   return next;
 }
@@ -299,11 +317,12 @@ export function reconcileDailySplits(
 export function scaleWorkout(
   targetKm: number,
   template: WorkoutTemplate,
+  paces?: ReturnType<typeof calculateTrainingPaces>,
 ): ScaledWorkout {
   const safeTarget = Math.max(0.5, targetKm);
   const warmupRatio = clampRatio(template.warmupRatio, 0.18, 0.15, 0.2);
   const cooldownRatio = clampRatio(template.cooldownRatio, 0.18, 0.15, 0.2);
-  let mainRatio = clampRatio(template.mainRatio, 0.64, 0.6, 0.7);
+  const mainRatio = clampRatio(template.mainRatio, 0.64, 0.6, 0.7);
   const ratioSum = warmupRatio + mainRatio + cooldownRatio;
   const warmupKm = roundKm((safeTarget * warmupRatio) / ratioSum, 3);
   const cooldownKm = roundKm((safeTarget * cooldownRatio) / ratioSum, 3);
@@ -321,7 +340,11 @@ export function scaleWorkout(
     const recoveryCount = Math.max(1, candidate - 1);
     const recovery = recoveryBudget / recoveryCount;
     const intervalPenalty =
-      interval < 0.2 ? (0.2 - interval) * 8 : interval > 2 ? (interval - 2) * 4 : 0;
+      interval < 0.2
+        ? (0.2 - interval) * 8
+        : interval > 2
+          ? (interval - 2) * 4
+          : 0;
     const recoveryPenalty = recovery > 1.5 ? recovery - 1.5 : 0;
     const score = intervalPenalty + recoveryPenalty;
     if (score < bestScore) {
@@ -353,6 +376,17 @@ export function scaleWorkout(
     }
   }
   steps.push({ label: 'Cool down', kind: 'cooldown', km: cooldownKm });
+
+  if (paces)
+    for (const step of steps)
+      step.paceSecondsPerKm =
+        step.kind === 'interval'
+          ? template.kind === 'speed'
+            ? paces.interval
+            : /cruise|threshold/i.test(template.name)
+              ? paces.threshold
+              : paces.tempo
+          : paces.easy;
 
   const rawTotal = steps.reduce((sum, step) => sum + step.km, 0);
   const delta = roundKm(safeTarget - rawTotal, 3);
@@ -419,13 +453,18 @@ function typesForDays(daysPerWeek: DaysPerWeek): RunType[] {
   if (daysPerWeek === 6) {
     return ['long', 'speed', 'tempo', 'recovery', 'recovery', 'recovery'];
   }
-  return ['long', 'speed', 'tempo', 'recovery', 'recovery', 'recovery', 'recovery'];
+  return [
+    'long',
+    'speed',
+    'tempo',
+    'recovery',
+    'recovery',
+    'recovery',
+    'recovery',
+  ];
 }
 
-function splitRemaining(
-  remainingKm: number,
-  types: RunType[],
-): number[] {
+function splitRemaining(remainingKm: number, types: RunType[]): number[] {
   const otherTypes = types.filter((type) => type !== 'long');
   if (otherTypes.length === 0) return [];
   const weights = otherTypes.map((type) => {
@@ -445,7 +484,10 @@ function titleFor(type: RunType, template?: WorkoutTemplate): string {
   return 'Recovery run';
 }
 
-function baselineWeeklyVolume(input: UserTrainingInput, week1Long: number): number {
+function baselineWeeklyVolume(
+  input: UserTrainingInput,
+  week1Long: number,
+): number {
   const declared = input.currentWeeklyVolume;
   const derived = week1Long * (input.daysPerWeek <= 4 ? 2.2 : 2.6);
   const floor = week1Long + 2 * (input.daysPerWeek - 1);
@@ -469,12 +511,24 @@ function longRunSeries(
     const phase = phaseForWeek(week, weeksUntilRace, taperWeeks);
     if (week > 0 && week <= peakAt) {
       current = roundKm(
-        current + safeLongRunStep(current, Math.max(0, peakTarget - current)),
+        current +
+          (goal === 'marathon'
+            ? Math.min(2, Math.max(0, peakTarget - current))
+            : safeLongRunStep(current, Math.max(0, peakTarget - current))),
         3,
       );
     }
     if (phase === 'taper' || phase === 'race-week') {
-      series.push(Math.max(startLong, current));
+      series.push(
+        goal === 'marathon' && week > 0
+          ? Math.max(
+              1,
+              Math.floor(
+                current * volumeFractionForWeek(week, weeksUntilRace, goal),
+              ),
+            )
+          : Math.max(startLong, current),
+      );
     } else {
       series.push(current);
     }
@@ -495,36 +549,55 @@ function validateInput(input: UserTrainingInput): UserTrainingInput {
       details: { goal: String(input.goal) },
     });
   }
-  if (!Number.isFinite(input.weeksUntilRace) || input.weeksUntilRace < 2) {
+  if (
+    !Number.isInteger(input.weeksUntilRace) ||
+    input.weeksUntilRace < 2 ||
+    input.weeksUntilRace > 52
+  ) {
     throw new TrainingEngineError(
-      'weeksUntilRace must be at least 2. Shorter blocks cannot fit a taper and a peak.',
+      'weeksUntilRace must be a whole number from 2 to 52.',
       {
         code: 'INVALID_WEEKS',
         details: { weeksUntilRace: input.weeksUntilRace ?? null },
       },
     );
   }
-  if (!Number.isFinite(input.currentLongRun) || input.currentLongRun <= 0) {
-    throw new TrainingEngineError('currentLongRun must be greater than 0 km.', {
-      code: 'INVALID_LONG_RUN',
-      details: { currentLongRun: input.currentLongRun ?? null },
-    });
+  if (
+    !Number.isFinite(input.currentLongRun) ||
+    input.currentLongRun <= 0 ||
+    input.currentLongRun > 1000
+  ) {
+    throw new TrainingEngineError(
+      'currentLongRun must be greater than 0 and at most 1000 km.',
+      {
+        code: 'INVALID_LONG_RUN',
+        details: { currentLongRun: input.currentLongRun ?? null },
+      },
+    );
   }
   const days = input.daysPerWeek;
   if (![3, 4, 5, 6, 7].includes(days)) {
-    throw new TrainingEngineError('daysPerWeek must be an integer from 3 to 7.', {
-      code: 'INVALID_DAYS',
-      details: { daysPerWeek: days ?? null },
-    });
+    throw new TrainingEngineError(
+      'daysPerWeek must be an integer from 3 to 7.',
+      {
+        code: 'INVALID_DAYS',
+        details: { daysPerWeek: days ?? null },
+      },
+    );
   }
   if (
     input.currentWeeklyVolume != null &&
-    (!Number.isFinite(input.currentWeeklyVolume) || input.currentWeeklyVolume < 0)
+    (!Number.isFinite(input.currentWeeklyVolume) ||
+      input.currentWeeklyVolume < 0 ||
+      input.currentWeeklyVolume > 1000)
   ) {
-    throw new TrainingEngineError('currentWeeklyVolume must be a non-negative number.', {
-      code: 'INVALID_VOLUME',
-      details: { currentWeeklyVolume: input.currentWeeklyVolume },
-    });
+    throw new TrainingEngineError(
+      'currentWeeklyVolume must be between 0 and 1000 km.',
+      {
+        code: 'INVALID_VOLUME',
+        details: { currentWeeklyVolume: input.currentWeeklyVolume },
+      },
+    );
   }
   return {
     ...input,
@@ -536,6 +609,16 @@ function validateInput(input: UserTrainingInput): UserTrainingInput {
 
 export function generateTrainingPlan(raw: UserTrainingInput): TrainingPlan {
   const input = validateInput(raw);
+  let paces: ReturnType<typeof calculateTrainingPaces> | undefined;
+  if (input.recentRace !== undefined) {
+    try {
+      paces = calculateTrainingPaces(validateRecentRace(input.recentRace));
+    } catch (error) {
+      throw new TrainingEngineError((error as Error).message, {
+        code: 'INVALID_BENCHMARK',
+      });
+    }
+  }
   const week1Long = week1LongRunKm(input);
   const unconstrainedPeak = peakLongRunTargetKm(input.goal, week1Long);
   const taperWeeks = taperWeekCount(input.goal, input.weeksUntilRace);
@@ -545,27 +628,42 @@ export function generateTrainingPlan(raw: UserTrainingInput): TrainingPlan {
     unconstrainedPeak,
     input.goal,
   );
-  const peakLongRunAchievedKm = roundKm(Math.max(...longs), 3);
+  const peakLongRunAchievedKm = roundKm(
+    longs.reduce((peak, km) => Math.max(peak, km), 0),
+    3,
+  );
   const baselineWeekly = baselineWeeklyVolume(input, week1Long);
   const peakWeeklyVolumeKm = roundKm(
-    Math.max(baselineWeekly, peakLongRunAchievedKm * (input.daysPerWeek <= 4 ? 2.3 : 2.7)),
+    Math.max(
+      baselineWeekly,
+      peakLongRunAchievedKm * (input.daysPerWeek <= 4 ? 2.3 : 2.7),
+    ),
     KM_DIGITS,
   );
 
   const notes: string[] = [];
   if (peakLongRunAchievedKm + KM_EPS < unconstrainedPeak) {
     notes.push(
-      `Peak long run is ${peakLongRunAchievedKm} km rather than the ${unconstrainedPeak} km benchmark because weekly step-ups are capped at 10% or 2 km.`,
+      `Peak long run is ${peakLongRunAchievedKm} km rather than the ${unconstrainedPeak} km benchmark because the available build weeks limit progression before taper.`,
     );
   }
   if (week1Long > input.currentLongRun) {
     notes.push(
-      `Week 1 long run was raised to the ${input.goal} minimum of ${MINIMUM_LONG_RUN_KM[input.goal]} km.`,
+      input.goal === 'marathon'
+        ? `Week 1 long run was rounded up to ${week1Long} whole kilometres.`
+        : `Week 1 long run was raised to the ${input.goal} minimum of ${MINIMUM_LONG_RUN_KM[input.goal]} km.`,
     );
   }
 
   const templateHistory: Array<{ weekIndex: number; templateId?: string }> = [];
-  const types = typesForDays(input.daysPerWeek);
+  const types: RunType[] =
+    input.goal === 'marathon'
+      ? [
+          'long',
+          'tempo',
+          ...Array<RunType>(input.daysPerWeek - 2).fill('recovery'),
+        ]
+      : typesForDays(input.daysPerWeek);
   const weeks: TrainingWeek[] = [];
 
   for (let weekIndex = 0; weekIndex < input.weeksUntilRace; weekIndex++) {
@@ -577,7 +675,10 @@ export function generateTrainingPlan(raw: UserTrainingInput): TrainingPlan {
     );
     const longKm = roundKm(longs[weekIndex], KM_DIGITS);
     let weeklyTotalVolume = roundKm(
-      Math.max(peakWeeklyVolumeKm * fraction, longKm + 0.8 * (input.daysPerWeek - 1)),
+      Math.max(
+        peakWeeklyVolumeKm * fraction,
+        longKm + 0.8 * (input.daysPerWeek - 1),
+      ),
       KM_DIGITS,
     );
     if (weekIndex === 0) {
@@ -601,19 +702,38 @@ export function generateTrainingPlan(raw: UserTrainingInput): TrainingPlan {
     const speedTemplate = selectTemplate(SPEED_TEMPLATES, banned, weekIndex);
     const tempoBanned = new Set(banned);
     tempoBanned.add(speedTemplate.id);
-    const tempoTemplate = selectTemplate(TEMPO_TEMPLATES, tempoBanned, weekIndex);
+    const tempoTemplate = selectTemplate(
+      TEMPO_TEMPLATES,
+      tempoBanned,
+      weekIndex,
+    );
 
     const dailySplits: DailyWorkout[] = types.map((type, dayIndex) => {
       const km = reconciled[dayIndex];
       const template =
-        type === 'speed' ? speedTemplate : type === 'tempo' ? tempoTemplate : undefined;
+        type === 'speed'
+          ? speedTemplate
+          : type === 'tempo'
+            ? tempoTemplate
+            : undefined;
       const scaled =
-        template && km > 0 ? scaleWorkout(km, template) : undefined;
+        template && km > 0 ? scaleWorkout(km, template, paces) : undefined;
       if (template) {
         templateHistory.push({ weekIndex, templateId: template.id });
       }
       return {
         dayIndex,
+        ...(paces
+          ? {
+              paceSecondsPerKm:
+                type === 'speed'
+                  ? paces.interval
+                  : type === 'tempo'
+                    ? (scaled?.steps.find((s) => s.kind === 'interval')
+                        ?.paceSecondsPerKm ?? paces.tempo)
+                    : paces.easy,
+            }
+          : {}),
         type,
         km,
         title: titleFor(type, template),

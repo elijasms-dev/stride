@@ -1,4 +1,9 @@
 import {
+  schedulingEasyPace,
+  validateRecentRace,
+  type RecentRace,
+} from './fitness-pacing.ts';
+import {
   withSpecificWorkoutName,
   withSteadyRaceInstructions,
 } from './workout-names.ts';
@@ -43,6 +48,7 @@ import {
 } from './ultra-policy.ts';
 import {
   qualitySchedule,
+  usesMarathonRhythm,
   requestedQualityCount,
   desiredRuns,
   availableRunningDays,
@@ -88,15 +94,14 @@ import {
   peakLongRunKm,
   peakLongWeekIndex,
   recentTemplateIds,
-  reconcileDailySplits,
   usesFiveDaySplit,
 } from './progression-engine.ts';
 /** Independent coaching heuristics. See outputs/Stride-Algorithm-Research.md. */
-export const ENGINE_VERSION = 'stride-0.9.0';
+export const ENGINE_VERSION = 'stride-0.10.0';
 export const MAX_EVENT_KM = HUNDRED_MILES_KM; // Exact 100 miles, on runnable courses.
 /** Product heuristics for review, not scientifically established safety thresholds. */
 export const TRAINING_POLICY = {
-  version: 'provisional-2026-09-11-v29',
+  version: 'provisional-2026-09-11-v30',
   reviewStatus: 'Awaiting independent coaching review',
   estimatedEasyMinutesPerKm: 7,
   returningRunnerFactor: 0.8,
@@ -108,7 +113,7 @@ export const TRAINING_POLICY = {
     '5k': {
       weeklyStepKm: 1.5,
       longStepKm: 0.5,
-      longCeilingKm: 12,
+      longCeilingKm: 11,
       minimumTrainingExposureKm: 4,
       minWeekly: 10,
       minLong: 3,
@@ -140,7 +145,7 @@ export const TRAINING_POLICY = {
     },
     marathon: {
       weeklyStepKm: 3,
-      longStepKm: 1.5,
+      longStepKm: 2,
       longCeilingKm: 35,
       minimumTrainingExposureKm: 26,
       minWeekly: 32,
@@ -204,6 +209,7 @@ export type WorkoutKind =
   | 'fartlek'
   | 'race';
 export type Profile = {
+  recentRace?: RecentRace;
   dayPreferences?: DayPreference[];
   weeklyMinutesLimit?: number | null;
   workoutFormat?: 'automatic' | 'time' | 'distance';
@@ -681,6 +687,14 @@ export function validateProfile(
     'doubleGapHours',
   ] as const)
     if (p[key] === null) delete p[key];
+  if (p.recentRace === null) delete p.recentRace;
+  if (p.recentRace !== undefined) {
+    try {
+      p.recentRace = validateRecentRace(p.recentRace);
+    } catch (error) {
+      throw new PlanError((error as Error).message);
+    }
+  }
   if (p.workoutTargets !== undefined) {
     try {
       p.workoutTargets = validateWorkoutTargets(p.workoutTargets);
@@ -1004,6 +1018,7 @@ export function validateProfile(
       'Check your quality, recovery, and terrain preferences.',
     );
   if (
+    !usesMarathonRhythm(p) &&
     p.qualityMode !== 'automatic' &&
     p.qualitySessions === 2 &&
     ((p.recentQualitySessions ?? 0) < 2 ||
@@ -1044,6 +1059,14 @@ export function validateProfile(
     )
       throw new PlanError(
         'Place the paired threshold day at least one easy or rest day away from the long run.',
+      );
+  }
+  if (usesMarathonRhythm(p)) {
+    // This legacy field counts weekday workouts; the long run is the other quality session.
+    p.qualitySessions = 1;
+    if (p.days.length < 3 || qualitySchedule(p).length !== 1)
+      throw new PlanError(
+        'A standard marathon week needs a long run, one tempo workout of at least 30 minutes, and easy running. Choose a workout day separated from the long run by an easy or rest day.',
       );
   }
   p.days.sort((a, b) => a - b);
@@ -1286,7 +1309,7 @@ export function makePlan(
           week: Math.floor(dayDiff(start, e.date) / 7),
         }))
     : [];
-  const pace = p.easyPace ?? TRAINING_POLICY.estimatedEasyMinutesPerKm;
+  const pace = schedulingEasyPace(p);
   // Scheduling must respect recorded time as well as distance. A supplied pace
   // cannot turn faster actual running into extra tolerated training minutes.
   const reviewedBaseKm = replan
@@ -1356,6 +1379,12 @@ export function makePlan(
     (p.weeklyMinutesLimit ?? Infinity) / pace,
   );
   const family = trainingFamily(p);
+  // Distance-ended long runs must fit at the slow edge of an explicit easy
+  // target. This changes their share of the existing budget, not weekly minutes.
+  const longPace =
+    family === 'marathon' && p.workoutTargets?.mode === 'pace'
+      ? Math.max(pace, (p.workoutTargets.pace?.easy?.high ?? 0) / 60)
+      : pace;
   const absoluteCeiling = bookMarathon
     ? Math.max(p.weeklyKm, marathonReference(p).peakCeilingKm)
     : family === 'ultra'
@@ -1374,21 +1403,27 @@ export function makePlan(
   const declaredLong =
     (replan?.preserveProgression ? p.longestKm : reviewedLongKm) ??
     (p.longestKm || 2);
-  const startLong = anchoredLongRunKm(declaredLong, policy.minLong);
+  const startLong =
+    family === 'marathon'
+      ? Math.min(35, Math.ceil(declaredLong))
+      : anchoredLongRunKm(declaredLong, policy.minLong);
   const peakLong = Math.min(
     peakLongRunKm(trainingFamily(p), startLong, p.intent),
-    isLongUltra(p)
-      ? (replan && !replan.preserveProgression
-          ? (replan.baseline.longestMinutes ?? p.ultraLongestMinutes!)
-          : p.ultraLongestMinutes!) / pace
-      : Infinity,
+    // Keep the opening run anchored to history, but allow later whole sessions
+    // to progress toward the existing long-ultra time ceiling.
+    isLongUltra(p) ? LONG_ULTRA_POLICY.longMinutes / pace : Infinity,
     p.longLimitKm ?? Infinity,
-    p.longMinutes / pace,
+    p.longMinutes / longPace,
   );
   const peakWeek = peakLongWeekIndex(count, taperWeeks);
   let load = base;
   load = Math.min(
     Math.max(load, startLong / longRunShareLimit(p)),
+    // A retained long-run baseline cannot undo a reduced running-frequency budget.
+    replan && usesMarathonRhythm(p) ? base : Infinity,
+    // A high long-run/weekly ratio cannot create an opening load that later
+    // falls when the ordinary forecast ceiling is applied.
+    family === 'marathon' ? base * policy.maxForecast : Infinity,
     absoluteCeiling,
     p.peakWeeklyKm ?? Infinity,
     (p.weeklyMinutesLimit ?? Infinity) / pace,
@@ -1425,6 +1460,10 @@ export function makePlan(
         : family === 'half'
           ? 16
           : 12;
+  const longProgressionStart =
+    family === 'marathon'
+      ? Math.max(progressionStart, count - preparationWeeks)
+      : progressionStart;
   for (let w = 0; w < count; w++) {
     const remaining = count - w;
     const maintenance =
@@ -1458,7 +1497,7 @@ export function makePlan(
         : marathonBlockPhase(p, addDays(start, w * 7))
       : p.goal !== 'base' && remaining === 1
         ? 'Race week'
-        : (family === 'ultra' ? taper : taperAtWeekStart)
+        : taperAtWeekStart
           ? 'Taper'
           : recovery
             ? 'Recovery'
@@ -1469,23 +1508,23 @@ export function makePlan(
                 : raceSpecificEntry
                   ? 'Race preparation'
                   : 'Build';
-    const weekTaperFraction = taperFactor(
-      p,
-      addDays(start, w * 7 + p.longDay),
-    );
+    const weekTaperFraction = taperFactor(p, addDays(start, w * 7 + p.longDay));
     long = Math.min(
       longRunForWeek({
-        weekIndex: Math.max(0, w - progressionStart),
+        weekIndex: Math.max(0, w - longProgressionStart),
         startLongKm: startLong,
         peakKm: Math.max(startLong, peakLong),
-        peakWeekIndex: Math.max(0, peakWeek - progressionStart),
+        peakWeekIndex: Math.max(0, peakWeek - longProgressionStart),
         recovery,
         taper: taper || taperAtWeekStart,
         taperFraction: weekTaperFraction,
+        wholeKilometres: family === 'marathon',
+        recoveryEveryWeeks: p.recoveryWeeks,
+        recoveryOffset: longProgressionStart,
       }),
       Math.max(startLong, policy.longCeilingKm),
       p.longLimitKm ?? Infinity,
-      p.longMinutes / pace,
+      p.longMinutes / longPace,
     );
     if (
       w > progressionStart &&
@@ -1640,7 +1679,7 @@ export function makePlan(
     const longWave =
       !recovery &&
       !taper &&
-      ['marathon', 'ultra'].includes(family) &&
+      family === 'ultra' &&
       peakLongs.length >= 2 &&
       previousLong &&
       nearPeak(previousLong)
@@ -1661,20 +1700,20 @@ export function makePlan(
         !recovery &&
         !taper &&
         !isShortTimeline(weeksUntilRace)
-        ? previousLongKm! + Math.min(policy.longStepKm, previousLongKm! * 0.08)
+        ? previousLongKm! + 2
         : Infinity,
       family === 'marathon' && previousLong && recovery
         ? previousLong.estimatedKm * 0.8
         : Infinity,
       Math.max(
-        !taper && !recovery ? startLong : 0,
-        longShareBudget * longRunShareLimit(p),
+        !taper && !recovery && !usesMarathonRhythm(p) ? startLong : 0,
+        (longShareBudget * pace * longRunShareLimit(p)) / longPace,
       ),
       Math.max(
-        !taper && !recovery ? startLong : 0,
-        (desired * pace - Math.max(0, dates.length - 1) * 5) / pace,
+        !taper && !recovery && !usesMarathonRhythm(p) ? startLong : 0,
+        (desired * pace - Math.max(0, dates.length - 1) * 5) / longPace,
       ),
-      p.longMinutes / pace,
+      p.longMinutes / longPace,
       isLongUltra(p) ? LONG_ULTRA_POLICY.longMinutes / pace : Infinity,
       longDate &&
         p.goal !== 'base' &&
@@ -1690,10 +1729,12 @@ export function makePlan(
         : Infinity,
       p.longLimitKm ?? Infinity,
     );
-    const longDistance = Math.min(
+    const cappedLong = Math.min(
       usualLongDistance,
-      runningDayLimit(p, longDate ? weekday(longDate) : p.longDay) / pace,
+      runningDayLimit(p, longDate ? weekday(longDate) : p.longDay) / longPace,
     );
+    const longDistance =
+      family === 'marathon' ? Math.floor(cappedLong + 1e-9) : cappedLong;
     const previousSpecific = workouts.filter(
       (s) =>
         s.stimulus === 'race-rhythm' && s.kind !== 'long' && s.kind !== 'race',
@@ -1722,16 +1763,17 @@ export function makePlan(
           0;
     // A marathon-effort long run consumes a workout slot. With an explicit
     // second book workout it replaces the secondary, never adds a third effort.
-    const weekQualityDays = mixedLong
-      ? bookMarathon && p.qualityMode === 'custom' && p.qualitySessions === 2
-        ? qualityDays.slice(0, -1)
-        : qualityDays.slice(1)
-      : qualityDays;
-      const support =
+    const weekQualityDays =
+      mixedLong && !usesMarathonRhythm(p)
+        ? bookMarathon && p.qualityMode === 'custom' && p.qualitySessions === 2
+          ? qualityDays.slice(0, -1)
+          : qualityDays.slice(1)
+        : qualityDays;
+    const support =
       !recovery &&
       !taper &&
       dates.length >= 4 &&
-      !usesFiveDaySplit(p)
+      (!usesFiveDaySplit(p) || usesMarathonRhythm(p))
         ? mediumDay
         : undefined;
     const strideDay =
@@ -1756,7 +1798,11 @@ export function makePlan(
     const regularDates = dates.filter((d) => d !== longDate);
     const regularBudget =
       Math.floor(desired * pace) -
-      (longDate ? Math.floor(usualLongDistance * pace) : 0);
+      (longDate
+        ? family === 'marathon'
+          ? Math.ceil(longDistance * longPace)
+          : Math.floor(usualLongDistance * pace)
+        : 0);
     const weights = new Map(
       regularDates.map((d) => [
         d,
@@ -1777,6 +1823,7 @@ export function makePlan(
       key: d,
       weight: weights.get(d)!,
       cap: Math.min(
+        usesMarathonRhythm(p) ? runningDayLimit(p, weekday(d)) : Infinity,
         p.weekdayMinutes,
         !isNovice &&
           longDate &&
@@ -1849,17 +1896,33 @@ export function makePlan(
       !recovery &&
       !taper &&
       p.goal !== 'base' &&
-      p.intent !== 'finish'
+      (p.intent !== 'finish' || usesMarathonRhythm(p))
     ) {
       for (const date of regularDates.filter((d) =>
         weekQualityDays.includes(weekday(d)),
       )) {
-        const missing = 30 - (allocation.get(date) ?? 0);
         const cap = Math.min(
           p.weekdayMinutes,
           runningDayLimit(p, weekday(date)),
           (p.qualityLimitKm ?? Infinity) * pace,
         );
+        // Preserve the primary session's familiar complete dose before filling
+        // optional aerobic support. Move existing minutes; never add volume.
+        const desiredWork =
+          usesMarathonRhythm(p) && cap >= 30
+            ? selectTemplate(p, phase, {
+                previous: workouts,
+                availableMinutes: cap,
+                week: w,
+                slot: 0,
+                marathonModel: true,
+              }).targetWorkMinutes
+            : 0;
+        const targetMinutes = Math.max(
+          30,
+          Math.min(cap, Math.ceil(25 + desiredWork)),
+        );
+        const missing = targetMinutes - (allocation.get(date) ?? 0);
         if (missing <= 0 || cap < 30) continue;
         const easyDates = regularDates.filter(
           (d) => !weekQualityDays.includes(weekday(d)),
@@ -1880,7 +1943,7 @@ export function makePlan(
           allocation.set(easy, allocation.get(easy)! - taken);
           remaining -= taken;
         }
-        allocation.set(date, 30);
+        allocation.set(date, targetMinutes);
       }
     }
     for (const date of dates) {
@@ -1898,7 +1961,9 @@ export function makePlan(
         (remaining > 1 ||
           (remaining === 1 && dayDiff(date, p.raceDate) >= 3)) &&
         weekQualityDays.includes(weekday(date)) &&
-        (phase !== 'Foundation' || p.experience === 'established');
+        (usesMarathonRhythm(p) ||
+          phase !== 'Foundation' ||
+          p.experience === 'established');
       const pairedQuality =
         p.method === 'double-threshold' &&
         p.doubleDays?.includes(weekday(date)) &&
@@ -1921,7 +1986,12 @@ export function makePlan(
                   (pairedQuality ? 2 : 1)
               : Infinity,
           );
-      let minutes = Math.max(5, Math.floor(Math.min(budget * pace, cap)));
+      let minutes = Math.max(
+        5,
+        isLong && family === 'marathon'
+          ? Math.ceil(budget * longPace - 1e-9)
+          : Math.floor(Math.min(budget * pace, cap)),
+      );
       let kind: WorkoutKind = isLong ? 'long' : 'easy';
       const gentle = p.difficulty === 'gentle';
       let steps = buildSteps(
@@ -1955,8 +2025,7 @@ export function makePlan(
               : p.marathonApproach === 'endurance'
                 ? 'Medium-long aerobic run'
                 : 'Aerobic endurance run'
-            : usesFiveDaySplit(p) ||
-                (!isNovice && (weights.get(date) ?? 1) < 1)
+            : usesFiveDaySplit(p) || (!isNovice && (weights.get(date) ?? 1) < 1)
               ? 'Recovery run'
               : bookMarathon
                 ? 'General aerobic run'
@@ -1993,11 +2062,6 @@ export function makePlan(
             week: w,
             slot: qualityDays.indexOf(weekday(date)),
             qualitySlots: weekQualityDays.length,
-            preferredKind: usesFiveDaySplit(p)
-              ? qualityDays.indexOf(weekday(date)) === 0
-                ? 'intervals'
-                : 'tempo'
-              : undefined,
             excludeTemplateIds: recentTemplateIds(
               [...recordedQuality, ...workouts],
               w,
@@ -2110,7 +2174,7 @@ export function makePlan(
           title = template.title;
           purpose = template.purpose;
           selectionReason = bookMarathon
-            ? 'Sustained marathon effort replaces weekday intensity. The easier opening distance prepares you for a controlled race-pace segment; total time and weekly work remain bounded.'
+            ? 'The long run includes controlled marathon effort alongside the weekday tempo. Its faster segment shares the existing weekly work allowance.'
             : 'Marathon effort replaces one weekday quality session this week. Most of this long run stays easy; the aim is controlled race practice, not racing tired legs.';
         }
       }
@@ -2154,7 +2218,10 @@ export function makePlan(
         title,
         kind,
         minutes,
-        estimatedKm: round(minutes / pace, 3),
+        estimatedKm:
+          isLong && family === 'marathon'
+            ? longDistance
+            : round(minutes / pace, 3),
         hard,
         templateId,
         stimulus,
@@ -2294,7 +2361,19 @@ export function makePlan(
         ? (p.recentQualityMinutes ?? 0)
         : Infinity,
     );
-    for (const w of quality) {
+    const guaranteed =
+      usesMarathonRhythm(p) &&
+      !['Recovery', 'Taper', 'Race week'].includes(week.phase);
+    if (guaranteed && prescribedQuality <= ceiling + 0.01) continue;
+    let remainingWork = ceiling;
+    const orderedQuality = guaranteed
+      ? [...quality].sort(
+          (a, b) =>
+            Number(b.kind !== 'long' && b.stimulus === 'threshold') -
+            Number(a.kind !== 'long' && a.stimulus === 'threshold'),
+        )
+      : quality;
+    for (const w of orderedQuality) {
       const template = WORKOUT_LIBRARY.find((t) => t.id === w.templateId);
       if (!template) continue;
       const dose = scaleTemplate(
@@ -2302,17 +2381,24 @@ export function makePlan(
         w.minutes,
         p.difficulty === 'gentle',
         trainingPhaseOn(p, week.phase, w.date),
-        bookMarathon && prescribedQuality > 0
-          ? (ceiling * qualityWorkMinutes(w)) / prescribedQuality
-          : ceiling / quality.length,
+        guaranteed
+          ? Math.min(qualityWorkMinutes(w), remainingWork)
+          : bookMarathon && prescribedQuality > 0
+            ? (ceiling * qualityWorkMinutes(w)) / prescribedQuality
+            : ceiling / quality.length,
         w.targetWorkMinutes,
         p,
         w.steps,
+        guaranteed ? { capBasis: 'prescribed' } : {},
       );
       if (dose) {
+        remainingWork -= dose.qualityMinutes;
         w.steps = dose.steps;
         w.minutes = dose.minutes;
-        w.estimatedKm = round(dose.minutes / pace, 3);
+        w.estimatedKm =
+          w.kind === 'long' && family === 'marathon'
+            ? Math.min(w.estimatedKm, round(dose.minutes / longPace, 3))
+            : round(dose.minutes / pace, 3);
         w.distanceEstimate = distanceEstimate(dose.steps, p);
         w.qualityMinutes = dose.qualityMinutes;
       } else {
@@ -2460,7 +2546,9 @@ export function makePlan(
         p.peakWeeklyKm ?? Infinity,
         (p.weeklyMinutesLimit ?? Infinity) / pace,
         base * (p.volume === 'gradual' ? policy.maxForecast : 1),
-      ) * longRunShareLimit(p);
+      ) *
+      longRunShareLimit(p) *
+      (pace / longPace);
     if (family === 'marathon' && maximumFromBaseline + 0.01 < requiredExposure)
       throw new PlanError(
         `Your current baseline and volume limits leave a longest training exposure of at most ${round(maximumFromBaseline)} km; this model needs room for ${requiredExposure} km. More available time or a later race cannot overcome this volume limit. Start with a base-building plan, or review your recent mileage and volume preference if entered incorrectly.`,
@@ -2480,15 +2568,36 @@ export function makePlan(
       `These limits leave a longest training exposure of ${round(exposure)} ${exposureUnit}; this policy requires room for ${round(requiredExposure)} ${exposureUnit}. Allow more session time, review distance caps, or build a base first.${alternative}`,
     );
   }
+  if (
+    replan &&
+    !isLongUltra(p) &&
+    p.goal !== 'base' &&
+    replan.baseline.source === 'recorded-plan-history' &&
+    replan.baseline.weeklyKm < preparationRequirements(p).minWeekly
+  ) {
+    plan.feasibility = {
+      status: 'review-required',
+      asOf: replan.from,
+      reasons: [
+        ...(plan.feasibility?.reasons ?? []),
+        'Your recorded recent weekly volume is below this event’s preparation baseline. The reduced forecast is retained; review the event and current running capacity before progressing.',
+      ],
+    };
+  }
   let capacityReason = '';
   if (isLongUltra(p) && !replan)
     capacityReason = longUltraCapacityMessage(plan) ?? '';
   if (trainingFamily(p) === 'ultra' && !isLongUltra(p) && !replan) {
-    const peakHours = weeks.map((w) =>
-      workouts
-        .filter((s) => s.week === w.index && s.kind !== 'race')
-        .reduce((n, s) => n + s.minutes, 0),
-    );
+    const peakHours = weeks.map((w) => {
+      const runs = workouts.filter(
+        (s) => s.week === w.index && s.kind !== 'race',
+      );
+      // A partially tapered week cannot establish a full pre-taper capacity week.
+      // Keep its zero in place so separated weeks cannot become consecutive.
+      return runs.some((s) => taperFactor(p, s.date) < 1)
+        ? 0
+        : runs.reduce((n, s) => n + s.minutes, 0);
+    });
     const candidates = peakHours.slice(
       Math.max(0, count - 10),
       Math.max(0, count - 3),
@@ -2514,7 +2623,9 @@ export function makePlan(
       reasons: [...(plan.feasibility?.reasons ?? []), capacityReason],
     };
   }
+  ensureGeneratedMarathonRhythm(plan, replan?.from ?? p.startDate);
   const varied = refreshWorkoutVariety(plan, replan?.from ?? p.startDate);
+  normalizeGeneratedMarathonLongRuns(varied, replan?.from ?? p.startDate);
   const errors = validatePlan(varied);
   if (errors.length) throw new PlanError(errors[0]);
   varied.workouts = varied.workouts.map((w) =>
@@ -2526,11 +2637,170 @@ export function makePlan(
     applyActualTrainingEnvelope(varied, undefined, replan?.retainedPrefix);
     rebalanceFutureQuality(varied, replan?.from ?? p.startDate);
   }
+  ensureGeneratedMarathonRhythm(varied, replan?.from ?? p.startDate);
+  normalizeGeneratedMarathonLongRuns(varied, replan?.from ?? p.startDate);
   refreshWeekTotals(varied);
   const finalErrors = validatePlan(varied);
   if (finalErrors.length) throw new PlanError(finalErrors[0]);
   return varied;
 }
+/** Intersect the whole-kilometre forecast with every final session capacity.
+ * A backward pass lowers earlier targets when a later ordinary week cannot fund
+ * them; it never adds minutes, alters history, or creates an unmarked cutback. */
+function normalizeGeneratedMarathonLongRuns(plan: Plan, from: string) {
+  if (trainingFamily(plan.profile) !== 'marathon' || plan.returnState) return;
+  let nextBuildCeiling = 35;
+  for (const week of [...plan.weeks].reverse()) {
+    if (week.start < from) continue;
+    const long = plan.workouts.find(
+      (w) => w.week === week.index && w.kind === 'long',
+    );
+    if (
+      !long ||
+      long.status !== 'planned' ||
+      long.returnRole ||
+      (long.changed && long.changeSource !== 'preferences')
+    )
+      continue;
+    const ordinary =
+      !['Recovery', 'Taper', 'Race week'].includes(week.phase) &&
+      taperFactor(plan.profile, addDays(week.start, 6)) >= 1;
+    const km = Math.min(
+      35,
+      Math.floor(long.estimatedKm + 1e-6),
+      ordinary ? nextBuildCeiling : 35,
+    );
+    if (ordinary) nextBuildCeiling = km;
+    if (long.estimatedKm !== km) {
+      long.estimatedKm = km;
+      Object.assign(long, withWorkoutTargets(long, plan.profile));
+    }
+  }
+  refreshWeekTotals(plan);
+}
+
+/** Final allocation check for generated full weeks. History and deliberate adaptations
+ * are handled by the existing state reducers; missing work is never caught up. */
+function ensureGeneratedMarathonRhythm(plan: Plan, from: string) {
+  const p = plan.profile;
+  if (!usesMarathonRhythm(p) || plan.returnState) return;
+  const qualityDay = qualitySchedule(p)[0];
+  for (const week of plan.weeks) {
+    if (
+      week.start < from ||
+      ['Recovery', 'Taper', 'Race week'].includes(week.phase) ||
+      taperFactor(p, addDays(week.start, 6)) < 1
+    )
+      continue;
+    const runs = plan.workouts.filter(
+      (w) => w.week === week.index && w.kind !== 'race',
+    );
+    if (
+      runs.length !== p.days.length ||
+      runs.some((w) => w.status !== 'planned' || w.returnRole)
+    )
+      continue;
+    const tempo = runs.find((w) => weekday(w.date) === qualityDay);
+    const long = runs.find((w) => w.kind === 'long');
+    if (!tempo || !long) continue; // validatePlan reports an unfillable schedule.
+    const timeCap = Math.min(
+      p.weekdayMinutes,
+      runningDayLimit(p, qualityDay),
+      (p.qualityLimitKm ?? Infinity) * schedulingEasyPace(p),
+    );
+    if (tempo.minutes < 30 && timeCap >= 30) {
+      let missing = 30 - tempo.minutes;
+      const donors = runs.filter((w) => w !== tempo && w !== long && !w.hard);
+      if (
+        donors.reduce((sum, w) => sum + Math.max(0, w.minutes - 5), 0) >=
+        missing
+      ) {
+        for (const donor of donors) {
+          const take = Math.min(missing, donor.minutes - 5);
+          if (take > 0)
+            Object.assign(
+              donor,
+              resizeWorkout(donor, p, week.phase, donor.minutes - take),
+            );
+          missing -= take;
+        }
+        tempo.minutes = 30;
+      }
+    }
+    if (tempo.minutes < 30 || timeCap < 30)
+      throw new PlanError(
+        `Week ${week.index + 1} cannot fit a 30-minute tempo workout within the selected time and distance limits.`,
+      );
+    const ceiling = runs.reduce((sum, w) => sum + w.minutes, 0) * 0.22;
+    // Protect the weekday's useful minimum before allocating any faster long-run work.
+    const otherWork = runs
+      .filter((w) => w !== tempo && w !== long)
+      .reduce((sum, w) => sum + qualityWorkMinutes(w), 0);
+    if (qualityWorkMinutes(long) > ceiling - otherWork - 6) {
+      Object.assign(
+        long,
+        resizeWorkout(
+          long,
+          p,
+          week.phase,
+          long.minutes,
+          Math.max(0, ceiling - otherWork - 6),
+        ),
+      );
+    }
+    const allowance = Math.max(
+      0,
+      ceiling -
+        runs
+          .filter((w) => w !== tempo)
+          .reduce((sum, w) => sum + qualityWorkMinutes(w), 0),
+    );
+    if (
+      tempo.hard &&
+      tempo.stimulus === 'threshold' &&
+      qualityWorkMinutes(tempo) >= 6 &&
+      qualityWorkMinutes(tempo) <= allowance + 0.01
+    )
+      continue;
+    const template = WORKOUT_LIBRARY.find(
+      (t) => t.id === 'marathon-book-lt-6',
+    )!;
+    const dose = scaleTemplate(
+      template,
+      tempo.minutes,
+      p.difficulty === 'gentle',
+      week.phase,
+      allowance,
+      6,
+      p,
+      undefined,
+      { capBasis: 'prescribed' },
+    );
+    if (!dose)
+      throw new PlanError(
+        `Week ${week.index + 1} cannot fit a complete tempo workout within its weekly work allowance.`,
+      );
+    Object.assign(tempo, {
+      steps: dose.steps,
+      minutes: dose.minutes,
+      estimatedKm: round(dose.minutes / schedulingEasyPace(p), 3),
+      kind: 'tempo',
+      hard: true,
+      templateId: template.id,
+      stimulus: 'threshold',
+      role: 'threshold',
+      qualityMinutes: dose.qualityMinutes,
+      targetWorkMinutes: 6,
+      title: template.title,
+      purpose: template.purpose,
+      reason:
+        'A short controlled tempo preserves the two-session marathon rhythm within the existing weekly allocation.',
+    });
+    Object.assign(tempo, withWorkoutTargets(tempo, p));
+  }
+  refreshWeekTotals(plan);
+}
+
 export function validatePlan(plan: Plan): string[] {
   const errors: string[] = [];
   const ids = new Set<string>();
@@ -2577,6 +2847,10 @@ export function validatePlan(plan: Plan): string[] {
     )
       errors.push(
         'That day is reserved for cross-training without running. Move the run or revise your cross-training days.',
+      );
+    if (!Number.isFinite(s.estimatedKm) || s.estimatedKm < 0)
+      errors.push(
+        'Workout distance estimates must be finite and non-negative.',
       );
     if (
       !Number.isFinite(s.minutes) ||
@@ -2792,6 +3066,44 @@ function qualityBudgetErrors(plan: Plan): string[] {
         'This change leaves too much quality work for the remaining weekly volume. Reduce quality work or review the week together.',
       );
   }
+  if (
+    plan.engineVersion === ENGINE_VERSION &&
+    usesMarathonRhythm(plan.profile) &&
+    !plan.returnState
+  ) {
+    let previousLongKm = 0;
+    for (const week of plan.weeks) {
+      if (
+        ['Recovery', 'Taper', 'Race week'].includes(week.phase) ||
+        week.start < (plan.constraintsFrom ?? plan.profile.startDate) ||
+        taperFactor(plan.profile, addDays(week.start, 6)) < 1
+      )
+        continue;
+      const sessions = plan.workouts.filter((w) => w.week === week.index);
+      if (
+        sessions.some(
+          (w) => w.status !== 'planned' || w.changed || w.returnRole,
+        )
+      )
+        continue;
+      const quality = sessions.filter((w) => w.hard || w.kind === 'long');
+      const long = quality.find((w) => w.kind === 'long');
+      if (long && long.estimatedKm + 0.001 < previousLongKm)
+        errors.push(
+          `Week ${week.index + 1} cannot retain the preceding long-run distance within its allocated volume. Review the weekly and session limits.`,
+        );
+      if (long) previousLongKm = long.estimatedKm;
+      if (
+        quality.length !== 2 ||
+        quality.filter((w) => w.kind === 'long').length !== 1 ||
+        quality.filter((w) => w.kind !== 'long' && w.stimulus === 'threshold')
+          .length !== 1
+      )
+        errors.push(
+          `Week ${week.index + 1} needs one tempo/threshold workout and one long run. Increase available workout time or review the weekly limits.`,
+        );
+    }
+  }
   return errors;
 }
 function applyActualTrainingEnvelope(
@@ -2933,7 +3245,7 @@ function applyActualTrainingEnvelope(
     const longs = plan.workouts
       .filter((w) => w.kind === 'long' && w.status !== 'skipped')
       .sort((a, b) => a.date.localeCompare(b.date));
-    const pace = p.easyPace ?? TRAINING_POLICY.estimatedEasyMinutesPerKm;
+    const pace = schedulingEasyPace(p);
     const declaredFrom = plan.baselineEvidence?.asOf ?? p.startDate;
     const declaredKm = plan.baselineEvidence?.longestKm ?? p.longestKm;
     for (const [index, run] of longs.entries()) {
@@ -2957,11 +3269,15 @@ function applyActualTrainingEnvelope(
         plan.weeks[run.week]?.phase === 'Recovery' && last
           ? km(last) * 0.8
           : familiar > 0
-            ? familiar + Math.min(1.5, familiar * 0.08)
+            ? Math.min(35, Math.floor(familiar) + 2)
             : Infinity;
       // Check the final executable allocation too: earlier per-week caps may
       // have reduced the reference used during the first scheduling pass.
-      if (run.minutes > ceiling * pace + 0.01) update(run, ceiling * pace);
+      if (run.estimatedKm > ceiling + 0.001)
+        update(
+          run,
+          Math.ceil((run.minutes * ceiling) / run.estimatedKm - 1e-9),
+        );
     }
   }
   // A mileage reduction can disappear when both weeks hit the same session caps.
@@ -3031,6 +3347,8 @@ function applyActualTrainingEnvelope(
         );
         return (
           week.phase !== 'Recovery' &&
+          (!usesMarathonBook(p) ||
+            dayDiff(addDays(week.start, 6), p.raceDate) >= 21) &&
           runs.every((s) => taperFactor(p, s.date) === 1) &&
           new Set(runs.map((s) => s.date)).size >= p.days.length
         );
@@ -3061,7 +3379,11 @@ function applyActualTrainingEnvelope(
       )) {
         const factor = taperFactor(p, run.date);
         const typical = familiar.get(weekday(run.date));
-        if (factor < 1 && typical != null) {
+        if (
+          (factor < 1 ||
+            (usesMarathonBook(p) && dayDiff(run.date, p.raceDate) <= 21)) &&
+          typical != null
+        ) {
           const total = dailyTotals.get(run.date)!;
           // Book allocation already applies the taper fraction to weekly volume.
           // This guard only prevents an outing from exceeding its familiar length.
@@ -3095,8 +3417,7 @@ function applyActualTrainingEnvelope(
     // the starting routine on every pass, including later preference edits.
     const startingWeeklyMinutes = Math.min(
       Math.min(
-        (p.weeklyKm || 5) *
-          (p.easyPace ?? TRAINING_POLICY.estimatedEasyMinutesPerKm),
+        (p.weeklyKm || 5) * schedulingEasyPace(p),
         isLongUltra(p) ? p.ultraWeeklyMinutes! : Infinity,
       ) *
         (p.experience === 'returning'
@@ -3240,7 +3561,7 @@ export function refreshFeasibility(plan: Plan, asOf: string) {
       .map((w) =>
         w.status === 'completed'
           ? (w.feedback?.actualKm ??
-            (w.feedback?.actualMinutes ?? 0) / (plan.profile.easyPace ?? 7))
+            (w.feedback?.actualMinutes ?? 0) / schedulingEasyPace(plan.profile))
           : w.estimatedKm,
       ),
   );
@@ -3263,7 +3584,10 @@ export function rebalanceFutureQuality(plan: Plan, asOf: string): Plan {
       );
       const editable = runs.filter(
         (w) =>
-          w.status === 'planned' && w.date >= asOf && qualityWorkMinutes(w) > 0,
+          w.status === 'planned' &&
+          w.date >= asOf &&
+          qualityWorkMinutes(w) > 0 &&
+          (!w.changed || w.changeSource === 'preferences'),
       );
       if (!editable.length) continue;
       const immutableWork = runs
@@ -3298,6 +3622,7 @@ export function rebalanceFutureQuality(plan: Plan, asOf: string): Plan {
         );
         Object.assign(w, replacement, {
           changed: true,
+          changeSource: 'preferences',
           reason: `${w.reason} Quality reduced after a change in available weekly running; no extra mileage was added.`,
         });
         w.distanceEstimate = distanceEstimate(w.steps, plan.profile);
@@ -3447,7 +3772,7 @@ export function adjustPlan(
             w.minutes * 0.7,
             next.profile.weekdayMinutes,
             (next.profile.easyLimitKm ?? Infinity) *
-              (next.profile.easyPace ?? 7),
+              schedulingEasyPace(next.profile),
           ),
         ),
       );
@@ -3496,7 +3821,7 @@ export function adjustPlan(
 }
 function applyReturnStage(plan: Plan, asOf: string) {
   const state = plan.returnState!;
-  const pace = plan.profile.easyPace ?? 7;
+  const pace = schedulingEasyPace(plan.profile);
   const factor = state.stage === 1 ? 0.65 : 0.8;
   // Keep recorded time and distance as independent ceilings. Older saved
   // stages predate time evidence and retain their distance-based fallback.
@@ -3973,7 +4298,7 @@ export type PreferencePatch = Pick<
   | 'weeklyMinutesLimit'
   | 'workoutFormat'
   | 'workoutVariety'
->;
+> & { recentRace?: RecentRace | null };
 export function revisePreferences(
   plan: Plan,
   patch: PreferencePatch,
@@ -4022,6 +4347,7 @@ export function revisePreferences(
     'weeklyMinutesLimit',
     'workoutFormat',
     'workoutVariety',
+    'recentRace',
   ] as const;
   const profile = { ...plan.profile };
   for (const key of allowed)
@@ -4099,7 +4425,7 @@ export function revisePreferences(
     const next = structuredClone(plan);
     next.profile = validateProfile(profile, profile.startDate);
     next.constraintsFrom = asOf;
-    const pace = profile.easyPace ?? 7;
+    const pace = schedulingEasyPace(profile);
     for (const w of next.workouts) {
       if (w.date < asOf || w.status !== 'planned' || w.kind === 'race')
         continue;

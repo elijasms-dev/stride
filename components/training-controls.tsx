@@ -1,4 +1,5 @@
 'use client';
+import { RecentRaceFields } from './recent-race-fields';
 import { useId } from 'react';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { ChevronDown, SlidersHorizontal, Check } from 'lucide-react';
@@ -19,6 +20,7 @@ import {
   classicQualityCount,
   resolveRunningDays,
   requestedQualityCount,
+  usesMarathonRhythm,
 } from '@/lib/training-structure';
 import { dayNames, trainingFamily, type Profile } from '@/lib/engine';
 import { qualitySchedule } from '@/lib/training-structure';
@@ -102,6 +104,16 @@ function WorkoutFrequencyField({
       : p.experience !== 'established' || p.weeklyKm < 45
         ? 'Two harder workouts need an established routine of at least 45 km a week.'
         : null;
+  if (usesMarathonRhythm(p))
+    return (
+      <div className="plan-workout-choice">
+        <strong>Two quality sessions per build week</strong>
+        <p>
+          One tempo or threshold workout and one long run, with easy running
+          between them. Recovery and taper weeks reduce the workload.
+        </p>
+      </div>
+    );
   if (p.method === 'double-threshold')
     return (
       <div className="plan-workout-choice">
@@ -211,6 +223,7 @@ export function PlanCustomizationFields({
         }
       }}
     >
+      <RecentRaceFields profile={profile} onChange={onChange} />
       <ScheduleFields
         profile={profile}
         onChange={onChange}

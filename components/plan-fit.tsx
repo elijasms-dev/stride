@@ -53,7 +53,7 @@ export function PlanFit({ plan, asOf }: { plan: Plan; asOf: string }) {
         {openingRatio < 0.9 && p.weeklyKm > 0
           ? ' This is below your reported weekly distance. Fewer requested runs, a return to training, or the time and session-role limits can reduce the opening allocation. Review the week before activating; unused capacity is not added to recovery runs.'
           : ''}
-        {!p.easyPace
+        {!p.easyPace && !p.recentRace
           ? ' Distance and time comparisons use 7 min/km for scheduling; enter your usual easy pace for a closer estimate.'
           : ''}
       </p>

@@ -21,11 +21,13 @@ const slots = Object.freeze(
   ),
 );
 
-void test('allocation refuses a 16-minute budget that cannot fit four existing five-minute minima', () => {
+void test('underfunded allocation remains bounded without a RangeError', () => {
   const before = structuredClone(slots);
-  assert.throws(
-    () => allocateRunningMinutes(16, slots),
-    /minimum|five|5|budget|small|minutes/i,
+  const values = [...allocateRunningMinutes(16, slots).values()];
+  assert.ok(values.every((n) => Number.isInteger(n) && n >= 0 && n <= 5));
+  assert.equal(
+    values.reduce((total, n) => total + n, 0),
+    16,
   );
   assert.deepEqual(slots, before);
 });

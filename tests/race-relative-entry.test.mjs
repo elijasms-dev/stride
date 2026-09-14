@@ -11,6 +11,7 @@ import {
   validatePlan,
 } from '../lib/engine.ts';
 import { qualityWorkMinutes } from '../lib/prescription.ts';
+import { assertMarathonWeek } from './marathon-contract.mjs';
 
 const start = '2026-09-07';
 const input = (patch = {}) => ({
@@ -101,12 +102,17 @@ for (const [weeklyKm, longestKm] of [
       qualitySessions: 2,
       workoutVariety: 'varied',
     });
-    assert.equal(p.weeks[0].targetKm, weeklyKm);
+    const openingRuns = training(p, 0);
+    assert.equal(minutes(openingRuns), weeklyKm * p.profile.easyPace);
+    const openingKm = openingRuns.reduce((sum, w) => sum + w.estimatedKm, 0);
+    assert.equal(p.weeks[0].targetKm, Math.round(openingKm * 10) / 10);
+    assert.ok(openingKm <= weeklyKm + 0.001);
+    assert.ok(weeklyKm - openingKm < openingRuns.length * 0.1);
     assert.equal(p.weeks[0].longKm, longestKm);
     assert.equal(p.weeks[0].phase, 'Build');
     assert.ok(p.weeks.some((w) => w.phase === 'Race preparation'));
     assert.ok(p.weeks.every((w) => w.phase !== 'Foundation'));
-    const opening = training(p, 0).filter(main);
+    const opening = openingRuns.filter((w) => main(w) || w.kind === 'long');
     assert.equal(opening.length, 2);
     assert.ok(
       opening.some(
@@ -114,9 +120,7 @@ for (const [weeklyKm, longestKm] of [
       ),
     );
     assert.ok(
-      opening.some(
-        (w) => w.stimulus === 'aerobic-power' && qualityWorkMinutes(w) >= 12,
-      ),
+      opening.some((w) => w.kind === 'long' && w.estimatedKm === longestKm),
     );
     assert.equal(p.profile.recentQualitySessions, 2);
     assert.equal(p.profile.recentQualityMinutes ?? null, null);
@@ -130,12 +134,13 @@ for (const [weeklyKm, longestKm] of [
     );
     let familiar = longestKm;
     for (const w of untapered) {
-      assert.ok(w.estimatedKm <= familiar + Math.min(1.5, familiar * 0.08) + 0.1);
+      assert.ok(Number.isInteger(w.estimatedKm));
+      assert.ok(w.estimatedKm >= familiar);
+      assert.ok(w.estimatedKm <= Math.min(35, familiar + 3));
       familiar = Math.max(familiar, w.estimatedKm);
     }
-    const peak = Math.max(
-      ...p.weeks.map((w) => minutes(training(p, w.index))),
-    );
+    for (const week of p.weeks) assertMarathonWeek(p, week);
+    const peak = Math.max(...p.weeks.map((w) => minutes(training(p, w.index))));
     for (const [minimum, maximum, fraction] of [
       [7, 13, 0.6],
       [1, 6, 0.4],
@@ -189,7 +194,7 @@ for (const [goal, weeklyKm, longestKm, days] of [
   ['10k', 35, 12, [0, 1, 3, 5]],
   ['half', 50, 18, [0, 1, 3, 5]],
 ])
-  test(`${goal} keeps race-relative entry across short and same-day windows`, () => {
+  test(`${String(goal)} keeps race-relative entry across short and same-day windows`, () => {
     for (let offset = 0; offset < 7; offset++)
       for (const span of [0, 1, 6, 13, 14, 20, 27, 34]) {
         const startDate = addDays(start, offset);
@@ -271,7 +276,9 @@ test('a race date never fabricates readiness for a novice below the event baseli
   assert.deepEqual(novice, original);
   const base = makePlan({ ...novice, goal: 'base' }, start, false);
   assert.ok(base.workouts.every((w) => !w.hard && w.kind !== 'race'));
-  assert.ok(base.workouts.some((w) => w.steps.some((s) => s.movement === 'walk')));
+  assert.ok(
+    base.workouts.some((w) => w.steps.some((s) => s.movement === 'walk')),
+  );
   assert.ok(base.weeks.every((w) => w.phase !== 'Race preparation'));
   assert.equal(base.profile.recentQualitySessions, 0);
   assertBoundedPlan(base);
@@ -283,7 +290,12 @@ test('full-length road plans keep an opening foundation and later event preparat
     ['10k', 83, 35, 12],
     ['half', 111, 50, 18],
   ]) {
-    const p = build({ goal, raceDate: addDays(start, span), weeklyKm, longestKm });
+    const p = build({
+      goal,
+      raceDate: addDays(start, span),
+      weeklyKm,
+      longestKm,
+    });
     assert.equal(p.weeks[0].phase, 'Foundation');
     assert.ok(p.weeks.some((w) => w.phase === 'Build'));
     assert.ok(p.weeks.some((w) => w.phase === 'Race preparation'));
@@ -310,9 +322,17 @@ test('reviewing a short event block preserves recorded history and is stable on 
   }
   const saved = structuredClone(p.workouts.filter((w) => w.date < asOf));
   const once = revisePreferences(p, { volume: p.profile.volume }, asOf, true);
-  const twice = revisePreferences(once, { volume: p.profile.volume }, asOf, true);
+  const twice = revisePreferences(
+    once,
+    { volume: p.profile.volume },
+    asOf,
+    true,
+  );
   for (const reviewed of [once, twice]) {
-    assert.deepEqual(reviewed.workouts.filter((w) => w.date < asOf), saved);
+    assert.deepEqual(
+      reviewed.workouts.filter((w) => w.date < asOf),
+      saved,
+    );
     assert.ok(
       reviewed.workouts
         .filter((w) => w.date >= asOf)

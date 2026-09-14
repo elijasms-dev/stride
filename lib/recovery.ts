@@ -231,7 +231,7 @@ export function validateRecovery(input: unknown): RecoveryFile {
   text(p.engineVersion, 80, 'engine version');
   text(p.policyVersion, 100, 'policy version');
   text(p.createdAt, 40, 'creation date');
-  if (!/^stride-0\.[12345678]\.\d+$/.test(p.engineVersion))
+  if (!/^stride-0\.(?:[1-9]|10)\.\d+$/.test(p.engineVersion))
     fail('this training engine version needs a newer recovery reader.');
   if (
     !Array.isArray(p.weeks) ||

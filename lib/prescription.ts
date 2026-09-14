@@ -1,7 +1,11 @@
+import { schedulingEasyPace } from './fitness-pacing.ts';
 import type { Profile, Step, Workout } from './engine';
 
 /** Labels and estimates describe the prescription; they are never pace targets or actuals. */
-export function distanceEstimate(steps: Step[], p: Pick<Profile, 'easyPace'>) {
+export function distanceEstimate(
+  steps: Step[],
+  p: Pick<Profile, 'easyPace' | 'recentRace'>,
+) {
   if (steps.length > 0 && steps.every((s) => s.metres !== undefined)) {
     const km = steps.reduce((n, s) => n + s.metres! / 1000, 0);
     return {
@@ -10,7 +14,7 @@ export function distanceEstimate(steps: Step[], p: Pick<Profile, 'easyPace'>) {
       basis: 'Exact distance prescribed in every step.',
     };
   }
-  if (!p.easyPace)
+  if (!p.easyPace && !p.recentRace)
     return {
       lowerKm: null,
       upperKm: null,
@@ -24,13 +28,21 @@ export function distanceEstimate(steps: Step[], p: Pick<Profile, 'easyPace'>) {
       upper += s.metres / 1000;
       continue;
     }
+    if (s.target?.mode === 'pace') {
+      lower += s.seconds / s.target.high;
+      upper += s.seconds / s.target.low;
+      continue;
+    }
     const minutes = s.seconds / 60;
     // Broad scenario bounds, independently authored; no inferred race/threshold pace.
     const walk = s.movement === 'walk';
-    const slow = walk ? 20 : p.easyPace * (s.kind === 'recovery' ? 1.5 : 1.15);
+    const slow = walk
+      ? 20
+      : schedulingEasyPace(p) * (s.kind === 'recovery' ? 1.5 : 1.15);
     const quick = walk
       ? 10
-      : p.easyPace * (s.kind === 'work' && s.intensity >= 5 ? 0.8 : 0.95);
+      : schedulingEasyPace(p) *
+        (s.kind === 'work' && s.intensity >= 5 ? 0.8 : 0.95);
     lower += minutes / slow;
     upper += minutes / quick;
   }

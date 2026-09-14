@@ -1,3 +1,4 @@
+import { assertMarathonWeek } from './marathon-contract.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -134,8 +135,12 @@ void test('long lead-in uses maintenance without reaching peak a year early', ()
     start,
   );
   assert.equal(p.weeks[5].phase, 'Maintenance');
-  assert.ok(!p.workouts.some((w) => w.week < 8 && w.hard));
-  assert.ok(p.workouts.some((w) => w.week < 8 && w.stimulus === 'economy'));
+  for (const week of p.weeks.slice(0, 8)) assertMarathonWeek(p, week);
+  assert.ok(
+    p.workouts
+      .filter((w) => w.week < 8 && w.hard && w.kind !== 'long')
+      .every((w) => w.qualityMinutes <= 12),
+  );
   assert.ok(p.weeks[20].targetKm <= p.weeks[0].targetKm + 0.1);
 });
 void test('maintain option does not silently grow the long run', () => {

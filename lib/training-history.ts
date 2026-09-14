@@ -1,3 +1,4 @@
+import { schedulingEasyPace } from './fitness-pacing.ts';
 import { recordedWorkoutDate, trainingRecords } from './run-records.ts';
 export {
   recordedWorkoutDate,
@@ -112,7 +113,7 @@ export function currentTrainingBaseline(plan: Plan, asOf: string) {
   const declaredMinutes =
     plan.baselineEvidence?.weeklyMinutes ??
     Math.min(
-      declaredKm * (plan.profile.easyPace ?? 7),
+      declaredKm * schedulingEasyPace(plan.profile),
       isLongUltra(plan.profile)
         ? (plan.profile.ultraWeeklyMinutes ?? Infinity) *
             Math.min(
@@ -193,14 +194,14 @@ export function currentTrainingBaseline(plan: Plan, asOf: string) {
       : enough
         ? Math.min(
             declaredKm,
-            observedKm ?? weeklyMinutes / (plan.profile.easyPace ?? 7),
+            observedKm ?? weeklyMinutes / schedulingEasyPace(plan.profile),
           )
         : declaredKm;
   const priorLong = plan.baselineEvidence?.longestKm ?? plan.profile.longestKm;
   const priorLongMinutes =
     plan.baselineEvidence?.longestMinutes ??
     Math.min(
-      priorLong * (plan.profile.easyPace ?? 7),
+      priorLong * schedulingEasyPace(plan.profile),
       isLongUltra(plan.profile)
         ? (plan.profile.ultraLongestMinutes ?? Infinity)
         : Infinity,
@@ -214,7 +215,7 @@ export function currentTrainingBaseline(plan: Plan, asOf: string) {
             Math.max(
               0,
               ...records.map(
-                (r) => r.km ?? r.minutes / (plan.profile.easyPace ?? 7),
+                (r) => r.km ?? r.minutes / schedulingEasyPace(plan.profile),
               ),
             ),
           )
@@ -244,7 +245,10 @@ export function currentTrainingBaseline(plan: Plan, asOf: string) {
       repeatedLongMinutes >= priorLongMinutes * 0.9,
     longestMinutes: strong
       ? repeatedLongMinutes
-      : Math.min(priorLongMinutes, longestKm * (plan.profile.easyPace ?? 7)),
+      : Math.min(
+          priorLongMinutes,
+          longestKm * schedulingEasyPace(plan.profile),
+        ),
     explanation: fatigue.length
       ? 'Recent running, including today, includes tired feedback or unexpectedly high effort on an easy run. Hold increases and review recovery; today’s distance and time do not establish a higher baseline.'
       : strong

@@ -1,4 +1,5 @@
 import type { Plan, Workout } from './engine';
+import { usesMarathonRhythm } from './training-structure.ts';
 import { usesMarathonBook } from './marathon-book.ts';
 import { qualityWorkMinutes } from './prescription.ts';
 import { isSteadyRaceAdaptation } from './steady-race-workout.ts';
@@ -48,10 +49,25 @@ export function marathonPlanDescription(plan: Plan) {
   );
   if (!f.training.length)
     return 'This remaining block contains no training runs before race day. It does not represent a complete marathon preparation.';
-  const count = f.maximumQuality;
-  const structure = count
-    ? `This block schedules up to ${count} main ${count === 1 ? 'workout' : 'workouts'} per week, with lighter weeks for recovery and taper.`
-    : 'This block schedules easy running, with no hard training sessions.';
+  const standard =
+    usesMarathonRhythm(plan.profile) && plan.engineVersion === 'stride-0.10.0';
+  const count = standard
+    ? Math.max(
+        0,
+        ...[...weeks].map(
+          (index) =>
+            f.training.filter(
+              (w) => w.week === index && (w.hard || w.kind === 'long'),
+            ).length,
+        ),
+      )
+    : f.maximumQuality;
+  const structure =
+    standard && count === 2
+      ? `Standard build weeks contain two quality sessions: one ${f.steady && !f.tempo ? 'controlled steady' : 'tempo or threshold'} workout and one long run. Recovery and taper weeks reduce the workload.`
+      : count
+        ? `This block schedules up to ${count} main ${count === 1 ? 'workout' : 'workouts'} per week, with lighter weeks for recovery and taper.`
+        : 'This block schedules easy running, with no hard training sessions.';
   const work = [
     f.steady ? 'Steady, comfortable efforts keep the work controlled.' : '',
     f.tempo ? 'Controlled tempo develops threshold endurance.' : '',

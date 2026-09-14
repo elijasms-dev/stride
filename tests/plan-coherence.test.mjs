@@ -1,3 +1,4 @@
+import { assertMarathonWeek } from './marathon-contract.mjs';
 // Source-executing regression candidate. Synthetic runners only; no API, account,
 // browser, or provider writes. Portable unchanged from work/ to stride/tests/.
 // Numerical bands below are authored product acceptance criteria, not evidence
@@ -127,12 +128,7 @@ for (const n of [5, 6]) {
         w.minutes <= 60,
         `${w.date}: recovery role inflated to ${w.minutes} minutes`,
       );
-    for (const week of development(p))
-      assert.equal(
-        runs(p, week.index).filter((w) => w.hard).length,
-        1,
-        'Marathon weeks prioritise one quality stimulus alongside long and midweek endurance',
-      );
+    for (const week of development(p)) assertMarathonWeek(p, week);
   });
 }
 
@@ -203,7 +199,7 @@ for (const n of [5, 6]) {
 }
 
 for (const n of [5, 6]) {
-  void test(`${n}-day marathon pace long run replaces weekday intensity`, () => {
+  void test(`${n}-day marathon pace long run accompanies one weekday tempo`, () => {
     const p = make({ runsPerWeek: n });
     executable(p);
     const mixed = runs(p).filter(
@@ -218,8 +214,8 @@ for (const n of [5, 6]) {
           p.weeks[long.week].phase,
         ),
       );
-      assert.equal(hardWeekdays(p, long.week).length, 0);
-      assert.equal(week.filter((w) => w.hard).length, 1);
+      assert.equal(hardWeekdays(p, long.week).length, 1);
+      assert.equal(week.filter((w) => w.hard || w.kind === 'long').length, 2);
       assert.equal(week.length, n);
       assert.ok(
         qualityWorkMinutes(long) >= 20 && qualityWorkMinutes(long) <= 90,

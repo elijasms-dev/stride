@@ -106,14 +106,14 @@ for (let weekday = 0; weekday < 7; weekday++) {
 }
 
 test('native/custom short-road taper lengths and longer event models retain their current factors', () => {
-  for (const [event, length] of [
-    [{ goal: '5k' }, 14],
-    [{ goal: '10k' }, 14],
-    [{ goal: 'custom', raceDistanceKm: 15 }, 14],
-    [{ goal: 'custom', raceDistanceKm: 16.09344 }, 21],
-    [{ goal: 'half' }, 21],
-    [{ goal: 'custom', raceDistanceKm: 35 }, 21],
-    [{ goal: 'ultra', raceDistanceKm: 50 }, 21],
+  for (const { event, length } of [
+    { event: { goal: '5k' }, length: 14 },
+    { event: { goal: '10k' }, length: 14 },
+    { event: { goal: 'custom', raceDistanceKm: 15 }, length: 14 },
+    { event: { goal: 'custom', raceDistanceKm: 16.09344 }, length: 21 },
+    { event: { goal: 'half' }, length: 21 },
+    { event: { goal: 'custom', raceDistanceKm: 35 }, length: 21 },
+    { event: { goal: 'ultra', raceDistanceKm: 50 }, length: 21 },
   ]) {
     const p = input(event);
     assert.equal(taperFactor(p, addDays(p.raceDate, -length - 1)), 1);
@@ -196,7 +196,7 @@ test('legacy premature labels resolve by actual date during explicit edits', () 
   assert.equal(trainingPhaseOn(p, 'Taper', '2026-11-15'), 'Taper');
   assert.equal(
     trainingPhaseOn({ ...p, startDate: '2026-11-09' }, 'Taper', '2026-11-10'),
-    'Foundation',
+    'Race preparation',
   );
 });
 

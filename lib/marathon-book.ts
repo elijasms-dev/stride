@@ -33,7 +33,7 @@ export function marathonReference(p: Profile) {
           : band === 'established'
             ? 113
             : 89,
-    longCeilingKm: band === 'foundation' ? 32 : 35,
+    longCeilingKm: 35,
     mediumCeilingKm: band === 'foundation' ? 21 : 24,
     compact: daysBetween(p.startDate, p.raceDate) + 1 <= 84,
   };

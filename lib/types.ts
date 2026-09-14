@@ -17,6 +17,7 @@ export interface PeakLongRunBand {
 }
 
 export interface UserTrainingInput {
+  recentRace?: import('./fitness-pacing.ts').RecentRace;
   /** Current comfortable long-run distance in kilometres. Must be > 0. */
   currentLongRun: number;
   /** Optional recent weekly volume (km). Week 1 will not drop below this. */
@@ -47,6 +48,7 @@ export interface WorkoutTemplate {
 }
 
 export interface WorkoutStep {
+  paceSecondsPerKm?: number;
   label: string;
   kind: 'warmup' | 'interval' | 'recovery' | 'cooldown';
   km: number;
@@ -68,6 +70,7 @@ export interface ScaledWorkout {
 }
 
 export interface DailyWorkout {
+  paceSecondsPerKm?: number;
   dayIndex: number;
   type: RunType;
   km: number;
@@ -106,6 +109,7 @@ export interface TrainingEngineErrorOptions {
 }
 
 export type TrainingEngineErrorCode =
+  | 'INVALID_BENCHMARK'
   | 'INVALID_WEEKS'
   | 'INVALID_LONG_RUN'
   | 'INVALID_GOAL'

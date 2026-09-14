@@ -1,3 +1,8 @@
+import {
+  calculateTrainingPaces,
+  fitnessPaceRange,
+  predictRaceTime,
+} from './fitness-pacing.ts';
 import { distanceEstimate } from './prescription.ts';
 import {
   withSpecificWorkoutName,
@@ -143,13 +148,52 @@ function targetBand(workout: TargetWorkout, step: TargetStep): TargetBand {
     return step.intensity <= 5 ? 'steady' : 'interval';
   return step.intensity <= 5 ? 'steady' : 'tempo';
 }
-/** Resolve a runner-supplied target without constructing or renaming a workout. */
+/** Resolve explicit targets first, otherwise use the current fitness benchmark. */
 export function workoutStepTarget(
   workout: TargetWorkout,
   step: TargetStep,
-  profile: Pick<Profile, 'goal' | 'raceDistanceKm' | 'workoutTargets'>,
+  profile: Pick<
+    Profile,
+    'goal' | 'raceDistanceKm' | 'workoutTargets' | 'recentRace'
+  >,
 ): StepTarget | undefined {
-  const config = profile.workoutTargets;
+  let config = profile.workoutTargets;
+  const fitness =
+    !config && profile.recentRace
+      ? calculateTrainingPaces(profile.recentRace)
+      : undefined;
+  if (fitness) {
+    const distances = {
+      '5k': 5,
+      '10k': 10,
+      half: 21.0975,
+      marathon: 42.195,
+      ultra: 50,
+      custom: 42.195,
+      base: 5,
+    };
+    const distance = ['custom', 'ultra'].includes(profile.goal)
+      ? (profile.raceDistanceKm ?? distances[profile.goal])
+      : distances[profile.goal];
+    const racePace =
+      (predictRaceTime(profile.recentRace!, distance) * 60) / distance;
+    config = {
+      mode: 'pace',
+      raceScope: `${profile.goal}:${profile.raceDistanceKm ?? ''}`,
+      pace: {
+        easy: fitnessPaceRange(fitness.easy),
+        steady: fitnessPaceRange(fitness.tempo),
+        tempo: fitnessPaceRange(
+          workout.stimulus === 'threshold' ? fitness.threshold : fitness.tempo,
+        ),
+        interval: fitnessPaceRange(fitness.interval),
+        race:
+          racePace >= 120 && racePace <= 1200
+            ? fitnessPaceRange(racePace)
+            : undefined,
+      },
+    };
+  }
   if (
     !config ||
     config.mode === 'effort' ||
@@ -173,7 +217,7 @@ export function workoutStepTarget(
   const range = config[config.mode === 'pace' ? 'pace' : 'heartRate']?.[band];
   return range ? { ...range, mode: config.mode } : undefined;
 }
-/** Snapshot runner-supplied ranges, never derive them from a distance estimate. */
+/** Snapshot explicit or benchmark ranges, never derive them from a distance estimate. */
 export function withWorkoutTargets(input: Workout, profile: Profile): Workout {
   const workout = withSteadyRaceInstructions(
     withWorkoutEventContext(input, profile),
@@ -206,7 +250,7 @@ export function withWorkoutTargets(input: Workout, profile: Profile): Workout {
       (s) =>
         s.metres !== undefined &&
         s.target?.mode === 'pace' &&
-        Math.ceil((s.metres * s.target.high) / 1000) > s.seconds,
+        Math.ceil((s.metres * s.target.high) / 1000) > s.seconds + 1,
     )
   ) {
     const timed = steps.map((s) => {

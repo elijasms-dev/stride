@@ -1,4 +1,5 @@
 'use client';
+import { RecentRaceFields } from './recent-race-fields';
 import { UltraDistanceChoices, UltraRoutineFields } from './ultra-fields';
 import { TrainingPattern } from './training-pattern';
 import { BusyButton } from './action-progress';
@@ -720,6 +721,7 @@ export default function Onboarding({
                   />
                 </Field>
                 <UltraRoutineFields profile={p} onChange={setP} />
+                <RecentRaceFields profile={p} onChange={setP} />
                 <Field
                   label={`Easy pace (minutes:seconds/${p.units}, optional)`}
                   hint="Used to estimate distance and the time needed for your recent mileage. Workout targets are set separately. Enter 6:17, not decimal minutes; leave blank if unknown."
