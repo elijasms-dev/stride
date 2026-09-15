@@ -414,7 +414,7 @@ export default function Onboarding({
       }
       description={
         step === 3
-          ? 'Review the shape of your plan before you commit.'
+          ? 'Check the weekly time, longest runs and workout balance before you commit.'
           : `${existing ? 'RESTART PLAN' : 'YOUR PLAN'} · ${step + 1} OF 3`
       }
       wide
@@ -912,8 +912,8 @@ export default function Onboarding({
                 <div className="notice">
                   These are independent training rules, with effort-based
                   guidance. The workload limits are provisional coaching
-                  choices, not Runna’s proprietary algorithm. Start with the
-                  first week and use your feedback to review changes.
+                  choices. Start with the first week and use your feedback to
+                  review changes.
                 </div>
                 {existing && (
                   <p className="subtle">

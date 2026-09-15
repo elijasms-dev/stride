@@ -30,7 +30,7 @@ export default function Login({
   const title = expired
     ? 'Let’s reconnect.'
     : joining
-      ? 'Make it your run.'
+      ? 'Your week. Your plan.'
       : 'Welcome back.';
   const label = expired
     ? 'Review sign-in'
@@ -76,11 +76,11 @@ export default function Login({
         </a>
         <div className="access-story-caption">
           <p>
-            Out there.
+            Marathon training.
             <br />
-            In your stride.
+            On your terms.
           </p>
-          <span>Your next run starts here.</span>
+          <span>Fits your week. Shows you the tradeoffs.</span>
         </div>
       </section>
       <section className="access-panel" aria-labelledby="access-title">
@@ -108,22 +108,22 @@ export default function Login({
             {expired
               ? 'Your sign-in changed or expired. Reopen your journal before making more changes.'
               : joining
-                ? 'A training plan shaped around your goal, your experience and the days you want to run.'
-                : 'Pick up your plan. Find your next workout. Keep moving.'}
+                ? 'For runners who want a say in their training. Start with your recent running, set the time you actually have, and review a plan built around both.'
+                : 'Your next workout, the reason behind it, and room to adjust your week.'}
           </p>
           {joining && (
             <ul className="access-benefits">
               <li>
                 <Check aria-hidden="true" size={18} />
-                Choose your race and running routine
+                Set a time limit for each running day
               </li>
               <li>
                 <Check aria-hidden="true" size={18} />
-                Set your pace, heart rate or effort targets
+                Compare plans and understand the tradeoffs
               </li>
               <li>
                 <Check aria-hidden="true" size={18} />
-                Connect your watch through Intervals.icu
+                Review changes, undo them, and keep your history
               </li>
             </ul>
           )}

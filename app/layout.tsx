@@ -25,9 +25,9 @@ const spatialDisplay = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: 'Stride — Your running, considered',
+  title: 'Stride — Marathon training that fits your week',
   description:
-    'Your personal training journal. Purposeful race plans, thoughtful workouts, and room for real life.',
+    'Build around your recent running and the time you actually have. Compare training plans, understand the tradeoffs, and stay in control of every change.',
   robots: { index: false, follow: false },
   icons: {
     icon: [

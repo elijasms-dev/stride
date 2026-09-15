@@ -5,11 +5,25 @@ export default function About() {
       <Link className="text-button" href="/">
         Back to Stride
       </Link>
-      <h1>Training, with a reason</h1>
+      <h1>Marathon training that fits your actual week</h1>
       <p>
-        Stride builds deterministic plans from your recent running, available
-        days, time limits and event. Workouts progress through related purposes.
-        A cap limits a session; it is not a target every workout must fill.
+        You know your running. You know how much time your week allows. Stride
+        brings the two together, with a training plan you can understand,
+        compare and change.
+      </p>
+      <h2>Set the limits that matter</h2>
+      <p>
+        Forty minutes on Tuesday. Two hours on Sunday. A ceiling for the whole
+        week. Set different limits for each running day and build from your
+        recent training. If your goal and availability do not fit, Stride
+        explains which limits need a review.
+      </p>
+      <h2>See the tradeoffs before you choose</h2>
+      <p>
+        Compare your saved plan with an alternative: weekly training time,
+        longest run, quality sessions and total commitment. Each workout has a
+        reason. Plan changes can be reviewed before saving, and your journal
+        keeps a record you can undo or export.
       </p>
       <h2>Supported training</h2>
       <p>
