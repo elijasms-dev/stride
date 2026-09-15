@@ -1,4 +1,5 @@
-import { addDays, type Plan, type Workout } from './engine.ts';
+import { addDays } from './plan/calendar.ts';
+import { type Plan, type Workout } from './plan/types.ts';
 import { supportingSession } from './coaching-context.ts';
 import { journalEntries } from './journal-view.ts';
 import { orderedDaySessions } from './day-sessions.ts';

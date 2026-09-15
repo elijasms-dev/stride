@@ -1,4 +1,5 @@
-import { addDays, type Workout } from './engine.ts';
+import { addDays } from './plan/calendar.ts';
+import { type Workout } from './plan/types.ts';
 
 export type DeliveryReceipt = {
   workout_id: string;

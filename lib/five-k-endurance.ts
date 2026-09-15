@@ -1,4 +1,4 @@
-import type { Profile } from './engine.ts';
+import { type Profile } from './plan/types.ts';
 
 /** A retention allowance, not a new long-run target. See docs/five-k-endurance.md.
  * Published 5K approaches differ; only preserve already familiar easy endurance.

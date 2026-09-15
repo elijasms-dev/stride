@@ -32,18 +32,15 @@ import {
   peakLongRunKm,
   peakLongWeekIndex,
 } from '../progression-engine.ts';
+import { monday, dayDiff } from './calendar.ts';
 import {
-  monday,
-  dayDiff,
   preparationRequirements,
   trainingFamily,
   extendedUltra,
-  PlanError,
-  TRAINING_POLICY,
-  type Plan,
-  type Profile,
-  type Workout,
-} from '../engine.ts';
+} from './profile.ts';
+import { PlanError } from './errors.ts';
+import { TRAINING_POLICY } from './policy.ts';
+import { type Plan, type Profile, type Workout } from './types.ts';
 export type ReplanContext = {
   from: string;
   baseline: NonNullable<Plan['baselineEvidence']>;

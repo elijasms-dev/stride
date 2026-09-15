@@ -3,7 +3,7 @@ import {
   SECONDS_PER_MINUTE,
   RUN_WALK_VARIANT_STRIDE,
 } from './generation-constants.ts';
-import type { Phase, Step, WorkoutKind } from '../engine.ts';
+import { type Phase, type Step, type WorkoutKind } from './types.ts';
 import { runWalkSteps } from '../prescription.ts';
 
 export const focus: Record<Phase, string> = {

@@ -1,7 +1,9 @@
 import { stepLength } from './workout-names.ts';
 import { targetLabel } from './workout-targets.ts';
 import { isLongUltra } from './ultra-policy.ts';
-import { addDays, eventDistanceDisplay, type Plan } from './engine.ts';
+import { addDays } from './plan/calendar.ts';
+import { eventDistanceDisplay } from './plan/display.ts';
+import { type Plan } from './plan/types.ts';
 function escape(value: string) {
   return value
     .replace(/\\/g, '\\\\')

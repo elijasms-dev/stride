@@ -1,4 +1,4 @@
-import type { Profile, Workout } from './engine.ts';
+import { type Profile, type Workout } from './plan/types.ts';
 import { customRaceName, withSpecificWorkoutName } from './workout-names.ts';
 
 export function customWorkoutEventDistance(profile: Profile) {

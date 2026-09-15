@@ -6,15 +6,9 @@ import {
   DAYS_PER_WEEK,
   FINAL_WEEKDAY_OFFSET,
 } from './generation-constants.ts';
-import {
-  addDays,
-  dayDiff,
-  monday,
-  weekday,
-  trainingFamily,
-  type Profile,
-  type Phase,
-} from '../engine.ts';
+import { addDays, dayDiff, monday, weekday } from './calendar.ts';
+import { trainingFamily } from './profile.ts';
+import { type Profile, type Phase } from './types.ts';
 import {
   usesMarathonBook,
   marathonTaperFraction,

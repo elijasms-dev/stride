@@ -1,5 +1,7 @@
 import { MAX_RECORDED_MINUTES } from './ultra-policy.ts';
-import { validDate, PlanError, type ExtraRun } from './engine.ts';
+import { validDate } from './plan/calendar.ts';
+import { PlanError } from './plan/errors.ts';
+import { type ExtraRun } from './plan/types.ts';
 export function validateRun(raw: unknown, today: string): ExtraRun {
   const r = raw as ExtraRun;
   if (

@@ -1,5 +1,6 @@
-import { runningDayRange, type Profile } from './engine.ts';
-export { runningDayRange } from './engine.ts';
+import { runningDayRange } from './plan/profile.ts';
+import { type Profile } from './plan/types.ts';
+export { runningDayRange } from './plan/profile.ts';
 
 /** Suggest a compatible selection without changing any declared running history. */
 export function suggestedRunningDays(

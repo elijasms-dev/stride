@@ -2,20 +2,20 @@ import { validStepTarget } from './workout-targets.ts';
 import { MAX_RECORDED_MINUTES } from './ultra-policy.ts';
 import { validWorkoutEnjoyment } from './workout-enjoyment.ts';
 import { validateRun } from './run-input.ts';
-import type { ExtraRun } from './engine.ts';
+import { type ExtraRun } from './plan/types.ts';
 import { distanceEstimate, qualityWorkMinutes } from './prescription.ts';
 import {
   validDate,
-  validateProfile,
-  validatePlan,
   monday,
   addDays,
   dayDiff,
-  refreshWeekTotals,
   todayInZone,
-  type Plan,
-  PlanError,
-} from './engine.ts';
+} from './plan/calendar.ts';
+import { validateProfile } from './plan/profile.ts';
+import { validatePlan } from './plan/validate.ts';
+import { refreshWeekTotals } from './plan/totals.ts';
+import { type Plan } from './plan/types.ts';
+import { PlanError } from './plan/errors.ts';
 export type RecoveryProfile = {
   display_name: string;
   city: string;

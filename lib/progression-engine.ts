@@ -1,4 +1,4 @@
-import type { Goal, Profile, Workout } from './engine.ts';
+import { type Goal, type Profile, type Workout } from './plan/types.ts';
 
 /** Benchmark peak long-run bands by event family. */
 export const PEAK_LONG_RUN_KM: Record<

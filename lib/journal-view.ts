@@ -1,4 +1,4 @@
-import type { ExtraRun, Plan, Workout } from './engine.ts';
+import { type ExtraRun, type Plan, type Workout } from './plan/types.ts';
 import { trainingRecords, type RunRecord } from './training-history.ts';
 
 export type JournalEntry = { record: RunRecord } & (

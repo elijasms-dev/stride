@@ -25,16 +25,10 @@ import { marathonLongCeiling } from '../marathon-model.ts';
 
 import { selectTemplate } from '../workout-library.ts';
 import { isShortTimeline, usesFiveDaySplit } from '../progression-engine.ts';
-import {
-  addDays,
-  dayDiff,
-  weekday,
-  monday,
-  PlanError,
-  TRAINING_POLICY,
-  type Week,
-  type Workout,
-} from '../engine.ts';
+import { addDays, dayDiff, weekday, monday } from './calendar.ts';
+import { PlanError } from './errors.ts';
+import { TRAINING_POLICY } from './policy.ts';
+import { type Week, type Workout } from './types.ts';
 import {
   trainingPhaseOn,
   usesDailyTaperPhase,

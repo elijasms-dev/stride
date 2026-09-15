@@ -1,5 +1,10 @@
 import { schedulingEasyPace } from './fitness-pacing.ts';
-import type { Plan, Profile, Step, Workout } from './engine.ts';
+import {
+  type Plan,
+  type Profile,
+  type Step,
+  type Workout,
+} from './plan/types.ts';
 import { distanceEstimate, qualityWorkMinutes } from './prescription.ts';
 import { withSpecificWorkoutName } from './workout-names.ts';
 

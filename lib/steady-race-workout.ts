@@ -1,4 +1,4 @@
-import type { Workout } from './engine.ts';
+import { type Workout } from './plan/types.ts';
 
 /** Inspect the saved prescription, not today's profile preference or target mode. */
 export function isSteadyRaceAdaptation(workout: Workout): boolean {

@@ -1,5 +1,5 @@
 import { workoutStepGroups } from './workout-groups.ts';
-import type { Step, Workout } from './engine.ts';
+import { type Step, type Workout } from './plan/types.ts';
 import {
   isSteadyRaceAdaptation,
   steadyRaceBriefing,

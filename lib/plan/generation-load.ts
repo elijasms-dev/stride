@@ -7,7 +7,9 @@ import {
 import { marathonBlockPhase, marathonTaperDays } from '../marathon-book.ts';
 
 import { longRunForWeek } from '../progression-engine.ts';
-import { dayDiff, addDays, TRAINING_POLICY, type Phase } from '../engine.ts';
+import { dayDiff, addDays } from './calendar.ts';
+import { TRAINING_POLICY } from './policy.ts';
+import { type Phase } from './types.ts';
 import { racePreparationDays, taperFactor } from './generation-calendar.ts';
 import type { GenerationPolicy } from './generation-policy.ts';
 

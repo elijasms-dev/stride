@@ -1,4 +1,4 @@
-import type { Workout } from './engine.ts';
+import { type Workout } from './plan/types.ts';
 
 // Classify the saved prescription, not its editable display name. Walking
 // recoveries in a speed session do not make it a beginner run/walk outing.

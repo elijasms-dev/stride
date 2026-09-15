@@ -1,4 +1,5 @@
-import { addDays, todayInZone, type Plan } from './engine.ts';
+import { addDays, todayInZone } from './plan/calendar.ts';
+import { type Plan } from './plan/types.ts';
 import { shouldReconcile, type DeliveryReceipt } from './delivery-policy.ts';
 
 export const GARMIN_CALENDAR_URL = 'https://connect.garmin.com/modern/calendar';

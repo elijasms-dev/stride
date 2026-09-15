@@ -6,14 +6,9 @@ export {
   type RunRecord,
 } from './run-records.ts';
 import { isLongUltra } from './ultra-policy.ts';
-import {
-  addDays,
-  dayDiff,
-  round,
-  todayInZone,
-  type Plan,
-  type Workout,
-} from './engine.ts';
+import { addDays, dayDiff, todayInZone } from './plan/calendar.ts';
+import { round } from './plan/math.ts';
+import { type Plan, type Workout } from './plan/types.ts';
 export function recordingCandidates(workouts: Workout[], date: string) {
   return workouts.filter(
     (w) =>

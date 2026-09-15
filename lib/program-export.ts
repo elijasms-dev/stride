@@ -1,12 +1,5 @@
-import {
-  addDays,
-  dayDiff,
-  dayNames,
-  weekday,
-  type Plan,
-  type Step,
-  type Workout,
-} from './engine.ts';
+import { addDays, dayDiff, dayNames, weekday } from './plan/calendar.ts';
+import { type Plan, type Step, type Workout } from './plan/types.ts';
 import { distanceEstimate } from './prescription.ts';
 import { supportingSession, workoutGuidance } from './coaching-context.ts';
 import { planWeekFocus } from './plan-guidance.ts';

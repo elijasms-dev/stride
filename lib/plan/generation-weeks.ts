@@ -25,18 +25,10 @@ import {
   WORKOUT_LIBRARY,
 } from '../workout-library.ts';
 import { recentTemplateIds, usesFiveDaySplit } from '../progression-engine.ts';
-import {
-  addDays,
-  dayDiff,
-  weekday,
-  dateLabel,
-  round,
-  raceDistance,
-  trainingFamily,
-  type Week,
-  type Workout,
-  type WorkoutKind,
-} from '../engine.ts';
+import { addDays, dayDiff, weekday, dateLabel } from './calendar.ts';
+import { round } from './math.ts';
+import { raceDistance, trainingFamily } from './profile.ts';
+import { type Week, type Workout, type WorkoutKind } from './types.ts';
 import {
   trainingPhaseOn,
   usesDailyTaperPhase,

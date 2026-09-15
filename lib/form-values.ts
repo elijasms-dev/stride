@@ -1,4 +1,4 @@
-import { dayDiff, todayInZone } from './engine.ts';
+import { dayDiff, todayInZone } from './plan/calendar.ts';
 
 export const MILE_KM = 1.609344;
 /** Subjective feedback must be chosen by the runner, never inferred from a recording. */

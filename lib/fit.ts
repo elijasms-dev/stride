@@ -8,7 +8,8 @@ import {
   type WorkoutMesg,
   type WorkoutStepMesg,
 } from '@garmin/fitsdk';
-import { validDate, type Workout } from './engine.ts';
+import { validDate } from './plan/calendar.ts';
+import { type Workout } from './plan/types.ts';
 import { FitExportError } from './fit-error.ts';
 import { validStepTarget } from './workout-targets.ts';
 

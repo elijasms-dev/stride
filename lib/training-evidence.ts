@@ -1,4 +1,4 @@
-import type { Workout } from './engine.ts';
+import { type Workout } from './plan/types.ts';
 import { recordedWorkoutDate, trainingRecords } from './training-history.ts';
 import { qualityWorkMinutes } from './prescription.ts';
 import { validStepTarget } from './workout-targets.ts';

@@ -4,21 +4,15 @@ import {
   LONG_ULTRA_POLICY,
   isLongUltra,
 } from './ultra-policy.ts';
-import {
-  addDays,
-  dayDiff,
-  makePlan,
-  adjustPlan,
-  refreshWeekTotals,
-  refreshFeasibility,
-  todayInZone,
-  rebalanceFutureQuality,
-  validatePlan,
-  PlanError,
-  type Goal,
-  type Plan,
-  type Profile,
-} from './engine.ts';
+import { addDays, dayDiff, todayInZone } from './plan/calendar.ts';
+import { makePlan } from './plan/generate.ts';
+import { adjustPlan } from './plan/adjust.ts';
+import { refreshWeekTotals } from './plan/totals.ts';
+import { refreshFeasibility } from './plan/feasibility.ts';
+import { rebalanceFutureQuality } from './plan/allocate.ts';
+import { validatePlan } from './plan/validate.ts';
+import { PlanError } from './plan/errors.ts';
+import { type Goal, type Plan, type Profile } from './plan/types.ts';
 import { currentTrainingBaseline } from './training-history.ts';
 export type EventPatch = Pick<
   Profile,

@@ -9,7 +9,12 @@ import {
   withSteadyRaceInstructions,
   stepLength,
 } from './workout-names.ts';
-import type { Plan, Profile, Step, Workout } from './engine.ts';
+import {
+  type Plan,
+  type Profile,
+  type Step,
+  type Workout,
+} from './plan/types.ts';
 import { refreshDistanceTotals, withRunDistance } from './run-distance.ts';
 import { withWorkoutEventContext } from './workout-event-context.ts';
 

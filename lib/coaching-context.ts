@@ -1,13 +1,10 @@
 import { isLongUltra } from './ultra-policy.ts';
+import { addDays, dayDiff, weekday } from './plan/calendar.ts';
 import {
-  addDays,
-  dayDiff,
-  weekday,
   trainingPhaseOn,
   usesDailyTaperPhase,
-  type Plan,
-  type Workout,
-} from './engine.ts';
+} from './plan/generation-calendar.ts';
+import { type Plan, type Workout } from './plan/types.ts';
 
 export const crossTrainingLabel = {
   strength: 'Familiar strength routine',

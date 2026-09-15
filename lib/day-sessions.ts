@@ -1,4 +1,4 @@
-import type { Workout } from './engine.ts';
+import { type Workout } from './plan/types.ts';
 
 /** Calendar presentation only: never changes prescriptions or journal records. */
 export function orderedDaySessions(workouts: Workout[], date: string) {
