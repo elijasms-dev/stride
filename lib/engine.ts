@@ -1,4 +1,27 @@
 import {
+  SESSION_POLICY,
+  FEASIBILITY_POLICY,
+  DAYS_PER_WEEK,
+  RUN_WALK_VARIANT_STRIDE,
+} from './plan/generation-constants.ts';
+import {
+  resolveGenerationPolicy,
+  type ReplanContext,
+} from './plan/generation-policy.ts';
+import { generatePlanWeeks } from './plan/generation-weeks.ts';
+import { buildSteps } from './plan/generation-prescription.ts';
+import {
+  taperFactor,
+  trainingPhaseOn,
+  usesDailyTaperPhase,
+  marathonRaceWeekRunCount,
+} from './plan/generation-calendar.ts';
+export {
+  taperFactor,
+  trainingPhaseOn,
+  usesDailyTaperPhase,
+} from './plan/generation-calendar.ts';
+import {
   schedulingEasyPace,
   validateRecentRace,
   type RecentRace,
@@ -8,21 +31,15 @@ import {
   withSteadyRaceInstructions,
 } from './workout-names.ts';
 import { isSteadyRaceAdaptation } from './steady-race-workout.ts';
-import { fiveKEnduranceCeiling } from './five-k-endurance.ts';
+
 import {
   customWorkoutEventDistance,
   eventContextText,
 } from './workout-event-context.ts';
 import {
   usesMarathonBook,
-  marathonReference,
-  marathonBlockPhase,
   marathonTaperDays,
-  marathonTaperFraction,
   marathonRecoveryFactor,
-  marathonMediumTargetKm,
-  marathonPaceOpportunity,
-  marathonPaceDose,
   marathonBookNote,
 } from './marathon-book.ts';
 import {
@@ -49,25 +66,16 @@ import {
 import {
   qualitySchedule,
   usesMarathonRhythm,
-  requestedQualityCount,
   desiredRuns,
   availableRunningDays,
   resolveRunningDays,
   classicQualityCount,
   allocateRunningMinutes,
-  aerobicSupportDay,
   longRunShareLimit,
-  recoveryRunCap,
-  sessionWeight,
 } from './training-structure.ts';
-import { runWalkSteps, runWalkIntervalSeconds } from './prescription.ts';
+import { runWalkIntervalSeconds } from './prescription.ts';
 import { isRunWalkWorkout } from './run-walk.ts';
-import {
-  marathonLongCeiling,
-  marathonLongRecipe,
-  marathonWeekFocus,
-} from './marathon-model.ts';
-import { qualityTrainingEvidence } from './training-evidence.ts';
+
 import {
   currentTrainingBaseline,
   trainingRecords,
@@ -80,22 +88,12 @@ import {
   type TrainingMethod,
 } from './advanced-methods.ts';
 import {
-  selectTemplate,
   variedWorkoutPrescription,
   scaleTemplate,
   resizeWorkout,
   WORKOUT_LIBRARY,
 } from './workout-library.ts';
-import {
-  anchoredLongRunKm,
-  isShortTimeline,
-  longRunForWeek,
-  mandatoryTaperWeeks,
-  peakLongRunKm,
-  peakLongWeekIndex,
-  recentTemplateIds,
-  usesFiveDaySplit,
-} from './progression-engine.ts';
+
 /** Independent coaching heuristics. See outputs/Stride-Algorithm-Research.md. */
 export const ENGINE_VERSION = 'stride-0.10.0';
 export const MAX_EVENT_KM = HUNDRED_MILES_KM; // Exact 100 miles, on runnable courses.
@@ -1074,1276 +1072,31 @@ export function validateProfile(
   p.raceName = p.raceName.trim();
   return p;
 }
-const focus: Record<Phase, string> = {
-  Foundation: 'Establish a rhythm. Most of this week should feel comfortable.',
-  Maintenance:
-    'Maintain familiar training at a stable workload before race preparation. Review your next eight weeks from actual running.',
-  Build: 'Build on what you can already do. Keep the easy days easy.',
-  'Race preparation': 'Practice controlled, sustained efforts for your race.',
-  Recovery: 'A little less work. More room to absorb your training.',
-  Taper: 'Reduce the volume while keeping a little rhythm in your legs.',
-  'Race week': 'Arrive rested. Your preparation is already in the bank.',
-};
-function buildSteps(
-  kind: WorkoutKind,
-  minutes: number,
-  variant: number,
-  gentle: boolean,
-  runWalk = false,
-): Step[] {
-  const step = (
-    label: string,
-    mins: number,
-    effort: string,
-    intensity: number,
-    type: Step['kind'],
-  ): Step => ({
-    label,
-    seconds: Math.round(mins * 60),
-    effort,
-    intensity,
-    kind: type,
-  });
-  if (runWalk)
-    return runWalkSteps(minutes, Math.min(4, Math.floor(variant / 3)));
-  if (['easy', 'long', 'race'].includes(kind))
-    return [
-      step(
-        kind === 'race'
-          ? 'Race'
-          : kind === 'long'
-            ? 'Easy long run'
-            : 'Easy run',
-        minutes,
-        kind === 'race'
-          ? 'Start controlled, finish by feel'
-          : 'Conversational · 2–3 / 10',
-        kind === 'race' ? 7 : 3,
-        'work',
-      ),
-    ];
-  const warmup = 10,
-    cooldown = 5,
-    budget = minutes - warmup - cooldown;
-  const reps =
-    kind === 'tempo'
-      ? Math.max(2, Math.min(3, Math.floor(budget / 6)))
-      : Math.max(
-          3,
-          Math.min(8, Math.floor(budget / (kind === 'fartlek' ? 3 : 5))),
-        );
-  const rest = kind === 'fartlek' ? 1 : 2;
-  const work = Math.max(1, Math.floor((budget - (reps - 1) * rest) / reps));
-  const steps = [step('Warm up', warmup, 'Start gently · 2 / 10', 2, 'warmup')];
-  for (let r = 0; r < reps; r++) {
-    steps.push(
-      step(
-        kind === 'tempo'
-          ? `Controlled effort ${r + 1}`
-          : kind === 'fartlek'
-            ? `Pick-up ${r + 1}`
-            : `Rep ${r + 1} of ${reps}`,
-        work,
-        gentle
-          ? 'Steady · 5–6 / 10'
-          : kind === 'tempo'
-            ? 'Comfortably hard · 6–7 / 10'
-            : 'Quick, never sprinting · 7 / 10',
-        gentle ? 5 : kind === 'tempo' ? 6 : 7,
-        'work',
-      ),
-    );
-    if (r < reps - 1)
-      steps.push(
-        step('Easy recovery', rest, 'Walk or jog · 1–2 / 10', 2, 'recovery'),
-      );
-  }
-  steps.push(
-    step(
-      'Cool down',
-      minutes - steps.reduce((sum, s) => sum + s.seconds / 60, 0),
-      'Let your breathing settle · 2 / 10',
-      2,
-      'cooldown',
-    ),
-  );
-  void variant;
-  return steps;
-}
-/** Race-relative taper: calendar week boundaries must not delay race recovery. */
-export function taperFactor(
-  p: Pick<Profile, 'goal' | 'raceDistanceKm' | 'raceDate'> &
-    Partial<Pick<Profile, 'startDate' | 'method'>>,
-  date: string,
-) {
-  if (p.goal === 'base') return 1;
-  if (usesMarathonBook(p) && p.startDate)
-    return marathonTaperFraction(
-      { startDate: p.startDate, raceDate: p.raceDate },
-      date,
-    );
-  const days = dayDiff(date, p.raceDate);
-  if (days <= 7) return 0.4;
-  if (days <= 14) return 0.65;
-  if (days <= 21 && ['half', 'marathon', 'ultra'].includes(trainingFamily(p)))
-    return 0.85;
-  return 1;
-}
-/** Race-specific entry is a position before the event, not time since signup.
- * Fitness and quality-history gates remain independent of this phase window.
- */
-function racePreparationDays(p: Profile) {
-  const family = trainingFamily(p);
-  const referenceWeeks =
-    family === 'ultra'
-      ? isLongUltra(p)
-        ? 32
-        : 28
-      : family === 'marathon'
-        ? 22
-        : family === 'half'
-          ? 16
-          : 12;
-  return Math.max(6, Math.ceil(referenceWeeks * 0.4)) * 7;
-}
-export function trainingPhaseOn(
-  p: Profile,
-  weekPhase: Phase,
-  date: string,
-): Phase {
-  if (usesMarathonBook(p))
-    return weekPhase === 'Recovery' ? 'Recovery' : marathonBlockPhase(p, date);
-  if (usesDailyTaperPhase(p) && weekPhase !== 'Race week') {
-    if (taperFactor(p, date) < 1) return 'Taper';
-    // Older plans labelled the whole boundary week Taper. Explicit workout
-    // reviews must not keep that premature phase on dates outside the taper.
-    if (weekPhase === 'Taper')
-      return dayDiff(date, p.raceDate) <= racePreparationDays(p)
-        ? 'Race preparation'
-        : dayDiff(monday(p.startDate), date) < 14
-          ? 'Foundation'
-          : 'Build';
-  }
-  return trainingFamily(p) === 'marathon' &&
-    weekPhase !== 'Race week' &&
-    taperFactor(p, date) < 1
-    ? 'Taper'
-    : weekPhase;
-}
-// These road preparation families share the daily taper resolver. Marathon
-// and ultra retain their own phase models and are reviewed separately.
-export function usesDailyTaperPhase(
-  p: Pick<Profile, 'goal' | 'raceDistanceKm'>,
-) {
-  return ['5k', '10k', 'half'].includes(trainingFamily(p));
-}
-function raceWeekSessionCap(
-  p: Pick<Profile, 'goal' | 'raceDate'> & Partial<Pick<Profile, 'method'>>,
-  date: string,
-) {
-  if (p.goal === 'base') return Infinity;
-  const days = dayDiff(date, p.raceDate);
-  // Marathon taper volume is already budgeted across the actual running days.
-  // Keep the last two days modest without imposing short-race caps all week.
-  if (usesMarathonBook(p)) return days <= 1 ? 45 : days <= 2 ? 60 : Infinity;
-  return days <= 1
-    ? 20
-    : days <= 2
-      ? 25
-      : days <= 3
-        ? 30
-        : days <= 7
-          ? 45
-          : Infinity;
-}
-/** Expected running outings in the complete six-day pre-marathon window.
- * The race consumes a normal slot only in its own calendar week. Partial blocks
- * keep this full-window denominator so starting late never creates catch-up.
- */
-function marathonRaceWeekRunCount(p: Profile) {
-  const dates = Array.from({ length: 6 }, (_, i) =>
-    addDays(p.raceDate, i - 6),
-  ).filter((date) => p.days.includes(weekday(date)));
-  const raceWeek = dates.filter((date) => monday(date) === monday(p.raceDate));
-  return Math.max(1, dates.length - Number(raceWeek.length >= p.days.length));
-}
 export function makePlan(
   input: unknown,
   asOf?: string,
   findAlternative = true,
-  replan?: {
-    from: string;
-    baseline: NonNullable<Plan['baselineEvidence']>;
-    history: Workout[];
-    retainedPrefix?: Workout[];
-    preserveProgression?: boolean;
-    referenceRuns?: number;
-  },
+  replan?: ReplanContext,
 ): Plan {
-  const p = validateProfile(input, asOf);
-  const bookMarathon = usesMarathonBook(p);
-  const recoveryFactor = marathonRecoveryFactor(p);
-  const shortBlock =
-    dayDiff(p.startDate, p.raceDate) <
-    preparationRequirements(p).recommendedDays;
-  p.runMeasure ??= 'distance';
-  const familyPolicy = isLongUltra(p)
-    ? {
-        ...TRAINING_POLICY.family.ultra,
-        longCeilingKm: LONG_ULTRA_POLICY.longCeilingKm,
-      }
-    : bookMarathon
-      ? {
-          ...TRAINING_POLICY.family.marathon,
-          longCeilingKm: marathonReference(p).longCeilingKm,
-        }
-      : TRAINING_POLICY.family[trainingFamily(p)];
-  const start = monday(p.startDate),
-    count = Math.floor(dayDiff(start, p.raceDate) / 7) + 1;
-  const recordedQuality = replan
-    ? qualityTrainingEvidence(replan.history, replan.from)
-        .filter((e) => e.eligible)
-        .map((e) => ({
-          ...e.workout,
-          date: e.date,
-          week: Math.floor(dayDiff(start, e.date) / 7),
-        }))
-    : [];
-  const pace = schedulingEasyPace(p);
-  // Scheduling must respect recorded time as well as distance. A supplied pace
-  // cannot turn faster actual running into extra tolerated training minutes.
-  const reviewedBaseKm = replan
-    ? Math.min(replan.baseline.weeklyKm, replan.baseline.weeklyMinutes / pace)
-    : undefined;
-  const reviewedLongKm = replan
-    ? Math.min(
-        replan.baseline.longestKm,
-        (replan.baseline.longestMinutes ?? replan.baseline.longestKm * pace) /
-          pace,
-      )
-    : undefined;
-  const baseKm = replan?.preserveProgression
-    ? p.weeklyKm || 5
-    : (reviewedBaseKm ?? (p.weeklyKm || 5));
-  const progressionStart =
-    replan && !replan.preserveProgression
-      ? Math.max(0, Math.floor(dayDiff(start, replan.from) / 7))
-      : 0;
-  const isNovice = p.experience === 'new' || p.weeklyKm < 10;
-  const initialFactor =
-    p.experience === 'returning' ? TRAINING_POLICY.returningRunnerFactor : 1;
-  if (
-    replan &&
-    !replan.preserveProgression &&
-    (reviewedBaseKm! * pace * initialFactor < p.days.length * 5 ||
-      reviewedLongKm! * pace < 5)
-  )
-    throw new PlanError(
-      'Your recent recorded running is too limited for an automatic replan on these training days. Review your starting routine before creating a new schedule. Your saved journal has not changed.',
-    );
-  // Fewer outings must not concentrate the former week into much longer runs.
-  const referenceRuns =
-    replan && !replan.preserveProgression
-      ? (replan.referenceRuns ?? p.days.length)
-      : p.currentRuns;
-  const policy = {
-    ...familyPolicy,
-    longCeilingKm: fiveKEnduranceCeiling(p, familyPolicy.longCeilingKm, {
-      longestKm: reviewedLongKm ?? p.longestKm,
-      longestMinutes:
-        replan?.baseline.longestMinutes ??
-        (reviewedLongKm ?? p.longestKm) * pace,
-      // Allocation frequency can include a newly requested day. It is not
-      // evidence that the runner already had that routine before this block.
-      currentRuns: Math.min(
-        p.currentRuns,
-        replan?.referenceRuns ?? p.currentRuns,
-      ),
-    }),
-  };
-  const frequencyFactor = Math.min(
-    1,
-    p.days.length / Math.max(1, referenceRuns),
-  );
-  const base = Math.min(
-    (isLongUltra(p)
-      ? Math.min(
-          baseKm,
-          (replan && !replan.preserveProgression
-            ? replan.baseline.weeklyMinutes
-            : p.ultraWeeklyMinutes!) / pace,
-        )
-      : baseKm) *
-      initialFactor *
-      frequencyFactor,
-    (p.weeklyMinutesLimit ?? Infinity) / pace,
-  );
-  const family = trainingFamily(p);
-  // Distance-ended long runs must fit at the slow edge of an explicit easy
-  // target. This changes their share of the existing budget, not weekly minutes.
-  const longPace =
-    family === 'marathon' && p.workoutTargets?.mode === 'pace'
-      ? Math.max(pace, (p.workoutTargets.pace?.easy?.high ?? 0) / 60)
-      : pace;
-  const absoluteCeiling = bookMarathon
-    ? Math.max(p.weeklyKm, marathonReference(p).peakCeilingKm)
-    : family === 'ultra'
-      ? extendedUltra(p)
-        ? 120
-        : 100
-      : family === 'marathon' || family === '10k'
-        ? 100
-        : 80;
-  const weeksUntilRace = count;
-  const taperWeeks = mandatoryTaperWeeks(
-    trainingFamily(p),
-    weeksUntilRace,
-    p.goal,
-  );
-  const declaredLong =
-    (replan?.preserveProgression ? p.longestKm : reviewedLongKm) ??
-    (p.longestKm || 2);
-  const startLong =
-    family === 'marathon'
-      ? Math.min(35, Math.ceil(declaredLong))
-      : anchoredLongRunKm(declaredLong, policy.minLong);
-  const peakLong = Math.min(
-    peakLongRunKm(trainingFamily(p), startLong, p.intent),
-    // Keep the opening run anchored to history, but allow later whole sessions
-    // to progress toward the existing long-ultra time ceiling.
-    isLongUltra(p) ? LONG_ULTRA_POLICY.longMinutes / pace : Infinity,
-    p.longLimitKm ?? Infinity,
-    p.longMinutes / longPace,
-  );
-  const peakWeek = peakLongWeekIndex(count, taperWeeks);
-  let load = base;
-  load = Math.min(
-    Math.max(load, startLong / longRunShareLimit(p)),
-    // A retained long-run baseline cannot undo a reduced running-frequency budget.
-    replan && usesMarathonRhythm(p) ? base : Infinity,
-    // A high long-run/weekly ratio cannot create an opening load that later
-    // falls when the ordinary forecast ceiling is applied.
-    family === 'marathon' ? base * policy.maxForecast : Infinity,
+  const context = resolveGenerationPolicy(validateProfile(input, asOf), replan);
+  const {
+    p,
+    bookMarathon,
+    shortBlock,
+    familyPolicy,
+    start,
+    count,
+    pace,
+    isNovice,
+    policy,
+    base,
+    family,
+    longPace,
     absoluteCeiling,
-    p.peakWeeklyKm ?? Infinity,
-    (p.weeklyMinutesLimit ?? Infinity) / pace,
-  );
-  let long = Math.min(
-    startLong,
-    isLongUltra(p)
-      ? (replan && !replan.preserveProgression
-          ? (replan.baseline.longestMinutes ?? p.ultraLongestMinutes!)
-          : p.ultraLongestMinutes!) / pace
-      : Infinity,
-    Math.max(startLong, policy.longCeilingKm),
-    p.longLimitKm ?? Infinity,
-  );
-  const weeks: Week[] = [],
-    workouts: Workout[] = [];
-  const marathonLongBaseline = long;
-  const qualityDays = qualitySchedule(p);
-  const requestedQuality = requestedQualityCount(p);
-  const mediumDay = aerobicSupportDay(p, family, qualityDays);
-  if (p.marathonApproach === 'endurance' && mediumDay === undefined)
-    throw new PlanError(
-      'Your available days cannot fit a medium-long run away from the long run and quality session.',
-    );
-  const preparationWeeks =
-    family === 'ultra'
-      ? isLongUltra(p)
-        ? 32
-        : 28
-      : family === 'marathon'
-        ? bookMarathon
-          ? 18
-          : 22
-        : family === 'half'
-          ? 16
-          : 12;
-  const longProgressionStart =
-    family === 'marathon'
-      ? Math.max(progressionStart, count - preparationWeeks)
-      : progressionStart;
-  for (let w = 0; w < count; w++) {
-    const remaining = count - w;
-    const maintenance =
-      p.goal !== 'base' &&
-      remaining > preparationWeeks &&
-      p.experience === 'established' &&
-      (p.recentQualitySessions ?? 0) >= 1 &&
-      !isNovice;
-    const taper =
-      taperWeeks > 0 &&
-      dayDiff(addDays(start, w * 7 + 6), p.raceDate) <=
-        (bookMarathon ? marathonTaperDays(p) - 1 : taperWeeks * 7);
-    // A boundary week may contain a tapered Sunday without making its Monday
-    // workout a taper session. Keep suppressing load growth across that boundary.
-    const taperAtWeekStart =
-      p.goal !== 'base' &&
-      dayDiff(addDays(start, w * 7), p.raceDate) <=
-        (bookMarathon ? marathonTaperDays(p) - 1 : taperWeeks * 7);
-    const recovery = !taper && w > 0 && (w + 1) % (p.recoveryWeeks ?? 4) === 0;
-    const raceSpecificEntry =
-      p.goal !== 'base' &&
-      dayDiff(
-        addDays(start, w * 7) < p.startDate
-          ? p.startDate
-          : addDays(start, w * 7),
-        p.raceDate,
-      ) <= racePreparationDays(p);
-    const phase: Phase = bookMarathon
-      ? recovery
-        ? 'Recovery'
-        : marathonBlockPhase(p, addDays(start, w * 7))
-      : p.goal !== 'base' && remaining === 1
-        ? 'Race week'
-        : taperAtWeekStart
-          ? 'Taper'
-          : recovery
-            ? 'Recovery'
-            : maintenance && w >= 1
-              ? 'Maintenance'
-              : (w < 2 && !raceSpecificEntry) || remaining > preparationWeeks
-                ? 'Foundation'
-                : raceSpecificEntry
-                  ? 'Race preparation'
-                  : 'Build';
-    const weekTaperFraction = taperFactor(p, addDays(start, w * 7 + p.longDay));
-    long = Math.min(
-      longRunForWeek({
-        weekIndex: Math.max(0, w - longProgressionStart),
-        startLongKm: startLong,
-        peakKm: Math.max(startLong, peakLong),
-        peakWeekIndex: Math.max(0, peakWeek - longProgressionStart),
-        recovery,
-        taper: taper || taperAtWeekStart,
-        taperFraction: weekTaperFraction,
-        wholeKilometres: family === 'marathon',
-        recoveryEveryWeeks: p.recoveryWeeks,
-        recoveryOffset: longProgressionStart,
-      }),
-      Math.max(startLong, policy.longCeilingKm),
-      p.longLimitKm ?? Infinity,
-      p.longMinutes / longPace,
-    );
-    if (
-      w > progressionStart &&
-      remaining <= preparationWeeks &&
-      !(p.method === 'easy-doubles' && w < 5) &&
-      !recovery &&
-      !taper &&
-      p.volume === 'gradual' &&
-      !(p.days.length > p.currentRuns && w < 3) &&
-      (!bookMarathon ||
-        (phase !== 'Race preparation' && (w - progressionStart) % 2 === 0))
-    ) {
-      load = Math.min(
-        load +
-          (isNovice
-            ? 0.5
-            : Math.min(
-                policy.weeklyStepKm,
-                load * (family === 'ultra' ? 0.05 : 0.06),
-              )),
-        absoluteCeiling,
-        base * policy.maxForecast,
-        p.peakWeeklyKm ?? Infinity,
-        (p.weeklyMinutesLimit ?? Infinity) / pace,
-      );
-    }
-    const retainedPrefix = (replan?.retainedPrefix ?? []).filter(
-      (s) => s.week === w && s.kind !== 'race',
-    );
-    const retainedDates = new Set(
-      (replan?.retainedPrefix ?? []).flatMap((s) => [s.date, s.originalDate]),
-    );
-    const wholeWeekDates = p.days
-      .map((d) => addDays(start, w * 7 + d))
-      .filter(
-        (d) =>
-          d >= p.startDate &&
-          d <= p.raceDate &&
-          (p.goal === 'base' || d < p.raceDate),
-      );
-    // Race day occupies a running day; it is not an extra outing on top of the
-    // requested week. Remove its ordinary slot before allocating any minutes.
-    if (p.goal !== 'base' && monday(p.raceDate) === addDays(start, w * 7)) {
-      const prescribedDays = () =>
-        new Set([
-          ...wholeWeekDates,
-          ...retainedPrefix
-            .filter((s) => s.status !== 'skipped')
-            .map((s) => s.date),
-          p.raceDate,
-        ]).size;
-      const editable = wholeWeekDates
-        .filter(
-          (d) => d >= (replan?.from ?? p.startDate) && !retainedDates.has(d),
-        )
-        .sort(
-          (a, b) =>
-            Number(weekday(b) === p.longDay) -
-              Number(weekday(a) === p.longDay) || b.localeCompare(a),
-        );
-      for (const date of editable) {
-        if (prescribedDays() <= desiredRuns(p)) break;
-        wholeWeekDates.splice(wholeWeekDates.indexOf(date), 1);
-      }
-    }
-    const dates = wholeWeekDates.filter(
-      (d) => d >= (replan?.from ?? p.startDate) && !retainedDates.has(d),
-    );
-    const allocationForDate = (date: string) =>
-      (load /
-        (bookMarathon && dayDiff(date, p.raceDate) < 7
-          ? marathonRaceWeekRunCount(p)
-          : p.days.length)) *
-      (recovery ? recoveryFactor : taperFactor(p, date));
-    const remainingAllocation = dates.reduce(
-      (n, d) => n + allocationForDate(d),
-      0,
-    );
-    const activeReviewWeek =
-      replan &&
-      (monday(replan.from) === addDays(start, w * 7) ||
-        retainedPrefix.length > 0);
-    const wholeWeekAllocation = wholeWeekDates.reduce(
-      (n, d) => n + allocationForDate(d),
-      0,
-    );
-    // Reserve elapsed prescriptions even if unlogged, skipped or shorter than
-    // planned. Missed time never funds catch-up work; extra recorded time reduces
-    // what remains. The prefix is allocation context, never completed evidence.
-    const reservedMinutes = retainedPrefix.reduce(
-      (n, s) =>
-        n +
-        Math.max(
-          s.minutes,
-          s.status === 'completed'
-            ? (s.feedback?.actualMinutes ?? s.minutes)
-            : s.minutes,
-        ),
-      0,
-    );
-    // A newly enabled day that has already passed cannot contribute catch-up
-    // time. Reserve its ordinary share when no retained prescription accounts for it.
-    const unavailableAllocation = replan
-      ? wholeWeekDates
-          .filter((d) => d < replan.from && !retainedDates.has(d))
-          .reduce((n, d) => n + allocationForDate(d), 0)
-      : 0;
-    const desired =
-      activeReviewWeek && dates.length
-        ? Math.max(
-            0,
-            wholeWeekAllocation -
-              reservedMinutes / pace -
-              unavailableAllocation,
-          )
-        : remainingAllocation;
-    const longShareBudget = activeReviewWeek ? wholeWeekAllocation : desired;
-    const longDate = dates.find(
-      (d) =>
-        p.days.length > 2 &&
-        weekday(d) === p.longDay &&
-        (p.goal === 'base' || dayDiff(d, p.raceDate) >= (bookMarathon ? 7 : 8)),
-    );
-    if (Math.floor(desired * pace) < dates.length * 5)
-      throw new PlanError(
-        'The available running time cannot support minimum-length sessions in every week, including recovery weeks. Review your starting routine or running days; no extra training has been added.',
-      );
-    const previousLong = workouts.findLast(
-      (s) => s.kind === 'long' && weeks[s.week]?.phase !== 'Recovery',
-    );
-    // A short opening calendar week is not evidence that the runner lost their
-    // declared long-run capacity. Its reduced outing must not rebase the next
-    // full week; the same-week volume/time limits still apply independently.
-    const previousLongKm =
-      previousLong &&
-      bookMarathon &&
-      previousLong.week === 0 &&
-      start < p.startDate &&
-      dayDiff(p.startDate, longDate ?? addDays(start, w * 7)) <= 30
-        ? Math.max(previousLong.estimatedKm, marathonLongBaseline)
-        : previousLong?.estimatedKm;
-    const longPeakMinutes = Math.min(
-      policy.longCeilingKm * pace,
-      p.longMinutes,
-      LONG_ULTRA_POLICY.longMinutes,
-    );
-    const nearPeak = (s: Workout) =>
-      isLongUltra(p)
-        ? s.minutes >= longPeakMinutes * 0.95
-        : s.estimatedKm >= policy.longCeilingKm * 0.95;
-    const peakLongs = workouts.filter((s) => s.kind === 'long' && nearPeak(s));
-    const longWave =
-      !recovery &&
-      !taper &&
-      family === 'ultra' &&
-      peakLongs.length >= 2 &&
-      previousLong &&
-      nearPeak(previousLong)
-        ? 0.88
-        : 1;
-    const usualLongDistance = Math.min(
-      long * longWave,
-      policy.longCeilingKm,
-      family === 'marathon'
-        ? marathonLongCeiling(
-            marathonLongBaseline,
-            dayDiff(longDate ?? addDays(start, w * 7 + p.longDay), p.raceDate),
-            Math.max(startLong, policy.longCeilingKm),
-          )
-        : Infinity,
-      family === 'marathon' &&
-        previousLong &&
-        !recovery &&
-        !taper &&
-        !isShortTimeline(weeksUntilRace)
-        ? previousLongKm! + 2
-        : Infinity,
-      family === 'marathon' && previousLong && recovery
-        ? previousLong.estimatedKm * 0.8
-        : Infinity,
-      Math.max(
-        !taper && !recovery && !usesMarathonRhythm(p) ? startLong : 0,
-        (longShareBudget * pace * longRunShareLimit(p)) / longPace,
-      ),
-      Math.max(
-        !taper && !recovery && !usesMarathonRhythm(p) ? startLong : 0,
-        (desired * pace - Math.max(0, dates.length - 1) * 5) / longPace,
-      ),
-      p.longMinutes / longPace,
-      isLongUltra(p) ? LONG_ULTRA_POLICY.longMinutes / pace : Infinity,
-      longDate &&
-        p.goal !== 'base' &&
-        !bookMarathon &&
-        dayDiff(longDate, p.raceDate) <= 14
-        ? (family === 'ultra'
-            ? 120
-            : family === 'marathon'
-              ? 90
-              : family === 'half'
-                ? 75
-                : 60) / pace
-        : Infinity,
-      p.longLimitKm ?? Infinity,
-    );
-    const cappedLong = Math.min(
-      usualLongDistance,
-      runningDayLimit(p, longDate ? weekday(longDate) : p.longDay) / longPace,
-    );
-    const longDistance =
-      family === 'marathon' ? Math.floor(cappedLong + 1e-9) : cappedLong;
-    const previousSpecific = workouts.filter(
-      (s) =>
-        s.stimulus === 'race-rhythm' && s.kind !== 'long' && s.kind !== 'race',
-    );
-    const mixedLong = bookMarathon
-      ? !!longDate &&
-        !recovery &&
-        !taper &&
-        longDistance * pace >= 90 &&
-        marathonPaceOpportunity(p, longDate, [...recordedQuality, ...workouts])
-      : family === 'marathon' &&
-        phase === 'Race preparation' &&
-        !!longDate &&
-        taperFactor(p, longDate) === 1 &&
-        p.experience === 'established' &&
-        p.intent !== 'finish' &&
-        p.difficulty !== 'gentle' &&
-        (!p.method || p.method === 'balanced') &&
-        p.weeklyKm >= 50 &&
-        p.longestKm >= 20 &&
-        (p.recentQualitySessions ?? 0) >= 2 &&
-        qualityDays.length >= 2 &&
-        previousSpecific.length >= 2 &&
-        longDistance * pace >= 100 &&
-        weeks.filter((week) => week.phase === 'Race preparation').length % 2 ===
-          0;
-    // A marathon-effort long run consumes a workout slot. With an explicit
-    // second book workout it replaces the secondary, never adds a third effort.
-    const weekQualityDays =
-      mixedLong && !usesMarathonRhythm(p)
-        ? bookMarathon && p.qualityMode === 'custom' && p.qualitySessions === 2
-          ? qualityDays.slice(0, -1)
-          : qualityDays.slice(1)
-        : qualityDays;
-    const support =
-      !recovery &&
-      !taper &&
-      dates.length >= 4 &&
-      (!usesFiveDaySplit(p) || usesMarathonRhythm(p))
-        ? mediumDay
-        : undefined;
-    const strideDay =
-      bookMarathon &&
-      !recovery &&
-      !taper &&
-      phase !== 'Maintenance' &&
-      p.experience === 'established' &&
-      p.intent !== 'finish' &&
-      p.difficulty !== 'gentle' &&
-      (p.recentQualitySessions ?? 0) > 0 &&
-      (p.qualitySessions ?? 0) > 0
-        ? p.days.find(
-            (d) =>
-              d !== p.longDay &&
-              d !== support &&
-              !qualityDays.includes(d) &&
-              Math.min(Math.abs(d - p.longDay), 7 - Math.abs(d - p.longDay)) >=
-                2,
-          )
-        : undefined;
-    const regularDates = dates.filter((d) => d !== longDate);
-    const regularBudget =
-      Math.floor(desired * pace) -
-      (longDate
-        ? family === 'marathon'
-          ? Math.ceil(longDistance * longPace)
-          : Math.floor(usualLongDistance * pace)
-        : 0);
-    const weights = new Map(
-      regularDates.map((d) => [
-        d,
-        isNovice ||
-        p.days.length <= 3 ||
-        ['easy-doubles', 'double-threshold'].includes(p.method ?? '')
-          ? 1
-          : sessionWeight(
-              weekday(d),
-              p.longDay,
-              weekQualityDays,
-              support,
-              p.marathonApproach === 'endurance',
-            ),
-      ]),
-    );
-    const regularSlots = regularDates.map((d) => ({
-      key: d,
-      weight: weights.get(d)!,
-      cap: Math.min(
-        usesMarathonRhythm(p) ? runningDayLimit(p, weekday(d)) : Infinity,
-        p.weekdayMinutes,
-        !isNovice &&
-          longDate &&
-          !weekQualityDays.includes(weekday(d)) &&
-          weekday(d) !== support
-          ? Math.floor(longDistance * pace)
-          : Infinity,
-        (weights.get(d) ?? 1) < 1 &&
-          !['easy-doubles', 'double-threshold'].includes(p.method ?? '')
-          ? recoveryRunCap(
-              p,
-              (activeReviewWeek ? wholeWeekAllocation : desired) * pace,
-            )
-          : Infinity,
-        raceWeekSessionCap(p, d),
-        (weekQualityDays.includes(weekday(d))
-          ? (p.qualityLimitKm ?? Infinity)
-          : (p.easyLimitKm ?? Infinity)) *
-          pace *
-          (p.method === 'double-threshold' &&
-          p.doubleDays?.includes(weekday(d)) &&
-          w >= 2 &&
-          ['Build', 'Race preparation'].includes(
-            usesDailyTaperPhase(p) ? trainingPhaseOn(p, phase, d) : phase,
-          )
-            ? 2
-            : 1),
-      ),
-    }));
-    const supportSlot =
-      bookMarathon && support !== undefined
-        ? regularSlots.find((s) => weekday(s.key) === support)
-        : undefined;
-    const mediumMinutes = supportSlot
-      ? Math.max(
-          5,
-          Math.floor(
-            Math.min(
-              marathonMediumTargetKm(
-                p,
-                activeReviewWeek ? wholeWeekAllocation : desired,
-                longDistance || long,
-              ) * pace,
-              supportSlot.cap,
-              regularBudget - (regularSlots.length - 1) * 5,
-            ),
-          ),
-        )
-      : 0;
-    const allocation = supportSlot
-      ? new Map([
-          ...allocateRunningMinutes(
-            regularBudget - mediumMinutes,
-            regularSlots.filter((s) => s !== supportSlot),
-          ),
-          [supportSlot.key, mediumMinutes],
-        ])
-      : allocateRunningMinutes(regularBudget, regularSlots);
-    // Busy-day limits reduce that outing; spare minutes are not forced onto
-    // another day. The final workload pass also checks paired sessions.
-    for (const date of regularDates)
-      allocation.set(
-        date,
-        Math.min(allocation.get(date)!, runningDayLimit(p, weekday(date))),
-      );
-    // A complete introductory workout needs 30 minutes. Move existing easy
-    // minutes into that slot when they fit, without adding weekly volume.
-    if (
-      !isNovice &&
-      !recovery &&
-      !taper &&
-      p.goal !== 'base' &&
-      (p.intent !== 'finish' || usesMarathonRhythm(p))
-    ) {
-      for (const date of regularDates.filter((d) =>
-        weekQualityDays.includes(weekday(d)),
-      )) {
-        const cap = Math.min(
-          p.weekdayMinutes,
-          runningDayLimit(p, weekday(date)),
-          (p.qualityLimitKm ?? Infinity) * pace,
-        );
-        // Preserve the primary session's familiar complete dose before filling
-        // optional aerobic support. Move existing minutes; never add volume.
-        const desiredWork =
-          usesMarathonRhythm(p) && cap >= 30
-            ? selectTemplate(p, phase, {
-                previous: workouts,
-                availableMinutes: cap,
-                week: w,
-                slot: 0,
-                marathonModel: true,
-              }).targetWorkMinutes
-            : 0;
-        const targetMinutes = Math.max(
-          30,
-          Math.min(cap, Math.ceil(25 + desiredWork)),
-        );
-        const missing = targetMinutes - (allocation.get(date) ?? 0);
-        if (missing <= 0 || cap < 30) continue;
-        const easyDates = regularDates.filter(
-          (d) => !weekQualityDays.includes(weekday(d)),
-        );
-        if (
-          easyDates.reduce(
-            (n, d) => n + Math.max(0, allocation.get(d)! - 5),
-            0,
-          ) < missing
-        )
-          continue;
-        let remaining = missing;
-        for (const easy of easyDates) {
-          const taken = Math.min(
-            remaining,
-            Math.max(0, allocation.get(easy)! - 5),
-          );
-          allocation.set(easy, allocation.get(easy)! - taken);
-          remaining -= taken;
-        }
-        allocation.set(date, targetMinutes);
-      }
-    }
-    for (const date of dates) {
-      const sessionPhase = trainingPhaseOn(p, phase, date);
-      const isLong =
-        p.days.length > 2 &&
-        weekday(date) === p.longDay &&
-        (p.goal === 'base' ||
-          dayDiff(date, p.raceDate) >= (bookMarathon ? 7 : 8));
-      const isQuality =
-        !isNovice &&
-        p.goal !== 'base' &&
-        !recovery &&
-        (!bookMarathon || dayDiff(date, p.raceDate) >= 3) &&
-        (remaining > 1 ||
-          (remaining === 1 && dayDiff(date, p.raceDate) >= 3)) &&
-        weekQualityDays.includes(weekday(date)) &&
-        (usesMarathonRhythm(p) ||
-          phase !== 'Foundation' ||
-          p.experience === 'established');
-      const pairedQuality =
-        p.method === 'double-threshold' &&
-        p.doubleDays?.includes(weekday(date)) &&
-        w >= 2 &&
-        ['Build', 'Race preparation'].includes(
-          usesDailyTaperPhase(p) ? sessionPhase : phase,
-        );
-      const useMedium =
-        mediumDay !== undefined && !recovery && !taper && dates.length >= 4;
-      const isMedium = useMedium && weekday(date) === mediumDay;
-      const budget = isLong ? longDistance : (allocation.get(date) ?? 5) / pace;
-      const cap = isLong
-        ? p.longMinutes
-        : Math.min(
-            p.weekdayMinutes,
-            raceWeekSessionCap(p, date),
-            (isQuality ? p.qualityLimitKm : p.easyLimitKm) != null
-              ? (isQuality ? p.qualityLimitKm! : p.easyLimitKm!) *
-                  pace *
-                  (pairedQuality ? 2 : 1)
-              : Infinity,
-          );
-      let minutes = Math.max(
-        5,
-        isLong && family === 'marathon'
-          ? Math.ceil(budget * longPace - 1e-9)
-          : Math.floor(Math.min(budget * pace, cap)),
-      );
-      let kind: WorkoutKind = isLong ? 'long' : 'easy';
-      const gentle = p.difficulty === 'gentle';
-      let steps = buildSteps(
-        kind,
-        minutes,
-        isNovice
-          ? (p.runWalkStage ?? 0) * 3
-          : recovery
-            ? Math.max(0, w - 1)
-            : w,
-        gentle,
-        isNovice,
-      );
-      let hard = false,
-        templateId: string | undefined,
-        stimulus = 'aerobic',
-        qualityMinutes = 0,
-        targetWorkMinutes: number | undefined,
-        selectionReason = '';
-      let title = isNovice
-        ? 'Run & walk'
-        : isLong
-          ? isLongUltra(p)
-            ? 'Ultra time on feet'
-            : 'Easy long run'
-          : isMedium
-            ? bookMarathon
-              ? minutes / pace >= 18
-                ? 'Medium-long endurance run'
-                : 'Midweek endurance run'
-              : p.marathonApproach === 'endurance'
-                ? 'Medium-long aerobic run'
-                : 'Aerobic endurance run'
-            : usesFiveDaySplit(p) || (!isNovice && (weights.get(date) ?? 1) < 1)
-              ? 'Recovery run'
-              : bookMarathon
-                ? 'General aerobic run'
-                : 'Easy run';
-      let purpose = isMedium
-        ? bookMarathon
-          ? 'Midweek endurance reinforces the long run. Keep a controlled conversational effort; ease back if the preceding workout has left you tired. Its distance comes from your existing weekly volume.'
-          : 'A second aerobic endurance outing, funded by the week’s existing easy volume. Keep it fully conversational.'
-        : isLong
-          ? isLongUltra(p)
-            ? 'Build easy time on feet on terrain like your runnable race course. Walk climbs before the effort rises, and rehearse familiar fueling and equipment.'
-            : p.goal === '5k'
-              ? 'Easy endurance supports your 5K preparation. Keep this conversational, without a fast finish; its length follows your recent running and the room in this week.'
-              : 'Build endurance at a pace you could happily hold a conversation.'
-          : usesFiveDaySplit(p) || (weights.get(date) ?? 1) < 1
-            ? 'A shorter easy outing to recover between the week’s key sessions. Keep the effort relaxed.'
-            : 'Comfortable running that builds your aerobic base and leaves room to recover.';
-      if (
-        isQuality &&
-        minutes >= 30 &&
-        (p.method !== 'double-threshold' || phase === 'Maintenance')
-      ) {
-        const decision = selectTemplate(
-          { ...p, goal: trainingFamily(p) },
-          sessionPhase,
-          {
-            previous: [...recordedQuality, ...workouts].filter(
-              (w) =>
-                (w.hard || w.stimulus === 'economy') &&
-                (phase === 'Maintenance' || w.week >= count - preparationWeeks),
-            ),
-            availableMinutes: minutes,
-            marathonModel: bookMarathon,
-            week: w,
-            slot: qualityDays.indexOf(weekday(date)),
-            qualitySlots: weekQualityDays.length,
-            excludeTemplateIds: recentTemplateIds(
-              [...recordedQuality, ...workouts],
-              w,
-            ),
-            introduction:
-              // A late calendar entry does not establish tolerance for speed.
-              (w === 0 && p.days.length > p.currentRuns) ||
-              ((phase === 'Foundation' || w < 2) &&
-                (p.recentQualitySessions ?? 0) === 0) ||
-              (qualityDays.indexOf(weekday(date)) > 0 &&
-                (p.recentQualitySessions ?? 0) < 2 &&
-                [...recordedQuality, ...workouts].filter(
-                  (s) =>
-                    s.week < w &&
-                    s.hard &&
-                    s.kind !== 'long' &&
-                    s.kind !== 'race' &&
-                    s.status !== 'skipped',
-                ).length < 2),
-          },
-        );
-        const template = decision.template;
-        targetWorkMinutes = decision.targetWorkMinutes;
-        selectionReason = decision.reason;
-        const dose = scaleTemplate(
-          template,
-          minutes,
-          gentle,
-          sessionPhase,
-          p.method === 'threshold-singles'
-            ? Math.min(desired * pace * 0.18, p.recentQualityMinutes ?? 0) /
-                Math.max(1, qualityDays.length)
-            : (desired * pace * 0.22) / Math.max(1, qualityDays.length),
-          targetWorkMinutes,
-          p,
-        );
-        if (dose) {
-          kind = template.kind;
-          steps = dose.steps;
-          minutes = dose.minutes;
-          hard = template.stimulus !== 'economy';
-          title = template.title;
-          purpose = template.purpose;
-          templateId = template.id;
-          stimulus = template.stimulus;
-          qualityMinutes = dose.qualityMinutes;
-        } else {
-          targetWorkMinutes = 0;
-          selectionReason =
-            'Keep this run easy: the structured dose cannot fit the current time or work allowance. No faster work is prescribed.';
-        }
-      }
-      if (
-        !hard &&
-        !pairedQuality &&
-        !isLong &&
-        p.easyLimitKm != null &&
-        minutes / pace > p.easyLimitKm
-      ) {
-        minutes = Math.max(5, Math.floor(p.easyLimitKm * pace));
-        steps = buildSteps(
-          'easy',
-          minutes,
-          isNovice ? (p.runWalkStage ?? 0) * 3 : w,
-          gentle,
-          isNovice,
-        );
-      }
-      if (isLong && mixedLong) {
-        const exposures = workouts.filter(
-          (s) => s.kind === 'long' && s.stimulus === 'race-rhythm',
-        ).length;
-        const bookDose = bookMarathon
-          ? marathonPaceDose(p, [...recordedQuality, ...workouts], minutes)
-          : 0;
-        let recipe = bookMarathon
-          ? `marathon-book-mp-${Math.max(20, bookDose)}`
-          : marathonLongRecipe(exposures);
-        if (
-          recipe === 'marathon-long-finish' &&
-          !previousSpecific.some((s) =>
-            s.steps.some((step) => step.kind === 'work' && step.seconds >= 960),
-          )
-        )
-          recipe = 'marathon-long-split';
-        const template = WORKOUT_LIBRARY.find((t) => t.id === recipe)!;
-        const target = bookMarathon
-          ? bookDose
-          : Math.min(
-              30,
-              20 + exposures * 10,
-              previousSpecific.at(-1)?.qualityMinutes ?? 20,
-            );
-        const dose = scaleTemplate(
-          template,
-          minutes,
-          false,
-          phase,
-          desired * pace * (bookMarathon ? 0.22 : 0.1),
-          target,
-          p,
-        );
-        if (dose) {
-          steps = dose.steps;
-          hard = true;
-          templateId = template.id;
-          stimulus = template.stimulus;
-          qualityMinutes = dose.qualityMinutes;
-          targetWorkMinutes = target;
-          title = template.title;
-          purpose = template.purpose;
-          selectionReason = bookMarathon
-            ? 'The long run includes controlled marathon effort alongside the weekday tempo. Its faster segment shares the existing weekly work allowance.'
-            : 'Marathon effort replaces one weekday quality session this week. Most of this long run stays easy; the aim is controlled race practice, not racing tired legs.';
-        }
-      }
-      if (
-        weekday(date) === strideDay &&
-        !hard &&
-        !isMedium &&
-        !isLong &&
-        minutes >= 25
-      ) {
-        const template = WORKOUT_LIBRARY.find(
-          (t) => t.id === 'marathon-book-strides',
-        )!;
-        const dose = scaleTemplate(
-          template,
-          minutes,
-          false,
-          sessionPhase,
-          2,
-          4 / 3,
-          p,
-        );
-        if (dose) {
-          steps = dose.steps;
-          minutes = dose.minutes;
-          templateId = template.id;
-          stimulus = 'economy';
-          qualityMinutes = dose.qualityMinutes;
-          targetWorkMinutes = 4 / 3;
-          title = template.title;
-          purpose = template.purpose;
-          selectionReason =
-            'Short, fully recovered strides support running form within an existing easy day. They are not another hard workout.';
-        }
-      }
-      workouts.push({
-        id: `${start}-${date}-${kind}`,
-        date,
-        originalDate: date,
-        week: w,
-        title,
-        kind,
-        minutes,
-        estimatedKm:
-          isLong && family === 'marathon'
-            ? longDistance
-            : round(minutes / pace, 3),
-        hard,
-        templateId,
-        stimulus,
-        qualityMinutes,
-        targetWorkMinutes,
-        distanceEstimate: distanceEstimate(steps, p),
-        role: isLong
-          ? 'long'
-          : isMedium
-            ? 'medium-long'
-            : templateId
-              ? stimulus
-              : (weights.get(date) ?? 1) < 1
-                ? 'recovery'
-                : 'easy',
-        purpose,
-        reason: `${selectionReason} ${usesDailyTaperPhase(p) ? sessionPhase : phase} · ${isLong ? 'Independent long-run progression' : hard ? `${stimulus} session chosen for your ${p.goal.toUpperCase()} phase, within a separate quality-work budget` : 'Easy volume within your weekly and time limits'}. ${p.easyPace ? 'Distance estimated from your easy pace.' : 'Distance estimated at 7 min/km for scheduling only; this is not a pace target.'}`,
-        steps,
-        status: 'planned',
-      });
-    }
-    const ordinary = workouts.filter(
-      (s) => s.week === w && regularDates.includes(s.date),
-    );
-    const allocated = [...allocation.values()].reduce((n, m) => n + m, 0);
-    const unused = taper
-      ? 0
-      : Math.max(0, allocated - ordinary.reduce((n, s) => n + s.minutes, 0));
-    const donors = ordinary.filter((s) => !s.templateId && !s.hard);
-    const extra = allocateRunningMinutes(
-      unused + donors.length * 5,
-      donors.map((s) => ({
-        key: s.id,
-        weight: weights.get(s.date) ?? 1,
-        cap:
-          5 +
-          Math.max(
-            0,
-            Math.min(
-              p.weekdayMinutes,
-              !isNovice && longDate && weekday(s.date) !== support
-                ? Math.floor(longDistance * pace)
-                : Infinity,
-              (weights.get(s.date) ?? 1) < 1 &&
-                !['easy-doubles', 'double-threshold'].includes(p.method ?? '')
-                ? recoveryRunCap(
-                    p,
-                    (activeReviewWeek ? wholeWeekAllocation : desired) * pace,
-                  )
-                : Infinity,
-              raceWeekSessionCap(p, s.date),
-              (p.easyLimitKm ?? Infinity) * pace,
-            ) - s.minutes,
-          ),
-      })),
-    );
-    for (const run of donors) {
-      const added = (extra.get(run.id) ?? 5) - 5;
-      if (added <= 0) continue;
-      run.minutes += added;
-      run.steps = buildSteps(
-        'easy',
-        run.minutes,
-        isNovice ? (p.runWalkStage ?? 0) * 3 : w,
-        p.difficulty === 'gentle',
-        isNovice,
-      );
-      run.estimatedKm = round(run.minutes / pace, 3);
-      run.distanceEstimate = distanceEstimate(run.steps, p);
-    }
-    if (p.goal !== 'base' && remaining === 1) {
-      const distance = raceDistance(p),
-        minutes = Math.round(distance * pace);
-      workouts.push({
-        id: `${start}-race`,
-        date: p.raceDate,
-        originalDate: p.raceDate,
-        week: w,
-        title: p.raceName || `${round(distance, 4)} km race day`,
-        kind: 'race',
-        minutes,
-        estimatedKm: distance,
-        hard: true,
-        purpose:
-          'Start with patience, settle into your effort, and use what you have left at the finish.',
-        reason:
-          'Your race date anchors the taper. Race duration is an estimate, not a prediction.',
-        steps: [
-          {
-            ...buildSteps('race', minutes, 0, false)[0],
-            metres: Math.round(distance * 10000) / 10,
-          },
-        ],
-        status: 'planned',
-      });
-    }
-    const sessions = workouts.filter((s) => s.week === w);
-    weeks.push({
-      index: w,
-      start: addDays(start, w * 7),
-      phase,
-      targetKm: round(sessions.reduce((sum, s) => sum + s.estimatedKm, 0)),
-      longKm: round(
-        Math.max(
-          0,
-          ...sessions
-            .filter((s) => s.kind === 'long')
-            .map((s) => s.estimatedKm),
-        ),
-      ),
-      focus: maintenance
-        ? `${focus[phase]} Maintenance block ${Math.floor(w / 8) + 1}; review on ${dateLabel(addDays(start, Math.min(count - preparationWeeks, (Math.floor(w / 8) + 1) * 8) * 7))}. No ongoing volume growth is forecast in this phase.`
-        : family === 'marathon'
-          ? marathonWeekFocus(phase, p)
-          : family !== 'ultra' &&
-              taper &&
-              !taperAtWeekStart &&
-              phase !== 'Race week'
-            ? `${focus[phase]} Taper begins on ${dateLabel(addDays(p.raceDate, -taperWeeks * 7))}; earlier runs keep this week's training focus.`
-            : focus[phase],
-    });
-  }
+    qualityDays,
+    requestedQuality,
+  } = context;
+  const { weeks, workouts } = generatePlanWeeks(context, replan);
   // Apply the quality-work fraction to actual capped sessions, not the requested mileage.
   for (const week of weeks) {
     const sessions = workouts.filter(
@@ -2356,7 +1109,9 @@ export function makePlan(
     );
     const ceiling = Math.min(
       sessions.reduce((n, w) => n + w.minutes, 0) *
-        (p.method === 'threshold-singles' ? 0.18 : 0.22),
+        (p.method === 'threshold-singles'
+          ? SESSION_POLICY.thresholdSinglesWorkFraction
+          : SESSION_POLICY.qualityWorkFraction),
       p.method === 'threshold-singles'
         ? (p.recentQualityMinutes ?? 0)
         : Infinity,
@@ -2411,7 +1166,9 @@ export function makePlan(
         w.steps = buildSteps(
           'easy',
           w.minutes,
-          isNovice ? (p.runWalkStage ?? 0) * 3 : week.index,
+          isNovice
+            ? (p.runWalkStage ?? 0) * RUN_WALK_VARIANT_STRIDE
+            : week.index,
           false,
           isNovice,
         );
@@ -2555,9 +1312,14 @@ export function makePlan(
       );
     let alternative = '';
     if (findAlternative)
-      for (let extra = 1; extra <= 12; extra++) {
-        const nextDate = addDays(p.raceDate, extra * 7);
-        if (dayDiff(p.startDate, nextDate) > 363) break;
+      for (
+        let extra = 1;
+        extra <= FEASIBILITY_POLICY.maximumAlternativeWeeks;
+        extra++
+      ) {
+        const nextDate = addDays(p.raceDate, extra * DAYS_PER_WEEK);
+        if (dayDiff(p.startDate, nextDate) > FEASIBILITY_POLICY.maximumPlanDays)
+          break;
         try {
           makePlan({ ...p, raceDate: nextDate }, asOf, false);
           alternative = ` With these inputs, try a race on or after ${dateLabel(nextDate, { day: 'numeric', month: 'long', year: 'numeric' })}.`;
@@ -2599,16 +1361,16 @@ export function makePlan(
         : runs.reduce((n, s) => n + s.minutes, 0);
     });
     const candidates = peakHours.slice(
-      Math.max(0, count - 10),
-      Math.max(0, count - 3),
+      Math.max(0, count - FEASIBILITY_POLICY.ultraCapacityLookbackWeeks),
+      Math.max(0, count - FEASIBILITY_POLICY.ultraTaperWeeks),
     );
     if (
       !candidates.some(
         (m, i) =>
-          i >= 2 &&
-          m >= 360 &&
-          candidates[i - 1] >= 360 &&
-          candidates[i - 2] >= 360,
+          i >= FEASIBILITY_POLICY.ultraConsecutiveCapacityWeeks - 1 &&
+          m >= FEASIBILITY_POLICY.ultraCapacityMinutes &&
+          candidates[i - 1] >= FEASIBILITY_POLICY.ultraCapacityMinutes &&
+          candidates[i - 2] >= FEASIBILITY_POLICY.ultraCapacityMinutes,
       )
     )
       capacityReason = shortBlock
