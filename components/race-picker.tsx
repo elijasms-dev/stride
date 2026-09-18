@@ -2,10 +2,10 @@
 import { useState } from 'react';
 import { Search, ArrowUpRight } from 'lucide-react';
 import { searchRaces, type RaceRecord, type RaceOption } from '@/lib/races';
+import { trainingDayIfValid } from '@/lib/form-values';
 import {
   dateLabel,
   eventDistanceDisplay,
-  todayInZone,
   dayDiff,
   preparationRequirements,
   MAX_EVENT_KM,
@@ -26,6 +26,7 @@ export default function RacePicker({
       date: string;
       goal: string;
     } | null>(null);
+  const today = trainingDayIfValid(profile.timezone);
   function choose(r: RaceRecord, o: RaceOption) {
     const km = o.distanceKm;
     const goal =
@@ -72,7 +73,13 @@ export default function RacePicker({
           ? selected.label
           : 'Find a major race'}
       </button>
-      {open && (
+      {open && !today && (
+        <output className="notice">
+          Enter a valid training timezone below to see race dates and
+          preparation guidance. Your race search is kept.
+        </output>
+      )}
+      {open && today && (
         <div className="race-search-panel">
           <label className="race-search">
             <Search size={17} />
@@ -106,7 +113,7 @@ export default function RacePicker({
                 </div>
                 <small>
                   Verified {dateLabel(r.verifiedAt)} ·{' '}
-                  {dayDiff(r.verifiedAt, todayInZone(profile.timezone)) > 30
+                  {dayDiff(r.verifiedAt, today) > 30
                     ? 'Recheck organizer information'
                     : 'Curated record'}
                 </small>
@@ -133,14 +140,12 @@ export default function RacePicker({
                       {o.distanceKm != null
                         ? ` · ${eventDistanceDisplay(o.distanceKm, profile.units)} ${profile.units}`
                         : ' · distance to confirm'}
-                      {(o.date ?? r.date) &&
-                      (o.date ?? r.date)! < todayInZone(profile.timezone)
+                      {(o.date ?? r.date) && (o.date ?? r.date)! < today
                         ? ' · Past edition; next date unverified'
                         : !(o.date ?? r.date)
                           ? ' · Date unannounced'
                           : dayDiff(
-                                profile.startDate ||
-                                  todayInZone(profile.timezone),
+                                profile.startDate || today,
                                 (o.date ?? r.date)!,
                               ) <
                               preparationRequirements({

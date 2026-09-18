@@ -7,11 +7,23 @@ import {
   numericText,
   MILE_KM,
   trainingDay,
+  trainingDayIfValid,
   reconcileStartDate,
   relativeDayLabel,
   runFeedbackError,
 } from '../lib/form-values.ts';
 import { demoProfile, makePlan, addDays, todayInZone } from '../lib/engine.ts';
+
+void test('editable timezone date guidance waits for a valid timezone without throwing or inventing a local day', () => {
+  const instant = new Date('2026-09-18T00:30:00Z');
+  for (const zone of ['', 'Europe/', 'Europe/Bruss', 'invalid'])
+    assert.equal(trainingDayIfValid(zone, instant), null);
+  assert.equal(trainingDayIfValid('Europe/Brussels', instant), '2026-09-18');
+  assert.equal(
+    trainingDayIfValid('America/Los_Angeles', instant),
+    '2026-09-17',
+  );
+});
 
 void test('new feedback must be supplied deliberately before it can become a training observation', () => {
   for (const [effort, feeling] of [

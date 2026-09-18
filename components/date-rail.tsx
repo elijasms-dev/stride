@@ -3,12 +3,14 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Check } from 'lucide-react';
 import { addDays, dateLabel, type Plan, type Workout } from '@/lib/engine';
 import {
-  orderedDaySessions,
+  calendarSessions,
+  orderedCalendarSessions,
   focusedSession,
   daySessionSummary,
   workoutTone,
 } from '@/lib/day-sessions';
 import { supportingSession } from '@/lib/coaching-context';
+import { recordedWorkoutDate } from '@/lib/run-records';
 
 export function DateRail({
   plan,
@@ -38,6 +40,7 @@ export function DateRail({
   const suppressClick = useRef(false);
   const centered = useRef(false);
   const [dragging, setDragging] = useState(false);
+  const visibleSessions = useMemo(() => calendarSessions(plan), [plan]);
   const dates = useMemo(
     () =>
       [
@@ -45,21 +48,23 @@ export function DateRail({
           ...plan.weeks.flatMap((week) =>
             Array.from({ length: 7 }, (_, day) => addDays(week.start, day)),
           ),
+          ...visibleSessions.map(recordedWorkoutDate),
           today,
           selectedDate,
         ]),
       ].sort(),
-    [plan.weeks, today, selectedDate],
+    [plan.weeks, visibleSessions, today, selectedDate],
   );
   const sessionsByDate = useMemo(() => {
     const map = new Map<string, Workout[]>();
-    for (const workout of plan.workouts) {
-      const sessions = map.get(workout.date) ?? [];
+    for (const workout of visibleSessions) {
+      const date = recordedWorkoutDate(workout);
+      const sessions = map.get(date) ?? [];
       sessions.push(workout);
-      map.set(workout.date, sessions);
+      map.set(date, sessions);
     }
     return map;
-  }, [plan.workouts]);
+  }, [visibleSessions]);
   const cancelHold = () => {
     if (timer.current) clearTimeout(timer.current);
     timer.current = null;
@@ -125,7 +130,7 @@ export function DateRail({
           );
           const workout = button?.dataset.date
             ? focusedSession(
-                orderedDaySessions(
+                orderedCalendarSessions(
                   sessionsByDate.get(button.dataset.date) ?? [],
                   button.dataset.date,
                 ),
@@ -190,7 +195,7 @@ export function DateRail({
         }}
       >
         {dates.map((date, index) => {
-          const sessions = orderedDaySessions(
+          const sessions = orderedCalendarSessions(
             sessionsByDate.get(date) ?? [],
             date,
           );

@@ -57,6 +57,10 @@ export function validTimezone(zone: string) {
 export function trainingDay(zone: string, instant = new Date()) {
   return todayInZone(validTimezone(zone) ? zone : 'UTC', instant);
 }
+/** An editable timezone can be incomplete; defer date guidance until valid. */
+export function trainingDayIfValid(zone: string, instant = new Date()) {
+  return validTimezone(zone) ? todayInZone(zone, instant) : null;
+}
 export function reconcileStartDate(
   start: string,
   zone: string,

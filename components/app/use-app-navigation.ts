@@ -1,7 +1,11 @@
 'use client';
 /* oxlint-disable next/no-html-link-for-pages -- Authentication transitions require a new document to discard the pinned account session. */
 import { dayOverview } from '@/lib/daily-guide';
-import { focusedSession, orderedDaySessions } from '@/lib/day-sessions';
+import {
+  calendarSessions,
+  focusedSession,
+  orderedCalendarSessions,
+} from '@/lib/day-sessions';
 import { trainingDay } from '@/lib/form-values';
 import {
   DEFAULT_HOME_PREFERENCES,
@@ -92,7 +96,7 @@ export function useAppNavigation({
       }
     : plan;
   const currentDate = selectedDate || today,
-    dayWorkouts = orderedDaySessions(plan.workouts, currentDate),
+    dayWorkouts = orderedCalendarSessions(calendarSessions(plan), currentDate),
     workout = focusedSession(dayWorkouts, selectedSession),
     dayTitle = workout ? '' : dayOverview(plan, currentDate).title,
     currentWeek = Math.max(

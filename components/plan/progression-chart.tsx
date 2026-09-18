@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { Flag } from 'lucide-react';
 import { kmDisplay, type Plan } from '@/lib/engine';
-import { planWeekSummary } from '@/lib/plan-explorer';
+import { planWeekPhase, planWeekSummary } from '@/lib/plan-explorer';
 
 export function ProgressionChart({
   plan,
@@ -18,6 +18,7 @@ export function ProgressionChart({
     () =>
       plan.weeks.map((week) => ({
         week,
+        phase: planWeekPhase(plan, week.index) ?? week.phase,
         ...planWeekSummary(plan, week.index),
       })),
     [plan],
@@ -41,9 +42,8 @@ export function ProgressionChart({
           </span>
         </div>
       </div>
-      <div
+      <fieldset
         className="pe-chart-scroll"
-        role="group"
         aria-label="Weekly training and long-run distances"
       >
         <div
@@ -52,9 +52,9 @@ export function ProgressionChart({
         >
           {summaries.map((item) => {
             const reduced = ['Recovery', 'Taper', 'Race week'].includes(
-              item.week.phase,
+              item.phase,
             );
-            const label = `Week ${item.week.index + 1}, ${item.week.phase}, ${kmDisplay(item.trainingKm, plan.profile.units)} ${plan.profile.units} training, ${kmDisplay(item.longKm, plan.profile.units)} ${plan.profile.units} long run${item.raceKm ? `, plus ${kmDisplay(item.raceKm, plan.profile.units)} ${plan.profile.units} race` : ''}`;
+            const label = `Week ${item.week.index + 1}, ${item.phase}, ${kmDisplay(item.trainingKm, plan.profile.units)} ${plan.profile.units} training, ${kmDisplay(item.longKm, plan.profile.units)} ${plan.profile.units} long run${item.raceKm ? `, plus ${kmDisplay(item.raceKm, plan.profile.units)} ${plan.profile.units} race` : ''}`;
             return (
               <button
                 type="button"
@@ -86,7 +86,7 @@ export function ProgressionChart({
             );
           })}
         </div>
-      </div>
+      </fieldset>
       <p className="pe-chart-note">
         Week number below each bar. Hatched bars mark recovery or taper.
         Distances are planned training estimates; race distance is separate.

@@ -10,6 +10,7 @@ const { planCalendarDays, planWeekSummary, nearestPlanWeek } =
 const { FullPlan, PlanWeekSchedule } =
   await import('../components/plan/plan-explorer.tsx');
 const { WeekRhythm } = await import('../components/week-rhythm.tsx');
+const { trainingPlanHtml } = await import('../lib/plan-print.ts');
 const noop = () => {};
 
 function fixture() {
@@ -237,6 +238,18 @@ test('Today lookup works before, inside and after a saved block without changing
   planWeekSummary(plan, 4);
   render(FullPlan, { ...props(plan), initialView: 'full' });
   assert.equal(JSON.stringify(plan), before);
+});
+
+test('legacy taper labels resolve consistently in the schedule, chart and export', () => {
+  const plan = fixture();
+  plan.profile.goal = '5k';
+  plan.profile.method = 'balanced';
+  plan.weeks[0].phase = 'Taper';
+  const html = render(FullPlan, props(plan));
+  assert.match(html, /aria-label="Week 1, Foundation,/);
+  assert.match(html, /class="pe-phase ">Foundation<\/span>/);
+  assert.match(trainingPlanHtml(plan), /Week 1 · Foundation<\/h2>/);
+  assert.equal(plan.weeks[0].phase, 'Taper');
 });
 
 test('weekly rhythm describes actual saved runs for any engine version', () => {

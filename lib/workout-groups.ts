@@ -9,6 +9,7 @@ export type StepGroup = {
 };
 const signature = (s: Step) =>
   JSON.stringify([
+    s.label.replace(/ · \d+ of \d+$/, ''),
     s.kind,
     s.seconds,
     s.metres,

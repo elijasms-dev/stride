@@ -1,6 +1,5 @@
 'use client';
 /* oxlint-disable next/no-html-link-for-pages -- Authentication transitions require a new document to discard the pinned account session. */
-import Image from 'next/image';
 import { useEffect, useState, type MouseEvent } from 'react';
 import { ArrowRight, Check, LoaderCircle, LockKeyhole } from 'lucide-react';
 import { safeReturnTo, signInHref } from '@/lib/auth-navigation';
@@ -57,15 +56,35 @@ export default function Login({
   return (
     <main className="access-shell">
       <section className="access-story" aria-label="Stride running">
-        <Image
-          unoptimized
-          className="access-photo"
-          src="/images/stride-coast.jpg"
-          alt="Two runners following a wooded coastal trail"
-          width={1024}
-          height={1536}
-          fetchPriority="high"
-        />
+        <svg
+          className="access-track"
+          viewBox="0 0 720 960"
+          preserveAspectRatio="xMidYMid slice"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <g transform="rotate(-28 360 480)" fill="none">
+            {[0, 1, 2, 3, 4].map((lane) => (
+              <rect
+                key={lane}
+                x={66 + lane * 28}
+                y={72 + lane * 28}
+                width={588 - lane * 56}
+                height={960 - lane * 56}
+                rx={294 - lane * 28}
+                stroke="currentColor"
+                strokeWidth="2"
+              />
+            ))}
+            <path
+              d="M150 738V366a210 210 0 0 1 420 0v80"
+              stroke="#3b66f5"
+              strokeWidth="20"
+              strokeLinecap="round"
+            />
+            <circle cx="570" cy="446" r="12" fill="#d9f99d" />
+          </g>
+        </svg>
         <a
           className="access-wordmark"
           href="/"

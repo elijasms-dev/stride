@@ -1,19 +1,14 @@
 'use client';
 /* oxlint-disable next/no-html-link-for-pages -- Authentication transitions require a new document to discard the pinned account session. */
-import { workoutTone } from '@/lib/day-sessions';
 import { relativeDayLabel } from '@/lib/form-values';
 import { runDuration } from '@/lib/journal-view';
-import { mainWorkoutTarget, targetLabel } from '@/lib/workout-targets';
 import { ChevronRight, Moon } from 'lucide-react';
 import { DateRail } from '../date-rail';
 /* oxlint-disable react/react-compiler -- This app hydrates device preferences after SSR; it does not use the React Compiler. */
 import { TabsContent } from '@/components/ui/tabs';
-import { dateLabel, kmDisplay, workoutDistanceValue } from '@/lib/engine';
-import { prescribedDistanceKm } from '@/lib/run-distance';
-import { Check } from 'lucide-react';
 import { UpcomingSessions } from '../journal-panels';
-import { workoutEffort } from '../stride-ui';
 import { useAppContext } from './app-context';
+import { TodayWorkoutCard } from './today-workout-card';
 
 export function TodayRoute() {
   const {
@@ -22,7 +17,6 @@ export function TodayRoute() {
     homePreferences,
     plan,
     today,
-    unit,
     currentDate,
     dayWorkouts,
     workout,
@@ -103,7 +97,22 @@ export function TodayRoute() {
                   aria-pressed={workout?.id === w.id}
                   onClick={() => setSelectedSession(w.id)}
                 >
-                  {w.session} · {w.startTime} · {runDuration(w.minutes)}
+                  {[
+                    w.session,
+                    w.startTime,
+                    w.status === 'completed'
+                      ? w.feedback
+                        ? runDuration(w.feedback.actualMinutes) + ' recorded'
+                        : 'Time not recorded'
+                      : w.kind === 'race'
+                        ? 'Race day'
+                        : runDuration(w.minutes) +
+                          (w.steps.some((step) => step.metres !== undefined)
+                            ? ' estimated'
+                            : ''),
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
                   <span className="session-state">
                     {w.status === 'completed'
                       ? 'Completed'
@@ -116,129 +125,13 @@ export function TodayRoute() {
             </fieldset>
           )}
           {workout ? (
-            <article
-              className="workout-card"
-              data-tone={workoutTone(workout)}
+            <TodayWorkoutCard
               key={workout.id}
-            >
-              <div className="card-topline">
-                <span className="eyebrow">
-                  {workout.kind === 'race'
-                    ? 'Race day'
-                    : workout.kind === 'long'
-                      ? workout.hard
-                        ? 'Long run · quality'
-                        : 'Long run'
-                      : workout.hard
-                        ? 'Quality session'
-                        : 'Easy effort'}
-                </span>
-                <div className="workout-status-actions">
-                  {workout.status !== 'planned' && (
-                    <span className="pill">
-                      {workout.status === 'completed' ? (
-                        <>
-                          <Check size={12} /> Completed
-                        </>
-                      ) : (
-                        'Skipped'
-                      )}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="session-heading">
-                <h2>{workout.title}</h2>
-                <time className="session-date-stamp" dateTime={workout.date}>
-                  <span>{dateLabel(workout.date, { month: 'short' })}</span>
-                  <strong>{dateLabel(workout.date, { day: 'numeric' })}</strong>
-                </time>
-              </div>
-              <div
-                className="workout-stats"
-                data-metrics={
-                  homePreferences.showEstimates ||
-                  prescribedDistanceKm(workout) !== null ||
-                  (workout.status === 'completed' && workout.feedback)
-                    ? 3
-                    : 2
-                }
-              >
-                {(homePreferences.showEstimates ||
-                  prescribedDistanceKm(workout) !== null ||
-                  (workout.status === 'completed' && workout.feedback)) && (
-                  <div>
-                    <strong>
-                      {workout.status === 'completed' && workout.feedback
-                        ? workout.feedback.actualKm === null
-                          ? '—'
-                          : kmDisplay(workout.feedback.actualKm, unit)
-                        : workoutDistanceValue(workout, plan.profile)}
-                    </strong>
-                    <span>
-                      {workout.status === 'completed' && workout.feedback
-                        ? workout.feedback.actualKm === null
-                          ? 'Distance not recorded'
-                          : `${unit} recorded`
-                        : prescribedDistanceKm(workout) !== null
-                          ? `${unit} target`
-                          : plan.profile.easyPace
-                            ? `${unit} estimated range`
-                            : 'distance not estimated'}
-                    </span>
-                  </div>
-                )}
-                <div>
-                  <strong>
-                    {runDuration(
-                      workout.status === 'completed' && workout.feedback
-                        ? workout.feedback.actualMinutes
-                        : workout.minutes,
-                    )}
-                  </strong>
-                  <span>
-                    {workout.status === 'completed' && workout.feedback
-                      ? 'recorded time'
-                      : prescribedDistanceKm(workout) !== null
-                        ? 'estimated time'
-                        : 'duration'}
-                  </span>
-                </div>
-                <div>
-                  <strong>
-                    {workout.status === 'completed' && workout.feedback
-                      ? workout.feedback.effort
-                      : mainWorkoutTarget(workout)
-                        ? targetLabel(mainWorkoutTarget(workout), unit)
-                        : workoutEffort(workout)}
-                    {(workout.status === 'completed' ||
-                      !mainWorkoutTarget(workout)) && (
-                      <span className="stat-small"> / 10</span>
-                    )}
-                  </strong>
-                  <span>
-                    {workout.status !== 'completed' &&
-                    mainWorkoutTarget(workout)
-                      ? mainWorkoutTarget(workout)?.mode === 'pace'
-                        ? 'Target pace'
-                        : 'Target heart rate'
-                      : 'effort'}
-                  </span>
-                </div>
-              </div>
-              <div className="card-footer">
-                <div className="today-run-actions">
-                  <button
-                    className="primary-button"
-                    onClick={() => showWorkout(workout)}
-                  >
-                    {workout.status === 'completed'
-                      ? 'View run'
-                      : 'Open workout'}
-                  </button>
-                </div>
-              </div>
-            </article>
+              workout={workout}
+              profile={plan.profile}
+              showEstimates={homePreferences.showEstimates}
+              onOpen={showWorkout}
+            />
           ) : (
             <button
               type="button"

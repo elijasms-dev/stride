@@ -1519,7 +1519,7 @@ textarea,
   content: '';
   position: absolute;
   inset: 0 0 0 48%;
-  background: url('/images/stride-coast.jpg') center / cover;
+  background: linear-gradient(135deg, #17241d, #244a3a);
   opacity: 0.85;
   z-index: 0;
 }

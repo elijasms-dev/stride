@@ -32,11 +32,7 @@ export const metadata: Metadata = {
     'Build around your recent running and the time you actually have. Compare training plans, understand the tradeoffs, and stay in control of every change.',
   robots: { index: false, follow: false },
   icons: {
-    icon: [
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-      { url: '/favicon-32.png', type: 'image/png', sizes: '32x32' },
-    ],
-    apple: '/apple-touch-icon.png',
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
   },
 };
 

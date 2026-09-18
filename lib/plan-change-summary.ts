@@ -204,7 +204,7 @@ export function preferenceOverviewRows(
     return [
       nextWeek ? summedDistance(runs, profile) : 'No full week remaining',
       nextWeek
-        ? runDuration(runs.reduce((n, w) => n + w.minutes, 0))
+        ? `${runDuration(runs.reduce((n, w) => n + w.minutes, 0))}${runs.some((w) => w.steps.some((step) => step.metres !== undefined)) ? ' estimated' : ''}`
         : 'No full week remaining',
       longest ? previewDistance(longest, profile) : 'No upcoming long run',
     ];

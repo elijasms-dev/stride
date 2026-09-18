@@ -4,6 +4,7 @@ import { addDays, dateLabel, dayDiff, validDate } from './plan/calendar.ts';
 import {
   eventDistanceDisplay,
   goalLabel,
+  kmDisplay,
   workoutDistanceLabel,
 } from './plan/display.ts';
 import type { Plan, Step, Workout } from './plan/types.ts';
@@ -11,6 +12,7 @@ import { trainingRecords, type RunRecord } from './run-records.ts';
 import { prescribedDistanceKm } from './run-distance.ts';
 import { duration, stepLength } from './workout-names.ts';
 import { targetLabel } from './workout-targets.ts';
+import { planWeekPhase } from './plan-explorer.ts';
 
 /** Text only: no profile, workout, or feedback field is trusted as markup. */
 function escapeHtml(value: string) {
@@ -25,8 +27,8 @@ function escapeHtml(value: string) {
   });
 }
 
-function distance(km: number, plan: Plan) {
-  return `${eventDistanceDisplay(km, plan.profile.units)} ${plan.profile.units}`;
+function distance(km: number, plan: Plan, exact = false) {
+  return `${exact ? eventDistanceDisplay(km, plan.profile.units) : kmDisplay(km, plan.profile.units)} ${plan.profile.units}`;
 }
 
 function dateText(date: string) {
@@ -41,7 +43,7 @@ function dateText(date: string) {
 function stepHtml(step: Step, workout: Workout, plan: Plan) {
   const length =
     step.metres !== undefined && ['race', 'easy', 'long'].includes(workout.kind)
-      ? distance(step.metres / 1000, plan)
+      ? distance(step.metres / 1000, plan, workout.kind === 'race')
       : stepLength(step);
   const allowance =
     step.metres !== undefined && workout.kind !== 'race'
@@ -75,7 +77,7 @@ function workoutHtml(workout: Workout, plan: Plan, record?: RunRecord) {
   const actualDate = record?.date ?? workout.feedback?.actualDate;
   const status =
     workout.status === 'completed'
-      ? `Completed${actualDate && actualDate !== workout.date ? ` on ${dateText(actualDate)}` : ''}`
+      ? `Completed${workout.week < 0 ? ' · previous plan' : ''}${actualDate && actualDate !== workout.date ? ` on ${dateText(actualDate)}` : ''}`
       : workout.status === 'skipped'
         ? 'Skipped prescription'
         : 'Planned';
@@ -83,7 +85,7 @@ function workoutHtml(workout: Workout, plan: Plan, record?: RunRecord) {
     record && record.date === workout.date
       ? recordHtml(record, plan, 'Recorded run')
       : '';
-  return `<article class="workout ${escapeHtml(workout.kind)}"><header><h4>${escapeHtml(timing ? `${timing} · ${workout.title}` : workout.title)}</h4><span class="status">${escapeHtml(status)}</span></header><p class="metrics">${escapeHtml(metrics.join(' · '))}</p>${workout.purpose ? `<p>${escapeHtml(workout.purpose)}</p>` : ''}${workout.kind === 'race' ? '<p class="muted">Follow the event distance. Any time used to plan this session is not a finish-time target.</p>' : ''}${workout.skipReason ? `<p class="muted">${escapeHtml(workout.skipReason)}</p>` : ''}<ol class="steps">${workout.steps.map((step) => stepHtml(step, workout, plan)).join('')}</ol>${actual}</article>`;
+  return `<article class="workout ${escapeHtml(workout.kind)}"><header><h4>${escapeHtml(timing ? `${timing} · ${workout.title}` : workout.title)}</h4><span class="status">${escapeHtml(status)}</span></header><p class="metrics">${workout.status === 'completed' ? 'Original prescription: ' : ''}${escapeHtml(metrics.join(' · '))}</p>${workout.status === 'completed' && !workout.feedback ? '<p class="muted">Recorded result unavailable.</p>' : ''}${workout.purpose ? `<p>${escapeHtml(workout.purpose)}</p>` : ''}${workout.kind === 'race' ? '<p class="muted">Follow the event distance. Any time used to plan this session is not a finish-time target.</p>' : ''}${workout.skipReason ? `<p class="muted">${escapeHtml(workout.skipReason)}</p>` : ''}<ol class="steps">${workout.steps.map((step) => stepHtml(step, workout, plan)).join('')}</ol>${actual}</article>`;
 }
 
 function dayHtml(date: string, plan: Plan, records: RunRecord[]) {
@@ -136,6 +138,7 @@ function weekSummary(plan: Plan, dates: string[], records: RunRecord[]) {
     (workout) =>
       workout.date >= start &&
       workout.date <= end &&
+      workout.week >= 0 &&
       workout.status !== 'skipped',
   );
   const training = scheduled.filter((workout) => workout.kind !== 'race');
@@ -174,6 +177,7 @@ function weekSummary(plan: Plan, dates: string[], records: RunRecord[]) {
           distance(
             races.reduce((sum, workout) => sum + workout.estimatedKm, 0),
             plan,
+            true,
           ),
         )}. Excluded from the training total.</p>`
       : ''
@@ -265,7 +269,7 @@ export function trainingPlanHtml(plan: Plan): string {
   const weeks = groups
     .map(
       ({ week, dates }, index) =>
-        `<section class="week"><header class="week-heading"><h2>${escapeHtml(week ? `Week ${week.index + 1} · ${week.phase}` : `Schedule ${index + 1}`)}</h2><p class="week-range">${escapeHtml(dateText(dates[0]))} – ${escapeHtml(dateText(dates.at(-1)!))}</p>${weekSummary(plan, dates, records)}${week?.focus ? `<p>${escapeHtml(week.focus)}</p>` : ''}</header>${dates.map((date) => dayHtml(date, plan, records)).join('')}</section>`,
+        `<section class="week"><header class="week-heading"><h2>${escapeHtml(week ? `Week ${week.index + 1} · ${planWeekPhase(plan, week.index) ?? week.phase}` : `Schedule ${index + 1}`)}</h2><p class="week-range">${escapeHtml(dateText(dates[0]))} – ${escapeHtml(dateText(dates.at(-1)!))}</p>${weekSummary(plan, dates, records)}${week?.focus ? `<p>${escapeHtml(week.focus)}</p>` : ''}</header>${dates.map((date) => dayHtml(date, plan, records)).join('')}</section>`,
     )
     .join('');
   const outside = records.filter(
@@ -299,7 +303,7 @@ export function trainingPlanHtml(plan: Plan): string {
           )
           .join('')}</section>`
       : '';
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"><title>${escapeHtml(title)} · Stride training plan</title><style>${printStyles}</style></head><body><main><header class="intro"><p class="brand">Stride</p><h1>${escapeHtml(title)}</h1><p>${escapeHtml(plan.profile.name ? `${plan.profile.name} · ${goalLabel(plan.profile.goal)}` : goalLabel(plan.profile.goal))}</p><p>${escapeHtml(dateText(startDate))} – ${escapeHtml(dateText(raceDate))} · ${days.length} days</p><p class="legend">Every calendar day is included. Workout steps appear in their saved order, including every repetition and recovery. Distance targets end at the stated distance; their time is a planning allowance. Timed steps end at the stated duration. Pace or heart-rate targets are shown only when saved; effort cues always apply.</p><p class="legend">Weekly scheduled distance is a planning estimate where runs are timed. Training totals exclude the race and skipped sessions, and include completed prescriptions on their scheduled dates. Recorded running is shown separately on its actual date. Optional supporting activities do not count toward running totals.</p></header>${weeks}${appendix}${plan.notes.length ? `<section class="notes"><h2>Plan notes</h2><ul>${plan.notes.map((note) => `<li>${escapeHtml(note)}</li>`).join('')}</ul></section>` : ''}</main></body></html>`;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"><title>${escapeHtml(title)} · Stride training plan</title><style>${printStyles}</style></head><body><main><header class="intro"><p class="brand">Stride</p><h1>${escapeHtml(title)}</h1><p>${escapeHtml(plan.profile.name ? `${plan.profile.name} · ${goalLabel(plan.profile.goal)}` : goalLabel(plan.profile.goal))}</p><p>${escapeHtml(dateText(startDate))} – ${escapeHtml(dateText(raceDate))} · ${days.length} days</p><p class="legend">Every calendar day is included. Workout steps appear in their saved order, including every repetition and recovery. Distance targets end at the stated distance; their time is a planning allowance. Timed steps end at the stated duration. Pace or heart-rate targets are shown only when saved; effort cues always apply.</p><p class="legend">Weekly scheduled distance is a planning estimate where runs are timed. Training totals exclude races, skipped sessions and sessions retained from a previous plan, and include completed prescriptions from this block on their scheduled dates. Recorded running is shown separately on its actual date. Optional supporting activities do not count toward running totals.</p></header>${weeks}${appendix}${plan.notes.length ? `<section class="notes"><h2>Plan notes</h2><ul>${plan.notes.map((note) => `<li>${escapeHtml(note)}</li>`).join('')}</ul></section>` : ''}</main></body></html>`;
 }
 
 /** Print in an isolated document without opening a tab or granting an opener. */

@@ -75,7 +75,10 @@ export function UpcomingSessions({
   const runs = plan.workouts
     .filter(
       (w) =>
-        w.date >= fromDate && w.id !== selectedId && w.status === 'planned',
+        w.week >= 0 &&
+        w.date >= fromDate &&
+        w.id !== selectedId &&
+        w.status === 'planned',
     )
     .sort(
       (a, b) =>
@@ -114,7 +117,7 @@ export function UpcomingSessions({
                 <span>
                   {w.kind === 'race'
                     ? `${eventDistanceDisplay(w.estimatedKm, plan.profile.units)} ${plan.profile.units}`
-                    : `${prescribedDistanceKm(w) !== null || showEstimates ? `${workoutDistanceLabel(w, plan.profile)} · ` : ''}${runDuration(w.minutes)}${prescribedDistanceKm(w) !== null ? ' estimated' : ''}`}
+                    : `${prescribedDistanceKm(w) !== null || showEstimates ? `${workoutDistanceLabel(w, plan.profile)} · ` : ''}${runDuration(w.minutes)}${w.steps.some((step) => step.metres !== undefined) ? ' estimated' : ''}`}
                 </span>
               </span>
               <ArrowRight size={17} />

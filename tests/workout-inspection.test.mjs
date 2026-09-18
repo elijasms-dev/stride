@@ -10,6 +10,7 @@ import {
   preferenceOverviewRows,
   previewDistance,
 } from '../lib/plan-change-summary.ts';
+import { workoutStepGroups } from '../lib/workout-groups.ts';
 
 const { default: WorkoutDetail } =
   await import('../components/workout-detail.tsx');
@@ -344,4 +345,157 @@ test('effort changes stay visible alongside unchanged pace targets', () => {
   assert.equal(row.changed, true);
   assert.match(row.before, /Steady/);
   assert.match(row.after, /Hard/);
+});
+
+const detailProps = (workout) => ({
+  workout,
+  plan,
+  profile: plan.profile,
+  version: 3,
+  open: true,
+  today: '2026-12-31',
+  onClose: noop,
+  onAction: async () => {},
+  onConnect: noop,
+  busy: false,
+  isDemo: false,
+  connected: false,
+});
+
+test('completed runs without feedback separate missing observations from the saved prescription', () => {
+  const completed = { ...first, status: 'completed', feedback: undefined };
+  const html = render(WorkoutDetail, detailProps(completed));
+  assert.match(html, /Run details not recorded/);
+  assert.match(html, /duration, distance and feedback were not recorded/);
+  assert.match(html, /Add run details/);
+  assert.doesNotMatch(html, /More actions|class="recorded-run-metrics"/);
+  assert.ok(
+    html.indexOf('class="recorded-prescription"') <
+      html.indexOf('class="workout-stats"'),
+  );
+});
+
+test('recorded summaries show actual dates and self-reported execution, including zero quality work', () => {
+  const completed = {
+    ...first,
+    hard: true,
+    status: 'completed',
+    feedback: {
+      actualDate: '2026-10-06',
+      actualMinutes: 25,
+      actualKm: null,
+      effort: 4,
+      feeling: 'okay',
+      note: '',
+      recordedAt: '2026-10-06T12:00:00Z',
+      execution: 'easy-substitute',
+      completedQualityMinutes: 0,
+    },
+  };
+  const html = render(WorkoutDetail, detailProps(completed));
+  assert.match(
+    html,
+    /Tuesday,? 6 October|Tuesday 6 October|Tuesday, October 6|Tuesday, 6 October/,
+  );
+  assert.match(html, /Ran easy instead/);
+  assert.match(html, /Quality work completed<\/dt><dd>0m/);
+  assert.match(html, /Recorded distance<\/dt><dd>Not recorded/);
+  delete completed.feedback.completedQualityMinutes;
+  assert.match(
+    render(WorkoutDetail, detailProps(completed)),
+    /Quality work completed<\/dt><dd>Not recorded/,
+  );
+});
+
+test('races do not offer an empty effort-profile and distance-estimates disclosure', () => {
+  const race = structuredClone(plan.workouts.find((w) => w.kind === 'race'));
+  for (const step of race.steps) {
+    delete step.target;
+    step.effort = 'Run by feel';
+  }
+  const html = render(WorkoutDetail, detailProps(race));
+  assert.doesNotMatch(html, /Effort profile &amp; distance estimates/);
+  assert.match(html, /Your session, step by step/);
+  assert.match(html, /<strong>By feel<\/strong>/);
+  assert.doesNotMatch(html, /class="stat-small"/);
+  assert.match(html, /class="pill filled">Race day</);
+});
+
+test('workout detail identifies long runs while completed and skipped statuses retain priority', () => {
+  for (const [status, hard, label] of [
+    ['planned', false, 'Long run'],
+    ['planned', true, 'Quality long run'],
+    ['completed', true, 'Completed'],
+    ['skipped', true, 'Skipped'],
+  ]) {
+    const workout = { ...first, kind: 'long', status, hard };
+    assert.ok(
+      render(WorkoutDetail, detailProps(workout)).includes(
+        `class="pill filled">${label}</span>`,
+      ),
+    );
+  }
+});
+
+test('full-week preview times identify distance-based planning estimates', () => {
+  const exact = structuredClone(plan);
+  for (const workout of exact.workouts) {
+    workout.steps[0].metres = 1000;
+  }
+  assert.match(
+    preferenceOverviewRows(exact, exact, today).rows[1].after,
+    /estimated$/,
+  );
+  const timed = structuredClone(exact);
+  for (const workout of timed.workouts) {
+    for (const step of workout.steps) delete step.metres;
+  }
+  assert.doesNotMatch(
+    preferenceOverviewRows(timed, timed, today).rows[1].after,
+    /estimated/,
+  );
+});
+
+test('repeat grouping preserves distinct work and recovery instructions', () => {
+  const work = {
+    kind: 'work',
+    seconds: 120,
+    intensity: 6,
+    effort: 'Controlled',
+    label: 'Run tall · 1 of 2',
+  };
+  const reset = {
+    kind: 'recovery',
+    seconds: 60,
+    intensity: 2,
+    effort: 'Easy',
+    label: 'Jog recovery',
+  };
+  const differentCue = { ...work, label: 'Relax your shoulders · 2 of 2' };
+  const groups = workoutStepGroups([work, reset, differentCue]);
+  assert.equal(groups.length, 3);
+  assert.equal(groups[2].work.label, differentCue.label);
+  const matchingCue = { ...work, label: 'Run tall · 2 of 2' };
+  assert.equal(workoutStepGroups([work, reset, matchingCue])[0].repetitions, 2);
+  const distinctRecovery = { ...reset, label: 'Walk recovery' };
+  const three = workoutStepGroups([
+    work,
+    reset,
+    matchingCue,
+    distinctRecovery,
+    { ...work, label: 'Run tall · 3 of 3' },
+  ]);
+  assert.ok(three.some((group) => group.work.label === 'Walk recovery'));
+  assert.equal(three[0].repetitions, 2);
+});
+
+test('quality-minute entry follows the recorded execution choice instead of accepting a value the API discards', () => {
+  const workout = { ...first, hard: true };
+  const props = { ...detailProps(workout), initialMode: 'log' };
+  assert.doesNotMatch(
+    render(WorkoutDetail, props),
+    /Quality minutes completed/,
+  );
+  workout.feedback = { execution: 'partial', completedQualityMinutes: 5 };
+  assert.match(render(WorkoutDetail, props), /Quality minutes completed/);
 });

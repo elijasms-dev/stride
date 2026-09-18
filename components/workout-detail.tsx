@@ -1,6 +1,7 @@
 'use client';
 import { GarminHandoff } from './garmin-handoff';
 import { SessionBriefing } from './session-briefing';
+import { RecordedRunSummary } from './recorded-run-summary';
 import { DailyGuide } from './daily-guide';
 import { dailyGuide } from '@/lib/daily-guide';
 import { isRunWalkWorkout } from '@/lib/run-walk';
@@ -47,7 +48,7 @@ import {
   EffortGraph,
   workoutEffort,
 } from './stride-ui';
-import { dateLabel, kmDisplay, type Workout, type Profile } from '@/lib/engine';
+import { dateLabel, type Workout, type Profile } from '@/lib/engine';
 export type Action = (
   action: string,
   payload?: Record<string, unknown>,
@@ -125,6 +126,7 @@ export default function WorkoutDetail({
   const logging = mode === 'log' || mode === 'correctLog';
   const runWalk = isRunWalkWorkout(w);
   const estimate = distanceEstimate(w.steps, profile);
+  const effortLabel = workoutEffort(w);
   async function act(action: string, payload: Record<string, unknown> = {}) {
     setError('');
     setPendingAction(action);
@@ -171,8 +173,10 @@ export default function WorkoutDetail({
               targetLabel(mainWorkoutTarget(w), profile.units)
             ) : (
               <>
-                {workoutEffort(w)}
-                <span className="stat-small"> / 10</span>
+                {effortLabel}
+                {effortLabel !== 'By feel' && (
+                  <span className="stat-small"> / 10</span>
+                )}
               </>
             )}
           </strong>
@@ -187,19 +191,19 @@ export default function WorkoutDetail({
         </div>
         <WorkoutSteps workout={w} profile={profile} />
       </div>
-      <details className="workout-supporting-detail">
-        <summary>Effort profile & distance estimates</summary>
-        {w.kind !== 'race' && <EffortGraph workout={w} units={profile.units} />}
-        {w.kind !== 'race' && (
+      {w.kind !== 'race' && (
+        <details className="workout-supporting-detail">
+          <summary>Effort profile & distance estimates</summary>
+          <EffortGraph workout={w} units={profile.units} />
           <p className="subtle">
             {w.steps.some((s) => s.metres !== undefined)
               ? 'Distance steps finish at their kilometre or mile target. Time is a planning estimate; keep the effort comfortable and stop earlier if you reach your available time limit. '
               : ''}
             {estimate.basis} Follow the targets and cues in each step.
           </p>
-        )}
-      </details>
-      {!completedLog && (
+        </details>
+      )}
+      {w.status !== 'completed' && (
         <details className="workout-supporting-detail">
           <summary>Preparation, food & recovery</summary>
           <DailyGuide guide={dailyGuide(plan, w.date, w)} />
@@ -355,8 +359,8 @@ export default function WorkoutDetail({
       }
       description={
         mode === 'view'
-          ? completedLog
-            ? `${dateLabel(recordedWorkoutDate(w), { weekday: 'long', day: 'numeric', month: 'long' })} · ${runDuration(completedLog.actualMinutes)}`
+          ? w.status === 'completed'
+            ? `${dateLabel(recordedWorkoutDate(w), { weekday: 'long', day: 'numeric', month: 'long' })} · ${completedLog ? runDuration(completedLog.actualMinutes) : 'Run details not recorded'}`
             : `${dateLabel(w.date, { weekday: 'long', day: 'numeric', month: 'long' })} · ${w.kind === 'race' || prescribedDistanceKm(w) !== null ? workoutDistanceLabel(w, profile) : runDuration(w.minutes)}${w.session ? ` · ${w.session} ${w.startTime}` : ''}`
           : logging
             ? 'Your feedback helps decide whether to ease the next week.'
@@ -380,11 +384,17 @@ export default function WorkoutDetail({
                 ? 'Completed'
                 : w.status === 'skipped'
                   ? 'Skipped'
-                  : w.hard
-                    ? 'Quality session'
-                    : 'Easy effort'}
+                  : w.kind === 'race'
+                    ? 'Race day'
+                    : w.kind === 'long'
+                      ? w.hard
+                        ? 'Quality long run'
+                        : 'Long run'
+                      : w.hard
+                        ? 'Quality session'
+                        : 'Easy effort'}
             </span>
-            {!completedLog && (
+            {w.status !== 'completed' && (
               <DropdownMenu defaultOpen={initialMode === 'actions'}>
                 <DropdownMenuTrigger
                   className="secondary-button small-button"
@@ -419,69 +429,22 @@ export default function WorkoutDetail({
               </DropdownMenu>
             )}
           </div>
-          {completedLog ? (
+          {w.status === 'completed' ? (
             <>
-              <section
-                className="recorded-run-summary"
-                aria-label="Recorded run"
-              >
-                <div className="recorded-run-heading">
-                  <h3>Your recorded run</h3>
-                  <button
-                    className="secondary-button"
-                    disabled={busy || isDemo}
-                    onClick={() => setMode('correctLog')}
-                  >
-                    Correct run log
-                  </button>
-                </div>
-                <dl className="recorded-run-metrics">
-                  <div>
-                    <dt>Time running</dt>
-                    <dd>{runDuration(completedLog.actualMinutes)}</dd>
-                  </div>
-                  <div>
-                    <dt>Recorded distance</dt>
-                    <dd>
-                      {completedLog.actualKm === null
-                        ? 'Not recorded'
-                        : `${kmDisplay(completedLog.actualKm, profile.units)} ${profile.units}`}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt>Effort</dt>
-                    <dd>
-                      {completedLog.effort}
-                      <small> / 10</small>
-                    </dd>
-                  </div>
-                </dl>
-                <p>
-                  Feeling {completedLog.feeling}
-                  {completedLog.activityId
-                    ? ' · Recording attached'
-                    : ' · Manual log'}
-                </p>
-                {completedLog.enjoyment && (
-                  <p>
-                    Would do this workout again:{' '}
-                    {completedLog.enjoyment === 'yes'
-                      ? 'Yes'
-                      : completedLog.enjoyment === 'maybe'
-                        ? 'Maybe'
-                        : 'No'}
-                    .
-                  </p>
-                )}
-                {completedLog.note && (
-                  <p className="recorded-run-note">{completedLog.note}</p>
-                )}
-              </section>
+              <RecordedRunSummary
+                workout={w}
+                profile={profile}
+                disabled={busy || isDemo || w.date > today}
+                onCorrect={() => setMode('correctLog')}
+              />
               <details className="recorded-prescription">
                 <summary>View prescribed workout</summary>
                 <p className="subtle">
                   Scheduled for {dateLabel(w.date)}. These are the original
-                  instructions; your recorded results are above.
+                  instructions
+                  {completedLog
+                    ? '; your recorded results are above.'
+                    : ', not recorded results.'}
                 </p>
                 {prescriptionContent}
               </details>
@@ -533,7 +496,10 @@ export default function WorkoutDetail({
                 actualKm: distance,
                 note,
                 execution,
-                completedQualityMinutes: qualityDone ?? undefined,
+                completedQualityMinutes:
+                  execution !== 'unknown' && !runWalk
+                    ? (qualityDone ?? undefined)
+                    : undefined,
                 ...(w.feedback?.activityId
                   ? {
                       activityId: w.feedback.activityId,
@@ -646,7 +612,7 @@ export default function WorkoutDetail({
                     ]}
                   />
                 </Field>
-                {!runWalk && (
+                {!runWalk && execution !== 'unknown' && (
                   <Field
                     label="Quality minutes completed, optional"
                     hint="Count work intervals only. Leave blank if unknown; exclude warm-up, recoveries and cooldown."
@@ -656,7 +622,10 @@ export default function WorkoutDetail({
                       value={qualityDone}
                       onValueChange={setQualityDone}
                       min={0}
-                      max={w.qualityMinutes ?? w.minutes}
+                      max={Math.min(
+                        w.qualityMinutes ?? w.minutes,
+                        Number.isFinite(minutes) ? minutes : Infinity,
+                      )}
                     />
                   </Field>
                 )}

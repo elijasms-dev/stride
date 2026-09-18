@@ -293,6 +293,45 @@ void test('supporting activities and history outside the block are retained with
   assert.doesNotMatch(html, /11 km scheduled training/);
 });
 
+void test('previous-plan prescriptions inside a new block never inflate its printed forecast', () => {
+  const historical = workout({
+    id: 'previous-plan',
+    week: -1,
+    title: 'Previous long run',
+    kind: 'long',
+    estimatedKm: 20,
+    minutes: 120,
+    status: 'completed',
+    feedback: {
+      actualDate: addDays(start, 1),
+      actualMinutes: 108,
+      actualKm: 18,
+      effort: 4,
+      feeling: 'good',
+      note: 'Retained after changing event',
+      recordedAt: '2026-09-22T12:00:00Z',
+    },
+  });
+  const html = trainingPlanHtml(plan({ workouts: [workout(), historical] }));
+  assert.match(html, /5 km scheduled training/);
+  assert.doesNotMatch(html, /25 km scheduled training|Long run 20 km/);
+  assert.match(html, /Completed · previous plan on Tuesday, 22 Sept 2026/);
+  assert.match(html, /Recorded training: 1h 48m · 18 km/);
+  assert.match(html, /Retained after changing event/);
+});
+
+void test('completed sessions without feedback distinguish saved prescriptions from missing results', () => {
+  const html = trainingPlanHtml(
+    plan({ workouts: [workout({ status: 'completed' })] }),
+  );
+  assert.match(html, /Original prescription:/);
+  assert.match(html, /Recorded result unavailable\./);
+  assert.doesNotMatch(
+    html,
+    /Recorded training:|<strong>Recorded run<\/strong>/,
+  );
+});
+
 void test('mile preferences convert event and pace displays while track repetitions retain authored metres', () => {
   const fixture = plan({
     workouts: [
@@ -312,7 +351,8 @@ void test('mile preferences convert event and pace displays while track repetiti
   const html = trainingPlanHtml(fixture);
   assert.match(html, /400 m/);
   assert.match(html, /8:03–8:35 \/mi/);
-  assert.match(html, /3\.10686 mi scheduled training/);
+  assert.match(html, /3\.1 mi scheduled training/);
+  assert.doesNotMatch(html, /3\.10686 mi/);
 });
 
 void test('all user text is escaped and the offline document contains no executable or external content', () => {

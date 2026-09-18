@@ -1,4 +1,32 @@
-import { type Workout } from './plan/types.ts';
+import { type Plan, type Workout } from './plan/types.ts';
+import { journalEntries } from './journal-view.ts';
+import { recordedWorkoutDate } from './run-records.ts';
+
+/** Keep actual running on its recorded day, including retained previous-plan
+ * workouts. Use the same canonical records as Progress to avoid duplicate imports. */
+export function calendarSessions(plan: Plan): Workout[] {
+  const recorded = new Set(
+    journalEntries(plan).flatMap((entry) =>
+      entry.kind === 'planned' ? [entry.workout] : [],
+    ),
+  );
+  return plan.workouts.filter((workout) =>
+    workout.status === 'completed'
+      ? !workout.feedback || recorded.has(workout)
+      : workout.week >= 0,
+  );
+}
+
+export function orderedCalendarSessions(workouts: Workout[], date: string) {
+  return workouts
+    .filter((workout) => recordedWorkoutDate(workout) === date)
+    .sort(
+      (a, b) =>
+        (a.startTime ?? (a.session === 'PM' ? '18:00' : '06:00')).localeCompare(
+          b.startTime ?? (b.session === 'PM' ? '18:00' : '06:00'),
+        ) || a.id.localeCompare(b.id),
+    );
+}
 
 /** Calendar presentation only: never changes prescriptions or journal records. */
 export function orderedDaySessions(workouts: Workout[], date: string) {

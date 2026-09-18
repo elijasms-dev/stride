@@ -3,7 +3,7 @@ import { RecentRaceFields } from './recent-race-fields';
 import { UltraDistanceChoices, UltraRoutineFields } from './ultra-fields';
 import { TrainingPattern } from './training-pattern';
 import { BusyButton } from './action-progress';
-import { runDuration } from '@/lib/journal-view';
+import { OnboardingWorkoutPreview } from './onboarding-workout-preview';
 import { useState, useEffect, useRef } from 'react';
 import {
   NumericInput,
@@ -893,20 +893,11 @@ export default function Onboarding({
                         Math.min(previewWeek, preview.weeks.length - 1),
                     )
                     .map((w) => (
-                      <details className="preview-workout" key={w.id}>
-                        <summary className="preview-run">
-                          <span>{dateLabel(w.date, { weekday: 'short' })}</span>
-                          <strong>{w.title}</strong>
-                          <span>{runDuration(w.minutes)}</span>
-                        </summary>
-                        <p>{w.purpose}</p>
-                        {w.steps.map((step, i) => (
-                          <p key={i}>
-                            {step.label} · {runDuration(step.seconds / 60)} ·{' '}
-                            {step.effort}
-                          </p>
-                        ))}
-                      </details>
+                      <OnboardingWorkoutPreview
+                        key={w.id}
+                        workout={w}
+                        profile={preview.profile}
+                      />
                     ))}
                 </div>
                 <div className="notice">

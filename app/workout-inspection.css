@@ -1,6 +1,20 @@
 .workout-prescription {
   min-width: 0;
 }
+.recorded-run-execution {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.recorded-run-execution dt {
+  color: var(--text-label);
+}
+.recorded-run-execution dd {
+  margin-top: 3px;
+  font-weight: 600;
+}
 .workout-prescription .session-repeat-heading,
 .change-step-comparison .session-repeat-heading {
   background: var(--surface-raised);

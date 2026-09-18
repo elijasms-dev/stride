@@ -1,7 +1,20 @@
 import type { Plan, Workout } from './plan/types.ts';
 import { addDays, dayDiff } from './plan/calendar.ts';
-import { recordedWorkoutDate } from './training-history.ts';
 import { journalEntries } from './journal-view.ts';
+import { trainingPhaseOn } from './plan/generation-calendar.ts';
+import { calendarSessions, orderedCalendarSessions } from './day-sessions.ts';
+
+/** Older saved plans may label an entire boundary week as taper. Resolve the
+ * opening in-block day consistently in the schedule, chart, and export. */
+export function planWeekPhase(plan: Plan, weekIndex: number) {
+  const week = plan.weeks.find((item) => item.index === weekIndex);
+  if (!week) return undefined;
+  return trainingPhaseOn(
+    plan.profile,
+    week.phase,
+    week.start < plan.profile.startDate ? plan.profile.startDate : week.start,
+  );
+}
 
 /** Read-only presentation of saved prescriptions. Journal records never fund a
  * forecast total, and a completed workout appears on its recorded calendar day. */
@@ -9,31 +22,15 @@ export function planCalendarDays(plan: Plan, weekIndex: number) {
   const week = plan.weeks.find((item) => item.index === weekIndex);
   if (!week) return [];
   const records = journalEntries(plan);
-  const recordedWorkouts = new Set(
-    records.flatMap((entry) =>
-      entry.kind === 'planned' ? [entry.workout] : [],
-    ),
+  const workouts = calendarSessions(plan).filter(
+    (run) => run.status === 'completed' || run.week === weekIndex,
   );
   const extras = records.flatMap((entry) =>
     entry.kind === 'extra' ? [entry.run] : [],
   );
   return Array.from({ length: 7 }, (_, offset) => {
     const date = addDays(week.start, offset);
-    const sessions = plan.workouts
-      .filter((run) =>
-        run.status === 'completed'
-          ? recordedWorkoutDate(run) === date &&
-            (!run.feedback || recordedWorkouts.has(run))
-          : run.date === date && run.week === weekIndex,
-      )
-      .sort(
-        (a, b) =>
-          (
-            a.startTime ?? (a.session === 'PM' ? '18:00' : '06:00')
-          ).localeCompare(
-            b.startTime ?? (b.session === 'PM' ? '18:00' : '06:00'),
-          ) || a.id.localeCompare(b.id),
-      );
+    const sessions = orderedCalendarSessions(workouts, date);
     return {
       date,
       inBlock: date >= plan.profile.startDate && date <= plan.profile.raceDate,

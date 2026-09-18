@@ -1028,9 +1028,7 @@ textarea {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  background:
-    linear-gradient(90deg, #15241bee, #15241b83),
-    url('/images/stride-nordic.jpg') 65% 45%/cover;
+  background: linear-gradient(90deg, #15241b, #244a3a);
 }
 .rest-card .card-topline {
   margin-bottom: 25px;
@@ -2978,9 +2976,7 @@ details > summary {
   background: var(--background);
 }
 .login-story {
-  background:
-    linear-gradient(90deg, #13231be6, #14261b75),
-    url('/images/stride-nordic.jpg') 65% center/cover;
+  background: linear-gradient(90deg, #13231b, #244a3a);
   color: #fff;
   border-radius: 0 32px 32px 0;
 }

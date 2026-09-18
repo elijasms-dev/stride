@@ -2,14 +2,12 @@
 
 import { useState } from 'react';
 import { Check, ChevronDown, ChevronRight, Flag } from 'lucide-react';
+import { addDays, dateLabel, dayDiff, kmDisplay } from '@/lib/engine';
 import {
-  addDays,
-  dateLabel,
-  dayDiff,
-  kmDisplay,
-  trainingPhaseOn,
-} from '@/lib/engine';
-import { planCalendarDays, planWeekSummary } from '@/lib/plan-explorer';
+  planCalendarDays,
+  planWeekPhase,
+  planWeekSummary,
+} from '@/lib/plan-explorer';
 import { weekSupportingSessions } from '@/lib/coaching-context';
 import { planWeekFocus } from '@/lib/plan-guidance';
 import { workoutTone } from '@/lib/day-sessions';
@@ -31,14 +29,15 @@ export function PlanWeekSchedule({
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const week = plan.weeks.find((item) => item.index === weekIndex);
   if (!week) return null;
-  const expandedWorkout = planCalendarDays(plan, weekIndex)
+  const calendar = planCalendarDays(plan, weekIndex);
+  const expandedWorkout = calendar
     .flatMap((day) => day.sessions)
     .find((run) => run.id === expandedId);
   const summary = planWeekSummary(plan, weekIndex);
   const support = weekSupportingSessions(plan, weekIndex);
   const weekStart =
     week.start < plan.profile.startDate ? plan.profile.startDate : week.start;
-  const phase = trainingPhaseOn(plan.profile, week.phase, weekStart);
+  const phase = planWeekPhase(plan, weekIndex) ?? week.phase;
   const daysToRace = dayDiff(weekStart, plan.profile.raceDate);
   const reduced = ['Recovery', 'Taper', 'Race week'].includes(phase);
   return (
@@ -127,7 +126,7 @@ export function PlanWeekSchedule({
         className="pe-calendar"
         aria-label={`Week ${weekIndex + 1} daily schedule`}
       >
-        {planCalendarDays(plan, weekIndex).map((day) => {
+        {calendar.map((day) => {
           const activity = support.find((item) => item.date === day.date);
           return (
             <div
