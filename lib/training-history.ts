@@ -8,6 +8,7 @@ export {
 import { isLongUltra } from './ultra-policy.ts';
 import { addDays, dayDiff, todayInZone } from './plan/calendar.ts';
 import { round } from './plan/math.ts';
+import { TRAINING_POLICY } from './plan/policy.ts';
 import { type Plan, type Workout } from './plan/types.ts';
 export function recordingCandidates(workouts: Workout[], date: string) {
   return workouts.filter(
@@ -85,6 +86,13 @@ export function workloadSummary(
 
 /** Evidence has a denominator: unlogged prescriptions are unknown, never automatic rest. */
 export function currentTrainingBaseline(plan: Plan, asOf: string) {
+  const declaredPace = Math.max(
+    schedulingEasyPace(plan.profile),
+    plan.profile.runMeasure === 'distance' &&
+      plan.profile.workoutTargets?.mode === 'pace'
+      ? (plan.profile.workoutTargets.pace?.easy?.high ?? 0) / 60
+      : 0,
+  );
   const start = [plan.profile.startDate, addDays(asOf, -28)].sort().at(-1)!;
   const elapsed = Math.max(1, dayDiff(start, asOf));
   const due = plan.workouts.filter(
@@ -97,26 +105,53 @@ export function currentTrainingBaseline(plan: Plan, asOf: string) {
   const records = allRecords.filter((r) => r.date >= start && r.date < asOf);
   const coverage = due.length ? resolved.length / due.length : 0;
   const enough = elapsed >= 14 && due.length >= 6 && coverage >= 0.8;
-  const declaredKm =
-    (plan.baselineEvidence?.weeklyKm ??
-      plan.profile.weeklyKm *
-        Math.min(
+  // New plans already allocate the declared baseline to the selected routine.
+  // A later frequency review reduces that allocation once; incomplete logs must
+  // not restore the old workload or apply the same reduction a second time.
+  const declaredFrequency =
+    plan.policyVersion === TRAINING_POLICY.version
+      ? 1
+      : Math.min(
           1,
           plan.profile.days.length / Math.max(1, plan.profile.currentRuns),
-        )) ||
-    5;
-  const declaredMinutes =
+        );
+  const reviewedOpening =
+    plan.policyVersion === TRAINING_POLICY.version && plan.baselineEvidence
+      ? plan.weeks.find(
+          (week) =>
+            week.start >= plan.baselineEvidence!.asOf &&
+            addDays(week.start, 6) <= plan.profile.raceDate &&
+            !['Recovery', 'Taper', 'Race week'].includes(week.phase),
+        )
+      : undefined;
+  const reviewedRuns = reviewedOpening
+    ? plan.workouts.filter(
+        (w) =>
+          w.week === reviewedOpening.index &&
+          w.kind !== 'race' &&
+          w.status !== 'skipped',
+      )
+    : [];
+  const declaredKm = Math.min(
+    (plan.baselineEvidence?.weeklyKm ??
+      plan.profile.weeklyKm * declaredFrequency) ||
+      5,
+    reviewedRuns.length
+      ? reviewedRuns.reduce((sum, w) => sum + w.estimatedKm, 0)
+      : Infinity,
+  );
+  const declaredMinutes = Math.min(
     plan.baselineEvidence?.weeklyMinutes ??
-    Math.min(
-      declaredKm * schedulingEasyPace(plan.profile),
-      isLongUltra(plan.profile)
-        ? (plan.profile.ultraWeeklyMinutes ?? Infinity) *
-            Math.min(
-              1,
-              plan.profile.days.length / Math.max(1, plan.profile.currentRuns),
-            )
-        : Infinity,
-    );
+      Math.min(
+        declaredKm * declaredPace,
+        isLongUltra(plan.profile)
+          ? (plan.profile.ultraWeeklyMinutes ?? Infinity) * declaredFrequency
+          : Infinity,
+      ),
+    reviewedRuns.length
+      ? reviewedRuns.reduce((sum, w) => sum + w.minutes, 0)
+      : Infinity,
+  );
   const observedMinutes =
     (records.reduce((n, r) => n + r.minutes, 0) * 7) / elapsed;
   const observedKm = records.some((r) => r.km === null)
@@ -187,16 +222,13 @@ export function currentTrainingBaseline(plan: Plan, asOf: string) {
     strong && repeatedKm !== null
       ? repeatedKm
       : enough
-        ? Math.min(
-            declaredKm,
-            observedKm ?? weeklyMinutes / schedulingEasyPace(plan.profile),
-          )
+        ? Math.min(declaredKm, observedKm ?? weeklyMinutes / declaredPace)
         : declaredKm;
   const priorLong = plan.baselineEvidence?.longestKm ?? plan.profile.longestKm;
   const priorLongMinutes =
     plan.baselineEvidence?.longestMinutes ??
     Math.min(
-      priorLong * schedulingEasyPace(plan.profile),
+      priorLong * declaredPace,
       isLongUltra(plan.profile)
         ? (plan.profile.ultraLongestMinutes ?? Infinity)
         : Infinity,
@@ -209,9 +241,7 @@ export function currentTrainingBaseline(plan: Plan, asOf: string) {
             priorLong,
             Math.max(
               0,
-              ...records.map(
-                (r) => r.km ?? r.minutes / schedulingEasyPace(plan.profile),
-              ),
+              ...records.map((r) => r.km ?? r.minutes / declaredPace),
             ),
           )
         : priorLong;
@@ -240,10 +270,7 @@ export function currentTrainingBaseline(plan: Plan, asOf: string) {
       repeatedLongMinutes >= priorLongMinutes * 0.9,
     longestMinutes: strong
       ? repeatedLongMinutes
-      : Math.min(
-          priorLongMinutes,
-          longestKm * schedulingEasyPace(plan.profile),
-        ),
+      : Math.min(priorLongMinutes, longestKm * declaredPace),
     explanation: fatigue.length
       ? 'Recent running, including today, includes tired feedback or unexpectedly high effort on an easy run. Hold increases and review recovery; today’s distance and time do not establish a higher baseline.'
       : strong

@@ -13,16 +13,34 @@ export const availableRunningDays = (
   p: Pick<Profile, 'days' | 'availableDays'>,
 ) => p.availableDays ?? p.days;
 export function classicQualityCount(
-  p: Pick<Profile, 'days' | 'runsPerWeek' | 'goal' | 'raceDistanceKm'>,
+  p: Pick<
+    Profile,
+    'days' | 'runsPerWeek' | 'goal' | 'raceDistanceKm' | 'method'
+  >,
 ): 0 | 1 | 2 {
   const count = desiredRuns(p);
   return isLongUltra(p)
     ? 1
     : p.goal === 'base' || count === 2
       ? 0
-      : count >= 5
-        ? 2
-        : 1;
+      : !p.method || p.method === 'balanced'
+        ? 1
+        : count >= 5
+          ? 2
+          : 1;
+}
+
+/** Standard single-session routines pair one weekday stimulus with endurance.
+ * Explicit zero/two-workout choices and specialist methods retain their own policy. */
+export function usesStandardQualityRhythm(p: Profile): boolean {
+  return (
+    p.goal !== 'base' &&
+    desiredRuns(p) >= 3 &&
+    p.experience === 'established' &&
+    p.weeklyKm >= 10 &&
+    (!p.method || p.method === 'balanced') &&
+    (p.qualityMode !== 'custom' || (p.qualitySessions ?? 1) === 1)
+  );
 }
 
 export function usesMarathonRhythm(
@@ -36,17 +54,16 @@ export function usesMarathonRhythm(
   return marathon && (!p.method || p.method === 'balanced');
 }
 
-/** Number of weekday quality slots; standard marathon longs supply the second session. */
+/** Number of weekday quality slots; the standard long run supplies the second session. */
 export function requestedQualityCount(p: Profile): 0 | 1 | 2 {
-  if (usesMarathonRhythm(p)) return 1;
   if (p.goal === 'base' || desiredRuns(p) === 2) return 0;
+  if (p.qualityMode === 'custom') return p.qualitySessions ?? 1;
+  if (usesStandardQualityRhythm(p)) return 1;
   const requested =
     p.qualityMode === 'automatic'
       ? classicQualityCount(p)
       : (p.qualitySessions ?? 1);
-  return p.intent === 'finish' ||
-    isLongUltra(p) ||
-    (usesMarathonBook(p) && p.qualityMode !== 'custom')
+  return p.intent === 'finish' || isLongUltra(p) || usesMarathonBook(p)
     ? (Math.min(1, requested) as 0 | 1)
     : requested;
 }
@@ -265,13 +282,15 @@ export function sessionWeight(
 /** Authored allocation bounds, not universal physiological thresholds. */
 export function longRunShareLimit(p: Profile) {
   if (p.days.length <= 2) return 0.5;
-  if (p.days.length === 3 && p.experience === 'established') return 0.5;
-  const ordinary = p.days.length >= 6 ? 0.4 : 0.45;
+  const ordinary =
+    p.days.length === 3 && p.experience === 'established'
+      ? 0.5
+      : p.days.length >= 6
+        ? 0.4
+        : 0.45;
   // Adding an easy day does not erase the runner's reported long-run background.
   const familiar =
-    p.experience === 'established' && p.weeklyKm > 0
-      ? Math.min(0.45, p.longestKm / p.weeklyKm)
-      : 0;
+    p.weeklyKm > 0 ? Math.min(1 - 1e-9, p.longestKm / p.weeklyKm) : 0;
   return Math.max(ordinary, familiar);
 }
 

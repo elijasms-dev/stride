@@ -23,6 +23,21 @@ export const LONG_ULTRA_POLICY = {
   recoveryDays: 21,
 } as const;
 
+/** Recent minutes are independent evidence for long ultras, not spare capacity.
+ * Exact opening kilometres must fit that evidence at the prescribed pace. */
+export function longUltraOpeningBaselineMessage(
+  profile: Profile,
+  weeklyMinutes: number,
+  longMinutes: number,
+) {
+  if (!isLongUltra(profile)) return null;
+  const oneSecond = 1 / 60 + 1e-6;
+  return weeklyMinutes > profile.ultraWeeklyMinutes! + oneSecond ||
+    longMinutes > profile.ultraLongestMinutes! + oneSecond
+    ? 'Your long-ultra distance baseline needs more running time at the planning pace than your recent weekly or longest-run minutes. Review the distance, recent minutes and easy pace together; the opening week cannot silently increase either baseline.'
+    : null;
+}
+
 /** Six race-relative weeks before the 21-day taper, including lighter weeks.
  * This average-based product check differs from Koop's six consecutive 9h weeks.
  * It never adds training to reach a target or counts an unlogged past run as done.

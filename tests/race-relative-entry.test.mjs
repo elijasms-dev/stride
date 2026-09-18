@@ -99,6 +99,7 @@ for (const [weeklyKm, longestKm] of [
       runsPerWeek: 5,
       days: [0, 1, 2, 3, 5],
       recentQualitySessions: 2,
+      qualityMode: 'automatic',
       qualitySessions: 2,
       workoutVariety: 'varied',
     });
@@ -215,12 +216,13 @@ for (const [goal, weeklyKm, longestKm, days] of [
       }
   });
 
-test('calendar proximity does not give a runner without speed history a hard first workout', () => {
+test('calendar proximity keeps the guaranteed workout introductory without invented speed history', () => {
   const p = build({ recentQualitySessions: 0 });
   assert.equal(p.weeks[0].phase, 'Race preparation');
   const opening = training(p).filter((w) => w.week < 2);
   assert.ok(opening.length > 0);
-  assert.ok(opening.every((w) => !w.hard));
+  assert.ok(opening.some(main));
+  assert.ok(opening.filter(main).every((w) => qualityWorkMinutes(w) <= 8));
   assert.ok(opening.every((w) => w.steps.every((s) => s.intensity < 7)));
   assert.equal(p.profile.recentQualitySessions, 0);
   assert.equal(p.profile.recentQualityMinutes ?? null, null);

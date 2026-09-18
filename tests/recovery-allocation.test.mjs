@@ -34,6 +34,23 @@ const minutes = (ws) =>
     (n, w) => n + w.steps.reduce((total, step) => total + step.seconds, 0) / 60,
     0,
   );
+// A fresh declaration must fit. These tests exercise a later deliberate ceiling
+// review, followed by recovery allocation, without silently changing that input.
+function withReviewedLimits(input) {
+  const plan = makePlan(
+    { ...input, weekdayMinutes: 120, longMinutes: 300, easyLimitKm: undefined },
+    start,
+  );
+  return revisePreferences(
+    plan,
+    {
+      weekdayMinutes: input.weekdayMinutes,
+      longMinutes: input.longMinutes,
+      easyLimitKm: input.easyLimitKm,
+    },
+    start,
+  );
+}
 function checkRecovery(plan) {
   for (const week of plan.weeks.filter((w) => w.phase === 'Recovery')) {
     const previous = runs(plan, week.index - 1);
@@ -53,7 +70,7 @@ function checkRecovery(plan) {
 void test('time-capped two-day blocks genuinely reduce the executable recovery workload', () => {
   const input = profile(),
     before = structuredClone(input);
-  const plan = makePlan(input, start);
+  const plan = withReviewedLimits(input);
   assert.equal(minutes(runs(plan, 2)), 120);
   checkRecovery(plan);
   assert.equal(runs(plan, 3).length, 2);
@@ -63,7 +80,7 @@ void test('time-capped two-day blocks genuinely reduce the executable recovery w
 for (const recoveryWeeks of [3, 4]) {
   for (const volume of ['maintain', 'gradual']) {
     void test(`distance-capped recovery remains lighter: ${recoveryWeeks}-week rhythm, ${volume}`, () => {
-      const plan = makePlan(
+      const plan = withReviewedLimits(
         profile({
           weekdayMinutes: 120,
           easyPace: 6,
@@ -71,7 +88,6 @@ for (const recoveryWeeks of [3, 4]) {
           recoveryWeeks,
           volume,
         }),
-        start,
       );
       checkRecovery(plan);
     });
@@ -108,7 +124,7 @@ void test('a partial opening week does not become the full recovery reference', 
 });
 
 void test('recovery reductions preserve walking for low-mileage returning runners', () => {
-  const plan = makePlan(
+  const plan = withReviewedLimits(
     profile({
       experience: 'returning',
       weeklyKm: 9,
@@ -117,7 +133,6 @@ void test('recovery reductions preserve walking for low-mileage returning runner
       weekdayMinutes: 20,
       volume: 'maintain',
     }),
-    start,
   );
   checkRecovery(plan);
   for (const week of plan.weeks.filter((w) => w.phase === 'Recovery')) {
@@ -160,16 +175,15 @@ void test('a local ceiling review preserves completed running and does not compo
 
 for (const count of [2, 3, 4, 5, 6, 7]) {
   void test(`capped base plans preserve ${count} running days during recovery`, () => {
-    const plan = makePlan(
+    const plan = withReviewedLimits(
       profile({
         runsPerWeek: count,
         currentRuns: count,
-        weeklyKm: 60,
+        weeklyKm: Math.min(60, count * 10),
         longestKm: 15,
         weekdayMinutes: 35,
         longMinutes: 60,
       }),
-      start,
     );
     checkRecovery(plan);
     assert.equal(new Set(runs(plan, 3).map((w) => w.date)).size, count);
@@ -216,7 +230,7 @@ for (const method of ['balanced', 'easy-doubles', 'double-threshold']) {
 }
 
 void test('full replanning before recovery uses retained history without rewriting it', () => {
-  const plan = makePlan(profile(), start);
+  const plan = withReviewedLimits(profile());
   const asOf = addDays(start, 21);
   for (const w of plan.workouts.filter((w) => w.date < asOf)) {
     w.status = 'completed';
@@ -258,7 +272,7 @@ void test('a conflicting deliberate recovery edit is rejected without mutation',
 });
 
 void test('a valid manual recovery session stays pinned while the other session shrinks', () => {
-  const plan = makePlan(profile(), start);
+  const plan = withReviewedLimits(profile());
   const asOf = addDays(start, 21);
   const edited = runs(plan, 3)[0];
   edited.changed = true;

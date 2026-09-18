@@ -20,12 +20,9 @@ import {
   desiredRuns,
   qualitySchedule,
   resolveRunningDays,
-  usesMarathonRhythm,
+  usesStandardQualityRhythm,
 } from '../training-structure.ts';
-import {
-  isLongUltra,
-  LONG_ULTRA_POLICY,
-} from '../ultra-policy.ts';
+import { isLongUltra, LONG_ULTRA_POLICY } from '../ultra-policy.ts';
 import { validateWorkoutTargets } from '../workout-targets.ts';
 import { dayDiff, validDate } from './calendar.ts';
 import { PlanError } from './errors.ts';
@@ -577,8 +574,7 @@ export function validateProfile(
       'Check your quality, recovery, and terrain preferences.',
     );
   if (
-    !usesMarathonRhythm(p) &&
-    p.qualityMode !== 'automatic' &&
+    p.qualityMode === 'custom' &&
     p.qualitySessions === PROFILE_TRAINING_LIMITS.twoQualitySessions &&
     ((p.recentQualitySessions ?? 0) <
       PROFILE_TRAINING_LIMITS.twoQualitySessions ||
@@ -625,7 +621,7 @@ export function validateProfile(
         'Place the paired threshold day at least one easy or rest day away from the long run.',
       );
   }
-  if (usesMarathonRhythm(p)) {
+  if (usesStandardQualityRhythm(p)) {
     // This legacy field counts weekday workouts; the long run is the other quality session.
     p.qualitySessions = PLAN_LOAD_LIMITS.weekdayQualitySessions;
     if (
@@ -633,7 +629,7 @@ export function validateProfile(
       qualitySchedule(p).length !== PLAN_LOAD_LIMITS.weekdayQualitySessions
     )
       throw new PlanError(
-        'A standard marathon week needs a long run, one tempo workout of at least 30 minutes, and easy running. Choose a workout day separated from the long run by an easy or rest day.',
+        'A standard training week needs a long run, one quality workout of at least 30 minutes, and easy running. Choose a workout day separated from the long run by an easy or rest day.',
       );
   }
   p.days.sort((a, b) => a - b);

@@ -1,16 +1,24 @@
 import { PLAN_LOAD_LIMITS } from './policy-constants.ts';
 /** Plan validate responsibilities; extracted without changing policy or behavior. */
 import { qualityWorkMinutes } from '../prescription.ts';
+import { schedulingEasyPace } from '../fitness-pacing.ts';
+import { peakLongRunKm } from '../progression-engine.ts';
 import {
   clockMinutes,
   runningDayLimit,
   validStartTime,
 } from '../runner-customization.ts';
 import { usesMarathonRhythm } from '../training-structure.ts';
-import { isLongUltra, LONG_ULTRA_POLICY } from '../ultra-policy.ts';
+import {
+  isLongUltra,
+  LONG_ULTRA_POLICY,
+  longUltraOpeningBaselineMessage,
+} from '../ultra-policy.ts';
 import { addDays, dateLabel, dayDiff, dayNames, weekday } from './calendar.ts';
 import { taperFactor } from './generation-calendar.ts';
+import { standardQualityRhythmErrors } from './generation-rhythm.ts';
 import { ENGINE_VERSION, TRAINING_POLICY } from './policy.ts';
+import { trainingFamily } from './profile.ts';
 import { type Plan, type Workout } from './types.ts';
 
 export function validatePlan(plan: Plan): string[] {
@@ -253,7 +261,171 @@ export function validatePlan(plan: Plan): string[] {
       'This week exceeds your running-time ceiling. Review the remaining sessions or increase the ceiling.',
     );
   errors.push(...qualityBudgetErrors(plan));
+  errors.push(...baselineAndLongRunErrors(plan));
   return [...new Set(errors)];
+}
+
+/** New prescriptions retain the declared opening load and clean long-run steps.
+ * Older saved policies, observed history and deliberate edits keep their meaning. */
+function baselineAndLongRunErrors(plan: Plan): string[] {
+  if (plan.policyVersion !== TRAINING_POLICY.version || plan.returnState)
+    return [];
+  const errors: string[] = [];
+  // A metre tolerates arithmetic noise without accepting hundred-metre drift.
+  const toleranceKm = 0.001 + 1e-9;
+  const from = plan.constraintsFrom ?? plan.profile.startDate;
+  const ordinary = (week: Plan['weeks'][number]) =>
+    week.start >= from &&
+    !['Recovery', 'Taper', 'Race week'].includes(week.phase) &&
+    taperFactor(plan.profile, addDays(week.start, 6)) >= 1;
+  const first = plan.weeks[0];
+  const openingRuns = first
+    ? plan.workouts.filter((w) => w.week === first.index && w.kind !== 'race')
+    : [];
+  const freshOpening =
+    first &&
+    first.start === plan.profile.startDate &&
+    addDays(first.start, 6) <= plan.profile.raceDate &&
+    ordinary(first) &&
+    !plan.baselineEvidence &&
+    (!plan.constraintsFrom ||
+      plan.constraintsFrom === plan.profile.startDate) &&
+    openingRuns.every(
+      (w) => w.status === 'planned' && !w.changed && !w.returnRole,
+    );
+  if (freshOpening) {
+    const ultraConflict = longUltraOpeningBaselineMessage(
+      plan.profile,
+      openingRuns.reduce((sum, run) => sum + run.minutes, 0),
+      openingRuns.find((run) => run.kind === 'long')?.minutes ?? 0,
+    );
+    if (ultraConflict) errors.push(ultraConflict);
+    const totalKm = openingRuns.reduce((sum, w) => sum + w.estimatedKm, 0);
+    if (
+      plan.profile.weeklyKm > 0 &&
+      Math.abs(totalKm - plan.profile.weeklyKm) > toleranceKm
+    )
+      errors.push(
+        'The first complete training week must retain your declared weekly distance. Review the starting baseline and available time together.',
+      );
+    // Two-day routines distribute endurance between two ordinary runs.
+    if (plan.profile.days.length > 2 && plan.profile.longestKm > 0) {
+      const long = openingRuns.find((w) => w.kind === 'long');
+      if (
+        !long ||
+        Math.abs(long.estimatedKm - plan.profile.longestKm) > toleranceKm
+      )
+        errors.push(
+          'The first complete training week must retain your declared long-run distance. Review the starting baseline and long-run limits together.',
+        );
+    }
+  }
+  const pace = Math.max(
+    schedulingEasyPace(plan.profile),
+    plan.profile.workoutTargets?.mode === 'pace'
+      ? (plan.profile.workoutTargets.pace?.easy?.high ?? 0) / 60
+      : 0,
+  );
+  const familiarLongKm = plan.baselineEvidence
+    ? Math.min(
+        plan.baselineEvidence.longestKm,
+        (plan.baselineEvidence.longestMinutes ?? Infinity) / pace,
+      )
+    : plan.profile.longestKm;
+  const untouchedForecast =
+    !plan.baselineEvidence &&
+    from === plan.profile.startDate &&
+    plan.workouts.every(
+      (w) => w.status === 'planned' && !w.changed && !w.returnRole,
+    );
+  let previousWeeklyKm: number | undefined;
+  let previousLongKm: number | undefined;
+  for (const week of plan.weeks) {
+    if (!ordinary(week)) continue;
+    if (untouchedForecast && addDays(week.start, 6) <= plan.profile.raceDate) {
+      const runs = plan.workouts.filter(
+        (w) => w.week === week.index && w.kind !== 'race',
+      );
+      if (new Set(runs.map((w) => w.date)).size === plan.profile.days.length) {
+        const total = runs.reduce((sum, w) => sum + w.estimatedKm, 0);
+        if (
+          previousWeeklyKm !== undefined &&
+          total + toleranceKm < previousWeeklyKm
+        )
+          errors.push(
+            `Week ${week.index + 1} reduces weekly distance outside a recovery or taper week. Review the progression and available time together.`,
+          );
+        previousWeeklyKm = Math.max(previousWeeklyKm ?? 0, total);
+      }
+    }
+    const long = plan.workouts.find(
+      (w) => w.week === week.index && w.kind === 'long',
+    );
+    if (
+      !long ||
+      long.status !== 'planned' ||
+      long.returnRole ||
+      (long.changed && long.changeSource !== 'preferences')
+    )
+      continue;
+    const otherRuns = plan.workouts.filter(
+      (w) =>
+        w.week === week.index &&
+        w !== long &&
+        w.kind !== 'race' &&
+        w.status !== 'skipped',
+    );
+    const hardCapKm = Math.min(
+      plan.profile.longLimitKm ?? Infinity,
+      plan.profile.longMinutes / pace,
+      runningDayLimit(plan.profile, weekday(long.date)) / pace,
+      ((plan.profile.weeklyMinutesLimit ?? Infinity) -
+        otherRuns.reduce((sum, w) => sum + w.minutes, 0)) /
+        pace,
+      isLongUltra(plan.profile)
+        ? LONG_ULTRA_POLICY.longMinutes / pace
+        : Infinity,
+    );
+    // Logging another run does not invalidate a fractional baseline already
+    // prescribed at the original opening of the plan.
+    const openingAnchor =
+      week === first &&
+      first.start === plan.profile.startDate &&
+      Math.abs(long.estimatedKm - plan.profile.longestKm) <= toleranceKm;
+    const cappedFractionalAnchor =
+      Math.abs(long.estimatedKm - familiarLongKm) <= toleranceKm &&
+      Math.ceil(familiarLongKm) >
+        Math.min(
+          hardCapKm,
+          peakLongRunKm(
+            trainingFamily(plan.profile),
+            familiarLongKm,
+            plan.profile.intent,
+          ),
+        ) +
+          toleranceKm;
+    const maintainedFractionalAnchor =
+      plan.profile.volume === 'maintain' &&
+      Math.abs(long.estimatedKm - familiarLongKm) <= toleranceKm;
+    if (
+      !openingAnchor &&
+      !cappedFractionalAnchor &&
+      !maintainedFractionalAnchor &&
+      Math.abs(long.estimatedKm - Math.round(long.estimatedKm)) > toleranceKm
+    )
+      errors.push(
+        `Week ${week.index + 1} needs a whole-kilometre long-run distance after the starting baseline.`,
+      );
+    if (
+      previousLongKm !== undefined &&
+      long.estimatedKm + toleranceKm < previousLongKm
+    )
+      errors.push(
+        `Week ${week.index + 1} reduces the long run outside a recovery or taper week. Review the progression and available time together.`,
+      );
+    previousLongKm = long.estimatedKm;
+  }
+  return errors;
 }
 
 export function qualityBudgetErrors(plan: Plan): string[] {
@@ -312,17 +484,8 @@ export function qualityBudgetErrors(plan: Plan): string[] {
           `Week ${week.index + 1} cannot retain the preceding long-run distance within its allocated volume. Review the weekly and session limits.`,
         );
       if (long) previousLongKm = long.estimatedKm;
-      if (
-        quality.length !== PLAN_LOAD_LIMITS.marathonQualitySessions ||
-        quality.filter((w) => w.kind === 'long').length !==
-          PLAN_LOAD_LIMITS.longRunsPerWeek ||
-        quality.filter((w) => w.kind !== 'long' && w.stimulus === 'threshold')
-          .length !== PLAN_LOAD_LIMITS.weekdayQualitySessions
-      )
-        errors.push(
-          `Week ${week.index + 1} needs one tempo/threshold workout and one long run. Increase available workout time or review the weekly limits.`,
-        );
     }
   }
+  errors.push(...standardQualityRhythmErrors(plan));
   return errors;
 }

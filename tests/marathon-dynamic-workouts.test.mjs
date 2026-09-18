@@ -32,7 +32,7 @@ const input = (patch = {}) => ({
   runsPerWeek: 5,
   availableDays: [0, 1, 2, 3, 4, 5, 6],
   longDay: 5,
-  qualityMode: 'custom',
+  qualityMode: 'automatic',
   qualitySessions: 2,
   recentQualitySessions: 2,
   recentQualityMinutes: null,
@@ -186,11 +186,16 @@ test('explicit small recent work dose takes precedence over the established-runn
 });
 
 test('saved time limits remain real constraints and lifting them restores the entered distances', () => {
-  const limited = build({
+  const limits = {
     weekdayMinutes: 45,
     longMinutes: 180,
-    raceDate: '2026-10-18',
-  });
+  };
+  const settings = { raceDate: '2026-10-18' };
+  assert.throws(
+    () => build({ ...settings, ...limits }),
+    /starting weekly distance/,
+  );
+  const limited = revisePreferences(build(settings), limits, start);
   assert.ok(limited.weeks[0].targetKm < 60);
   assert.ok(
     limited.workouts

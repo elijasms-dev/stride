@@ -79,8 +79,10 @@ void test('omitted new preferences retain existing prescriptions', () => {
 });
 
 void test('custom days and weekly time ceilings tailor a five-day marathon without expanding availability into runs', () => {
-  const p = generate(
-    marathon({
+  const original = generate(marathon());
+  const p = revisePreferences(
+    original,
+    {
       weeklyMinutesLimit: 480,
       dayPreferences: [
         { day: 1, maxMinutes: 35, startTime: '06:30' },
@@ -88,7 +90,8 @@ void test('custom days and weekly time ceilings tailor a five-day marathon witho
         { day: 3, maxMinutes: 75 },
         { day: 5, maxMinutes: 180, startTime: '08:00' },
       ],
-    }),
+    },
+    start,
   );
   assert.deepEqual(validatePlan(p), []);
   assert.equal(p.profile.days.length, 5);
@@ -102,7 +105,6 @@ void test('custom days and weekly time ceilings tailor a five-day marathon witho
     if (weekday(w.date) === 1) assert.equal(w.startTime, '06:30');
     if (weekday(w.date) === 5) assert.equal(w.startTime, '08:00');
   }
-  const original = generate(marathon());
   // Busy-day constraints are applied before allocation so the guaranteed tempo
   // and long run can share the same funded week across the available days.
   assert.ok(
@@ -121,8 +123,16 @@ void test('short busy days are not selected for full quality workouts', () => {
   assert.equal(p.days.length, 5);
 });
 
-void test('a weekly time ceiling can deliberately lower a base block below declared distance', () => {
-  const p = generate(base({ weeklyMinutesLimit: 90 }));
+void test('a reviewed weekly time ceiling can deliberately lower a base block below declared distance', () => {
+  assert.throws(
+    () => generate(base({ weeklyMinutesLimit: 90 })),
+    /starting weekly distance.*cannot fit/,
+  );
+  const p = revisePreferences(
+    generate(base()),
+    { weeklyMinutesLimit: 90 },
+    start,
+  );
   assert.deepEqual(validatePlan(p), []);
   assert.ok(
     p.weeks.every(
@@ -461,7 +471,11 @@ void test('a daily review reserves extra runs recorded on that actual day', () =
   );
 });
 void test('logging actual overruns never invalidates the saved prescriptions', () => {
-  const p = generate(base({ weeklyMinutesLimit: 100 })),
+  const p = revisePreferences(
+      generate(base()),
+      { weeklyMinutesLimit: 100 },
+      start,
+    ),
     first = p.workouts[0];
   first.status = 'completed';
   first.feedback = {

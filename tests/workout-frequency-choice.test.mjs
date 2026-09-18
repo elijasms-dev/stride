@@ -123,18 +123,21 @@ for (const runs of [5, 6, 7])
         currentRuns: runs,
         qualitySessions: count,
       });
-      assert.equal(requestedQualityCount(p), 1);
+      assert.equal(requestedQualityCount(p), count);
       const days = resolveRunningDays(p);
       assert.equal(days.length, runs);
-      assert.equal(qualitySchedule({ ...p, days }).length, 1);
+      assert.equal(qualitySchedule({ ...p, days }).length, count);
       const plan = makePlan(p, start, false);
       assert.deepEqual(validatePlan(plan), []);
       for (const week of plan.weeks) {
         const sessions = plan.workouts.filter(
           (w) => w.week === week.index && w.kind !== 'race',
         );
-        assert.equal(plan.profile.qualitySessions, 1);
-        assertMarathonWeek(plan, week);
+        assert.equal(plan.profile.qualitySessions, count);
+        if (count === 1) assertMarathonWeek(plan, week);
+        assert.ok(
+          sessions.filter((w) => w.hard && w.kind !== 'long').length <= count,
+        );
         assert.ok(
           sessions.reduce((n, w) => n + qualityWorkMinutes(w), 0) <=
             sessions.reduce((n, w) => n + w.minutes, 0) * 0.22 + 0.1,
@@ -147,35 +150,52 @@ for (const runs of [5, 6, 7])
           (week) =>
             plan.workouts.filter(
               (w) => w.week === week.index && (w.hard || w.kind === 'long'),
-            ).length === 2,
+            ).length ===
+            count + 1,
         ),
       );
     });
 
-test('legacy two-workout choices normalize without requiring a second weekday workout background', () => {
+test('explicit two-workout choices require a familiar background while automatic schedules retain one weekday slot', () => {
   for (const patch of [
     { recentQualitySessions: 1 },
     { recentQualitySessions: null },
     { currentRuns: 4 },
     { experience: 'returning' },
   ]) {
-    const p = build({ ...patch, qualitySessions: 2 });
-    assert.equal(p.profile.qualitySessions, 1);
-    assert.deepEqual(validatePlan(p), []);
-    for (const week of p.weeks) assertMarathonWeek(p, week);
+    assert.throws(
+      () => build({ ...patch, qualitySessions: 2 }),
+      /Two quality sessions/,
+    );
+    const automatic = build({
+      ...patch,
+      qualityMode: 'automatic',
+      qualitySessions: 2,
+    });
+    assert.equal(automatic.profile.qualitySessions, 1);
+    assert.deepEqual(validatePlan(automatic), []);
   }
   assert.throws(
     () => build({ weeklyKm: 40, qualitySessions: 2 }),
-    /current baseline and volume limits/,
-    'normalizing a legacy workout count must retain the marathon volume requirement',
+    /Two quality sessions/,
   );
+  const familiarLong = build({
+    weeklyKm: 40,
+    qualityMode: 'automatic',
+    qualitySessions: 2,
+  });
+  assert.equal(familiarLong.weeks[0].targetKm, 40);
+  assert.equal(familiarLong.weeks[0].longKm, 28);
+  assert.equal(familiarLong.profile.qualitySessions, 1);
+  assert.deepEqual(validatePlan(familiarLong), []);
+  for (const week of familiarLong.weeks) assertMarathonWeek(familiarLong, week);
   assert.equal(
     requestedQualityCount(input({ goal: 'base', qualitySessions: 2 })),
     0,
   );
   assert.equal(
     requestedQualityCount(input({ runsPerWeek: 2, qualitySessions: 2 })),
-    1,
+    0,
   );
   assert.equal(
     requestedQualityCount(
@@ -185,8 +205,8 @@ test('legacy two-workout choices normalize without requiring a second weekday wo
   );
 });
 
-test('marathon-effort long runs consume the second workout and taper removes it', () => {
-  const p = build({ qualitySessions: 2 });
+test('automatic marathon-effort long runs consume the second workout and taper removes it', () => {
+  const p = build({ qualityMode: 'automatic', qualitySessions: 2 });
   const rehearsals = p.workouts.filter((w) => w.kind === 'long' && main(w));
   assert.ok(rehearsals.length > 0);
   for (const long of rehearsals) {
@@ -227,7 +247,7 @@ test('gentle and endurance preferences retain one controlled weekday workout and
     { difficulty: 'gentle' },
     { marathonApproach: 'endurance' },
   ]) {
-    const p = build({ ...patch, qualitySessions: 2 });
+    const p = build({ ...patch, qualityMode: 'automatic', qualitySessions: 2 });
     assert.deepEqual(validatePlan(p), []);
     for (const week of p.weeks) assertMarathonWeek(p, week);
     const weekday = p.workouts.filter((w) => w.kind !== 'long' && main(w));
@@ -295,6 +315,8 @@ test('changing only workout count preserves hidden settings and completed work',
     snapshot,
   );
   assert.deepEqual(validatePlan(updated), []);
+  assert.equal(updated.profile.qualitySessions, 2);
+  assert.notDeepEqual(prescriptions(updated), prescriptions(p));
   const repeated = revisePreferences(
     updated,
     { qualityMode: 'custom', qualitySessions: 2 },

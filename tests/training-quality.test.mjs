@@ -31,11 +31,13 @@ const training = (p, w) =>
     (s) => s.week === w && s.kind !== 'race' && s.status !== 'skipped',
   );
 
-void test('10K block repeats an aerobic-support family then progresses event-specific work', () => {
+void test('10K block repeats introductory aerobic support then progresses event-specific work', () => {
   const p = generate(demo),
     runs = p.workouts.filter((w) => w.hard && w.kind !== 'race');
   const support = runs.filter(
-    (w) => p.weeks[w.week].phase === 'Build' && w.stimulus === 'threshold',
+    (w) =>
+      ['Foundation', 'Build'].includes(p.weeks[w.week].phase) &&
+      w.stimulus === 'threshold',
   );
   assert.ok(support.length >= 2);
   assert.equal(support[0].templateId, support[1].templateId);
@@ -92,7 +94,11 @@ void test('gentle programming still supplies feasible conservative quality work'
   }
 });
 void test('actual allocated training controls long-run share and taper, with race separate', () => {
-  for (const input of [demo, marathon, { ...marathon, weekdayMinutes: 50 }]) {
+  for (const input of [
+    demo,
+    marathon,
+    { ...marathon, weeklyKm: 50, weekdayMinutes: 50 },
+  ]) {
     const p = generate(input);
     for (const week of p.weeks) {
       const ss = training(p, week.index),

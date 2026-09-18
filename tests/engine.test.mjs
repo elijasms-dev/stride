@@ -7,6 +7,7 @@ import {
   validatePlan,
   moveWorkout,
   adjustPlan,
+  revisePreferences,
   addDays,
   dayDiff,
   monday,
@@ -108,7 +109,7 @@ void test('insufficient time to prepare for a 10K is rejected', () => {
         },
         date,
       ),
-    /requires room/,
+    /starting weekly distance.*cannot fit/,
   );
 });
 void test('recovery and taper reduce load without treating recovery as new build baseline', () => {
@@ -201,7 +202,11 @@ void test('rest overlapping race defers the event without preventing recovery', 
 });
 
 void test('return sessions also respect the time cap of their new role', () => {
-  const plan = makePlan({ ...p, weekdayMinutes: 20, longMinutes: 100 }, date);
+  const plan = revisePreferences(
+    makePlan({ ...p, qualityMode: 'custom', qualitySessions: 0 }, date),
+    { weekdayMinutes: 20, longMinutes: 100 },
+    date,
+  );
   const next = adjustPlan(plan, '2026-09-14', '2026-09-16', 'easy', date);
   assert.deepEqual(validatePlan(next), []);
 });

@@ -94,19 +94,32 @@ export function calculateWeekLoad(
     p,
     addDays(start, w * DAYS_PER_WEEK + p.longDay),
   );
+  const forecastLong = longRunForWeek({
+    weekIndex: Math.max(0, w - longProgressionStart),
+    startLongKm: startLong,
+    peakKm: Math.max(startLong, peakLong),
+    peakWeekIndex: Math.max(0, peakWeek - longProgressionStart),
+    recovery,
+    taper: taper || taperAtWeekStart,
+    taperFraction: weekTaperFraction,
+    wholeKilometres: true,
+    recoveryEveryWeeks: p.recoveryWeeks,
+    recoveryOffset: longProgressionStart,
+  });
+  // Maintenance may hold the progression clock at zero for many weeks. Only
+  // the actual opening week keeps its fraction when the next integer fits.
+  const ordinaryLong =
+    !recovery &&
+    !taper &&
+    !taperAtWeekStart &&
+    p.volume === 'gradual' &&
+    w > progressionStart &&
+    forecastLong === startLong &&
+    Math.ceil(startLong) <= peakLong
+      ? Math.ceil(startLong)
+      : forecastLong;
   const long = Math.min(
-    longRunForWeek({
-      weekIndex: Math.max(0, w - longProgressionStart),
-      startLongKm: startLong,
-      peakKm: Math.max(startLong, peakLong),
-      peakWeekIndex: Math.max(0, peakWeek - longProgressionStart),
-      recovery,
-      taper: taper || taperAtWeekStart,
-      taperFraction: weekTaperFraction,
-      wholeKilometres: family === 'marathon',
-      recoveryEveryWeeks: p.recoveryWeeks,
-      recoveryOffset: longProgressionStart,
-    }),
+    ordinaryLong,
     Math.max(startLong, policy.longCeilingKm),
     p.longLimitKm ?? Infinity,
     p.longMinutes / longPace,

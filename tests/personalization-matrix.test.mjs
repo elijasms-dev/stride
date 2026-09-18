@@ -6,8 +6,15 @@ import { existsSync } from 'node:fs';
 const lib = existsSync(new URL('./stride/lib/engine.ts', import.meta.url))
   ? new URL('./stride/lib/', import.meta.url)
   : new URL('../lib/', import.meta.url);
-const { makePlan, demoProfile, addDays, dayDiff, weekday, raceDistance } =
-  await import(new URL('engine.ts', lib));
+const {
+  makePlan,
+  demoProfile,
+  addDays,
+  dayDiff,
+  weekday,
+  raceDistance,
+  revisePreferences,
+} = await import(new URL('engine.ts', lib));
 const start = '2026-09-07';
 const base = {
   ...demoProfile(start),
@@ -86,6 +93,7 @@ const matrix = [
       goal: 'half',
       weeklyKm: 55,
       longestKm: 18,
+      qualityMode: 'custom',
       qualitySessions: 2,
       recentQualitySessions: 2,
       recentQualityMinutes: 32,
@@ -99,6 +107,7 @@ const matrix = [
       longestKm: 26,
       currentRuns: 6,
       days: [0, 1, 2, 3, 4, 6],
+      qualityMode: 'custom',
       qualitySessions: 2,
       recentQualitySessions: 2,
       recentQualityMinutes: 40,
@@ -296,7 +305,7 @@ void test('recent longest run changes initial long capacity independently of wee
   assert.ok(longest(b) > longest(a));
   assert.ok(longest(a) <= 8 * base.easyPace + 0.01);
 });
-void test('reducing five current runs to four reduces volume instead of concentrating it, without rewriting history', () => {
+void test('a fresh four-day schedule retains declared mileage and current running history', () => {
   const a = generate({
       currentRuns: 5,
       days: [0, 2, 4, 6],
@@ -305,24 +314,27 @@ void test('reducing five current runs to four reduces volume instead of concentr
     b = generate({ currentRuns: 5, days: [0, 1, 3, 4, 6], qualitySessions: 0 });
   assert.equal(week(a, 0).length, 4);
   assert.equal(week(b, 0).length, 5);
-  assert.ok(total(week(a, 0)) < total(week(b, 0)));
-  assert.ok(total(week(a, 0)) / 4 <= total(week(b, 0)) / 5 + 1);
+  assert.equal(a.weeks[0].targetKm, base.weeklyKm);
+  assert.equal(b.weeks[0].targetKm, base.weeklyKm);
   assert.equal(a.profile.currentRuns, 5);
   assert.equal(b.profile.currentRuns, 5);
 });
 void test('lower weekday time caps reduce executable workload without reallocating beyond long-run capacity', () => {
   const a = generate({ weekdayMinutes: 100 }),
-    b = generate({ weekdayMinutes: 40 });
+    b = revisePreferences(a, { weekdayMinutes: 40 }, start);
+  assert.throws(() => generate({ weekdayMinutes: 40 }), /starting.*baseline/);
   assert.ok(total(training(b)) < total(training(a)));
   verifyExecutable(b, { ...base, weekdayMinutes: 40 });
 });
 void test('explicit easy/quality/long distance caps remain ceilings after redistribution', () => {
   const patch = { easyLimitKm: 8, qualityLimitKm: 7, longLimitKm: 12 };
-  const p = generate(patch);
+  assert.throws(() => generate(patch), /starting.*baseline/);
+  const p = revisePreferences(generate(), patch, start);
   verifyExecutable(p, { ...base, ...patch });
 });
 void test('zero quality requests really contain no fast work', () => {
   const p = generate({
+    qualityMode: 'custom',
     qualitySessions: 0,
     recentQualitySessions: 2,
     recentQualityMinutes: 50,
@@ -337,6 +349,7 @@ void test('one versus two established quality sessions changes actual compatible
       recentQualityMinutes: 50,
     }),
     b = generate({
+      qualityMode: 'custom',
       qualitySessions: 2,
       recentQualitySessions: 2,
       recentQualityMinutes: 50,
@@ -436,6 +449,7 @@ for (const goal of ['10k', 'half', 'marathon'])
 void test('feasible Tuesday/Sunday quality slots survive a Friday long run', () => {
   const p = generate({
     longDay: 4,
+    qualityMode: 'custom',
     qualitySessions: 2,
     recentQualitySessions: 2,
     recentQualityMinutes: 50,

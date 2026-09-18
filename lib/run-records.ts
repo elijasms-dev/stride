@@ -1,4 +1,4 @@
-import { type Plan, type ExtraRun, type Workout } from './plan/types.ts';
+import type { Plan, ExtraRun, Workout } from './plan/types.ts';
 
 // Canonical actual-running ledger; no runtime dependency on plan generation.
 export function recordedWorkoutDate(workout: Workout) {

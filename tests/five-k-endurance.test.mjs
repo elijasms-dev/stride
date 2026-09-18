@@ -72,14 +72,15 @@ test('a longer block or gradual volume does not extend the retained allowance be
   }
 });
 
-test('the 90-minute extension is an upper allowance, not a mandatory target', () => {
+test('a declared familiar long distance is retained without extending it toward a generic time target', () => {
   for (const [easyPace, longestKm, maximum] of [
     [5, 18, 90],
     [6, 14, 84],
-    [6.5, 16, 90],
+    [6.5, 16, 104],
     [5, 12, 60],
   ]) {
     const plan = make({ easyPace, longestKm, runMeasure: 'time' });
+    assert.equal(longs(plan)[0].estimatedKm, longestKm);
     assert.equal(longs(plan)[0].minutes, maximum);
     assert.ok(longs(plan).every((w) => w.minutes <= maximum));
   }
@@ -100,22 +101,34 @@ test('unknown pace, new or returning runners and other event families do not gai
     })),
   ])
     assert.equal(fiveKEnduranceCeiling(inputs(patch), 11, baseline), 11);
-  assert.ok(longs(make({ easyPace: null })).every((w) => w.estimatedKm <= 11));
-  assert.ok(
-    longs(make({ experience: 'returning' })).every((w) => w.estimatedKm <= 11),
-  );
+  for (const patch of [{ easyPace: null }, { experience: 'returning' }]) {
+    const plan = make(patch);
+    assert.equal(longs(plan)[0].estimatedKm, 16);
+    assert.ok(longs(plan).every((w) => w.estimatedKm <= 16));
+  }
 });
 
-test('adding availability or a fourth run cannot replace four days of current running history', () => {
+test('availability changes preserve the declared long baseline without manufacturing current running history', () => {
   const plan = make({ currentRuns: 3, runsPerWeek: 4 });
-  assert.ok(longs(plan).every((w) => w.estimatedKm <= 11));
+  assert.equal(plan.profile.currentRuns, 3);
+  assert.equal(longs(plan)[0].estimatedKm, 16);
+  assert.ok(longs(plan).every((w) => w.estimatedKm <= 16));
   plan.policyVersion = 'provisional-2026-09-10-v16';
   const reviewed = revisePreferences(plan, {}, addDays(start, 2));
-  assert.ok(longs(reviewed).every((w) => w.estimatedKm <= 11));
-  assert.ok(!reviewed.notes.some((n) => n.startsWith('5K endurance keeps')));
+  assert.ok(longs(reviewed).every((w) => w.estimatedKm <= 16));
+  assert.equal(reviewed.profile.currentRuns, 3);
+  assert.equal(
+    fiveKEnduranceCeiling(inputs({ currentRuns: 3 }), 11, {
+      longestKm: 16,
+      longestMinutes: 88,
+      currentRuns: 3,
+    }),
+    11,
+  );
   for (const runsPerWeek of [2, 3]) {
-    const p = make({ runsPerWeek });
-    assert.ok(longs(p).every((w) => w.estimatedKm <= 11));
+    assert.throws(() => make({ runsPerWeek }), /starting weekly distance/);
+    const p = revisePreferences(make(), { runsPerWeek }, start);
+    assert.ok(longs(p).every((w) => w.estimatedKm <= 16));
     assert.ok(
       p.workouts.every(
         (w) => w.kind === 'race' || p.profile.days.includes(weekday(w.date)),
@@ -140,7 +153,8 @@ test('session, weekly, per-day and distance limits constrain executable long run
     { dayPreferences: [{ day: 5, maxMinutes: 55 }] },
     { weekdayMinutes: 30 },
   ]) {
-    const plan = make(patch);
+    assert.throws(() => make(patch), /starting weekly distance/);
+    const plan = revisePreferences(make(), patch, start);
     assert.deepEqual(validatePlan(plan), []);
     for (const w of longs(plan)) {
       assert.ok(w.minutes <= (patch.longMinutes ?? 120));
@@ -207,7 +221,9 @@ test('reviewed recent distance and time supersede the old declaration even when 
       referenceRuns: 5,
     });
     assert.ok(longs(plan).length > 0);
-    assert.ok(longs(plan).every((w) => w.estimatedKm <= 13 && w.minutes <= 71));
+    assert.ok(
+      longs(plan).every((w) => w.estimatedKm <= 13 && w.minutes <= 71.5),
+    );
   }
   assert.equal(
     fiveKEnduranceCeiling(inputs(), 11, {
@@ -277,7 +293,9 @@ test('distance-first watch export retains the exact familiar easy distance and s
   const slower = make({
     workoutTargets: { mode: 'pace', pace: { easy: { low: 360, high: 420 } } },
   });
+  assert.equal(longs(slower)[0].estimatedKm, 16);
+  assert.equal(longs(slower)[0].minutes, 112);
   assert.ok(
-    longs(slower).every((w) => w.minutes <= 88 && w.estimatedKm <= 88 / 7),
+    longs(slower).every((w) => w.minutes <= 112 && w.estimatedKm <= 16),
   );
 });

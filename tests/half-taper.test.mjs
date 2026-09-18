@@ -31,6 +31,7 @@ const input = (patch = {}) => ({
   weekdayMinutes: 100,
   longMinutes: 150,
   experience: 'established',
+  qualityMode: 'custom',
   qualitySessions: 2,
   recentQualitySessions: 2,
   recentQualityMinutes: 30,

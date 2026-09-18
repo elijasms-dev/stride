@@ -35,12 +35,14 @@ export function peakLongRunKm(
   return Math.max(currentLongRun, target);
 }
 
-/** Week 1 long run never drops below the runner's baseline or the family floor. */
+/** A supplied positive baseline is evidence; a family minimum is only a fallback. */
 export function anchoredLongRunKm(
   currentLongRun: number,
   distanceMinimum: number,
 ): number {
-  return Math.max(currentLongRun, distanceMinimum);
+  return Number.isFinite(currentLongRun) && currentLongRun > 0
+    ? currentLongRun
+    : distanceMinimum;
 }
 
 export function isShortTimeline(weeksUntilRace: number): boolean {
@@ -67,6 +69,13 @@ export function peakLongWeekIndex(
   return Math.max(0, weekCount - taperWeeks - 1);
 }
 
+// Whole-distance build targets add at most two kilometres per ordinary build outing.
+const MAXIMUM_LONG_RUN_BUILD_STEP_KM = 2;
+// The default fourth-week recovery preserves the established consolidation rhythm.
+const DEFAULT_LONG_RUN_RECOVERY_WEEKS = 4;
+// Recovery long runs reduce the established endurance dose before progression resumes.
+const LONG_RUN_RECOVERY_FRACTION = 0.8;
+
 export function longRunForWeek(options: {
   weekIndex: number;
   startLongKm: number;
@@ -89,9 +98,12 @@ export function longRunForWeek(options: {
     taperFraction,
   } = options;
   if (options.wholeKilometres) {
-    const start = Math.min(35, Math.ceil(startLongKm));
-    const peak = Math.max(start, Math.min(35, Math.floor(peakKm)));
-    const every = options.recoveryEveryWeeks ?? 4;
+    // The first outing is the runner's actual baseline, even when fractional.
+    // Event-specific ceilings belong to the caller; ultra targets may exceed 35 km.
+    const start = startLongKm;
+    const wholeStart = Math.floor(start);
+    const peak = Math.max(start, Math.floor(peakKm));
+    const every = options.recoveryEveryWeeks ?? DEFAULT_LONG_RUN_RECOVERY_WEEKS;
     const offset = options.recoveryOffset ?? 0;
     const builds = (end: number) =>
       Math.max(
@@ -102,13 +114,35 @@ export function longRunForWeek(options: {
       );
     const available = builds(peakWeekIndex);
     const ordinal = builds(Math.min(weekIndex, peakWeekIndex));
-    const reachable = Math.min(peak, start + available * 2);
-    const steps = Math.ceil((reachable - start) / 2);
+    // Count only ordinary build opportunities. The first increase reaches the
+    // integer grid without rounding the baseline upward or exceeding a 2 km jump.
+    const reachable = Math.max(
+      start,
+      Math.min(peak, wholeStart + available * MAXIMUM_LONG_RUN_BUILD_STEP_KM),
+    );
+    const steps =
+      reachable > start
+        ? Math.ceil((reachable - wholeStart) / MAXIMUM_LONG_RUN_BUILD_STEP_KM)
+        : 0;
     const advances =
       available > 0 ? Math.floor((ordinal * steps) / available) : 0;
-    const progressed = Math.min(reachable, start + advances * 2);
-    if (taper) return Math.max(1, Math.floor(progressed * taperFraction));
-    if (recovery) return Math.max(1, Math.floor(progressed * 0.8));
+    const progressed =
+      advances === 0
+        ? start
+        : Math.min(
+            reachable,
+            wholeStart + advances * MAXIMUM_LONG_RUN_BUILD_STEP_KM,
+          );
+    // Rounding a cutback down must never turn a sub-kilometre baseline into
+    // a longer run; session feasibility remains the caller's responsibility.
+    if (taper) return Math.max(0, Math.floor(progressed * taperFraction));
+    if (recovery)
+      return Math.max(0, Math.floor(progressed * LONG_RUN_RECOVERY_FRACTION));
+    // A long timeline may hold the main two-kilometre ladder for several weeks.
+    // Only the opening outing keeps a fractional baseline when the next whole
+    // kilometre fits the peak; later ordinary holds use that first whole target.
+    if (weekIndex > 0 && progressed === start && peak >= Math.ceil(start))
+      return Math.ceil(start);
     return progressed;
   }
   const span = Math.max(1, peakWeekIndex);
@@ -117,7 +151,7 @@ export function longRunForWeek(options: {
       ? peakKm
       : startLongKm + ((peakKm - startLongKm) * weekIndex) / span;
   if (taper) return progressed * taperFraction;
-  if (recovery) return progressed * 0.8;
+  if (recovery) return progressed * LONG_RUN_RECOVERY_FRACTION;
   return progressed;
 }
 

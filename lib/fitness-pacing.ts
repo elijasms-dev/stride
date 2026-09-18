@@ -101,8 +101,6 @@ export function schedulingEasyPace(profile?: {
   recentRace?: RecentRace;
   workoutTargets?: { mode: string; pace?: { easy?: { high: number } } };
 }): number {
-  if (!profile?.recentRace)
-    return Math.ceil((profile?.easyPace ?? 7) * 60 - 1e-9) / 60;
   const fitness = profile?.recentRace
     ? fitnessPaceRange(calculateTrainingPaces(profile.recentRace).easy).high /
       60
@@ -115,7 +113,8 @@ export function schedulingEasyPace(profile?: {
         : undefined;
   return (
     Math.ceil(
-      Math.max(profile?.easyPace ?? fitness ?? 7, target ?? 0) * 60 - 1e-9,
+      Math.max(profile?.easyPace ?? fitness ?? target ?? 7, target ?? 0) * 60 -
+        1e-9,
     ) / 60
   );
 }

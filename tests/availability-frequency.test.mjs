@@ -111,10 +111,7 @@ for (let count = 2; count <= 7; count++)
     verify(p, input);
     assert.deepEqual(input, before);
     const ws = runs(p, build(p).index);
-    assert.equal(
-      ws.filter((w) => w.hard).length,
-      count === 2 ? 0 : count <= 4 ? 1 : 2,
-    );
+    assert.equal(ws.filter((w) => w.hard).length, count === 2 ? 0 : 1);
     assert.equal(
       ws.filter((w) => w.kind === 'long').length,
       count === 2 ? 0 : 1,
@@ -153,7 +150,7 @@ void test('extra availability cannot become extra weekly workload when desired f
     'Same frequency and baseline preserve the budget despite extra options',
   );
 });
-void test('reducing desired frequency scales the opening budget without concentrating the old weekly volume', () => {
+void test('an explicit frequency review scales the budget without concentrating the old weekly volume', () => {
   const input = {
     ...base,
     goal: 'base',
@@ -162,7 +159,7 @@ void test('reducing desired frequency scales the opening budget without concentr
     longestKm: 12,
   };
   const prior = makePlan({ ...input, runsPerWeek: 6 }, start),
-    reduced = makePlan({ ...input, runsPerWeek: 3 }, start);
+    reduced = revisePreferences(prior, { runsPerWeek: 3 }, start);
   const first = total(runs(prior, 0)),
     next = total(runs(reduced, 0));
   assert.ok(
@@ -234,7 +231,11 @@ void test('six-run marathon automatic structure includes controlled marathon wor
   );
 });
 void test('legacy profile retains exact scheduled days and its explicit quality override', () => {
-  const legacy = { ...demoProfile(start), qualitySessions: 0 };
+  const legacy = {
+    ...demoProfile(start),
+    qualityMode: 'custom',
+    qualitySessions: 0,
+  };
   const before = structuredClone(legacy),
     p = makePlan(legacy, start);
   assert.deepEqual(p.profile.days, legacy.days);
@@ -290,9 +291,11 @@ void test('clustered Mon/Tue/Wed with Wednesday long can still fit Monday qualit
     [0],
   );
 });
-void test('five weekdays with Wednesday long finds both Monday and Friday quality', () => {
+void test('five weekdays with Wednesday long finds both explicitly requested Monday and Friday quality slots', () => {
   const input = {
       ...base,
+      qualityMode: 'custom',
+      qualitySessions: 2,
       availableDays: [0, 1, 2, 3, 4],
       runsPerWeek: 5,
       longDay: 2,
@@ -385,8 +388,10 @@ void test('recovery round trip retains availability, desired frequency, resolved
   assert.throws(() => validateRecovery(malformed));
 });
 
-void test('partly feasible automatic quality structure explains the unfilled second slot', () => {
+void test('partly feasible explicit two-workout structure explains the unfilled second slot', () => {
   const p = make({
+    qualityMode: 'custom',
+    qualitySessions: 2,
     currentRuns: 5,
     runsPerWeek: 5,
     availableDays: [0, 1, 2, 3, 4],
@@ -424,13 +429,17 @@ function completedBlock(p, asOf) {
 }
 void test('recorded lower-frequency weeks are not halved again during an unrelated review', () => {
   const p = completedBlock(
-      make({
-        goal: 'base',
-        runsPerWeek: 3,
-        currentRuns: 6,
-        weeklyKm: 48,
-        longestKm: 12,
-      }),
+      revisePreferences(
+        make({
+          goal: 'base',
+          runsPerWeek: 6,
+          currentRuns: 6,
+          weeklyKm: 48,
+          longestKm: 12,
+        }),
+        { runsPerWeek: 3 },
+        start,
+      ),
       addDays(start, 28),
     ),
     asOf = addDays(start, 28),
@@ -480,13 +489,17 @@ void test('a further frequency reduction uses the prior actual schedule and pres
   assert.deepEqual(p, before);
 });
 void test('repeated reviews without observations retain the frequency-reduced starting budget', () => {
-  const p = make({
-      goal: 'base',
-      runsPerWeek: 3,
-      currentRuns: 6,
-      weeklyKm: 48,
-      longestKm: 12,
-    }),
+  const p = revisePreferences(
+      make({
+        goal: 'base',
+        runsPerWeek: 6,
+        currentRuns: 6,
+        weeklyKm: 48,
+        longestKm: 12,
+      }),
+      { runsPerWeek: 3 },
+      start,
+    ),
     before = structuredClone(p),
     asOf = addDays(start, 28);
   const first = revisePreferences(p, { recoveryWeeks: 3 }, asOf),

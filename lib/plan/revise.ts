@@ -18,6 +18,10 @@ import { PlanError } from './errors.ts';
 import { refreshFeasibility } from './feasibility.ts';
 import { makePlan } from './generate.ts';
 import { trainingPhaseOn, usesDailyTaperPhase } from './generation-calendar.ts';
+import {
+  ensureGeneratedMarathonRhythm,
+  normalizeGeneratedLongRuns,
+} from './generation-reconcile.ts';
 import { TRAINING_POLICY } from './policy.ts';
 import { validateProfile } from './profile.ts';
 import {
@@ -109,7 +113,7 @@ export function revisePreferences(
     'workoutVariety',
     'recentRace',
   ] as const;
-  const profile = { ...plan.profile };
+  let profile = { ...plan.profile };
   for (const key of allowed)
     if (patch[key] !== undefined) Object.assign(profile, { [key]: patch[key] });
   const defaults: Partial<Record<keyof Profile, unknown>> = {
@@ -143,6 +147,17 @@ export function revisePreferences(
         : value,
     );
   };
+  if (
+    !forceReplan &&
+    allowed.every(
+      (key) => comparable(profile, key) === comparable(plan.profile, key),
+    )
+  )
+    return structuredClone(plan);
+  // Compare effective settings after normalization too. Legacy marathon quality
+  // counts and equivalent day selections must not rebuild an unchanged plan on
+  // each review, consuming rounding allowances or reinterpreting partial logs.
+  profile = validateProfile(profile, profile.startDate);
   if (
     !forceReplan &&
     allowed.every(
@@ -296,6 +311,9 @@ export function revisePreferences(
         'The start time follows your reviewed day-by-day schedule.';
     }
     refreshFeasibility(next, asOf);
+    if (next.policyVersion === TRAINING_POLICY.version)
+      ensureGeneratedMarathonRhythm(next, asOf);
+    normalizeGeneratedLongRuns(next, asOf);
     const issues = validatePlan(next);
     if (issues.length) throw new PlanError(issues[0]);
     return next;
@@ -306,6 +324,10 @@ export function revisePreferences(
     baseline,
     preserveProgression: baseline.supportsProgression,
     referenceRuns: plan.profile.days.length,
+    returnState:
+      plan.returnState && plan.returnState.stage < 3
+        ? plan.returnState
+        : undefined,
     history: plan.workouts.filter((w) => w.status === 'completed'),
     retainedPrefix: plan.workouts.filter(
       (w) => w.date < asOf || w.status === 'completed',
@@ -378,6 +400,9 @@ export function revisePreferences(
   applyActualTrainingEnvelope(next, asOf);
   rebalanceFutureQuality(next, asOf);
   if (isLongUltra(next.profile)) refreshFeasibility(next, asOf);
+  if (next.policyVersion === TRAINING_POLICY.version)
+    ensureGeneratedMarathonRhythm(next, asOf);
+  normalizeGeneratedLongRuns(next, asOf);
   const issues = validatePlan(next);
   if (issues.length) throw new PlanError(issues[0]);
   return next;

@@ -70,7 +70,13 @@ test('one weekly workout includes half-effort practice during Build between temp
 
 test('selected running frequency and one-workout limit survive the new mix', () => {
   for (const runs of [3, 4, 5, 6, 7]) {
-    const plan = build({ currentRuns: runs, runsPerWeek: runs, weeklyKm: 60 });
+    const plan = build({
+      currentRuns: runs,
+      runsPerWeek: runs,
+      weeklyKm: runs === 3 ? 45 : 60,
+      weekdayMinutes: 120,
+      longMinutes: 180,
+    });
     assert.ok(buildWork(plan).some((w) => w.stimulus === 'race-rhythm'));
     for (const week of plan.weeks) {
       const sessions = plan.workouts.filter(
@@ -132,12 +138,13 @@ test('race rehearsal does not bypass introduction, history or an explicit traini
   );
 });
 
-test('zero-workout and finish choices stay easy; gentle sessions keep their effort ceiling', () => {
-  for (const patch of [{ qualitySessions: 0 }, { intent: 'finish' }]) {
-    const plan = build(patch);
-    assert.ok(!plan.workouts.some(main));
-    assert.deepEqual(validatePlan(plan), []);
-  }
+test('zero-workout choices stay easy while finish and gentle routines retain their selected controlled session', () => {
+  const easy = build({ qualitySessions: 0 });
+  assert.ok(!easy.workouts.some(main));
+  assert.deepEqual(validatePlan(easy), []);
+  const finish = build({ intent: 'finish' });
+  assert.ok(finish.workouts.some(main));
+  assert.deepEqual(validatePlan(finish), []);
   const gentle = build({ difficulty: 'gentle' });
   assert.ok(
     gentle.workouts

@@ -14,6 +14,7 @@ import { runningDayLimit } from '../runner-customization.ts';
 import { isLongUltra, LONG_ULTRA_POLICY } from '../ultra-policy.ts';
 import {
   usesMarathonRhythm,
+  usesStandardQualityRhythm,
   desiredRuns,
   allocateRunningMinutes,
   longRunShareLimit,
@@ -191,31 +192,26 @@ export function allocateGenerationWeek(
       SESSION_POLICY.openingBaselineRetentionDays
       ? Math.max(previousLong.estimatedKm, marathonLongBaseline)
       : previousLong?.estimatedKm;
-  const longPeakMinutes = Math.min(
-    policy.longCeilingKm * pace,
-    p.longMinutes,
-    LONG_ULTRA_POLICY.longMinutes,
-  );
-  const nearPeak = (s: Workout) =>
-    isLongUltra(p)
-      ? s.minutes >= longPeakMinutes * SESSION_POLICY.nearPeakFraction
-      : s.estimatedKm >= policy.longCeilingKm * SESSION_POLICY.nearPeakFraction;
-  const peakLongs = workouts.filter((s) => s.kind === 'long' && nearPeak(s));
-  const longWave =
+  // Reserve the complete weekday stimulus before forecasting a longer outing.
+  // Otherwise a whole-kilometre advance can consume the final quality minute.
+  const qualityReserve =
     !recovery &&
     !taper &&
-    family === 'ultra' &&
-    peakLongs.length >= SESSION_POLICY.ultraPeakExposuresBeforeWave &&
-    previousLong &&
-    nearPeak(previousLong)
-      ? SESSION_POLICY.ultraLongWaveFraction
-      : 1;
+    usesStandardQualityRhythm(p) &&
+    dates.some((d) => qualityDays.includes(weekday(d)))
+      ? SESSION_POLICY.introductoryWorkoutMinutes -
+        GENERATION_POLICY.minimumSessionMinutes
+      : 0;
   const usualLongDistance = Math.min(
-    long * longWave,
-    policy.longCeilingKm,
+    long,
+    Math.max(startLong, policy.longCeilingKm),
     family === 'marathon'
       ? marathonLongCeiling(
-          marathonLongBaseline,
+          // Staging must leave room for the first whole-kilometre target above
+          // a fractional familiar baseline. Explicit time/distance caps still win.
+          p.volume === 'gradual'
+            ? Math.ceil(marathonLongBaseline)
+            : marathonLongBaseline,
           dayDiff(
             longDate ?? addDays(start, w * DAYS_PER_WEEK + p.longDay),
             p.raceDate,
@@ -237,13 +233,12 @@ export function allocateGenerationWeek(
       !taper && !recovery && !usesMarathonRhythm(p) ? startLong : 0,
       (longShareBudget * pace * longRunShareLimit(p)) / longPace,
     ),
-    Math.max(
-      !taper && !recovery && !usesMarathonRhythm(p) ? startLong : 0,
-      (desired * pace -
-        Math.max(0, dates.length - 1) *
-          GENERATION_POLICY.minimumSessionMinutes) /
-        longPace,
-    ),
+    // Minimum useful easy outings are funded before the long run; a familiar
+    // baseline cannot override the actual minutes available in this week.
+    (desired * pace -
+      Math.max(0, dates.length - 1) * GENERATION_POLICY.minimumSessionMinutes -
+      qualityReserve) /
+      longPace,
     p.longMinutes / longPace,
     isLongUltra(p) ? LONG_ULTRA_POLICY.longMinutes / pace : Infinity,
     longDate &&
@@ -264,8 +259,31 @@ export function allocateGenerationWeek(
     usualLongDistance,
     runningDayLimit(p, longDate ? weekday(longDate) : p.longDay) / longPace,
   );
-  const longDistance =
-    family === 'marathon' ? Math.floor(cappedLong + 1e-9) : cappedLong;
+  let longDistance =
+    !recovery && !taper && cappedLong >= startLong - 1e-7
+      ? // A cap between a fractional baseline and the next integer permits a
+        // familiar hold, not a regression caused only by rounding (16.9 -> 16).
+        Math.max(startLong, Math.floor(cappedLong + 1e-9))
+      : Math.floor(cappedLong + 1e-9);
+  if (
+    longDate &&
+    longDistance * longPace < GENERATION_POLICY.minimumSessionMinutes
+  ) {
+    const fundedMinutes = Math.min(
+      p.longMinutes,
+      runningDayLimit(p, weekday(longDate)),
+      (p.longLimitKm ?? Infinity) * longPace,
+      desired * pace -
+        Math.max(0, dates.length - 1) * GENERATION_POLICY.minimumSessionMinutes,
+    );
+    if (fundedMinutes < GENERATION_POLICY.minimumSessionMinutes - 1e-7)
+      throw new PlanError(
+        'The long-run limits cannot fit the minimum five-minute outing. Review the starting distance, running days or session limits.',
+      );
+    // A whole-kilometre cutback can round a tiny run to zero. The scheduler
+    // already funds at least five minutes; retain its positive distance too.
+    longDistance = GENERATION_POLICY.minimumSessionMinutes / longPace;
+  }
   const previousSpecific = workouts.filter(
     (s) =>
       s.stimulus === 'race-rhythm' && s.kind !== 'long' && s.kind !== 'race',
@@ -336,11 +354,7 @@ export function allocateGenerationWeek(
   const regularDates = dates.filter((d) => d !== longDate);
   const regularBudget =
     Math.floor(desired * pace) -
-    (longDate
-      ? family === 'marathon'
-        ? Math.ceil(longDistance * longPace)
-        : Math.floor(usualLongDistance * pace)
-      : 0);
+    (longDate ? Math.ceil(longDistance * longPace - 1e-9) : 0);
   const weights = new Map(
     regularDates.map((d) => [
       d,
@@ -436,7 +450,7 @@ export function allocateGenerationWeek(
     !recovery &&
     !taper &&
     p.goal !== 'base' &&
-    (p.intent !== 'finish' || usesMarathonRhythm(p))
+    (p.intent !== 'finish' || usesStandardQualityRhythm(p))
   ) {
     for (const date of regularDates.filter((d) =>
       weekQualityDays.includes(weekday(d)),

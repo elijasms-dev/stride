@@ -6,7 +6,7 @@ import { runMeasureNote } from '../run-distance.ts';
 import { applyPreferredStartTimes } from '../runner-customization.ts';
 import {
   longRunShareLimit,
-  usesMarathonRhythm,
+  usesStandardQualityRhythm,
 } from '../training-structure.ts';
 import {
   isLongUltra,
@@ -37,10 +37,14 @@ import {
   type ReplanContext,
   resolveGenerationPolicy,
 } from './generation-policy.ts';
+import {
+  reconcileOpeningBaseline,
+  reconcileOrdinaryWeeklyProgression,
+} from './generation-baseline.ts';
 import { buildSteps } from './generation-prescription.ts';
 import {
   ensureGeneratedMarathonRhythm,
-  normalizeGeneratedMarathonLongRuns,
+  normalizeGeneratedLongRuns,
 } from './generation-reconcile.ts';
 import { generatePlanWeeks } from './generation-weeks.ts';
 import { round } from './math.ts';
@@ -56,6 +60,10 @@ import { refreshWeekTotals } from './totals.ts';
 import { type Plan } from './types.ts';
 import { validatePlan } from './validate.ts';
 import { refreshWorkoutVariety } from './variety.ts';
+
+// Numerical allocation must settle before a plan is accepted. This is a bounded
+// computation guard, not a training progression or load allowance.
+const MAX_FINAL_ALLOCATION_PASSES = 6;
 
 export function makePlan(
   input: unknown,
@@ -81,6 +89,10 @@ export function makePlan(
     qualityDays,
     requestedQuality,
   } = context;
+  const allowDeclaredOpening =
+    replan?.baseline.source === 'declared-baseline' &&
+    replan.from === p.startDate &&
+    (replan.referenceRuns ?? p.days.length) === p.days.length;
   const { weeks, workouts } = generatePlanWeeks(context, replan);
   // Apply the quality-work fraction to actual capped sessions, not the requested mileage.
   for (const week of weeks) {
@@ -102,7 +114,7 @@ export function makePlan(
         : Infinity,
     );
     const guaranteed =
-      usesMarathonRhythm(p) &&
+      usesStandardQualityRhythm(p) &&
       !['Recovery', 'Taper', 'Race week'].includes(week.phase);
     if (guaranteed && prescribedQuality <= ceiling + 0.01) continue;
     let remainingWork = ceiling;
@@ -136,7 +148,7 @@ export function makePlan(
         w.steps = dose.steps;
         w.minutes = dose.minutes;
         w.estimatedKm =
-          w.kind === 'long' && family === 'marathon'
+          w.kind === 'long'
             ? Math.min(w.estimatedKm, round(dose.minutes / longPace, 3))
             : round(dose.minutes / pace, 3);
         w.distanceEstimate = distanceEstimate(dose.steps, p);
@@ -239,14 +251,19 @@ export function makePlan(
     ],
     createdAt: p.startDate,
     baselineEvidence: replan?.baseline,
+    ...(replan?.returnState ? { returnState: replan.returnState } : {}),
     feasibility: {
       status: 'forecast',
       reasons: [],
       asOf: replan?.from ?? p.startDate,
     },
   };
+  reconcileOpeningBaseline(plan, allowDeclaredOpening);
   applyActualTrainingEnvelope(plan, undefined, replan?.retainedPrefix);
   rebalanceFutureQuality(plan, replan?.from ?? p.startDate);
+  normalizeGeneratedLongRuns(plan, replan?.from ?? p.startDate);
+  reconcileOpeningBaseline(plan, allowDeclaredOpening);
+  reconcileOrdinaryWeeklyProgression(plan, allowDeclaredOpening);
   const requiredExposure = isLongUltra(p)
     ? LONG_ULTRA_POLICY.rehearsalMinutes
     : ['custom', 'ultra'].includes(p.goal)
@@ -371,21 +388,43 @@ export function makePlan(
     };
   }
   ensureGeneratedMarathonRhythm(plan, replan?.from ?? p.startDate);
+  normalizeGeneratedLongRuns(plan, replan?.from ?? p.startDate);
+  reconcileOpeningBaseline(plan, allowDeclaredOpening);
+  reconcileOrdinaryWeeklyProgression(plan, allowDeclaredOpening);
   const varied = refreshWorkoutVariety(plan, replan?.from ?? p.startDate);
-  normalizeGeneratedMarathonLongRuns(varied, replan?.from ?? p.startDate);
+  normalizeGeneratedLongRuns(varied, replan?.from ?? p.startDate);
+  reconcileOpeningBaseline(varied, allowDeclaredOpening);
+  reconcileOrdinaryWeeklyProgression(varied, allowDeclaredOpening);
   const errors = validatePlan(varied);
   if (errors.length) throw new PlanError(errors[0]);
   varied.workouts = varied.workouts.map((w) =>
     withWorkoutTargets(withSpecificWorkoutName(w), varied.profile),
   );
-  // Whole-kilometre rounding can change the preceding long-run reference.
-  // Recheck the executable distance targets, not only pre-rounding estimates.
-  if (bookMarathon) {
+  // Funding can change the familiar outing used by recovery and taper. Settle
+  // those bounds against the final executable distances so a harmless later
+  // preference review cannot discover another reduction in the accepted plan.
+  const allocationSnapshot = () =>
+    JSON.stringify(
+      varied.workouts.map((w) => [w.minutes, w.estimatedKm, w.steps]),
+    );
+  let allocationSettled = false;
+  for (let pass = 0; pass < MAX_FINAL_ALLOCATION_PASSES; pass++) {
+    const before = allocationSnapshot();
     applyActualTrainingEnvelope(varied, undefined, replan?.retainedPrefix);
     rebalanceFutureQuality(varied, replan?.from ?? p.startDate);
+    ensureGeneratedMarathonRhythm(varied, replan?.from ?? p.startDate);
+    normalizeGeneratedLongRuns(varied, replan?.from ?? p.startDate);
+    reconcileOpeningBaseline(varied, allowDeclaredOpening);
+    reconcileOrdinaryWeeklyProgression(varied, allowDeclaredOpening);
+    if (allocationSnapshot() === before) {
+      allocationSettled = true;
+      break;
+    }
   }
-  ensureGeneratedMarathonRhythm(varied, replan?.from ?? p.startDate);
-  normalizeGeneratedMarathonLongRuns(varied, replan?.from ?? p.startDate);
+  if (!allocationSettled)
+    throw new PlanError(
+      'The weekly progression and session limits cannot settle into a consistent plan. Review the starting load and available training time together.',
+    );
   refreshWeekTotals(varied);
   const finalErrors = validatePlan(varied);
   if (finalErrors.length) throw new PlanError(finalErrors[0]);

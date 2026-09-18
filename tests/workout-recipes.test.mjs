@@ -98,7 +98,8 @@ void test('recognisable titles and exact main-set/recovery summaries use saved s
   assert.equal(pyramid.title, 'Pyramid intervals');
   assert.equal(mainSetSummary(pyramid), '1–2–3–2–1 min');
   assert.match(recoverySummary(pyramid), /90 sec easy jog.*4 recoveries/);
-  const distance = session('race-rhythm-5-metres', 7);
+  // Six 200 m repetitions need 7.8 minutes at the 6:30/km planning pace.
+  const distance = session('race-rhythm-5-metres', 8);
   assert.equal(mainSetSummary(distance), '6 × 200 m');
   assert.equal(specificWorkoutName(distance), '6 × 200 m 5K effort');
   assert.match(recoverySummary(distance), /2 min easy jog.*5 recoveries/);
@@ -190,7 +191,7 @@ void test('slower pace updates show a truthful timed alternative and preserve pr
   );
 });
 void test('FIT exports actual metre endings with precise pace targets and time-based recoveries', () => {
-  const w = session('race-rhythm-5-metres', 7);
+  const w = session('race-rhythm-5-metres', 8);
   const decoder = new Decoder(Stream.fromByteArray(encodeWorkout(w)));
   assert.equal(decoder.checkIntegrity(), true);
   const { messages, errors } = decoder.read();
@@ -207,7 +208,7 @@ void test('FIT exports actual metre endings with precise pace targets and time-b
 });
 void test('distance descriptions and exports separate exact reps from time allowances', () => {
   const p = profile(),
-    w = session('race-rhythm-5-metres', 7, p);
+    w = session('race-rhythm-5-metres', 8, p);
   const plan = makePlan(p, start);
   plan.workouts = [w];
   const calendar = exportCalendar(plan, start, 1).replace(/\r\n /g, '');
@@ -245,11 +246,13 @@ for (const goal of ['5k', '10k', 'half', 'marathon'])
     );
     assert.ok(measured.length > 0, `${goal} has measured sessions`);
     for (const w of measured) {
+      // Metre endpoints retain the validator's one-second export allowance,
+      // including long-run templates whose authored quality blocks are kept.
       assert.ok(
         w.steps.every(
           (s) =>
             s.metres === undefined ||
-            (s.metres * s.planningPaceSecondsPerKm) / 1000 <= s.seconds,
+            (s.metres * s.planningPaceSecondsPerKm) / 1000 <= s.seconds + 1,
         ),
       );
       assert.equal(

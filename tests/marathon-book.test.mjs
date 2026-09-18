@@ -240,6 +240,26 @@ void test('continuous prescriptions survive refresh, harmless preference edits, 
   );
 });
 
+void test('a short marathon block is already consistent with nonbinding ceiling reviews', () => {
+  const plan = build({ raceDate: addDays(start, 83) });
+  const prescription = (p) =>
+    p.workouts.map(({ date, minutes, estimatedKm, steps }) => ({
+      date,
+      minutes,
+      estimatedKm,
+      steps,
+    }));
+  let reviewed = plan;
+  for (const weeklyMinutesLimit of [900, 950, 900]) {
+    reviewed = revisePreferences(reviewed, { weeklyMinutesLimit }, start);
+    assert.deepEqual(
+      prescription(reviewed),
+      prescription(plan),
+      'Final weekly funding must respect the familiar-day taper ceiling before a plan is accepted',
+    );
+  }
+});
+
 void test('explicit distance repetitions use current pace and proportional jogging; unknown pace requires a timed recipe', () => {
   const p = build({
     workoutFormat: 'distance',

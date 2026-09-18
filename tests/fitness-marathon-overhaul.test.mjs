@@ -166,7 +166,7 @@ test('short blocks scale to available build weeks without jumping from 12 to 35'
   assert.ok(Math.max(...plan.weeks.map((w) => w.longKm)) <= 18);
 });
 
-test('manual easy pace funds integer long runs without increasing the weekly time budget', () => {
+test('manual easy pace funds the declared weekly distance and integer long runs', () => {
   const plan = build({
     longestKm: 25,
     raceDate: addDays(start, 139),
@@ -193,8 +193,9 @@ test('manual easy pace funds integer long runs without increasing the weekly tim
     plan.workouts
       .filter((w) => w.week === 0 && w.kind !== 'race')
       .reduce((sum, w) => sum + w.minutes, 0),
-    420,
+    70 * 6.5,
   );
+  assert.equal(plan.weeks[0].targetKm, 70);
   assert.equal(Math.max(...longs.map((w) => w.estimatedKm)), 32);
   for (const run of longs) {
     assert.ok(run.minutes >= run.estimatedKm * 6.5);
@@ -222,27 +223,33 @@ test('busy days are capped before allocation and cannot cause unmarked long-run 
   );
 });
 
-test('a maintained weekly budget cannot fund a long run beyond its manual pace time share', () => {
-  assert.throws(
-    () =>
-      build({
-        weeklyKm: 60,
-        longestKm: 26,
-        volume: 'maintain',
-        workoutTargets: {
-          mode: 'pace',
-          pace: { easy: { low: 330, high: 390 } },
-        },
-      }),
-    { name: 'PlanError', message: /baseline and volume limits/ },
-  );
+test('a maintained weekly distance retains its familiar long run at the manual pace', () => {
+  const plan = build({
+    weeklyKm: 60,
+    longestKm: 26,
+    volume: 'maintain',
+    workoutTargets: {
+      mode: 'pace',
+      pace: { easy: { low: 330, high: 390 } },
+    },
+  });
+  assert.equal(plan.weeks[0].targetKm, 60);
+  assert.equal(plan.weeks[0].longKm, 26);
+  assertRhythm(plan);
 });
 
-test('manual frequency choices normalize to one weekday workout plus the long run', () => {
+test('explicit frequency choices are retained while one weekday workout uses the standard rhythm', () => {
   for (const qualitySessions of [0, 1, 2]) {
     const plan = build({ qualityMode: 'custom', qualitySessions });
-    assert.equal(plan.profile.qualitySessions, 1);
-    assertRhythm(plan);
+    assert.equal(plan.profile.qualitySessions, qualitySessions);
+    assert.deepEqual(validatePlan(plan), []);
+    if (qualitySessions === 1) assertRhythm(plan);
+    if (qualitySessions === 0)
+      assert.ok(
+        plan.workouts.every(
+          (w) => !w.hard || ['long', 'race'].includes(w.kind),
+        ),
+      );
   }
 });
 
@@ -398,9 +405,10 @@ test('reapplying unchanged fitness targets preserves mixed long-run distance and
   for (const long of plan.workouts.filter((w) => w.kind === 'long')) {
     const again = withWorkoutTargets(long, plan.profile);
     assert.deepEqual(again, long);
-    assert.equal(
-      again.steps.reduce((n, s) => n + s.seconds, 0),
-      again.minutes * 60,
+    assert.ok(
+      Math.abs(
+        again.steps.reduce((n, s) => n + s.seconds, 0) - again.minutes * 60,
+      ) < 1e-6,
     );
   }
   for (const recentRace of [
@@ -464,19 +472,19 @@ test('switching measurement retains whole long allocations and complete work dur
 });
 
 test('a constrained long-run day produces a monotone build within its final capacity', () => {
-  const plan = build({
+  const constraints = [
+    { day: 1, maxMinutes: 35 },
+    { day: 2, maxMinutes: 45 },
+    { day: 3, maxMinutes: 75 },
+    { day: 5, maxMinutes: 180 },
+  ];
+  const settings = {
     weeklyMinutesLimit: 480,
     longDay: 5,
     longestKm: 25,
     runsPerWeek: 5,
     availableDays: [0, 1, 2, 3, 4, 5, 6],
     raceDate: addDays(start, 139),
-    dayPreferences: [
-      { day: 1, maxMinutes: 35 },
-      { day: 2, maxMinutes: 45 },
-      { day: 3, maxMinutes: 75 },
-      { day: 5, maxMinutes: 180 },
-    ],
     workoutTargets: {
       mode: 'pace',
       pace: {
@@ -485,7 +493,16 @@ test('a constrained long-run day produces a monotone build within its final capa
         interval: { low: 240, high: 270 },
       },
     },
-  });
+  };
+  assert.throws(
+    () => build({ ...settings, dayPreferences: constraints }),
+    /starting weekly distance/,
+  );
+  const plan = revisePreferences(
+    build(settings),
+    { dayPreferences: constraints },
+    start,
+  );
   assertRhythm(plan);
   assert.ok(
     plan.workouts

@@ -138,8 +138,8 @@ export function generatePlanWeeks(
           );
       let minutes = Math.max(
         GENERATION_POLICY.minimumSessionMinutes,
-        isLong && family === 'marathon'
-          ? Math.ceil(budget * longPace - 1e-9)
+        isLong
+          ? Math.round(budget * longPace * 60) / 60
           : Math.floor(Math.min(budget * pace, cap)),
       );
       let kind: WorkoutKind = isLong ? 'long' : 'easy';
@@ -388,7 +388,7 @@ export function generatePlanWeeks(
         kind,
         minutes,
         estimatedKm:
-          isLong && family === 'marathon'
+          isLong
             ? longDistance
             : round(minutes / pace, 3),
         hard,

@@ -65,6 +65,7 @@ function returning() {
       weeklyKm: 20,
       longestKm: 8,
       easyPace: 6,
+      weekdayMinutes: 60,
     }),
     before,
   );

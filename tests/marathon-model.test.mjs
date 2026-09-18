@@ -10,6 +10,7 @@ import {
   taperFactor,
   trainingPhaseOn,
   refreshWorkoutVariety,
+  revisePreferences,
   shortenWorkout,
 } from '../lib/engine.ts';
 import { qualityWorkMinutes } from '../lib/prescription.ts';
@@ -76,9 +77,10 @@ for (const weeks of [16, 20, 24])
           );
         }
         for (const w of runs(p)) {
-          assert.equal(
-            w.minutes * 60,
-            w.steps.reduce((n, s) => n + s.seconds, 0),
+          assert.ok(
+            Math.abs(
+              w.minutes * 60 - w.steps.reduce((n, s) => n + s.seconds, 0),
+            ) < 1e-6,
           );
           assert.ok(w.minutes <= (w.kind === 'long' ? 210 : 120));
           if (taperFactor(p.profile, w.date) < 1) assert.ok(longest(w) <= 600);
@@ -203,10 +205,19 @@ void test('long-run peaks wait for race preparation and recovery reduces the exe
 
 void test('post-allocation long-run growth uses the recent executable prescription', () => {
   for (const weekdayMinutes of [60, 90, 120]) {
-    const p = makePlan(
-      input({ weeklyKm: 85, longestKm: 30, weekdayMinutes, longMinutes: 240 }),
-      start,
-    );
+    const profile = input({
+      weeklyKm: 85,
+      longestKm: 30,
+      weekdayMinutes: 120,
+      longMinutes: 240,
+    });
+    const original = makePlan(profile, start);
+    if (weekdayMinutes === 60)
+      assert.throws(
+        () => makePlan({ ...profile, weekdayMinutes }, start),
+        /starting weekly distance/,
+      );
+    const p = revisePreferences(original, { weekdayMinutes }, start);
     const longs = runs(p).filter((w) => w.kind === 'long');
     for (const [i, w] of longs.entries()) {
       const recent = longs

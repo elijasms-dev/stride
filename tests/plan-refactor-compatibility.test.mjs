@@ -4,11 +4,12 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import * as engine from '../lib/engine.ts';
 
-// Captured from the committed engine before structural changes. Compare every
+// Versioned regression snapshot for the declared-baseline policy. The original
+// refactor snapshots remain alongside it as the v30/v31 policy records. Compare every
 // serialized value, allowing only irrelevant object-key insertion order to vary.
 const baseline = JSON.parse(
   readFileSync(
-    new URL('./fixtures/plan-refactor-baseline.json', import.meta.url),
+    new URL('./fixtures/plan-policy-v32.json', import.meta.url),
     'utf8',
   ),
 );
@@ -84,9 +85,10 @@ function resultFor(c) {
 }
 
 test('engine barrel preserves the complete runtime public API', () => {
+  assert.equal(baseline.policyVersion, engine.TRAINING_POLICY.version);
   assert.deepEqual(Object.keys(engine).sort(), baseline.exports);
 });
 for (const c of baseline.cases)
-  test(`unchanged engine behavior: ${c.name}`, () => {
+  test(`declared-baseline policy behavior: ${c.name}`, () => {
     assert.deepEqual(resultFor(c), c.expected);
   });

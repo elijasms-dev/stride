@@ -1,0 +1,110 @@
+{
+  "startedAt": "2026-09-16T20:45:23.880Z",
+  "finishedAt": "2026-09-16T20:45:35.934Z",
+  "sourceSha256": "55f176e2bb12555cc365eee0f6e75adad8fc0581793021ba5bfaaa0df42f95f9",
+  "sourceFiles": 93,
+  "cases": 2592,
+  "accepted": 1979,
+  "rejected": 613,
+  "runtimeErrors": [],
+  "violations": [],
+  "byGoal": {
+    "base": {
+      "cases": 432,
+      "accepted": 396,
+      "rejected": 36
+    },
+    "5k": {
+      "cases": 432,
+      "accepted": 384,
+      "rejected": 48
+    },
+    "10k": {
+      "cases": 432,
+      "accepted": 300,
+      "rejected": 132
+    },
+    "half": {
+      "cases": 432,
+      "accepted": 316,
+      "rejected": 116
+    },
+    "marathon": {
+      "cases": 432,
+      "accepted": 220,
+      "rejected": 212
+    },
+    "ultra": {
+      "cases": 432,
+      "accepted": 363,
+      "rejected": 69
+    }
+  },
+  "rejectionGroups": [
+    {
+      "message": "Your starting weekly distance and long-run baseline cannot fit the selected running days, session limits and weekly time ceiling. Review these inputs together.",
+      "count": 324
+    },
+    {
+      "message": "These limits leave a longest training exposure of 6.5 km; this policy requires room for 7.5 km. Allow more session time, review distance caps, or build a base first.",
+      "count": 72
+    },
+    {
+      "message": "These limits leave a longest training exposure of 14.5 km; this policy requires room for 16 km. Allow more session time, review distance caps, or build a base first.",
+      "count": 44
+    },
+    {
+      "message": "Your current baseline and volume limits leave a longest training exposure of at most 18 km; this model needs room for 26 km. More available time or a later race cannot overcome this volume limit. Start with a base-building plan, or review your recent mileage and volume preference if entered incorrectly.",
+      "count": 32
+    },
+    {
+      "message": "Your current baseline and volume limits leave a longest training exposure of at most 25.2 km; this model needs room for 26 km. More available time or a later race cannot overcome this volume limit. Start with a base-building plan, or review your recent mileage and volume preference if entered incorrectly.",
+      "count": 32
+    },
+    {
+      "message": "Your current baseline and volume limits leave a longest training exposure of at most 16 km; this model needs room for 26 km. More available time or a later race cannot overcome this volume limit. Start with a base-building plan, or review your recent mileage and volume preference if entered incorrectly.",
+      "count": 16
+    },
+    {
+      "message": "Your current baseline and volume limits leave a longest training exposure of at most 22.4 km; this model needs room for 26 km. More available time or a later race cannot overcome this volume limit. Start with a base-building plan, or review your recent mileage and volume preference if entered incorrectly.",
+      "count": 16
+    },
+    {
+      "message": "These limits leave a longest training exposure of 23 km; this policy requires room for 26 km. Allow more session time, review distance caps, or build a base first.",
+      "count": 44
+    },
+    {
+      "message": "These limits leave a longest training exposure of 18.5 km; this policy requires room for 28 km. Allow more session time, review distance caps, or build a base first.",
+      "count": 24
+    },
+    {
+      "message": "The generated ultra block cannot fit three consecutive six-hour training weeks before taper. Increase available time or choose a shorter distance; a longer race does not justify compressing the workload.",
+      "count": 9
+    }
+  ],
+  "boundary": {
+    "total": 580,
+    "accepted": 335,
+    "rejected": 245,
+    "violationCases": 0,
+    "checkedVariety": 44,
+    "documentedRejections": 245,
+    "falseRejections": 0,
+    "acceptedFindingCases": 0,
+    "reviewRequired": 69
+  },
+  "calendar": {
+    "total": 407,
+    "passed": 407,
+    "findings": 0,
+    "accepted": 285,
+    "controlledRejections": 122,
+    "invariantOrRuntimeFailures": 0
+  },
+  "lifecycle": {
+    "total": 525,
+    "passed": 525,
+    "failed": 0,
+    "policyVersion": "provisional-2026-09-16-v32"
+  }
+}

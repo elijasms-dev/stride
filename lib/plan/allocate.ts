@@ -34,7 +34,7 @@ export function applyActualTrainingEnvelope(
   allocationPrefix: Workout[] = [],
 ) {
   const p = plan.profile;
-  const update = (w: Workout, minutes: number) => {
+  const update = (w: Workout, minutes: number, minimumMinutes = 0) => {
     if (asOf && (w.date < asOf || w.status !== 'planned')) return;
     if (asOf && w.changed && w.changeSource !== 'preferences')
       throw new PlanError(
@@ -46,7 +46,11 @@ export function applyActualTrainingEnvelope(
         w,
         p,
         trainingPhaseOn(p, plan.weeks[w.week].phase, w.date),
-        Math.max(PLAN_LOAD_LIMITS.minimumSessionMinutes, Math.floor(minutes)),
+        Math.max(
+          PLAN_LOAD_LIMITS.minimumSessionMinutes,
+          minimumMinutes,
+          Math.floor(minutes),
+        ),
       ),
     );
     if (usesMarathonBook(p)) Object.assign(w, withWorkoutTargets(w, p));
@@ -157,8 +161,34 @@ export function applyActualTrainingEnvelope(
           ),
         ].reduce((n, w) => n + w.minutes, 0);
         const share = longRunShareLimit(p);
-        const maximum = (others * share) / (1 - share);
-        if (long.minutes > maximum) update(long, maximum);
+        const ordinary =
+          plan.policyVersion === TRAINING_POLICY.version &&
+          !['Recovery', 'Taper', 'Race week'].includes(week.phase) &&
+          week.start >= p.startDate &&
+          addDays(week.start, 6) <= p.raceDate &&
+          taperFactor(p, addDays(week.start, 6)) >= 1 &&
+          new Set(runs.map((w) => w.date)).size === p.days.length;
+        const familiarKm = plan.baselineEvidence
+          ? Math.min(
+              plan.baselineEvidence.longestKm,
+              (plan.baselineEvidence.longestMinutes ?? Infinity) /
+                schedulingEasyPace(p),
+            )
+          : p.longestKm;
+        // Rounded support-run budgets must not erase a familiar funded long
+        // exposure. Explicit daily and weekly ceilings have already reduced it.
+        const familiarMinutes =
+          ordinary &&
+          (!asOf || !runs.some((w) => w.changed)) &&
+          long.estimatedKm > 0
+            ? long.minutes * Math.min(1, familiarKm / long.estimatedKm)
+            : 0;
+        const maximum = Math.max(
+          (others * share) / (1 - share),
+          familiarMinutes,
+        );
+        if (long.minutes > maximum + 1e-6)
+          update(long, maximum, familiarMinutes);
       }
     }
   };
@@ -317,13 +347,9 @@ export function applyActualTrainingEnvelope(
       )) {
         const factor = taperFactor(p, run.date);
         const typical = familiar.get(weekday(run.date));
-        if (
-          (factor < 1 ||
-            (usesMarathonBook(p) &&
-              dayDiff(run.date, p.raceDate) <=
-                ENVELOPE_TAPER_POLICY.enduranceDays)) &&
-          typical != null
-        ) {
+        // Ordinary weeks retain their funded weekly baseline. A shorter quality
+        // recipe may redistribute easy time before the event's actual taper.
+        if (factor < 1 && typical != null) {
           const total = dailyTotals.get(run.date)!;
           // Book allocation already applies the taper fraction to weekly volume.
           // This guard only prevents an outing from exceeding its familiar length.

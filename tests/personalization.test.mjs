@@ -73,7 +73,13 @@ for (const goal of ['10k', 'half', 'marathon']) {
   });
 }
 void test('a feasible two-slot 10K schedule is not lost by greedily choosing Monday before Tuesday and Sunday', () => {
-  const p = { ...base, ...profiles['10k'], longDay: 4 };
+  const p = {
+    ...base,
+    ...profiles['10k'],
+    longDay: 4,
+    qualityMode: 'custom',
+    qualitySessions: 2,
+  };
   const plan = makePlan(p, date),
     build = plan.weeks.find((w) => w.phase === 'Build');
   const hard = training(plan, build.index).filter((w) => w.hard);

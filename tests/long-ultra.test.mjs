@@ -268,8 +268,14 @@ void test('100-mile exact bounds and stronger prerequisites preserve the 50-mile
     [{ qualityMode: 'custom', qualitySessions: 2 }, /zero or one/],
   ])
     assert.throws(() => make(patch), message);
-  assert.throws(() => make({ weekdayMinutes: 60 }), /six weeks before taper/);
-  assert.throws(() => make({ longMinutes: 160 }), /180 minutes/);
+  assert.throws(
+    () => make({ weekdayMinutes: 60 }),
+    /starting weekly distance.*cannot fit/,
+  );
+  assert.throws(
+    () => make({ longMinutes: 160 }),
+    /starting weekly distance.*cannot fit/,
+  );
 });
 void test('custom 100 miles receives the same prescriptions and race exports', () => {
   const p = make(),
@@ -321,11 +327,27 @@ void test('lower availability flags the long-ultra forecast without raising volu
   );
 });
 void test('slow 100-mile placeholder and 30-hour actual survive recovery without widening ordinary prescription caps', () => {
-  const p = make({
+  assert.throws(
+    () =>
+      make({
+        easyPace: 15,
+        ultraWeeklyMinutes: 1000,
+        ultraLongestMinutes: 300,
+      }),
+    /starting weekly distance.*cannot fit/,
+  );
+  // A saved earlier-policy plan still needs to restore long race placeholders
+  // and observations even when its old pace and time declarations conflict.
+  const p = make();
+  p.policyVersion = 'provisional-2026-09-11-v30';
+  Object.assign(p.profile, {
     easyPace: 15,
     ultraWeeklyMinutes: 1000,
     ultraLongestMinutes: 300,
   });
+  const placeholder = p.workouts.find((w) => w.kind === 'race');
+  placeholder.minutes = Math.ceil(160.9344 * 15);
+  placeholder.steps[0].seconds = placeholder.minutes * 60;
   const raw = {
     format: 'stride-recovery-2',
     exportedAt: start + 'T18:00:00Z',
@@ -440,11 +462,11 @@ void test('both new-block routes retain recovery after a completed long ultra', 
 });
 
 void test('measured ultra time is preserved in fallback and recovery baselines', () => {
-  const p = make({
-    easyPace: 10,
-    ultraWeeklyMinutes: 540,
-    ultraLongestMinutes: 180,
-  });
+  // Explicitly exercise restored legacy declarations, not a new contradictory
+  // distance/time baseline, which now requires a controlled input review.
+  const p = make();
+  p.policyVersion = 'provisional-2026-09-11-v30';
+  p.profile.easyPace = 10;
   const b = currentTrainingBaseline(p, start);
   assert.equal(b.weeklyMinutes, 540);
   assert.equal(b.longestMinutes, 180);

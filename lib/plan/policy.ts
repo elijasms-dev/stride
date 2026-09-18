@@ -1,15 +1,15 @@
 /** Plan policy responsibilities; extracted without changing policy or behavior. */
 import { HUNDRED_MILES_KM } from '../ultra-policy.ts';
 
-/** Existing model version; no policy change is introduced by this refactor. */
-export const ENGINE_VERSION = 'stride-0.10.0';
+/** Declared starting loads and whole-kilometre long-run progression. */
+export const ENGINE_VERSION = 'stride-0.10.1';
 
 // Supported runnable-course ceiling; longer events need preparation outside this model.
 export const MAX_EVENT_KM = HUNDRED_MILES_KM;
 
 /** Product heuristics for review, not scientifically established safety thresholds. */
 export const TRAINING_POLICY = {
-  version: 'provisional-2026-09-11-v30',
+  version: 'provisional-2026-09-16-v32',
   reviewStatus: 'Awaiting independent coaching review',
   // A conservative fallback estimates time when current easy pace is unknown.
   estimatedEasyMinutesPerKm: 7,

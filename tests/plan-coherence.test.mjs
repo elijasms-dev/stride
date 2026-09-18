@@ -14,6 +14,7 @@ const {
   demoProfile,
   addDays,
   dayDiff,
+  taperFactor,
   weekday,
   validatePlan,
   shortenWorkout,
@@ -168,12 +169,14 @@ void test('three-day 10K opening has a purposeful quality session and no easy ou
 });
 
 for (const n of [5, 6]) {
-  void test(`${n}-day half-marathon specific weeks have complementary workouts`, () => {
+  void test(`${n}-day half-marathon custom two-workout weeks have complementary workouts`, () => {
     const p = make({
       goal: 'half',
       raceDate: addDays(start, 111),
       weeklyKm: 55,
       longestKm: 18,
+      qualityMode: 'custom',
+      qualitySessions: 2,
       currentRuns: n,
       runsPerWeek: n,
       longMinutes: 180,
@@ -332,7 +335,9 @@ for (const n of [5, 6]) {
         runs(p, reference.index).map((w) => [weekday(w.date), w.minutes]),
       );
       const final = runs(p).filter(
-        (w) => dayDiff(w.date, p.profile.raceDate) <= 21,
+        // Exactly 21 days out remains ordinary in the long marathon model;
+        // compact blocks begin actual taper even later.
+        (w) => taperFactor(p.profile, w.date) < 1,
       );
       assert.ok(final.length > n);
       for (const w of final) {
@@ -351,7 +356,7 @@ for (const n of [5, 6]) {
 }
 
 for (const history of [undefined, 0]) {
-  void test(`${history === 0 ? 'zero' : 'unknown'} quality history introduces the second hard session after prior weeks of practice`, () => {
+  void test(`${history === 0 ? 'zero' : 'unknown'} quality history starts with one introductory weekday workout and develops its dose`, () => {
     const p = make({
       goal: 'half',
       raceDate: addDays(start, 111),
@@ -365,32 +370,39 @@ for (const history of [undefined, 0]) {
       longMinutes: 180,
     });
     executable(p);
-    for (const week of p.weeks.filter((w) => w.phase === 'Foundation'))
+    const foundation = p.weeks.filter((w) => w.phase === 'Foundation');
+    assert.ok(foundation.length);
+    for (const week of foundation) {
+      const [introductory] = hardWeekdays(p, week.index);
+      assert.equal(hardWeekdays(p, week.index).length, 1);
+      assert.ok(qualityWorkMinutes(introductory) >= 6);
+      assert.ok(qualityWorkMinutes(introductory) <= 8);
+      assert.ok(introductory.steps.every((step) => step.intensity < 7));
+    }
+    for (const week of [...foundation, ...development(p)]) {
       assert.equal(
         hardWeekdays(p, week.index).length,
-        0,
-        'Unknown experience starts with easy running and relaxed strides',
+        1,
+        'Automatic build rhythm retains one weekday workout as its dose develops',
       );
-    const firstBuild = development(p)[0];
-    assert.equal(
-      hardWeekdays(p, firstBuild.index).length,
-      1,
-      'Do not introduce two hard sessions together',
-    );
-    const doubled = development(p).filter(
-      (w) => hardWeekdays(p, w.index).length === 2,
+      assert.equal(
+        runs(p, week.index).filter((w) => w.hard || w.kind === 'long').length,
+        2,
+        'The long run supplies the second quality session',
+      );
+    }
+    const introductoryWork = qualityWorkMinutes(
+      hardWeekdays(p, foundation[0].index)[0],
     );
     assert.ok(
-      doubled.length,
-      'The conditional forecast can eventually develop the requested two-session structure',
+      development(p).some(
+        (week) =>
+          qualityWorkMinutes(hardWeekdays(p, week.index)[0]) > introductoryWork,
+      ),
+      'Later weeks develop a substantive dose after prior weeks of practice',
     );
-    const firstDouble = doubled[0];
-    assert.ok(
-      runs(p).filter(
-        (w) => w.week < firstDouble.index && w.hard && w.kind !== 'long',
-      ).length >= 2,
-      'The second hard slot follows prior weeks of substantive work, not same-week counting',
-    );
+    assert.equal(p.profile.recentQualitySessions, history);
+    assert.equal(p.profile.recentQualityMinutes, history === 0 ? 0 : undefined);
     assert.equal(runs(p).filter((w) => w.kind === 'long' && w.hard).length, 0);
   });
 }
@@ -468,20 +480,20 @@ void test('seven available days preserve requested two-through-seven running fre
     const p = make({
       goal: '10k',
       raceDate: addDays(start, 83),
-      weeklyKm: 45,
+      weeklyKm: n === 2 ? 30 : 45,
       longestKm: 12,
       currentRuns: n,
       runsPerWeek: n,
       recentQualitySessions: n >= 5 ? 2 : 1,
       recentQualityMinutes: n >= 5 ? 40 : 20,
-      weekdayMinutes: 100,
+      weekdayMinutes: 120,
       longMinutes: 160,
       easyPace: 6,
     });
     executable(p);
     assert.equal(p.profile.availableDays.length, 7);
     assert.equal(p.profile.days.length, n);
-    const expected = n === 2 ? 0 : n >= 5 ? 2 : 1;
+    const expected = n === 2 ? 0 : 1;
     for (const week of development(p)) {
       assert.equal(runs(p, week.index).length, n);
       assert.equal(runs(p, week.index).filter((w) => w.hard).length, expected);

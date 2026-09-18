@@ -18,10 +18,8 @@ import {
 import { isLongUltra, LONG_ULTRA_POLICY } from '../ultra-policy.ts';
 import {
   qualitySchedule,
-  usesMarathonRhythm,
   requestedQualityCount,
   aerobicSupportDay,
-  longRunShareLimit,
 } from '../training-structure.ts';
 
 import { qualityTrainingEvidence } from '../training-evidence.ts';
@@ -32,7 +30,8 @@ import {
   peakLongRunKm,
   peakLongWeekIndex,
 } from '../progression-engine.ts';
-import { monday, dayDiff } from './calendar.ts';
+import { monday, dayDiff, addDays } from './calendar.ts';
+import { taperFactor } from './generation-calendar.ts';
 import {
   preparationRequirements,
   trainingFamily,
@@ -48,6 +47,7 @@ export type ReplanContext = {
   retainedPrefix?: Workout[];
   preserveProgression?: boolean;
   referenceRuns?: number;
+  returnState?: Plan['returnState'];
 };
 
 /** Resolve policy once from the declared profile and recorded baseline; no schedule is mutated. */
@@ -83,7 +83,12 @@ export function resolveGenerationPolicy(
           week: Math.floor(dayDiff(start, e.date) / DAYS_PER_WEEK),
         }))
     : [];
-  const pace = schedulingEasyPace(p);
+  const pace = Math.max(
+    schedulingEasyPace(p),
+    p.workoutTargets?.mode === 'pace'
+      ? (p.workoutTargets.pace?.easy?.high ?? 0) / SECONDS_PER_MINUTE
+      : 0,
+  );
   // Scheduling must respect recorded time as well as distance. A supplied pace
   // cannot turn faster actual running into extra tolerated training minutes.
   const reviewedBaseKm = replan
@@ -106,7 +111,9 @@ export function resolveGenerationPolicy(
   const isNovice =
     p.experience === 'new' || p.weeklyKm < GENERATION_POLICY.noviceWeeklyKm;
   const initialFactor =
-    p.experience === 'returning' ? TRAINING_POLICY.returningRunnerFactor : 1;
+    replan && p.experience === 'returning'
+      ? TRAINING_POLICY.returningRunnerFactor
+      : 1;
   if (
     replan &&
     !replan.preserveProgression &&
@@ -137,10 +144,9 @@ export function resolveGenerationPolicy(
       ),
     }),
   };
-  const frequencyFactor = Math.min(
-    1,
-    p.days.length / Math.max(1, referenceRuns),
-  );
+  const frequencyFactor = replan
+    ? Math.min(1, p.days.length / Math.max(1, referenceRuns))
+    : 1;
   const base = Math.min(
     (isLongUltra(p)
       ? Math.min(
@@ -158,7 +164,7 @@ export function resolveGenerationPolicy(
   // Distance-ended long runs must fit at the slow edge of an explicit easy
   // target. This changes their share of the existing budget, not weekly minutes.
   const longPace =
-    family === 'marathon' && p.workoutTargets?.mode === 'pace'
+    p.workoutTargets?.mode === 'pace'
       ? Math.max(
           pace,
           (p.workoutTargets.pace?.easy?.high ?? 0) / SECONDS_PER_MINUTE,
@@ -179,32 +185,36 @@ export function resolveGenerationPolicy(
     weeksUntilRace,
     p.goal,
   );
+  // Keeping the block's progression clock never overrides recorded distance or
+  // duration. These two observations independently constrain familiar endurance.
   const declaredLong =
-    (replan?.preserveProgression ? p.longestKm : reviewedLongKm) ??
-    (p.longestKm || GENERATION_POLICY.fallbackLongKm);
+    reviewedLongKm ?? (p.longestKm || GENERATION_POLICY.fallbackLongKm);
   const startLong =
     family === 'marathon'
-      ? Math.min(
-          TRAINING_POLICY.family.marathon.longCeilingKm,
-          Math.ceil(declaredLong),
-        )
+      ? Math.min(TRAINING_POLICY.family.marathon.longCeilingKm, declaredLong)
       : anchoredLongRunKm(declaredLong, policy.minLong);
   const peakLong = Math.min(
-    peakLongRunKm(trainingFamily(p), startLong, p.intent),
+    p.volume === 'maintain'
+      ? startLong
+      : peakLongRunKm(trainingFamily(p), startLong, p.intent),
     // Keep the opening run anchored to history, but allow later whole sessions
     // to progress toward the existing long-ultra time ceiling.
     isLongUltra(p) ? LONG_ULTRA_POLICY.longMinutes / pace : Infinity,
     p.longLimitKm ?? Infinity,
     p.longMinutes / longPace,
   );
-  const peakWeek = peakLongWeekIndex(count, taperWeeks);
+  let peakWeek = peakLongWeekIndex(count, taperWeeks);
+  // Calendar counting can place the nominal peak on a long-run date that is
+  // already tapered. Reach the full target on the last untapered opportunity.
+  while (
+    peakWeek > 0 &&
+    taperFactor(p, addDays(start, peakWeek * DAYS_PER_WEEK + p.longDay)) < 1
+  )
+    peakWeek--;
+  // Opening volume comes from the supplied or reviewed baseline; long-run
+  // proportions cannot manufacture additional weekly running to support it.
   const initialLoad = Math.min(
-    Math.max(base, startLong / longRunShareLimit(p)),
-    // A retained long-run baseline cannot undo a reduced running-frequency budget.
-    replan && usesMarathonRhythm(p) ? base : Infinity,
-    // A high long-run/weekly ratio cannot create an opening load that later
-    // falls when the ordinary forecast ceiling is applied.
-    family === 'marathon' ? base * policy.maxForecast : Infinity,
+    base,
     absoluteCeiling,
     p.peakWeeklyKm ?? Infinity,
     (p.weeklyMinutesLimit ?? Infinity) / pace,
@@ -212,7 +222,7 @@ export function resolveGenerationPolicy(
   const initialLong = Math.min(
     startLong,
     isLongUltra(p)
-      ? (replan && !replan.preserveProgression
+      ? (replan
           ? (replan.baseline.longestMinutes ?? p.ultraLongestMinutes!)
           : p.ultraLongestMinutes!) / pace
       : Infinity,

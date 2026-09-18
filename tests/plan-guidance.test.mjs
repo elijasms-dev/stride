@@ -147,17 +147,23 @@ test('a short gentle block without familiar quality does not advertise optional 
   );
 });
 
-for (const patch of [
-  { qualityMode: 'custom', qualitySessions: 0 },
-  { intent: 'finish' },
-])
-  test(`legacy preferences describe the actual two-session marathon rhythm: ${JSON.stringify(patch)}`, () => {
-    const p = build(patch);
-    for (const week of p.weeks) assertMarathonWeek(p, week);
-    assert.match(marathonPlanDescription(p), /two quality sessions/);
-    assert.match(allFocus(p), /Controlled tempo is included/);
-    assert.doesNotMatch(allFocus(p), /Faster repetitions/);
-  });
+test('finish preference describes the actual two-session marathon rhythm', () => {
+  const p = build({ intent: 'finish' });
+  for (const week of p.weeks) assertMarathonWeek(p, week);
+  assert.match(marathonPlanDescription(p), /two quality sessions/);
+  assert.match(allFocus(p), /Controlled tempo is included/);
+  assert.doesNotMatch(allFocus(p), /Faster repetitions/);
+});
+
+test('explicit zero-quality preference is described from the saved easy prescriptions', () => {
+  const p = build({ qualityMode: 'custom', qualitySessions: 0 });
+  assert.equal(marathonScheduleFacts(p.workouts).maximumQuality, 0);
+  assert.match(marathonPlanDescription(p), /no hard training sessions/);
+  assert.doesNotMatch(
+    allFocus(p),
+    /Controlled tempo is included|Faster repetitions/,
+  );
+});
 
 test('busy-day summary shows the real small outing, not a full medium-long run', () => {
   const p = build({

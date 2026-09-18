@@ -1,9 +1,9 @@
 /** Plan types responsibilities; extracted without changing policy or behavior. */
-import { type TrainingMethod } from '../advanced-methods.ts';
-import { type RecentRace } from '../fitness-pacing.ts';
+import type { TrainingMethod } from '../advanced-methods.ts';
+import type { RecentRace } from '../fitness-pacing.ts';
 import type { distanceEstimate } from '../prescription.ts';
-import { type DayPreference } from '../runner-customization.ts';
-import { type StepTarget, type WorkoutTargets } from '../workout-targets.ts';
+import type { DayPreference } from '../runner-customization.ts';
+import type { StepTarget, WorkoutTargets } from '../workout-targets.ts';
 
 export type Goal =
   | '5k'

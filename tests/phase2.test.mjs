@@ -148,7 +148,7 @@ void test('maintain option does not silently grow the long run', () => {
   assert.ok(
     p.workouts
       .filter((w) => w.kind === 'long')
-      .every((w) => w.estimatedKm <= 16.01),
+      .every((w) => w.estimatedKm <= p.profile.longestKm),
   );
 });
 void test('threshold singles budget uses actual capped volume', () => {
@@ -163,14 +163,16 @@ void test('threshold singles budget uses actual capped volume', () => {
       recentQualitySessions: 2,
       recentQualityMinutes: 50,
       qualitySessions: 2,
-      easyLimitKm: 2,
-      longLimitKm: 8,
-      qualityLimitKm: 8,
     }),
     start,
   );
-  for (const week of p.weeks) {
-    const w = p.workouts.filter(
+  const capped = revisePreferences(
+    p,
+    { easyLimitKm: 2, longLimitKm: 8, qualityLimitKm: 8 },
+    start,
+  );
+  for (const week of capped.weeks) {
+    const w = capped.workouts.filter(
       (x) => x.week === week.index && x.kind !== 'race',
     );
     assert.ok(
@@ -180,14 +182,18 @@ void test('threshold singles budget uses actual capped volume', () => {
   }
 });
 void test('double threshold preserves weekly volume and respects individual distance caps', () => {
-  const p = makePlan(dt({ easyLimitKm: 11, qualityLimitKm: 8 }), start);
+  const p = revisePreferences(
+    makePlan(dt(), start),
+    { easyLimitKm: 8, qualityLimitKm: 8 },
+    start,
+  );
   // A separate quality-disabled plan has different daily allocations. The
   // declared maintained baseline is the weekly ceiling; expansion conservation
   // is checked directly in road-taper-phase.test.mjs.
   const pairs = p.workouts.filter((w) => w.pairType === 'double-threshold');
   assert.ok(pairs.length > 4);
   for (const w of pairs) {
-    assert.ok(w.estimatedKm <= 8);
+    assert.ok(w.estimatedKm <= 8.001);
     assert.ok(w.qualityMinutes <= 12);
     assert.equal(
       w.steps.reduce((n, s) => n + s.seconds, 0),

@@ -226,8 +226,9 @@ for (const distance of [50, 80.4672, 100, 160.9344]) {
   test(`${distance}km runnable ultra steady session survives an unchanged or shorter time limit`, () => {
     const p = make({
       goal: 'ultra',
+      volume: 'gradual',
       raceDistanceKm: distance,
-      weeklyKm: distance === 50 ? 90 : 110,
+      weeklyKm: distance === 50 ? 90 : 98,
       longestKm: 32,
       currentRuns: 5,
       runsPerWeek: 5,
@@ -237,8 +238,8 @@ for (const distance of [50, 80.4672, 100, 160.9344]) {
       longMinutes: 240,
       raceDate: '2027-02-21',
       stableWeeks: 16,
-      ultraWeeklyMinutes: distance === 50 ? 540 : 660,
-      ultraLongestMinutes: 180,
+      ultraWeeklyMinutes: distance === 50 ? 540 : 588,
+      ultraLongestMinutes: 192,
       workoutTargets: { mode: 'effort' },
     });
     const w = p.workouts.find((w) => w.templateId === 'ultra-steady');

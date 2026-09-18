@@ -3,6 +3,7 @@ import {
   fitnessPaceRange,
   predictRaceTime,
 } from './fitness-pacing.ts';
+import { normalizeGeneratedLongRuns } from './plan/generation-reconcile.ts';
 import { distanceEstimate } from './prescription.ts';
 import {
   withSpecificWorkoutName,
@@ -295,14 +296,28 @@ export function updateWorkoutTargets(
     raceScope: `${plan.profile.goal}:${plan.profile.raceDistanceKm ?? ''}`,
   };
   const protectedSet = new Set(protectedIds);
-  next.workouts = next.workouts.map((w) =>
-    w.status === 'planned' &&
-    w.week >= 0 &&
-    w.date >= from &&
-    !protectedSet.has(w.id)
-      ? withWorkoutTargets(w, next.profile)
-      : w,
-  );
+  let changedDistance = false;
+  next.workouts = next.workouts.map((w) => {
+    if (
+      w.status !== 'planned' ||
+      w.week < 0 ||
+      w.date < from ||
+      protectedSet.has(w.id)
+    )
+      return w;
+    const updated = withWorkoutTargets(w, next.profile);
+    if (updated.estimatedKm !== w.estimatedKm) {
+      changedDistance = true;
+      updated.changed = true;
+      updated.changeSource =
+        w.changeSource === 'manual' ? 'manual' : 'preferences';
+    }
+    return updated;
+  });
+  if (changedDistance) {
+    next.constraintsFrom = from;
+    normalizeGeneratedLongRuns(next, from, protectedIds);
+  }
   return refreshDistanceTotals(next);
 }
 export function mainWorkoutTarget(workout: Workout) {

@@ -1,0 +1,4284 @@
+{
+  "policyVersion": "provisional-2026-09-16-v31",
+  "previousFixture": "plan-refactor-baseline.json",
+  "date": "2026-09-14",
+  "exports": [
+    "ENGINE_VERSION",
+    "MAX_EVENT_KM",
+    "PlanError",
+    "TRAINING_POLICY",
+    "addDays",
+    "adjustPlan",
+    "advanceReturn",
+    "advanceRunWalk",
+    "customExposureKm",
+    "dateLabel",
+    "dayDiff",
+    "dayNames",
+    "demoPlan",
+    "demoProfile",
+    "eventDistanceDisplay",
+    "extendedUltra",
+    "goalLabel",
+    "kmDisplay",
+    "makePlan",
+    "monday",
+    "moveWorkout",
+    "noviceReview",
+    "preparationRequirements",
+    "raceDistance",
+    "rebalanceFutureQuality",
+    "refreshFeasibility",
+    "refreshWeekTotals",
+    "refreshWorkoutVariety",
+    "returnReview",
+    "revisePreferences",
+    "round",
+    "runningDayRange",
+    "shortenWorkout",
+    "substituteWorkout",
+    "suggestedAdjustment",
+    "taperFactor",
+    "todayInZone",
+    "trainingFamily",
+    "trainingPhaseOn",
+    "usesDailyTaperPhase",
+    "validDate",
+    "validatePlan",
+    "validateProfile",
+    "weekday",
+    "workoutAlternatives",
+    "workoutDistanceLabel",
+    "workoutDistanceValue"
+  ],
+  "cases": [
+    {
+      "name": "base, 6 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "base",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "71a347690777b1fe64847cd5789da13b1fd5f4cf1c6ec5b5493dcce04a8c4a7c"
+      }
+    },
+    {
+      "name": "base, 6 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "base",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "50fd0f01643caadf93a5ec109ad485abe2b7ab2b198499da27ec1e4733ed4d38"
+      }
+    },
+    {
+      "name": "base, 6 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "base",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "6e47991cac393e8e399eb4b5a0f9d8d6af27bf53c754ebbfe95773d125bb1f01"
+      }
+    },
+    {
+      "name": "base, 18 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "base",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "9efe34091166560f9563747ceedacf780fdd6d155349c0524cff8ec6f833b047"
+      }
+    },
+    {
+      "name": "base, 18 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "base",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "915c7ef42d82925d7623316e661018f20af6392c6891798f4dc2e43499a8e1e3"
+      }
+    },
+    {
+      "name": "base, 18 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "base",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "e315c9c601c54185b1774134d290dd284ec7b03278ea5113be800f10ae6683f5"
+      }
+    },
+    {
+      "name": "base, 26 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "base",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "256184d7e53d8be47b344bde4909d5559e37b386b9bd187e801407e0a8b3d031"
+      }
+    },
+    {
+      "name": "base, 26 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "base",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "9ba6bfcd72130a1dd0c8c79bf4007e8d11e4e5d81c6dcf73b871bb4c0c25b62b"
+      }
+    },
+    {
+      "name": "base, 26 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "base",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "419543a1c87c45673673ff2f19570feef4af8ee2cae17cb66e461163bb665e1b"
+      }
+    },
+    {
+      "name": "5k, 6 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "5k",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "0b6730d123f45fce03f1ea02a58e32d06c9df39f3cd07f8df062e568c5bbd2d9"
+      }
+    },
+    {
+      "name": "5k, 6 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "5k",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "f4c6330d99ec429a155798f332fa878e6d0a4a1755295825ace08caf6c6af228"
+      }
+    },
+    {
+      "name": "5k, 6 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "5k",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "ddcdd6b80ca6e32dca77b491689250776518f8245ee11e1e0ba3a470a6bc0b5f"
+      }
+    },
+    {
+      "name": "5k, 18 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "5k",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "66dc32f32bf023dcd0923ff9e339edecc6c8468607c49922789fc5244bb8a953"
+      }
+    },
+    {
+      "name": "5k, 18 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "5k",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "bf76a2f76edc192acbd137365dce4360212c0141510b2e84ac43df80bbb192f7"
+      }
+    },
+    {
+      "name": "5k, 18 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "5k",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "39f54a917a9ebea16849ec23f0dc0c737c6da442f961579986becb2c0976b202"
+      }
+    },
+    {
+      "name": "5k, 26 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "5k",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "4dcc41493e388aa4eb561096a03f47e4d81727c463ee03e7422ae0e5b414cfb7"
+      }
+    },
+    {
+      "name": "5k, 26 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "5k",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "cec56295d86f78be88cfc5028eb42fa93a583f5fd0ced41b6fa31847cf6f909e"
+      }
+    },
+    {
+      "name": "5k, 26 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "5k",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "3a647c89b5c97be90dbc93602134eb2154e49fb5eea3c7c8586cbe1ec2b68044"
+      }
+    },
+    {
+      "name": "10k, 6 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "10k",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "05f1420b0ed34295d08d940c85d0d657ccc7dfd16902a48bb6bbee2b29a25271"
+      }
+    },
+    {
+      "name": "10k, 6 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "10k",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "4d5eac3728ced606383035fb0f0c2044f53c6bb53247e0883c4db162701f29bb"
+      }
+    },
+    {
+      "name": "10k, 6 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "10k",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "4d9b989b3eccbe59c119413a071be7079d32160e3bd42ed7118a125866ab5161"
+      }
+    },
+    {
+      "name": "10k, 18 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "10k",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "b86f9e46c0eb1bfe1c4b0feb58bc7b431055b2857c6287c368333885a4956c0c"
+      }
+    },
+    {
+      "name": "10k, 18 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "10k",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "a7af65e560d78a170c44e21eea0117161143377be35bfd38def638b3478fffbb"
+      }
+    },
+    {
+      "name": "10k, 18 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "10k",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "ab067b4fe1db48f4ee7af999557ab51e3fef15a066754e796b5bcd2cede42cee"
+      }
+    },
+    {
+      "name": "10k, 26 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "10k",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "e89ba18bd3ecca1079292bf162813df8d0a6edfb695db05e8e75dd67385ee261"
+      }
+    },
+    {
+      "name": "10k, 26 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "10k",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "76785a2225ee3f35582011e42399da8cdc5f100396701134e1af711be423ec0f"
+      }
+    },
+    {
+      "name": "10k, 26 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "10k",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "d0593b85c1ad0eab813d0350d7e1ce6c86a6b3228621e62d1bf8710c55b07548"
+      }
+    },
+    {
+      "name": "half, 6 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "half",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "13f5f9981980efe7ae1dd4d7ea69e223ba7c7b6cdc11ddf6f6debbf6feee7218"
+      }
+    },
+    {
+      "name": "half, 6 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "half",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "496f25e6c73b4d9790bef29b38cb8827e10ecca2c50b1b73794e3fb1eddd4968"
+      }
+    },
+    {
+      "name": "half, 6 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "half",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "4ca43e138a116dda3ad21a3f61eba8955652a134f6bc088dcbadd5897d28bcdd"
+      }
+    },
+    {
+      "name": "half, 18 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "half",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "ae40bdeee80c283654d0699b0985cfee9d0dd7c26ff570af8461f2bacc758d6c"
+      }
+    },
+    {
+      "name": "half, 18 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "half",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "146e3671711945d2fbd8cb4cd208edf377c9b2c233371d595b906d30932612d6"
+      }
+    },
+    {
+      "name": "half, 18 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "half",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "dcb2309feb0f8ba433adfa549bb416c75a09e6371e63e4247ec94e57909b61c7"
+      }
+    },
+    {
+      "name": "half, 26 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "half",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "1b4be1f767e1ef5a350f24da51cebb4a6d3c24afda38bd34a4a07d7cfa6a05f5"
+      }
+    },
+    {
+      "name": "half, 26 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "half",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "c4ef72e85eb588384053df7189a6da5c339e11362c59d6260184d4ab08504982"
+      }
+    },
+    {
+      "name": "half, 26 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "half",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "301980198f299f4554ed8b9200da3211f7cdc2e66291539086ba2c7b192e4eb7"
+      }
+    },
+    {
+      "name": "marathon, 6 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "7a04b76a8f6111f7701522681ac7c8a89b19bdbea7197550c5a0d9cfd029b41d"
+      }
+    },
+    {
+      "name": "marathon, 6 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "e0355a9c093622dbb58799a3fbbad84c8ceb892521f8f5a1431feac6d65ee586"
+      }
+    },
+    {
+      "name": "marathon, 6 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "c320e33f811914d370d6fc84e7cf7e6842c4905c1faac0fb49e8374e654eac2c"
+      }
+    },
+    {
+      "name": "marathon, 18 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "c73276bd019225c588f3a9541a496e36fdd841c6ebf2ddfce900e78c2bbdcb6b"
+      }
+    },
+    {
+      "name": "marathon, 18 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "c06f3c142d473ef50a9389d836f23af9f3218b6eb4fd0ea4fc7c4383f77d8e92"
+      }
+    },
+    {
+      "name": "marathon, 18 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "c55f53e91134fcf23287576a3cfadb42701ed7fcea5989520f3d216182057331"
+      }
+    },
+    {
+      "name": "marathon, 26 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "a04a3a3464c04785c0623d37263327ad01dc333c3ccb683aa30c3960d8a5b334"
+      }
+    },
+    {
+      "name": "marathon, 26 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "8205bd0cde6062d0cb1d945e7bc237af59f4486651eaab773ce00024104df2f3"
+      }
+    },
+    {
+      "name": "marathon, 26 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "e88e420a3ee8c31a4f0ff71dbc6498dfa6a4c0b7bd21d4c1f81b38d28fdaec83"
+      }
+    },
+    {
+      "name": "ultra, 6 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "ultra",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 90,
+        "longestKm": 30,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "raceDistanceKm": 100,
+        "ultraWeeklyMinutes": 540,
+        "ultraLongestMinutes": 180,
+        "terrain": "flat",
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "error": {
+          "name": "PlanError",
+          "message": "For ultras beyond 50 miles, enter at least 12 weeks of consistent recent running and an established routine. Build a base first if you are returning or still building consistency."
+        }
+      }
+    },
+    {
+      "name": "ultra, 6 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "ultra",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 90,
+        "longestKm": 30,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "raceDistanceKm": 100,
+        "ultraWeeklyMinutes": 540,
+        "ultraLongestMinutes": 180,
+        "terrain": "flat",
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "error": {
+          "name": "PlanError",
+          "message": "For ultras beyond 50 miles, enter at least 12 weeks of consistent recent running and an established routine. Build a base first if you are returning or still building consistency."
+        }
+      }
+    },
+    {
+      "name": "ultra, 6 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "ultra",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 90,
+        "longestKm": 30,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "raceDistanceKm": 100,
+        "ultraWeeklyMinutes": 540,
+        "ultraLongestMinutes": 180,
+        "terrain": "flat",
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "error": {
+          "name": "PlanError",
+          "message": "For ultras beyond 50 miles, enter at least 12 weeks of consistent recent running and an established routine. Build a base first if you are returning or still building consistency."
+        }
+      }
+    },
+    {
+      "name": "ultra, 18 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "ultra",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 90,
+        "longestKm": 30,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "raceDistanceKm": 100,
+        "ultraWeeklyMinutes": 540,
+        "ultraLongestMinutes": 180,
+        "terrain": "flat",
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "error": {
+          "name": "PlanError",
+          "message": "For ultras beyond 50 miles, enter at least 12 weeks of consistent recent running and an established routine. Build a base first if you are returning or still building consistency."
+        }
+      }
+    },
+    {
+      "name": "ultra, 18 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "ultra",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 90,
+        "longestKm": 30,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "raceDistanceKm": 100,
+        "ultraWeeklyMinutes": 540,
+        "ultraLongestMinutes": 180,
+        "terrain": "flat",
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "error": {
+          "name": "PlanError",
+          "message": "For ultras beyond 50 miles, enter at least 12 weeks of consistent recent running and an established routine. Build a base first if you are returning or still building consistency."
+        }
+      }
+    },
+    {
+      "name": "ultra, 18 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "ultra",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 90,
+        "longestKm": 30,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "raceDistanceKm": 100,
+        "ultraWeeklyMinutes": 540,
+        "ultraLongestMinutes": 180,
+        "terrain": "flat",
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "error": {
+          "name": "PlanError",
+          "message": "For ultras beyond 50 miles, enter at least 12 weeks of consistent recent running and an established routine. Build a base first if you are returning or still building consistency."
+        }
+      }
+    },
+    {
+      "name": "ultra, 26 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "ultra",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 90,
+        "longestKm": 30,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "raceDistanceKm": 100,
+        "ultraWeeklyMinutes": 540,
+        "ultraLongestMinutes": 180,
+        "terrain": "flat",
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "error": {
+          "name": "PlanError",
+          "message": "For ultras beyond 50 miles, enter at least 12 weeks of consistent recent running and an established routine. Build a base first if you are returning or still building consistency."
+        }
+      }
+    },
+    {
+      "name": "ultra, 26 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "ultra",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 90,
+        "longestKm": 30,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "raceDistanceKm": 100,
+        "ultraWeeklyMinutes": 540,
+        "ultraLongestMinutes": 180,
+        "terrain": "flat",
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "error": {
+          "name": "PlanError",
+          "message": "For ultras beyond 50 miles, enter at least 12 weeks of consistent recent running and an established routine. Build a base first if you are returning or still building consistency."
+        }
+      }
+    },
+    {
+      "name": "ultra, 26 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "ultra",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 90,
+        "longestKm": 30,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "raceDistanceKm": 100,
+        "ultraWeeklyMinutes": 540,
+        "ultraLongestMinutes": 180,
+        "terrain": "flat",
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "error": {
+          "name": "PlanError",
+          "message": "For ultras beyond 50 miles, enter at least 12 weeks of consistent recent running and an established routine. Build a base first if you are returning or still building consistency."
+        }
+      }
+    },
+    {
+      "name": "custom, 6 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "custom",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "raceDistanceKm": 35,
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "9c488235c465abcf7007c8863b13f7e79c6c8233a0db1b595db113fc547be98b"
+      }
+    },
+    {
+      "name": "custom, 6 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "custom",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "raceDistanceKm": 35,
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "17295f31b11e6d27df167fa8e6f329250cb17dd10d0c6fd56068ed92b6ba3ad0"
+      }
+    },
+    {
+      "name": "custom, 6 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "custom",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2026-10-25",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "raceDistanceKm": 35,
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "06aa0ef501e2d72712a2203f19e8d920953c1a2f8b2276b6bccbe9a260f0daa7"
+      }
+    },
+    {
+      "name": "custom, 18 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "custom",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "raceDistanceKm": 35,
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "dc411fb9865b6ea64baaced63cd35d00e32a4312e9934a4446dbdf69212f6cd8"
+      }
+    },
+    {
+      "name": "custom, 18 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "custom",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "raceDistanceKm": 35,
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "aa7b4eff8e378ef5b060e43789208a15de37f1dec3d095b71cca8e739fa01b16"
+      }
+    },
+    {
+      "name": "custom, 18 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "custom",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "raceDistanceKm": 35,
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "8131246b2de038542555cf0b3fd8594ee2610d4f577286e932dd71f1a6af158b"
+      }
+    },
+    {
+      "name": "custom, 26 weeks, effort",
+      "profile": {
+        "name": "",
+        "goal": "custom",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "raceDistanceKm": 35,
+        "workoutTargets": {
+          "mode": "effort"
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "7c2a33e30d65d72726fd7d1cc2120ee05daeed534f43602f33fc50fd08faf7c0"
+      }
+    },
+    {
+      "name": "custom, 26 weeks, benchmark",
+      "profile": {
+        "name": "",
+        "goal": "custom",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "raceDistanceKm": 35,
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "874a0919a30d5d5fe43f22c5fd7c6c40ab4fa4ad630f710c14736c455c478ef2"
+      }
+    },
+    {
+      "name": "custom, 26 weeks, manual",
+      "profile": {
+        "name": "",
+        "goal": "custom",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-03-14",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "raceDistanceKm": 35,
+        "workoutTargets": {
+          "mode": "pace",
+          "pace": {
+            "easy": {
+              "low": 330,
+              "high": 390
+            },
+            "tempo": {
+              "low": 270,
+              "high": 300
+            }
+          }
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "cc8b7a81cf9f86b55d004f75dc6fd34650b1420148d4a477dfa3cb0f64c444da"
+      }
+    },
+    {
+      "name": "constraints {\"difficulty\":\"gentle\"}",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "gentle",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "0efe8def7b04624f38662cf318434ce83df49c8f87d4c11dc4177dd4f46ef960"
+      }
+    },
+    {
+      "name": "constraints {\"volume\":\"maintain\"}",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "maintain",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "error": {
+          "name": "PlanError",
+          "message": "These limits leave a longest training exposure of 23 km; this policy requires room for 26 km. Allow more session time, review distance caps, or build a base first."
+        }
+      }
+    },
+    {
+      "name": "constraints {\"weeklyMinutesLimit\":360}",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "weeklyMinutesLimit": 360
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "error": {
+          "name": "PlanError",
+          "message": "Your starting weekly distance and long-run baseline cannot fit the selected running days, session limits and weekly time ceiling. Review these inputs together."
+        }
+      }
+    },
+    {
+      "name": "constraints {\"dayPreferences\":[{\"day\":2,\"maxMinutes\":30}]}",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "dayPreferences": [
+          {
+            "day": 2,
+            "maxMinutes": 30
+          }
+        ]
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "07a7532845f363b69333d68646c33609c340d8c55126c648f7384443482a70fd"
+      }
+    },
+    {
+      "name": "constraints {\"longMinutes\":150}",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 150,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "error": {
+          "name": "PlanError",
+          "message": "These limits leave a longest training exposure of 25 km; this policy requires room for 26 km. Allow more session time, review distance caps, or build a base first."
+        }
+      }
+    },
+    {
+      "name": "constraints {\"runsPerWeek\":4,\"currentRuns\":5}",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 4,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "f8a777f2d5907d62f1d87d9ed67115d4fc568eb95ca60e236655801e0b779686"
+      }
+    },
+    {
+      "name": "constraints {\"recentRace\":{\"distanceKm\":0,\"timeMinutes\":20}}",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30,
+        "recentRace": {
+          "distanceKm": 0,
+          "timeMinutes": 20
+        }
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "error": {
+          "name": "PlanError",
+          "message": "Recent race: use 1–100 km and a finish time equivalent to 2–15 minutes per km."
+        }
+      }
+    },
+    {
+      "name": "constraints {\"easyPace\":null}",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": null,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30
+      },
+      "operation": "generate",
+      "asOf": "2026-09-14",
+      "expected": {
+        "sha256": "6dd892675525dd3f33b6f7fc558a880aa5923a770783b17e30a90fbf1aad28dd"
+      }
+    },
+    {
+      "name": "public operation refresh",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30
+      },
+      "operation": "refresh",
+      "asOf": "2026-09-28",
+      "expected": {
+        "sha256": "5cc9a4c50981a2fa36018c70e19fdce7f2a7adcec6abfd578c8e54d135dbf007"
+      }
+    },
+    {
+      "name": "public operation revise",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30
+      },
+      "operation": "revise",
+      "asOf": "2026-09-28",
+      "expected": {
+        "sha256": "24a6b54e20a2ea4791dce0e7955c726e68bc75936884aaa59d77671dfbe14b46"
+      }
+    },
+    {
+      "name": "public operation easy",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30
+      },
+      "operation": "easy",
+      "asOf": "2026-09-28",
+      "expected": {
+        "sha256": "314a6676e5e77210920f9e9a043c6cfdd9ad60771c72e840f470feb8cceaa0f5"
+      }
+    },
+    {
+      "name": "public operation rest",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30
+      },
+      "operation": "rest",
+      "asOf": "2026-09-28",
+      "expected": {
+        "sha256": "8c3d485a22ef5d5cabb74007be8dba53f6ba980c48de5d8fc0e7caf88479217c"
+      }
+    },
+    {
+      "name": "public operation shorten",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30
+      },
+      "operation": "shorten",
+      "asOf": "2026-09-28",
+      "expected": {
+        "sha256": "484ee7b16785cd892afc34b2c1da846bf458122ab80a51a34ac30b336616feea"
+      }
+    },
+    {
+      "name": "public operation return-review",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30
+      },
+      "operation": "return-review",
+      "asOf": "2026-09-28",
+      "expected": {
+        "sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b"
+      }
+    },
+    {
+      "name": "public operation novice-review",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30
+      },
+      "operation": "novice-review",
+      "asOf": "2026-09-28",
+      "expected": {
+        "sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b"
+      }
+    },
+    {
+      "name": "public operation alternatives",
+      "profile": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-14",
+        "raceDate": "2027-01-17",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "automatic",
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 30
+      },
+      "operation": "alternatives",
+      "asOf": "2026-09-28",
+      "expected": {
+        "sha256": "fddd50b60d6da07192d08f014c2a521e1ec1fa402fa20001e376f10c4b36b251"
+      }
+    }
+  ]
+}

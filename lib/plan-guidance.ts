@@ -1,5 +1,9 @@
 import type { Plan, Workout } from './engine';
-import { usesMarathonRhythm } from './training-structure.ts';
+import {
+  usesMarathonRhythm,
+  usesStandardQualityRhythm,
+} from './training-structure.ts';
+import { ENGINE_VERSION } from './plan/policy.ts';
 import { usesMarathonBook } from './marathon-book.ts';
 import { qualityWorkMinutes } from './prescription.ts';
 import { isSteadyRaceAdaptation } from './steady-race-workout.ts';
@@ -50,7 +54,10 @@ export function marathonPlanDescription(plan: Plan) {
   if (!f.training.length)
     return 'This remaining block contains no training runs before race day. It does not represent a complete marathon preparation.';
   const standard =
-    usesMarathonRhythm(plan.profile) && plan.engineVersion === 'stride-0.10.0';
+    usesMarathonRhythm(plan.profile) &&
+    (plan.engineVersion === 'stride-0.10.0' ||
+      (plan.engineVersion === ENGINE_VERSION &&
+        usesStandardQualityRhythm(plan.profile)));
   const count = standard
     ? Math.max(
         0,

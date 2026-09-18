@@ -120,7 +120,7 @@ test('the long-run forecast respects duration and distance caps independently of
   }
 });
 
-test('conservative manual long-run pace changes allocation without manufacturing weekly time', () => {
+test('conservative manual pace funds the same declared weekly distance', () => {
   const ordinary = resolveGenerationPolicy(
     profile({ longestKm: 25, longMinutes: 210 }),
   );
@@ -132,7 +132,8 @@ test('conservative manual long-run pace changes allocation without manufacturing
     }),
   );
   assert.equal(ordinary.initialLoad * ordinary.pace, 420);
-  assert.equal(manual.initialLoad * manual.pace, 420);
+  assert.equal(manual.initialLoad, ordinary.initialLoad);
+  assert.equal(manual.initialLoad * manual.pace, 70 * 6.5);
   assert.equal(manual.longPace, 6.5);
   assert.equal(manual.startLong, 25);
   assert.ok(manual.peakLong <= 210 / 6.5);
