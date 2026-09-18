@@ -2,11 +2,49 @@
 import { CustomizationSummary } from '../runner-customization-fields';
 
 import { dateLabel, type Plan } from '@/lib/engine';
-import { runDuration } from '@/lib/journal-view';
+import {
+  preferenceOverviewRows,
+  workoutComparisonRows,
+  type WorkoutComparisonRow,
+} from '@/lib/plan-change-summary';
+import { WorkoutSteps } from '../workout-steps';
 import { desiredRuns, requestedQualityCount } from '@/lib/training-structure';
 import { ArrowRight } from 'lucide-react';
 import { BusyButton } from '../action-progress';
 import type { usePlanPreferences } from './use-plan-preferences';
+
+function PrescriptionComparison({
+  label,
+  rows,
+}: {
+  label: string;
+  rows: WorkoutComparisonRow[];
+}) {
+  return (
+    <table className="prescription-comparison" aria-label={label}>
+      <thead>
+        <tr className="prescription-comparison-head">
+          <th scope="col">Prescription</th>
+          <th scope="col">Before</th>
+          <th scope="col">After</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row) => (
+          <tr
+            className="prescription-comparison-row"
+            data-changed={row.changed}
+            key={row.label}
+          >
+            <th scope="row">{row.label}</th>
+            <td>{row.before}</td>
+            <td>{row.after}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
 
 export function PreferencePreview({
   preview,
@@ -26,62 +64,68 @@ export function PreferencePreview({
   changes,
   removed,
 }: ReturnType<typeof usePlanPreferences> & { preview: Plan }) {
+  const overview = preferenceOverviewRows(plan, preview, today);
+  const added = changes.filter(
+    (w) => !plan.workouts.some((old) => old.id === w.id),
+  );
+  const entries = [
+    ...changes.map((after) => ({
+      before: plan.workouts.find((w) => w.id === after.id),
+      after,
+    })),
+    ...removed.map((before) => ({ before, after: undefined })),
+  ].sort((a, b) =>
+    (a.after?.date ?? a.before!.date).localeCompare(
+      b.after?.date ?? b.before!.date,
+    ),
+  );
   return (
-    <div className="form-section">
+    <div className="form-section preference-inspection">
       <div className="plan-review-choice">
         <strong>{desiredRuns(preview.profile)} running days</strong>
         <span>
-          Up to{' '}
-          {preview.profile.intent === 'finish'
-            ? 0
-            : requestedQualityCount(preview.profile)}{' '}
-          harder workouts per week
+          Up to {requestedQualityCount(preview.profile)} weekday quality
+          {requestedQualityCount(preview.profile) === 1
+            ? ' workout'
+            : ' workouts'}{' '}
+          per week
+          {preview.workouts.some((w) => w.kind === 'long' && w.date >= today)
+            ? ', plus the long run'
+            : ''}
         </span>
         <p>
           Recovery and taper weeks can be lighter. Completed runs and workouts
           you edited individually stay as saved.
         </p>
       </div>
-      <div className="plan-distance-metrics">
-        <div>
-          <span>Next full week</span>
-          <strong>
-            {Number(
-              (
-                (preview.weeks.find((w) => w.start >= today)?.targetKm ??
-                  preview.weeks.at(-1)?.targetKm ??
-                  0) / (preview.profile.units === 'mi' ? 1.609344 : 1)
-              ).toFixed(1),
-            )}
-            <small> {preview.profile.units}</small>
-          </strong>
+      <section
+        className="preference-overview"
+        aria-label="Plan totals before and after"
+      >
+        <div className="section-heading">
+          <h3>See what changes</h3>
+          {overview.weekStart && (
+            <span>Week of {dateLabel(overview.weekStart)}</span>
+          )}
         </div>
-        <div>
-          <span>Longest upcoming run</span>
-          <strong>
-            {Number(
-              (
-                Math.max(
-                  0,
-                  ...preview.workouts
-                    .filter((w) => w.date >= today && w.kind === 'long')
-                    .map((w) => w.estimatedKm),
-                ) / (preview.profile.units === 'mi' ? 1.609344 : 1)
-              ).toFixed(1),
-            )}
-            <small> {preview.profile.units}</small>
-          </strong>
-        </div>
-      </div>
-      <p className="plan-control-hint">
-        Weekly totals include estimates for timed workout steps.
-      </p>
+        <PrescriptionComparison
+          label="Training totals comparison"
+          rows={overview.rows}
+        />
+        <p className="plan-control-hint">
+          Both columns use{' '}
+          {preview.profile.units === 'mi' ? 'miles' : 'kilometres'}. Estimated
+          distances are ranges, not extra targets. Times that include distance
+          steps are planning estimates.
+        </p>
+      </section>
       <CustomizationSummary profile={preview.profile} />
       <div className="notice">
         {(previewVersion !== version || effectiveDate !== today) &&
           'This preview is out of date. Go back and preview again. '}
-        {changes.length} upcoming sessions change; {removed.length} are removed
-        from the schedule. Race day remains {dateLabel(plan.profile.raceDate)}.
+        {changes.length - added.length} upcoming sessions change; {added.length}{' '}
+        are added; {removed.length} are removed from the schedule. Race day
+        remains {dateLabel(plan.profile.raceDate)}.
       </div>
       {(preview.profile.carbsPerHour ?? null) !==
         (plan.profile.carbsPerHour ?? null) && (
@@ -110,41 +154,81 @@ export function PreferencePreview({
           running totals and watch delivery.
         </p>
       )}
-      <div className="changed-runs">
-        {removed.map((w) => (
-          <div key={w.id}>
-            <span>{dateLabel(w.date)}</span>
-            <strong>{w.title}</strong>
-            <span>Removed</span>
-          </div>
-        ))}
-        {changes.slice(0, showAll ? undefined : 12).map((w) => {
-          const old = plan.workouts.find((x) => x.id === w.id);
+      {entries.length === 0 && (
+        <p className="notice">
+          No upcoming run prescriptions change. Your preference settings will
+          still be saved.
+        </p>
+      )}
+      <div
+        className="session-change-list"
+        aria-label="Upcoming workout changes"
+      >
+        {entries.slice(0, showAll ? undefined : 12).map(({ before, after }) => {
+          const workout = after ?? before!;
+          const rows = workoutComparisonRows(
+            before,
+            after,
+            plan.profile,
+            preview.profile,
+          );
+          const kind = !before ? 'Added' : !after ? 'Removed' : 'Updated';
           return (
-            <div key={w.id}>
-              <span>{dateLabel(w.date)}</span>
-              <strong>{w.title}</strong>
-              <span>
-                {old ? runDuration(old.minutes) : 'New'} →{' '}
-                {runDuration(w.minutes)}
-                {old?.startTime !== w.startTime && (
-                  <small>
-                    {old?.startTime ?? 'Open start'} →{' '}
-                    {w.startTime ?? 'Open start'}
-                  </small>
-                )}
-              </span>
+            <article className="session-change" key={workout.id}>
+              <header className="session-change-heading">
+                <div>
+                  <span>{dateLabel(workout.date)}</span>
+                  <h3>{workout.title}</h3>
+                </div>
+                <span className="session-change-kind" data-kind={kind}>
+                  {kind}
+                </span>
+              </header>
+              <PrescriptionComparison
+                label={`${dateLabel(workout.date)} workout comparison`}
+                rows={rows}
+              />
               <details className="change-reason">
                 <summary>Why this changes</summary>
-                <p>{w.reason}</p>
+                <p>
+                  {after?.reason ??
+                    'This session is no longer scheduled with your revised preferences. The remaining sessions are shown in this preview.'}
+                </p>
               </details>
-            </div>
+              <details className="change-prescription-details">
+                <summary>Compare every step</summary>
+                <div className="change-step-comparison">
+                  <section aria-label="Before workout steps">
+                    <h4>Before</h4>
+                    {before ? (
+                      <WorkoutSteps
+                        workout={before}
+                        profile={{
+                          ...plan.profile,
+                          units: preview.profile.units,
+                        }}
+                      />
+                    ) : (
+                      <p>Not scheduled</p>
+                    )}
+                  </section>
+                  <section aria-label="After workout steps">
+                    <h4>After</h4>
+                    {after ? (
+                      <WorkoutSteps workout={after} profile={preview.profile} />
+                    ) : (
+                      <p>Not scheduled</p>
+                    )}
+                  </section>
+                </div>
+              </details>
+            </article>
           );
         })}
       </div>
-      {changes.length > 12 && (
+      {entries.length > 12 && (
         <button className="text-button" onClick={() => setShowAll(!showAll)}>
-          {showAll ? 'Show fewer' : `Show all ${changes.length} changes`}
+          {showAll ? 'Show fewer' : `Show all ${entries.length} changes`}
         </button>
       )}
       <div className="form-actions">

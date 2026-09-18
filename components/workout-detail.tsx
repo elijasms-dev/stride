@@ -143,25 +143,28 @@ export default function WorkoutDetail({
   const sendWindow = workoutSendWindow(w.date, today, !!delivery);
   const completedLog = w.status === 'completed' ? w.feedback : undefined;
   const prescriptionContent = (
-    <>
-      <p className="detail-purpose">{w.purpose}</p>
-      <div className="workout-stats">
+    <div className="workout-prescription">
+      <div className="workout-stats" data-metrics={w.kind === 'race' ? 2 : 3}>
         <div>
           <strong>{workoutDistanceValue(w, profile)}</strong>
           <span>
-            {prescribedDistanceKm(w) !== null
+            {w.kind === 'race' || prescribedDistanceKm(w) !== null
               ? `${profile.units} target`
               : estimate.lowerKm === null
                 ? 'Distance unknown'
                 : `${profile.units} estimate`}
           </span>
         </div>
-        <div>
-          <strong>{runDuration(w.minutes)}</strong>
-          <span>
-            {prescribedDistanceKm(w) !== null ? 'estimated time' : 'duration'}
-          </span>
-        </div>
+        {w.kind !== 'race' && (
+          <div>
+            <strong>{runDuration(w.minutes)}</strong>
+            <span>
+              {w.steps.some((step) => step.metres !== undefined)
+                ? 'estimated time'
+                : 'duration'}
+            </span>
+          </div>
+        )}
         <div>
           <strong>
             {mainWorkoutTarget(w) ? (
@@ -176,17 +179,7 @@ export default function WorkoutDetail({
           <span>{mainWorkoutTarget(w) ? 'main-set target' : 'effort'}</span>
         </div>
       </div>
-      {w.kind !== 'race' && (
-        <p className="subtle">
-          {w.steps.some((s) => s.metres !== undefined)
-            ? 'Distance steps finish at their kilometre or mile target. Time is a planning estimate; keep the effort comfortable and stop earlier if you reach your available time limit. '
-            : ''}
-          {estimate.basis} Follow the targets and cues in each step.
-        </p>
-      )}
-      {!completedLog && <DailyGuide guide={dailyGuide(plan, w.date, w)} />}
       <SessionBriefing workout={w} units={profile.units} />
-      <EffortGraph workout={w} units={profile.units} />
       <div className="session-steps">
         <div className="section-heading">
           <h3>Your session, step by step</h3>
@@ -194,8 +187,27 @@ export default function WorkoutDetail({
         </div>
         <WorkoutSteps workout={w} profile={profile} />
       </div>
+      <details className="workout-supporting-detail">
+        <summary>Effort profile & distance estimates</summary>
+        {w.kind !== 'race' && <EffortGraph workout={w} units={profile.units} />}
+        {w.kind !== 'race' && (
+          <p className="subtle">
+            {w.steps.some((s) => s.metres !== undefined)
+              ? 'Distance steps finish at their kilometre or mile target. Time is a planning estimate; keep the effort comfortable and stop earlier if you reach your available time limit. '
+              : ''}
+            {estimate.basis} Follow the targets and cues in each step.
+          </p>
+        )}
+      </details>
+      {!completedLog && (
+        <details className="workout-supporting-detail">
+          <summary>Preparation, food & recovery</summary>
+          <DailyGuide guide={dailyGuide(plan, w.date, w)} />
+        </details>
+      )}
       <details className="reason-details">
         <summary>Why this workout?</summary>
+        <p>{w.purpose}</p>
         <p>{w.reason}</p>
       </details>
       {workoutGuidance(plan, w).length > 0 && (
@@ -206,7 +218,7 @@ export default function WorkoutDetail({
           ))}
         </details>
       )}
-    </>
+    </div>
   );
   const currentDelivery =
     delivery?.version === version &&
@@ -345,7 +357,7 @@ export default function WorkoutDetail({
         mode === 'view'
           ? completedLog
             ? `${dateLabel(recordedWorkoutDate(w), { weekday: 'long', day: 'numeric', month: 'long' })} · ${runDuration(completedLog.actualMinutes)}`
-            : `${dateLabel(w.date, { weekday: 'long', day: 'numeric', month: 'long' })} · ${prescribedDistanceKm(w) !== null ? workoutDistanceLabel(w, profile) : runDuration(w.minutes)}${w.session ? ` · ${w.session} ${w.startTime}` : ''}`
+            : `${dateLabel(w.date, { weekday: 'long', day: 'numeric', month: 'long' })} · ${w.kind === 'race' || prescribedDistanceKm(w) !== null ? workoutDistanceLabel(w, profile) : runDuration(w.minutes)}${w.session ? ` · ${w.session} ${w.startTime}` : ''}`
           : logging
             ? 'Your feedback helps decide whether to ease the next week.'
             : mode === 'move'
@@ -465,7 +477,6 @@ export default function WorkoutDetail({
                   <p className="recorded-run-note">{completedLog.note}</p>
                 )}
               </section>
-              <DailyGuide guide={dailyGuide(plan, recordedWorkoutDate(w), w)} />
               <details className="recorded-prescription">
                 <summary>View prescribed workout</summary>
                 <p className="subtle">
@@ -473,6 +484,12 @@ export default function WorkoutDetail({
                   instructions; your recorded results are above.
                 </p>
                 {prescriptionContent}
+              </details>
+              <details className="workout-supporting-detail">
+                <summary>Recovery & daily guidance</summary>
+                <DailyGuide
+                  guide={dailyGuide(plan, recordedWorkoutDate(w), w)}
+                />
               </details>
             </>
           ) : (

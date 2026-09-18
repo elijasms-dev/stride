@@ -10,6 +10,8 @@ import './brand.css';
 import './daily-guide.css';
 import './plan-customization.css';
 import './notifications.css';
+import './plan-explorer.css';
+import './workout-inspection.css';
 import { APPEARANCE_BOOTSTRAP } from '@/lib/appearance';
 
 const journalSans = Manrope({

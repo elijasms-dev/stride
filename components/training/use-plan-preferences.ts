@@ -4,6 +4,7 @@ import { type Plan, type PreferencePatch, type Profile } from '@/lib/engine';
 import type { SubmitEvent } from 'react';
 import { useRef, useState } from 'react';
 import { api } from '../stride-ui';
+import { upcomingPlanChanges } from '@/lib/plan-change-summary';
 
 export function usePlanPreferences({
   initialPatch = {},
@@ -38,30 +39,9 @@ export function usePlanPreferences({
     [preview, setPreview] = useState<Plan | null>(null),
     [error, setError] = useState(''),
     [checking, setChecking] = useState(false);
-  const changes =
-    preview?.workouts.filter(
-      (w) =>
-        w.date >= today &&
-        (() => {
-          const old = plan.workouts.find((x) => x.id === w.id);
-          return (
-            !old ||
-            old.date !== w.date ||
-            old.startTime !== w.startTime ||
-            old.status !== w.status ||
-            old.title !== w.title ||
-            JSON.stringify(w.steps) !== JSON.stringify(old.steps)
-          );
-        })(),
-    ) ?? [];
-  const removed = preview
-    ? plan.workouts.filter(
-        (w) =>
-          w.date >= today &&
-          w.status !== 'completed' &&
-          !preview.workouts.some((x) => x.id === w.id),
-      )
-    : [];
+  const { changes, removed } = preview
+    ? upcomingPlanChanges(plan, preview, today)
+    : { changes: [], removed: [] };
   async function previewPreferences(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     if (flight.current) return;

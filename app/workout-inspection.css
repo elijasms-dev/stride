@@ -1,0 +1,193 @@
+.workout-prescription {
+  min-width: 0;
+}
+.workout-prescription .session-repeat-heading,
+.change-step-comparison .session-repeat-heading {
+  background: var(--surface-raised);
+  color: var(--text-main);
+}
+.workout-prescription > .workout-stats {
+  margin-top: 20px;
+}
+.workout-prescription > .session-steps {
+  margin-block: 24px;
+}
+.workout-supporting-detail {
+  padding: 17px 0;
+  border-top: 1px solid var(--border);
+}
+.workout-supporting-detail > summary,
+.change-prescription-details > summary {
+  padding: 5px 0;
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.workout-supporting-detail > summary:focus-visible,
+.change-prescription-details > summary:focus-visible,
+.session-change .change-reason > summary:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 5px;
+  border-radius: 3px;
+}
+.workout-supporting-detail > .daily-guide {
+  margin-top: 14px;
+}
+.preference-overview {
+  margin-block: 10px 24px;
+}
+.preference-overview > .section-heading {
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+.preference-overview > .section-heading > span {
+  font-size: 12px;
+  color: var(--text-label);
+}
+.prescription-comparison {
+  width: 100%;
+  table-layout: fixed;
+  text-align: left;
+  border-collapse: collapse;
+  min-width: 0;
+  border-block: 1px solid var(--border);
+  font-size: 14px;
+  line-height: 1.55;
+}
+.prescription-comparison thead,
+.prescription-comparison tbody {
+  display: block;
+}
+.prescription-comparison-head,
+.prescription-comparison-row {
+  display: grid;
+  grid-template-columns: minmax(92px, 0.68fr) repeat(2, minmax(0, 1fr));
+  gap: 0 12px;
+}
+.prescription-comparison-head {
+  color: var(--text-label);
+  font-size: 14px;
+  font-weight: 650;
+}
+.prescription-comparison-head > *,
+.prescription-comparison-row > * {
+  min-width: 0;
+  padding: 10px 7px;
+  overflow-wrap: anywhere;
+}
+.prescription-comparison-row + .prescription-comparison-row {
+  border-top: 1px solid var(--border);
+}
+.prescription-comparison-row > th {
+  color: var(--text-label);
+  font-weight: 500;
+}
+.prescription-comparison-row[data-changed='true'] > :last-child {
+  background: var(--surface-raised);
+  font-weight: 650;
+}
+.session-change-list {
+  display: grid;
+  gap: 28px;
+  margin-top: 24px;
+}
+.session-change {
+  min-width: 0;
+}
+.session-change-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 13px;
+}
+.session-change-heading > div {
+  min-width: 0;
+}
+.session-change-heading > div > span {
+  font-size: 12px;
+  color: var(--text-label);
+}
+.session-change-heading h3 {
+  margin-top: 4px;
+  font-family: var(--font-spatial-display), sans-serif;
+  font-size: 17px;
+  font-weight: 650;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.session-change-kind {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 650;
+}
+.session-change .change-reason,
+.change-prescription-details {
+  margin-top: 10px;
+}
+.session-change .change-reason > p {
+  margin-top: 10px;
+  max-width: 70ch;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.change-step-comparison {
+  display: grid;
+  gap: 20px;
+  margin-top: 16px;
+}
+.change-step-comparison h4 {
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 650;
+}
+.change-step-comparison > section {
+  min-width: 0;
+  border-left: 2px solid var(--border);
+  padding-left: 14px;
+}
+.change-step-comparison .session-step {
+  grid-template-columns: 25px minmax(0, 1fr) auto;
+}
+@media (max-width: 560px) {
+  .prescription-comparison-head,
+  .prescription-comparison-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 10px;
+  }
+  .prescription-comparison-head > :first-child {
+    display: none;
+  }
+  .prescription-comparison-row > th {
+    grid-column: 1 / -1;
+    padding-bottom: 0;
+    font-size: 14px;
+  }
+  .prescription-comparison-row > td {
+    padding-top: 5px;
+  }
+  .session-change-heading h3 {
+    font-size: 16px;
+  }
+  .workout-prescription .session-step,
+  .change-step-comparison .session-step {
+    grid-template-columns: 24px minmax(0, 1fr);
+  }
+  .workout-prescription .session-step .step-time,
+  .change-step-comparison .session-step .step-time {
+    grid-column: 2;
+    text-align: left;
+    padding-top: 3px;
+  }
+}
+
+.workout-prescription > .workout-stats[data-metrics='2'] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.workout-prescription > .workout-stats[data-metrics='2'] > div:last-child {
+  grid-column: auto;
+}
