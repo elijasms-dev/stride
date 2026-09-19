@@ -113,16 +113,27 @@ export function makePlan(
         ? (p.recentQualityMinutes ?? 0)
         : Infinity,
     );
+    // Keep both selected weekday recipes ahead of optional faster long-run
+    // work. Proportional cuts can erase a complete main set even when the two
+    // weekday workouts fit together within the existing weekly allowance.
+    const explicitTwoWorkouts =
+      bookMarathon && p.qualityMode === 'custom' && p.qualitySessions === 2;
     const guaranteed =
-      usesStandardQualityRhythm(p) &&
+      (usesStandardQualityRhythm(p) || explicitTwoWorkouts) &&
       !['Recovery', 'Taper', 'Race week'].includes(week.phase);
     if (guaranteed && prescribedQuality <= ceiling + 0.01) continue;
     let remainingWork = ceiling;
     const orderedQuality = guaranteed
       ? [...quality].sort(
           (a, b) =>
-            Number(b.kind !== 'long' && b.stimulus === 'threshold') -
-            Number(a.kind !== 'long' && a.stimulus === 'threshold'),
+            Number(
+              b.kind !== 'long' &&
+                (explicitTwoWorkouts ? b.hard : b.stimulus === 'threshold'),
+            ) -
+            Number(
+              a.kind !== 'long' &&
+                (explicitTwoWorkouts ? a.hard : a.stimulus === 'threshold'),
+            ),
         )
       : quality;
     for (const w of orderedQuality) {

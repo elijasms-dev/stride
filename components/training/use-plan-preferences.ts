@@ -47,10 +47,7 @@ export function usePlanPreferences({
     if (flight.current) return;
     flight.current = true;
     setChecking(true);
-    const snapshot = {
-      ...structuredClone(p),
-      workoutVariety: 'varied' as const,
-    };
+    const snapshot = structuredClone(p);
     setError('');
     try {
       const result = await api<{

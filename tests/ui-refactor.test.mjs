@@ -170,3 +170,81 @@ test('today route preserves workout and rest-day presentations through app conte
   assert.match(rest, /class="daily-rest-card"/);
   assert.match(rest, /Rest day, open daily guide/);
 });
+
+test('marathon preferences retain selectable zero, one and two workout options', () => {
+  for (const qualityMode of ['automatic', 'custom']) {
+    const saved = {
+      ...plan,
+      profile: {
+        ...plan.profile,
+        goal: 'marathon',
+        experience: 'established',
+        method: 'balanced',
+        intent: 'improve',
+        weeklyKm: 70,
+        currentRuns: 5,
+        runsPerWeek: 5,
+        days: [0, 1, 2, 3, 5],
+        availableDays: [0, 1, 2, 3, 4, 5, 6],
+        longDay: 5,
+        qualityMode,
+        qualitySessions: 2,
+        recentQualitySessions: 2,
+      },
+    };
+    const html = render(PlanPreferences, { plan: saved });
+    const frequency = html.slice(
+      html.indexOf('class="plan-workout-choice"'),
+      html.indexOf('class="plan-schedule-picker"'),
+    );
+    assert.match(frequency, /Harder workouts per week/);
+    for (const count of [0, 1, 2])
+      assert.match(frequency, new RegExp(`value="${count}"`));
+    assert.doesNotMatch(frequency, /disabled=""|aria-disabled="true"/);
+    assert.match(
+      frequency,
+      new RegExp(`checked="" value="${qualityMode === 'custom' ? 2 : 1}"`),
+    );
+  }
+});
+
+test('an unrelated preference preview preserves the selected workout count and variety', async (t) => {
+  const { usePlanPreferences } =
+    await import('../components/training/use-plan-preferences.ts');
+  const saved = {
+    ...plan,
+    profile: {
+      ...plan.profile,
+      qualityMode: 'custom',
+      qualitySessions: 2,
+      workoutVariety: 'familiar',
+    },
+  };
+  const original = JSON.stringify(saved);
+  const submitted = [];
+  t.mock.method(globalThis, 'fetch', async (path, init) => {
+    if (path === '/api/account')
+      return Response.json({ accountId: 'frequency-test', accountEpoch: 1 });
+    assert.equal(path, '/api/plan');
+    submitted.push(JSON.parse(init.body));
+    return Response.json({ plan: saved, version: 4, effectiveDate: today });
+  });
+  let state;
+  function Harness() {
+    state = usePlanPreferences({
+      ...props,
+      plan: saved,
+      initialPatch: { terrain: 'hills' },
+    });
+    return null;
+  }
+  renderToStaticMarkup(createElement(Harness));
+  await state.previewPreferences({ preventDefault: noop });
+  assert.equal(submitted.length, 1);
+  assert.equal(submitted[0].action, 'preferencesPreview');
+  assert.equal(submitted[0].preferences.terrain, 'hills');
+  assert.equal(submitted[0].preferences.qualityMode, 'custom');
+  assert.equal(submitted[0].preferences.qualitySessions, 2);
+  assert.equal(submitted[0].preferences.workoutVariety, 'familiar');
+  assert.equal(JSON.stringify(saved), original);
+});

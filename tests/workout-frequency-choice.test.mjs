@@ -325,6 +325,65 @@ test('changing only workout count preserves hidden settings and completed work',
   assert.deepEqual(prescriptions(repeated), prescriptions(updated));
 });
 
+test('two selected weekday workouts survive variety and unrelated preference changes', () => {
+  const assertTwo = (plan) => {
+    assert.equal(plan.profile.qualityMode, 'custom');
+    assert.equal(plan.profile.qualitySessions, 2);
+    assert.deepEqual(validatePlan(plan), []);
+    for (const week of plan.weeks) {
+      if (['Recovery', 'Taper', 'Race week'].includes(week.phase)) continue;
+      const runs = plan.workouts.filter(
+        (w) =>
+          w.week === week.index && w.kind !== 'race' && w.status !== 'skipped',
+      );
+      assert.equal(
+        runs.filter((w) => w.kind !== 'long' && w.hard && main(w)).length,
+        2,
+        `Week ${week.index + 1} must retain both selected weekday workouts`,
+      );
+      assert.ok(
+        runs.reduce((sum, w) => sum + qualityWorkMinutes(w), 0) <=
+          runs.reduce((sum, w) => sum + w.minutes, 0) * 0.22 + 0.1,
+        'The two workouts must share the existing work allowance',
+      );
+    }
+  };
+  for (const runsPerWeek of [5, 6, 7]) {
+    for (const workoutFormat of ['automatic', 'time', 'distance']) {
+      let plan = build({
+        runsPerWeek,
+        currentRuns: runsPerWeek,
+        qualitySessions: 2,
+        workoutFormat,
+      });
+      assertTwo(plan);
+      const weeklyDistances = plan.weeks.map(({ targetKm, longKm }) => [
+        targetKm,
+        longKm,
+      ]);
+      for (const patch of [
+        { workoutVariety: 'varied' },
+        { terrain: 'hills' },
+        { carbsPerHour: 60 },
+      ]) {
+        // Persistence and each new preview must retain the explicit selection.
+        plan = revisePreferences(
+          JSON.parse(JSON.stringify(plan)),
+          patch,
+          start,
+        );
+        assertTwo(plan);
+        assert.deepEqual(
+          plan.weeks.map(({ targetKm, longKm }) => [targetKm, longKm]),
+          weeklyDistances,
+          'Preserving workout frequency must not change weekly or long-run distances',
+        );
+      }
+      assertTwo(refreshWorkoutVariety(plan, start));
+    }
+  }
+});
+
 test('saved completed interval recipes survive refresh and export their real steps to the watch', () => {
   const p = build({ qualitySessions: 2 });
   const second = savedInterval(p);
