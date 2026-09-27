@@ -4,7 +4,7 @@ import type {
   TemplateDecision,
   WorkoutTemplate,
 } from './workout-library.ts';
-import { roadAbility } from './road-training-policy.ts';
+import { isShortRoadRaceProfile, roadAbility } from './road-training-policy.ts';
 
 // Independently authored doses. Published plans inform the roles and progression,
 // not these recipes; see docs/research/half-road-plans-2026-09-23.md.
@@ -314,9 +314,18 @@ export function selectRoadWorkout(
     );
   const allowance = Math.min(budget, context.workAllowanceMinutes ?? Infinity);
 
-  if (taper && last?.templateId) {
-    const remembered = helpers.savedTemplate(last.templateId);
-    const lastWork = last.steps.find((s) => s.kind === 'work');
+  // A second taper week may no longer fit the most recent long repetition.
+  // Reuse an earlier familiar short-race recipe before considering a new one;
+  // keep the existing half-marathon selection unchanged.
+  const taperHistory = isShortRoadRaceProfile(p)
+    ? [...prior].reverse()
+    : last
+      ? [last]
+      : [];
+  for (const previous of taper ? taperHistory : []) {
+    if (!previous.templateId) continue;
+    const remembered = helpers.savedTemplate(previous.templateId);
+    const lastWork = previous.steps.find((s) => s.kind === 'work');
     const familiar =
       remembered &&
       helpers.resolve(
@@ -328,7 +337,7 @@ export function selectRoadWorkout(
           ),
           cue: lastWork?.effort ?? remembered.cue,
         },
-        last.steps,
+        previous.steps,
       );
     if (
       familiar &&

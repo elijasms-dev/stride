@@ -21,7 +21,9 @@ export function independentRoadChecks(plan, input) {
   const check = (ok, message) => {
     if (!ok) failures.push(message);
   };
-  const taperDays = input.goal === 'half' ? 14 : 7;
+  // Supplied short-race reference counts the race in its final 7/14 days.
+  // Half retains its existing inclusive D14 boundary unchanged.
+  const taperDays = input.goal === '5k' ? 6 : input.goal === '10k' ? 13 : 14;
   const longCeiling = { '5k': 14, '10k': 16, half: 23 }[input.goal];
   // Literal reviewed contracts, deliberately independent of the implementation
   // helper: runner ability follows existing volume/frequency, never pace.

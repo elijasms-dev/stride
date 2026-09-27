@@ -108,8 +108,10 @@ for (let weekday = 0; weekday < 7; weekday++) {
 
 test('native/custom short-road taper lengths and longer event models retain their current factors', () => {
   for (const { event, length, factors = [0.65, 0.4] } of [
-    { event: { goal: '5k' }, length: 7, factors: [1, 0.6] },
-    { event: { goal: '10k' }, length: 7, factors: [1, 0.6] },
+    // Race-inclusive short-race windows: D6..D0 and D13..D0. D7 still
+    // contains the full final 5K long run in the supplied reference table.
+    { event: { goal: '5k' }, length: 6, factors: [1, 1] },
+    { event: { goal: '10k' }, length: 13, factors: [1, 0.6] },
     { event: { goal: 'custom', raceDistanceKm: 15 }, length: 14 },
     { event: { goal: 'custom', raceDistanceKm: 16.09344 }, length: 21 },
     { event: { goal: 'half' }, length: 14, factors: [0.8, 0.5] },

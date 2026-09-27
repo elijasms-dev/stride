@@ -5,6 +5,7 @@ import { ENVELOPE_TAPER_POLICY, PLAN_LOAD_LIMITS } from './policy-constants.ts';
 import { schedulingEasyPace } from '../fitness-pacing.ts';
 import {
   isRoadRaceProfile,
+  isShortRoadRaceProfile,
   roadTaperDays,
   roadTaperFraction,
 } from '../road-training-policy.ts';
@@ -451,7 +452,8 @@ export function applyActualTrainingEnvelope(
           ? ENVELOPE_TAPER_POLICY.enduranceWeeks
           : ENVELOPE_TAPER_POLICY.shortEventWeeks;
     for (let bucket = 1; bucket <= taperWeeks; bucket++) {
-      const boundaryOffset = usesMarathonBook(p) ? 1 : 0;
+      const boundaryOffset =
+        usesMarathonBook(p) || isShortRoadRaceProfile(p) ? 1 : 0;
       const from = addDays(p.raceDate, -bucket * 7 + boundaryOffset);
       const through = addDays(
         p.raceDate,
@@ -467,7 +469,10 @@ export function applyActualTrainingEnvelope(
       const target =
         baseline *
         (isRoadRaceProfile(p)
-          ? roadTaperFraction(p, bucket * 7)
+          ? roadTaperFraction(
+              p,
+              bucket * 7 - (isShortRoadRaceProfile(p) ? 1 : 0),
+            )
           : usesMarathonBook(p)
             ? bucket === 1
               ? ENVELOPE_TAPER_POLICY.finalWeekFraction

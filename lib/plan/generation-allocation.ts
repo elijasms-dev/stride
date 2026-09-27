@@ -175,9 +175,11 @@ export function allocateGenerationWeek(
       weekday(d) === p.longDay &&
       (p.goal === 'base' ||
         dayDiff(d, p.raceDate) >=
-          (bookMarathon
-            ? SESSION_POLICY.bookLongMinimumDaysBeforeRace
-            : SESSION_POLICY.longMinimumDaysBeforeRace)),
+          (p.goal === '5k'
+            ? DAYS_PER_WEEK
+            : bookMarathon
+              ? SESSION_POLICY.bookLongMinimumDaysBeforeRace
+              : SESSION_POLICY.longMinimumDaysBeforeRace)),
   );
   if (
     Math.floor(desired * pace) <

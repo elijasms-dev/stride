@@ -50,18 +50,22 @@ export function calculateWeekLoad(
     (p.recentQualitySessions ?? 0) >=
       GENERATION_POLICY.maintenanceQualitySessions &&
     !isNovice;
-  const taper =
-    taperWeeks > 0 &&
-    dayDiff(
-      addDays(start, w * DAYS_PER_WEEK + FINAL_WEEKDAY_OFFSET),
-      p.raceDate,
-    ) <= (bookMarathon ? marathonTaperDays(p) - 1 : taperWeeks * DAYS_PER_WEEK);
+  const taper = isShortRoadRaceProfile(p)
+    ? taperFactor(p, addDays(start, w * DAYS_PER_WEEK + FINAL_WEEKDAY_OFFSET)) <
+      1
+    : taperWeeks > 0 &&
+      dayDiff(
+        addDays(start, w * DAYS_PER_WEEK + FINAL_WEEKDAY_OFFSET),
+        p.raceDate,
+      ) <=
+        (bookMarathon ? marathonTaperDays(p) - 1 : taperWeeks * DAYS_PER_WEEK);
   // A boundary week may contain a tapered Sunday without making its Monday
   // workout a taper session. Keep suppressing load growth across that boundary.
-  const taperAtWeekStart =
-    p.goal !== 'base' &&
-    dayDiff(addDays(start, w * DAYS_PER_WEEK), p.raceDate) <=
-      (bookMarathon ? marathonTaperDays(p) - 1 : taperWeeks * DAYS_PER_WEEK);
+  const taperAtWeekStart = isShortRoadRaceProfile(p)
+    ? taperFactor(p, addDays(start, w * DAYS_PER_WEEK)) < 1
+    : p.goal !== 'base' &&
+      dayDiff(addDays(start, w * DAYS_PER_WEEK), p.raceDate) <=
+        (bookMarathon ? marathonTaperDays(p) - 1 : taperWeeks * DAYS_PER_WEEK);
   const recovery =
     !isShortRoadRaceProfile(p) &&
     !taper &&

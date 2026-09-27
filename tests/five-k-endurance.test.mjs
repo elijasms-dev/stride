@@ -174,23 +174,22 @@ test('session, weekly, per-day and distance limits constrain executable long run
   }
 });
 
-test('recovery, atypical race weekdays and partial starts retain lower allocations', () => {
+test('5K atypical race weekdays and partial starts retain the pre-taper long run without full recovery weeks', () => {
   for (let day = 0; day < 7; day++) {
     const plan = make({
       startDate: addDays(start, day),
       raceDate: addDays(start, 77 + day),
     });
     assert.deepEqual(validatePlan(plan), []);
+    assert.ok(plan.weeks.every((week) => week.phase !== 'Recovery'));
     assert.ok(plan.workouts.every((w) => w.date >= plan.profile.startDate));
     for (const w of longs(plan)) {
-      if (plan.weeks[w.week].phase === 'Recovery')
-        assert.ok(w.minutes <= 88 * 0.8);
       const remaining =
         (Date.parse(plan.profile.raceDate) - Date.parse(w.date)) / 86400000;
-      // The named 5K now tapers for seven days. Familiar endurance may remain
-      // intact before then; the race week contains no separate long run.
-      if (remaining > 7) assert.ok(w.minutes <= 88);
-      assert.ok(remaining >= 8);
+      // The supplied table retains the full long run on D7; only the
+      // seven-day race-inclusive window D6..D0 is tapered.
+      assert.ok(w.minutes <= 88);
+      assert.ok(remaining >= 7);
     }
   }
   const partial = make({ startDate: addDays(start, 3) });
@@ -198,7 +197,9 @@ test('recovery, atypical race weekdays and partial starts retain lower allocatio
   // remaining calendar budget can still fund that long with shorter support.
   assert.ok(longs(partial)[0].minutes <= 88);
   assert.ok(total(running(partial, 0)) < total(running(make(), 0)));
-  assert.ok(running(partial, 0).every(w => w.date >= partial.profile.startDate));
+  assert.ok(
+    running(partial, 0).every((w) => w.date >= partial.profile.startDate),
+  );
 });
 
 test('same-day and short blocks do not add endurance to compensate for missing preparation', () => {

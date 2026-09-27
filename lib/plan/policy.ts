@@ -9,8 +9,9 @@ export const MAX_EVENT_KM = HUNDRED_MILES_KM;
 
 /** Product heuristics for review, not scientifically established safety thresholds. */
 export const TRAINING_POLICY = {
-  version: 'provisional-2026-09-24-v34',
-  reviewStatus: 'Awaiting independent coaching review',
+  version: 'provisional-2026-09-27-v35',
+  reviewStatus:
+    'Verified against supplied Higdon 5K/10K/Half reference properties and the selected two-week 10K taper; Pfitzinger-marathon and published-ultra reference families regression-checked unchanged. Independent coaching review is still pending.',
   // A conservative fallback estimates time when current easy pace is unknown.
   estimatedEasyMinutesPerKm: 7,
   // Returning runners initially retain less load to allow reacclimation.

@@ -12,9 +12,11 @@ for (const scenario of roadOverhaulCases()) {
   });
 }
 
+// The supplied 5K/10K reference includes race day in the final 7/14 days;
+// half retains its pre-existing D14 boundary.
 for (const [goal, taperDays] of [
-  ['5k', 7],
-  ['10k', 7],
+  ['5k', 6],
+  ['10k', 13],
   ['half', 14],
 ]) {
   test(`${goal} taper begins exactly ${taperDays} days before the race`, () => {

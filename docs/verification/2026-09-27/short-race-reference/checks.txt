@@ -1,0 +1,50 @@
+Final policy: provisional-2026-09-27-v35
+
+{
+  "stage": "after-bug2-final",
+  "commit": "092cd80cddddfc2ed77d7594971c5a535feb5f3b",
+  "sourceSha256": "673de7115adba1dabab90d826020ea955cbcfd098b0743749ced1de2007f5329",
+  "cases": 284,
+  "generated": 207,
+  "rejected": 77,
+  "weeks": 2830,
+  "protectedCompared": 90,
+  "failures": [],
+  "goalCounts": {
+    "5k": {
+      "generated": 71,
+      "rejected": 20
+    },
+    "10k": {
+      "generated": 46,
+      "rejected": 15
+    },
+    "half": {
+      "generated": 40,
+      "rejected": 8
+    },
+    "marathon": {
+      "generated": 32,
+      "rejected": 16
+    },
+    "ultra": {
+      "generated": 18,
+      "rejected": 18
+    }
+  }
+}
+
+Full suite (npm test):
+✔ additional patterns use runnable whole or half minutes, keeping at least three quarters of work (18.985167ms)
+ℹ tests 3223
+ℹ suites 0
+ℹ pass 3223
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 19237.518625
+
+npm run typecheck: passed (exit 0)
+npm run lint:app: passed (exit 0)
+Scoped new script/test lint: passed (exit 0)

@@ -1,0 +1,573 @@
+diff --git a/lib/plan/allocate.ts b/lib/plan/allocate.ts
+index 5be520f..acabdfa 100644
+--- a/lib/plan/allocate.ts
++++ b/lib/plan/allocate.ts
+@@ -5,6 +5,7 @@ import { ENVELOPE_TAPER_POLICY, PLAN_LOAD_LIMITS } from './policy-constants.ts';
+ import { schedulingEasyPace } from '../fitness-pacing.ts';
+ import {
+   isRoadRaceProfile,
++  isShortRoadRaceProfile,
+   roadTaperDays,
+   roadTaperFraction,
+ } from '../road-training-policy.ts';
+@@ -451,7 +452,8 @@ export function applyActualTrainingEnvelope(
+           ? ENVELOPE_TAPER_POLICY.enduranceWeeks
+           : ENVELOPE_TAPER_POLICY.shortEventWeeks;
+     for (let bucket = 1; bucket <= taperWeeks; bucket++) {
+-      const boundaryOffset = usesMarathonBook(p) ? 1 : 0;
++      const boundaryOffset =
++        usesMarathonBook(p) || isShortRoadRaceProfile(p) ? 1 : 0;
+       const from = addDays(p.raceDate, -bucket * 7 + boundaryOffset);
+       const through = addDays(
+         p.raceDate,
+@@ -467,7 +469,10 @@ export function applyActualTrainingEnvelope(
+       const target =
+         baseline *
+         (isRoadRaceProfile(p)
+-          ? roadTaperFraction(p, bucket * 7)
++          ? roadTaperFraction(
++              p,
++              bucket * 7 - (isShortRoadRaceProfile(p) ? 1 : 0),
++            )
+           : usesMarathonBook(p)
+             ? bucket === 1
+               ? ENVELOPE_TAPER_POLICY.finalWeekFraction
+diff --git a/lib/plan/generation-allocation.ts b/lib/plan/generation-allocation.ts
+index 9d9f91e..a8adb15 100644
+--- a/lib/plan/generation-allocation.ts
++++ b/lib/plan/generation-allocation.ts
+@@ -175,9 +175,11 @@ export function allocateGenerationWeek(
+       weekday(d) === p.longDay &&
+       (p.goal === 'base' ||
+         dayDiff(d, p.raceDate) >=
+-          (bookMarathon
+-            ? SESSION_POLICY.bookLongMinimumDaysBeforeRace
+-            : SESSION_POLICY.longMinimumDaysBeforeRace)),
++          (p.goal === '5k'
++            ? DAYS_PER_WEEK
++            : bookMarathon
++              ? SESSION_POLICY.bookLongMinimumDaysBeforeRace
++              : SESSION_POLICY.longMinimumDaysBeforeRace)),
+   );
+   if (
+     Math.floor(desired * pace) <
+diff --git a/lib/plan/generation-load.ts b/lib/plan/generation-load.ts
+index 1f2e748..018f1db 100644
+--- a/lib/plan/generation-load.ts
++++ b/lib/plan/generation-load.ts
+@@ -50,18 +50,22 @@ export function calculateWeekLoad(
+     (p.recentQualitySessions ?? 0) >=
+       GENERATION_POLICY.maintenanceQualitySessions &&
+     !isNovice;
+-  const taper =
+-    taperWeeks > 0 &&
+-    dayDiff(
+-      addDays(start, w * DAYS_PER_WEEK + FINAL_WEEKDAY_OFFSET),
+-      p.raceDate,
+-    ) <= (bookMarathon ? marathonTaperDays(p) - 1 : taperWeeks * DAYS_PER_WEEK);
++  const taper = isShortRoadRaceProfile(p)
++    ? taperFactor(p, addDays(start, w * DAYS_PER_WEEK + FINAL_WEEKDAY_OFFSET)) <
++      1
++    : taperWeeks > 0 &&
++      dayDiff(
++        addDays(start, w * DAYS_PER_WEEK + FINAL_WEEKDAY_OFFSET),
++        p.raceDate,
++      ) <=
++        (bookMarathon ? marathonTaperDays(p) - 1 : taperWeeks * DAYS_PER_WEEK);
+   // A boundary week may contain a tapered Sunday without making its Monday
+   // workout a taper session. Keep suppressing load growth across that boundary.
+-  const taperAtWeekStart =
+-    p.goal !== 'base' &&
+-    dayDiff(addDays(start, w * DAYS_PER_WEEK), p.raceDate) <=
+-      (bookMarathon ? marathonTaperDays(p) - 1 : taperWeeks * DAYS_PER_WEEK);
++  const taperAtWeekStart = isShortRoadRaceProfile(p)
++    ? taperFactor(p, addDays(start, w * DAYS_PER_WEEK)) < 1
++    : p.goal !== 'base' &&
++      dayDiff(addDays(start, w * DAYS_PER_WEEK), p.raceDate) <=
++        (bookMarathon ? marathonTaperDays(p) - 1 : taperWeeks * DAYS_PER_WEEK);
+   const recovery =
+     !isShortRoadRaceProfile(p) &&
+     !taper &&
+diff --git a/lib/plan/generation-weeks.ts b/lib/plan/generation-weeks.ts
+index 6997392..9f4f8ab 100644
+--- a/lib/plan/generation-weeks.ts
++++ b/lib/plan/generation-weeks.ts
+@@ -93,9 +93,11 @@ export function generatePlanWeeks(
+         weekday(date) === p.longDay &&
+         (p.goal === 'base' ||
+           dayDiff(date, p.raceDate) >=
+-            (bookMarathon
+-              ? SESSION_POLICY.bookLongMinimumDaysBeforeRace
+-              : SESSION_POLICY.longMinimumDaysBeforeRace));
++            (p.goal === '5k'
++              ? DAYS_PER_WEEK
++              : bookMarathon
++                ? SESSION_POLICY.bookLongMinimumDaysBeforeRace
++                : SESSION_POLICY.longMinimumDaysBeforeRace));
+       const isQuality =
+         !isNovice &&
+         p.goal !== 'base' &&
+diff --git a/lib/plan/policy.ts b/lib/plan/policy.ts
+index 2c29cab..033edc2 100644
+--- a/lib/plan/policy.ts
++++ b/lib/plan/policy.ts
+@@ -9,8 +9,9 @@ export const MAX_EVENT_KM = HUNDRED_MILES_KM;
+ 
+ /** Product heuristics for review, not scientifically established safety thresholds. */
+ export const TRAINING_POLICY = {
+-  version: 'provisional-2026-09-24-v34',
+-  reviewStatus: 'Awaiting independent coaching review',
++  version: 'provisional-2026-09-27-v35',
++  reviewStatus:
++    'Verified against supplied Higdon 5K/10K/Half reference properties and the selected two-week 10K taper; Pfitzinger-marathon and published-ultra reference families regression-checked unchanged. Independent coaching review is still pending.',
+   // A conservative fallback estimates time when current easy pace is unknown.
+   estimatedEasyMinutesPerKm: 7,
+   // Returning runners initially retain less load to allow reacclimation.
+diff --git a/lib/progression-engine.ts b/lib/progression-engine.ts
+index 0009ecc..405de84 100644
+--- a/lib/progression-engine.ts
++++ b/lib/progression-engine.ts
+@@ -56,6 +56,7 @@ export function mandatoryTaperWeeks(
+   goal: Goal,
+ ): number {
+   if (goal === 'base') return 0;
++  if (family === '5k' && goal === '5k') return 1;
+   if (['half', 'marathon', 'ultra'].includes(family))
+     return weeksUntilRace <= 8 ? 2 : 3;
+   return 2;
+diff --git a/lib/road-training-policy.ts b/lib/road-training-policy.ts
+index 0d540d1..31f2176 100644
+--- a/lib/road-training-policy.ts
++++ b/lib/road-training-policy.ts
+@@ -124,14 +124,21 @@ export function roadTrainingPolicy(p: Profile) {
+ }
+ 
+ export function roadTaperDays(p: Pick<Profile, 'goal'>) {
+-  return p.goal === 'half' ? 14 : 7;
++  return p.goal === '5k' ? 7 : 14;
+ }
+ 
+ export function roadTaperFraction(
+   p: Pick<Profile, 'goal'>,
+   daysBeforeRace: number,
+ ) {
+-  if (daysBeforeRace > roadTaperDays(p)) return 1;
++  // Count race day inside the short-race window: D7 remains the final
++  // normal 5K long run; D14 remains outside the two-week 10K taper.
++  if (
++    isShortRoadRaceProfile(p)
++      ? daysBeforeRace >= roadTaperDays(p)
++      : daysBeforeRace > roadTaperDays(p)
++  )
++    return 1;
+   if (p.goal === 'half') return daysBeforeRace > 7 ? 0.8 : 0.5;
+   return 0.6;
+ }
+diff --git a/lib/road-workouts.ts b/lib/road-workouts.ts
+index 80524d3..c3af5d7 100644
+--- a/lib/road-workouts.ts
++++ b/lib/road-workouts.ts
+@@ -4,7 +4,7 @@ import type {
+   TemplateDecision,
+   WorkoutTemplate,
+ } from './workout-library.ts';
+-import { roadAbility } from './road-training-policy.ts';
++import { isShortRoadRaceProfile, roadAbility } from './road-training-policy.ts';
+ 
+ // Independently authored doses. Published plans inform the roles and progression,
+ // not these recipes; see docs/research/half-road-plans-2026-09-23.md.
+@@ -314,9 +314,18 @@ export function selectRoadWorkout(
+     );
+   const allowance = Math.min(budget, context.workAllowanceMinutes ?? Infinity);
+ 
+-  if (taper && last?.templateId) {
+-    const remembered = helpers.savedTemplate(last.templateId);
+-    const lastWork = last.steps.find((s) => s.kind === 'work');
++  // A second taper week may no longer fit the most recent long repetition.
++  // Reuse an earlier familiar short-race recipe before considering a new one;
++  // keep the existing half-marathon selection unchanged.
++  const taperHistory = isShortRoadRaceProfile(p)
++    ? [...prior].reverse()
++    : last
++      ? [last]
++      : [];
++  for (const previous of taper ? taperHistory : []) {
++    if (!previous.templateId) continue;
++    const remembered = helpers.savedTemplate(previous.templateId);
++    const lastWork = previous.steps.find((s) => s.kind === 'work');
+     const familiar =
+       remembered &&
+       helpers.resolve(
+@@ -328,7 +337,7 @@ export function selectRoadWorkout(
+           ),
+           cue: lastWork?.effort ?? remembered.cue,
+         },
+-        last.steps,
++        previous.steps,
+       );
+     if (
+       familiar &&
+diff --git a/package.json b/package.json
+index 000a713..327315b 100644
+--- a/package.json
++++ b/package.json
+@@ -12,7 +12,7 @@
+     "lint": "oxlint",
+     "format": "oxfmt",
+     "db:generate": "drizzle-kit generate",
+-    "test": "node --experimental-strip-types --test tests/ultra-baseline-consistency.test.mjs tests/quality-baseline-funding.test.mjs tests/calendar-fractional-regressions.test.mjs tests/measurement-baseline-migration.test.mjs tests/standard-quality-rhythm.test.mjs tests/weekly-progression-contract.test.mjs tests/baseline-edge-cases.test.mjs tests/baseline-progression-validation.test.mjs tests/input-baseline-contract.test.mjs tests/long-run-baseline-progression.test.mjs tests/run-distance-baseline.test.mjs tests/ui-refactor.test.mjs tests/plan-refactor-compatibility.test.mjs tests/plan-generation-stages.test.mjs tests/fitness-marathon-overhaul.test.mjs tests/engine.test.mjs tests/form-values.test.mjs tests/measurement.test.mjs tests/activity-status.test.mjs tests/journal-loading.test.mjs tests/journal-dates.test.mjs tests/journal-view.test.mjs tests/round2-training.test.mjs tests/round2-import.test.mjs tests/phase2.test.mjs tests/training-quality.test.mjs tests/adaptation.test.mjs tests/algorithm-review.test.mjs tests/training-evidence.test.mjs tests/delivery.test.mjs tests/recovery.test.mjs tests/account-recovery.test.cjs tests/event-calendar.test.mjs tests/billing.test.mjs tests/operations.test.mjs tests/return-duration.test.mjs tests/import-review.test.mjs tests/schedule-guidance.test.mjs tests/intervals-readback.test.mjs tests/personalization.test.mjs tests/historical-start.test.mjs tests/personalization-matrix.test.mjs tests/allocation-minimums.test.mjs tests/taper-weekdays.test.mjs tests/availability-frequency.test.mjs tests/outbound-delivery-acceptance.mjs tests/action-progress.test.mjs tests/upcoming-delivery.test.mjs tests/recovery-allocation.test.mjs tests/plan-coherence.test.mjs tests/plan-experience.test.mjs tests/midweek-review.test.mjs tests/endurance-brief.test.mjs tests/taper-reference.test.mjs tests/day-sessions.test.mjs tests/classic-schedule.test.mjs tests/long-ultra.test.mjs tests/workout-variety.test.mjs tests/workout-variety-route.test.mjs tests/workout-targets.test.mjs tests/workout-recipes.test.mjs tests/appearance.test.mjs tests/marathon-model.test.mjs tests/structured-formats.test.mjs tests/runner-customization.test.mjs tests/client-session.test.mjs tests/auth-navigation.test.mjs tests/run-distance.test.mjs tests/daily-guide.test.mjs tests/short-blocks.test.mjs tests/marathon-book.test.mjs tests/custom-event-context.test.mjs tests/five-k-endurance.test.mjs tests/half-taper.test.mjs tests/two-day-progression.test.mjs tests/steady-race-workout.test.mjs tests/prescribed-work-cap.test.mjs tests/run-walk-confirmation.test.mjs tests/road-taper-phase.test.mjs tests/plan-guidance.test.mjs tests/gentle-marathon.test.mjs tests/workout-frequency-choice.test.mjs tests/half-build-rhythm.test.mjs tests/marathon-dynamic-workouts.test.mjs tests/race-relative-entry.test.mjs tests/plan-print.test.mjs tests/workout-inspection.test.mjs tests/plan-explorer.test.mjs tests/today-summary.test.mjs tests/onboarding-preview.test.mjs tests/feasibility-evidence.test.mjs tests/watch-setup.test.mjs tests/benchmark-input.test.mjs tests/weekly-review-preferences.test.mjs tests/revision-review.test.mjs tests/training-contract-sequences.test.mjs tests/explicit-workout-contract.test.mjs tests/road-workout-policy.test.mjs tests/road-frequency-validation.test.mjs tests/road-overhaul-matrix.test.mjs tests/road-overhaul-edits.test.mjs tests/road-overhaul-marathon.test.mjs tests/workout-settings-contract.test.mjs tests/mobile-usability.test.mjs tests/security-hardening.test.mjs tests/offline-journal.test.mjs tests/journal-integrity.test.mjs tests/delivery-jobs.test.mjs tests/billing-inbox.test.mjs tests/deferred-dialog.test.mjs tests/offline-shell.test.mjs tests/journal-store-runtime.test.mjs tests/onboarding-draft.test.mjs tests/forecast-validation.test.mjs tests/road-steady-targets.test.mjs tests/endurance-calendar-regressions.test.mjs tests/road-allocation-viability.test.mjs tests/beginner-course.test.mjs tests/first-race-plans.test.mjs tests/first-race-integration.test.mjs tests/fitness-model.test.mjs tests/pace-target-roles.test.mjs tests/pacing-prescription-contract.test.mjs tests/stress-road-pacing-regressions.test.mjs tests/endurance-quality-stress.test.mjs tests/marathon-purposeful-variety.test.mjs tests/plan-quality-review.test.mjs tests/distinct-long-run-balance.test.mjs tests/short-race-recovery-reference.test.mjs tests/short-race-protected-regression.test.mjs",
++    "test": "node --experimental-strip-types --test tests/ultra-baseline-consistency.test.mjs tests/quality-baseline-funding.test.mjs tests/calendar-fractional-regressions.test.mjs tests/measurement-baseline-migration.test.mjs tests/standard-quality-rhythm.test.mjs tests/weekly-progression-contract.test.mjs tests/baseline-edge-cases.test.mjs tests/baseline-progression-validation.test.mjs tests/input-baseline-contract.test.mjs tests/long-run-baseline-progression.test.mjs tests/run-distance-baseline.test.mjs tests/ui-refactor.test.mjs tests/plan-refactor-compatibility.test.mjs tests/plan-generation-stages.test.mjs tests/fitness-marathon-overhaul.test.mjs tests/engine.test.mjs tests/form-values.test.mjs tests/measurement.test.mjs tests/activity-status.test.mjs tests/journal-loading.test.mjs tests/journal-dates.test.mjs tests/journal-view.test.mjs tests/round2-training.test.mjs tests/round2-import.test.mjs tests/phase2.test.mjs tests/training-quality.test.mjs tests/adaptation.test.mjs tests/algorithm-review.test.mjs tests/training-evidence.test.mjs tests/delivery.test.mjs tests/recovery.test.mjs tests/account-recovery.test.cjs tests/event-calendar.test.mjs tests/billing.test.mjs tests/operations.test.mjs tests/return-duration.test.mjs tests/import-review.test.mjs tests/schedule-guidance.test.mjs tests/intervals-readback.test.mjs tests/personalization.test.mjs tests/historical-start.test.mjs tests/personalization-matrix.test.mjs tests/allocation-minimums.test.mjs tests/taper-weekdays.test.mjs tests/availability-frequency.test.mjs tests/outbound-delivery-acceptance.mjs tests/action-progress.test.mjs tests/upcoming-delivery.test.mjs tests/recovery-allocation.test.mjs tests/plan-coherence.test.mjs tests/plan-experience.test.mjs tests/midweek-review.test.mjs tests/endurance-brief.test.mjs tests/taper-reference.test.mjs tests/day-sessions.test.mjs tests/classic-schedule.test.mjs tests/long-ultra.test.mjs tests/workout-variety.test.mjs tests/workout-variety-route.test.mjs tests/workout-targets.test.mjs tests/workout-recipes.test.mjs tests/appearance.test.mjs tests/marathon-model.test.mjs tests/structured-formats.test.mjs tests/runner-customization.test.mjs tests/client-session.test.mjs tests/auth-navigation.test.mjs tests/run-distance.test.mjs tests/daily-guide.test.mjs tests/short-blocks.test.mjs tests/marathon-book.test.mjs tests/custom-event-context.test.mjs tests/five-k-endurance.test.mjs tests/half-taper.test.mjs tests/two-day-progression.test.mjs tests/steady-race-workout.test.mjs tests/prescribed-work-cap.test.mjs tests/run-walk-confirmation.test.mjs tests/road-taper-phase.test.mjs tests/plan-guidance.test.mjs tests/gentle-marathon.test.mjs tests/workout-frequency-choice.test.mjs tests/half-build-rhythm.test.mjs tests/marathon-dynamic-workouts.test.mjs tests/race-relative-entry.test.mjs tests/plan-print.test.mjs tests/workout-inspection.test.mjs tests/plan-explorer.test.mjs tests/today-summary.test.mjs tests/onboarding-preview.test.mjs tests/feasibility-evidence.test.mjs tests/watch-setup.test.mjs tests/benchmark-input.test.mjs tests/weekly-review-preferences.test.mjs tests/revision-review.test.mjs tests/training-contract-sequences.test.mjs tests/explicit-workout-contract.test.mjs tests/road-workout-policy.test.mjs tests/road-frequency-validation.test.mjs tests/road-overhaul-matrix.test.mjs tests/road-overhaul-edits.test.mjs tests/road-overhaul-marathon.test.mjs tests/workout-settings-contract.test.mjs tests/mobile-usability.test.mjs tests/security-hardening.test.mjs tests/offline-journal.test.mjs tests/journal-integrity.test.mjs tests/delivery-jobs.test.mjs tests/billing-inbox.test.mjs tests/deferred-dialog.test.mjs tests/offline-shell.test.mjs tests/journal-store-runtime.test.mjs tests/onboarding-draft.test.mjs tests/forecast-validation.test.mjs tests/road-steady-targets.test.mjs tests/endurance-calendar-regressions.test.mjs tests/road-allocation-viability.test.mjs tests/beginner-course.test.mjs tests/first-race-plans.test.mjs tests/first-race-integration.test.mjs tests/fitness-model.test.mjs tests/pace-target-roles.test.mjs tests/pacing-prescription-contract.test.mjs tests/stress-road-pacing-regressions.test.mjs tests/endurance-quality-stress.test.mjs tests/marathon-purposeful-variety.test.mjs tests/plan-quality-review.test.mjs tests/distinct-long-run-balance.test.mjs tests/short-race-recovery-reference.test.mjs tests/short-race-protected-regression.test.mjs tests/short-race-taper-reference.test.mjs",
+     "test:api": "node --experimental-strip-types tests/api.test.mjs",
+     "test:engine": "node --experimental-strip-types --test tests/trainingEngine.test.ts",
+     "typecheck": "tsc --noEmit",
+diff --git a/tests/five-k-endurance.test.mjs b/tests/five-k-endurance.test.mjs
+index 368aef0..73820f0 100644
+--- a/tests/five-k-endurance.test.mjs
++++ b/tests/five-k-endurance.test.mjs
+@@ -174,23 +174,22 @@ test('session, weekly, per-day and distance limits constrain executable long run
+   }
+ });
+ 
+-test('recovery, atypical race weekdays and partial starts retain lower allocations', () => {
++test('5K atypical race weekdays and partial starts retain the pre-taper long run without full recovery weeks', () => {
+   for (let day = 0; day < 7; day++) {
+     const plan = make({
+       startDate: addDays(start, day),
+       raceDate: addDays(start, 77 + day),
+     });
+     assert.deepEqual(validatePlan(plan), []);
++    assert.ok(plan.weeks.every((week) => week.phase !== 'Recovery'));
+     assert.ok(plan.workouts.every((w) => w.date >= plan.profile.startDate));
+     for (const w of longs(plan)) {
+-      if (plan.weeks[w.week].phase === 'Recovery')
+-        assert.ok(w.minutes <= 88 * 0.8);
+       const remaining =
+         (Date.parse(plan.profile.raceDate) - Date.parse(w.date)) / 86400000;
+-      // The named 5K now tapers for seven days. Familiar endurance may remain
+-      // intact before then; the race week contains no separate long run.
+-      if (remaining > 7) assert.ok(w.minutes <= 88);
+-      assert.ok(remaining >= 8);
++      // The supplied table retains the full long run on D7; only the
++      // seven-day race-inclusive window D6..D0 is tapered.
++      assert.ok(w.minutes <= 88);
++      assert.ok(remaining >= 7);
+     }
+   }
+   const partial = make({ startDate: addDays(start, 3) });
+@@ -198,7 +197,9 @@ test('recovery, atypical race weekdays and partial starts retain lower allocatio
+   // remaining calendar budget can still fund that long with shorter support.
+   assert.ok(longs(partial)[0].minutes <= 88);
+   assert.ok(total(running(partial, 0)) < total(running(make(), 0)));
+-  assert.ok(running(partial, 0).every(w => w.date >= partial.profile.startDate));
++  assert.ok(
++    running(partial, 0).every((w) => w.date >= partial.profile.startDate),
++  );
+ });
+ 
+ test('same-day and short blocks do not add endurance to compensate for missing preparation', () => {
+diff --git a/tests/plan-generation-stages.test.mjs b/tests/plan-generation-stages.test.mjs
+index ff1e334..5902a61 100644
+--- a/tests/plan-generation-stages.test.mjs
++++ b/tests/plan-generation-stages.test.mjs
+@@ -153,15 +153,27 @@ test('taper fractions follow race-relative day boundaries for short road and hal
+             [7, 0.5],
+             [0, 0.5],
+           ]
+-        : [
+-            [22, 1],
+-            [21, 1],
+-            [15, 1],
+-            [14, 1],
+-            [8, 1],
+-            [7, 0.6],
+-            [0, 0.6],
+-          ];
++        : goal === '10k'
++          ? [
++              [22, 1],
++              [21, 1],
++              [15, 1],
++              [14, 1],
++              [13, 0.6],
++              [8, 0.6],
++              [7, 0.6],
++              [0, 0.6],
++            ]
++          : [
++              [22, 1],
++              [21, 1],
++              [15, 1],
++              [14, 1],
++              [8, 1],
++              [7, 1],
++              [6, 0.6],
++              [0, 0.6],
++            ];
+     for (const [daysBeforeRace, fraction] of expected)
+       assert.equal(
+         taperFactor(p, addDays(p.raceDate, -daysBeforeRace)),
+diff --git a/tests/plan-refactor-compatibility.test.mjs b/tests/plan-refactor-compatibility.test.mjs
+index ea9ef45..e400ba0 100644
+--- a/tests/plan-refactor-compatibility.test.mjs
++++ b/tests/plan-refactor-compatibility.test.mjs
+@@ -212,7 +212,7 @@ function resultFor(c, reviewed = false) {
+ }
+ 
+ test('engine barrel preserves the complete runtime public API', () => {
+-  assert.equal(engine.TRAINING_POLICY.version, 'provisional-2026-09-24-v34');
++  assert.equal(engine.TRAINING_POLICY.version, 'provisional-2026-09-27-v35');
+   assert.deepEqual(Object.keys(engine).sort(), baseline.exports);
+ });
+ test('pace fixture only versions the 18 numeric base, marathon and custom cases', () => {
+diff --git a/tests/road-overhaul-contract.mjs b/tests/road-overhaul-contract.mjs
+index 12bb9d4..523ca22 100644
+--- a/tests/road-overhaul-contract.mjs
++++ b/tests/road-overhaul-contract.mjs
+@@ -21,7 +21,9 @@ export function independentRoadChecks(plan, input) {
+   const check = (ok, message) => {
+     if (!ok) failures.push(message);
+   };
+-  const taperDays = input.goal === 'half' ? 14 : 7;
++  // Supplied short-race reference counts the race in its final 7/14 days.
++  // Half retains its existing inclusive D14 boundary unchanged.
++  const taperDays = input.goal === '5k' ? 6 : input.goal === '10k' ? 13 : 14;
+   const longCeiling = { '5k': 14, '10k': 16, half: 23 }[input.goal];
+   // Literal reviewed contracts, deliberately independent of the implementation
+   // helper: runner ability follows existing volume/frequency, never pace.
+diff --git a/tests/road-overhaul-edits.test.mjs b/tests/road-overhaul-edits.test.mjs
+index 12ba41e..c0868af 100644
+--- a/tests/road-overhaul-edits.test.mjs
++++ b/tests/road-overhaul-edits.test.mjs
+@@ -24,7 +24,7 @@ function assertSavedFrequency(plan, requested, asOf = plan.profile.startDate) {
+       week.start < asOf ||
+       week.phase === 'Recovery' ||
+       gap(dayAfter(week.start, 6), plan.profile.raceDate) <=
+-        (plan.profile.goal === 'half' ? 14 : 7)
++        (plan.profile.goal === '5k' ? 6 : plan.profile.goal === '10k' ? 13 : 14)
+     )
+       continue;
+     const runs = plan.workouts.filter(
+diff --git a/tests/road-overhaul-helpers.mjs b/tests/road-overhaul-helpers.mjs
+index e13b78a..caaeb04 100644
+--- a/tests/road-overhaul-helpers.mjs
++++ b/tests/road-overhaul-helpers.mjs
+@@ -78,7 +78,13 @@ export function roadOpeningFailures(plan, input = plan.profile) {
+   );
+   const week = plan.weeks[0];
+   const taperDays =
+-    input.goal === 'marathon' ? 21 : input.goal === 'half' ? 14 : 7;
++    input.goal === 'marathon'
++      ? 21
++      : input.goal === 'half'
++        ? 14
++        : input.goal === '10k'
++          ? 13
++          : 6;
+   const daysToRace = (date) =>
+     (Date.parse(`${input.raceDate}T12:00:00Z`) -
+       Date.parse(`${date}T12:00:00Z`)) /
+diff --git a/tests/road-overhaul-matrix.test.mjs b/tests/road-overhaul-matrix.test.mjs
+index af22758..02bd999 100644
+--- a/tests/road-overhaul-matrix.test.mjs
++++ b/tests/road-overhaul-matrix.test.mjs
+@@ -12,9 +12,11 @@ for (const scenario of roadOverhaulCases()) {
+   });
+ }
+ 
++// The supplied 5K/10K reference includes race day in the final 7/14 days;
++// half retains its pre-existing D14 boundary.
+ for (const [goal, taperDays] of [
+-  ['5k', 7],
+-  ['10k', 7],
++  ['5k', 6],
++  ['10k', 13],
+   ['half', 14],
+ ]) {
+   test(`${goal} taper begins exactly ${taperDays} days before the race`, () => {
+diff --git a/tests/road-taper-phase.test.mjs b/tests/road-taper-phase.test.mjs
+index 0524642..5884c15 100644
+--- a/tests/road-taper-phase.test.mjs
++++ b/tests/road-taper-phase.test.mjs
+@@ -108,8 +108,10 @@ for (let weekday = 0; weekday < 7; weekday++) {
+ 
+ test('native/custom short-road taper lengths and longer event models retain their current factors', () => {
+   for (const { event, length, factors = [0.65, 0.4] } of [
+-    { event: { goal: '5k' }, length: 7, factors: [1, 0.6] },
+-    { event: { goal: '10k' }, length: 7, factors: [1, 0.6] },
++    // Race-inclusive short-race windows: D6..D0 and D13..D0. D7 still
++    // contains the full final 5K long run in the supplied reference table.
++    { event: { goal: '5k' }, length: 6, factors: [1, 1] },
++    { event: { goal: '10k' }, length: 13, factors: [1, 0.6] },
+     { event: { goal: 'custom', raceDistanceKm: 15 }, length: 14 },
+     { event: { goal: 'custom', raceDistanceKm: 16.09344 }, length: 21 },
+     { event: { goal: 'half' }, length: 14, factors: [0.8, 0.5] },
+diff --git a/tests/short-race-taper-reference.test.mjs b/tests/short-race-taper-reference.test.mjs
+new file mode 100644
+index 0000000..359784b
+--- /dev/null
++++ b/tests/short-race-taper-reference.test.mjs
+@@ -0,0 +1,103 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import {
++  addDays,
++  makePlan,
++  taperFactor,
++  trainingPhaseOn,
++  validatePlan,
++} from '../lib/engine.ts';
++import { mandatoryTaperWeeks } from '../lib/progression-engine.ts';
++import { roadTaperDays } from '../lib/road-training-policy.ts';
++import { profile, start } from './short-race-reference-fixtures.mjs';
++
++// Acceptance source: the user's TRAINING_REFERENCE.md, supplied 2026-09-27.
++// Higdon 5K week 7 still has its full long run; only week 8 tapers. Therefore
++// the seven-day window includes race day (D6..D0), leaving D7 untapered.
++// Apply the same inclusive-race counting to the requested two-week 10K taper:
++// D13..D0, with D14 still outside. Half/marathon/ultra remain out of scope.
++for (const { goal, weeks, days } of [
++  { goal: '5k', weeks: 1, days: 7 },
++  { goal: '10k', weeks: 2, days: 14 },
++]) {
++  void test(`${goal}: the supplied reference requires ${weeks} taper week(s) in the public progression helper`, () => {
++    for (const blockWeeks of [8, 10, 12, 16, 20])
++      assert.equal(mandatoryTaperWeeks(goal, blockWeeks, goal), weeks);
++  });
++
++  void test(`${goal}: the actual road policy uses the supplied ${days}-day taper, not just the exported helper`, () => {
++    assert.equal(roadTaperDays({ goal }), days);
++  });
++
++  void test(`${goal}: the Sunday before the ${weeks}-week taper retains its full long run in a generated eight-week plan`, () => {
++    const input = profile(goal, 1);
++    const plan = makePlan(input, start, false);
++    const date = addDays(input.raceDate, -days);
++    const long = plan.workouts.find(
++      (workout) => workout.date === date && workout.kind === 'long',
++    );
++    assert.ok(long, `Expected the full long-run slot on ${date}`);
++    assert.equal(taperFactor(input, long.date), 1);
++    assert.notEqual(
++      trainingPhaseOn(input, plan.weeks[long.week].phase, long.date),
++      'Taper',
++    );
++    const previousLong = plan.workouts
++      .filter((workout) => workout.kind === 'long' && workout.date < date)
++      .at(-1);
++    assert.ok(previousLong);
++    assert.ok(
++      long.estimatedKm >= previousLong.estimatedKm,
++      'The table retains its full final pre-taper long run, not an early reduction.',
++    );
++    assert.deepEqual(validatePlan(plan), []);
++  });
++
++  for (let raceWeekday = 0; raceWeekday < 7; raceWeekday++) {
++    void test(`${goal}: race weekday ${raceWeekday} tapers the final ${days} days including race day`, () => {
++      const input = profile(goal, 1, {
++        raceDate: addDays('2026-11-23', raceWeekday),
++      });
++      for (let before = days; before <= days + 7; before++) {
++        const date = addDays(input.raceDate, -before);
++        assert.equal(taperFactor(input, date), 1, date);
++        assert.notEqual(trainingPhaseOn(input, 'Build', date), 'Taper');
++      }
++      for (let before = 0; before < days; before++) {
++        const date = addDays(input.raceDate, -before);
++        assert.ok(taperFactor(input, date) < 1, date);
++        assert.equal(trainingPhaseOn(input, 'Build', date), 'Taper');
++      }
++    });
++  }
++}
++
++void test('half, marathon and ultra retain the protected 2–3 week taper branch; base has no race taper', () => {
++  for (const goal of ['half', 'marathon', 'ultra']) {
++    assert.equal(mandatoryTaperWeeks(goal, 8, goal), 2);
++    for (const blockWeeks of [10, 12, 16, 20])
++      assert.equal(mandatoryTaperWeeks(goal, blockWeeks, goal), 3);
++  }
++  for (const family of ['5k', '10k', 'half', 'marathon', 'ultra', 'base'])
++    assert.equal(mandatoryTaperWeeks(family, 12, 'base'), 0);
++});
++
++void test('the named 5K reference does not change the existing custom/ultra short-distance taper contract', () => {
++  // The supplied fix is for the named 5K programme. A custom event classified
++  // into its preparation family still uses the existing generic daily taper;
++  // its week-level helper must stay consistent with that unchanged pathway.
++  for (const goal of ['custom', 'ultra'])
++    for (const blockWeeks of [8, 10, 12, 16, 20])
++      assert.equal(mandatoryTaperWeeks('5k', blockWeeks, goal), 2);
++
++  const input = profile('5k', 1, { goal: 'custom', raceDistanceKm: 5 });
++  const plan = makePlan(input, start, false);
++  const penultimateWeek = plan.weeks.at(-2);
++  assert.equal(penultimateWeek.phase, 'Taper');
++  assert.ok(taperFactor(input, penultimateWeek.start) < 1);
++  assert.equal(
++    trainingPhaseOn(input, penultimateWeek.phase, penultimateWeek.start),
++    'Taper',
++  );
++  assert.deepEqual(validatePlan(plan), []);
++});
+diff --git a/tests/taper-reference.test.mjs b/tests/taper-reference.test.mjs
+index 67af704..8606ae8 100644
+--- a/tests/taper-reference.test.mjs
++++ b/tests/taper-reference.test.mjs
+@@ -90,7 +90,7 @@ void test('same-effective calendar preferences preserve a Sunday-race marathon t
+     assert.equal(before.workouts.length, current.workouts.length);
+   }
+ });
+-void test('Sunday 10K taper never uses the already-reduced day at its 7-day boundary as its own reference', () => {
++void test('Sunday 10K taper never uses an already-reduced day inside its two-week window as its own reference', () => {
+   const original = makePlan(
+     inputs({
+       goal: '10k',
+@@ -108,16 +108,20 @@ void test('Sunday 10K taper never uses the already-reduced day at its 7-day boun
+     start,
+   );
+   assert.equal(
+-    taperFactor(original.profile, addDays(original.profile.raceDate, -7)),
++    taperFactor(original.profile, addDays(original.profile.raceDate, -13)),
+     0.6,
+   );
++  assert.equal(
++    taperFactor(original.profile, addDays(original.profile.raceDate, -14)),
++    1,
++  );
+   let current = original;
+   for (let i = 0; i < 4; i++) {
+     current = revisePreferences(current, {}, start, true);
+     assert.deepEqual(
+       changes(original, current),
+       [],
+-      `Full review ${i + 1} must not multiply the 7-day taper factor again`,
++      `Full review ${i + 1} must not multiply the two-week taper factor again`,
+     );
+     assert.deepEqual(validatePlan(current), []);
+   }
+diff --git a/tests/taper-weekdays.test.mjs b/tests/taper-weekdays.test.mjs
+index 83505ba..eb0e866 100644
+--- a/tests/taper-weekdays.test.mjs
++++ b/tests/taper-weekdays.test.mjs
+@@ -70,7 +70,10 @@ function verify(p) {
+   assert.ok(baseline > 0);
+   const buckets =
+     p.profile.goal === '10k'
+-      ? [[1, 0.6]]
++      ? [
++          [1, 0.6],
++          [2, 0.6],
++        ]
+       : p.profile.goal === 'half'
+         ? [
+             [1, 0.5],
+@@ -87,7 +90,7 @@ function verify(p) {
+   for (const [bucket, factor] of buckets) {
+     const window = runs.filter((w) => {
+       const d = dayDiff(w.date, p.profile.raceDate);
+-      return usesMarathonBook(p.profile)
++      return p.profile.goal === '10k' || usesMarathonBook(p.profile)
+         ? d >= (bucket - 1) * 7 && d < bucket * 7
+         : d >= (bucket - 1) * 7 + 1 && d <= bucket * 7;
+     });

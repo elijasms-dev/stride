@@ -78,7 +78,13 @@ export function roadOpeningFailures(plan, input = plan.profile) {
   );
   const week = plan.weeks[0];
   const taperDays =
-    input.goal === 'marathon' ? 21 : input.goal === 'half' ? 14 : 7;
+    input.goal === 'marathon'
+      ? 21
+      : input.goal === 'half'
+        ? 14
+        : input.goal === '10k'
+          ? 13
+          : 6;
   const daysToRace = (date) =>
     (Date.parse(`${input.raceDate}T12:00:00Z`) -
       Date.parse(`${date}T12:00:00Z`)) /

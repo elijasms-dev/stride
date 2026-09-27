@@ -2,6 +2,23 @@
 
 This audit covers the two properties requested in the [supplied reference](../../../research/TRAINING_REFERENCE.md) and pasted task: preserve at least one weekday quality session every week of eligible standard 5K/10K blocks, remove their automatic full recovery weeks, and distinguish the one-week 5K taper from the two-week 10K taper. It does not reproduce an entire published schedule or certify the suitability of the unchanged plans.
 
+## Final captures
+
+Use [the final three-stage comparison](comparison.md), [the final Bug-1 rows](after-bug1-final.md), and [the final Bug-2 rows](after-bug2-final.md) for the completed implementation. Earlier captures below remain as a transparent diagnostic history.
+
+Both final stages produce **207 plans from 284 attempts**, with **77 explicit incompatible-input refusals**, **2,830 generated weeks**, **90 unchanged protected-family plans**, **42 unchanged protected-family refusals**, and **zero applicable matrix failures**. All **858 weeks across 65 eligible short-race plans** retain actual weekday quality, including race week. All 36 ordinary fourth-week q2 opportunities reduce to one. The 50 standard short-race zero-workout examples plus the two foundation examples retain zero quality.
+
+Final source fingerprints:
+
+- Bug 1: `2699256a1950d24183efa347754106a3cc02d36860b2c595dace5722cbdd398b`
+- Bug 2 after policy update: `673de7115adba1dabab90d826020ea955cbcfd098b0743749ced1de2007f5329`
+
+The repository was already on policy v34, despite the supplied task's older v30/v31 wording. The completed change advances it to **v35**, preserving version order. The review status records the narrow reference checks and protected-family regression check without claiming independent coaching approval.
+
+Final verification after the v35 update: **3,223/3,223 full-suite tests pass**, with typecheck, application lint and scoped lint of the new regression scripts/tests also passing. The **179 new regression checks** comprise 24 recovery/reference checks, 22 taper/reference checks, and 133 protected-family checks. The matrix's 77 explicit refusals are counted separately from generated plans and test passes. See [the recorded check summary](checks.txt).
+
+The two individually reviewable code/test changes are [Bug 1: recovery and retained quality](diffs/bug1-recovery.patch) and [Bug 2: taper duration and boundary](diffs/bug2-taper.patch). The captured stage JSON/Markdown provides the independent before/after output evidence for each change.
+
 ## Immutable baseline
 
 The baseline was generated before production edits from commit `00416a6355cd6734732eb43b2f7f69bd68bd76ad`. The recursively calculated TypeScript `lib/` fingerprint was identical before and after generation:
@@ -57,6 +74,14 @@ The [verified Bug-1 capture](after-bug1-verified.md) passes all applicable asser
 
 [The reviewed five-goal comparison](comparison-bug1.md) prints each week before/after for one representative of all five goals, plus the additional 5K/10K two-workout examples. All 858 eligible short-race weeks retain quality. All 36 ordinary fourth-week two-workout back-offs reduce to one, and none becomes easy-plus-long only. Half-marathon recovery weeks remain, and marathon/ultra rows are unchanged. Taper behavior is intentionally still the pre-change behavior at this stage, ready for the separate Bug 2 review.
 
+## Verified Bug 2 result
+
+The [Bug-2 capture](after-bug2.md) passes all reference and regression assertions: **207 generated plans, 77 explicit refusals, 2,830 weeks, zero failures**. Its production-source fingerprint is `ca3b3868c93e735474b2d1c56e6c358c47864aacee75a114e427fd5ad0cc2348`. All 90 protected-family generated plans and 42 protected refusals are still identical. All 858 eligible short-race weeks retain quality.
+
+[The complete before → Bug 1 → Bug 2 comparison](comparison.md) shows the actual weeks for all five representative goals and the two additional q2 cases. The eight-week 5K q1 plan now retains its full 10 km long run in week seven and tapers only week eight. The eight-week 10K q1 plan retains its 13 km long run in week six, then tapers weeks seven and eight, with a quality session in each. All final daily taper offsets match the seven/fourteen-day inclusive-race windows.
+
+The existing 0.6 short-race taper allocation multiplier is retained, including across both 10K taper weeks. This percentage is **not** attributed to the supplied external plans: the acceptance property establishes taper duration and retained quality, not an exact 60% mileage rule. Actual weekly totals additionally depend on race-week caps and removal of the long-run outing. Half/marathon/ultra outputs remain protected rather than silently reinterpreted. The subsequent `after-bug2-final` capture includes the policy-version bump and the bounded familiar-workout fallback needed when the new two-week taper leaves only a short race-week dose.
+
 ```sh
 node --experimental-strip-types scripts/verify-short-race-reference.mjs --stage before
 node --experimental-strip-types scripts/verify-short-race-reference.mjs --stage after-bug1
@@ -68,3 +93,7 @@ node --experimental-strip-types scripts/verify-short-race-reference.mjs --stage 
 ## Scope limitations
 
 Matching the supplied short-race structural properties is not equivalent to following the complete Higdon schedules exactly. The generator's existing mileage allocation, workout recipes, progression and protected-family coaching decisions are deliberately outside this two-fix regression. Zero-workout choices, beginner courses and explicitly rejected combinations are not intermediate reference plans and are not forced to contain intervals.
+
+**Unchanged ultra observation, flagged separately:** the protected `ultra-20w-5d-q1` example peaks at 39 km in week 15, cuts back to 27 km in Recovery week 16, then has a 33 km long run in ordinary Race preparation week 17 before taper. The ordinary long run is therefore shorter than the previous ordinary peak, and the peak is below the supplied 40–45 km reference band. The exact same sequence existed before both fixes. It was not changed because the requested scope expressly protects ultra-specific behavior; its unchanged hash is **not** evidence that this sequence is sound coaching.
+
+The previously identified marathon issues are documented in the [earlier marathon derivation audit](../../2026-09-25/plan-derivation-audit/marathon-analysis.md), including measurement-dependent work duration and hard long-run/weekday combinations. This task preserves those outputs rather than presenting them as resolved or externally validated.

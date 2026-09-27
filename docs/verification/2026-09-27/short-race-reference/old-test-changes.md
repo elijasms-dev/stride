@@ -30,3 +30,29 @@ No old test was deleted. No endurance snapshots were regenerated to hide changes
 - After adding retained-slot and executable race-week mutation guards, the combined new recovery, existing frequency-validation and personalization suites: **120 tests passed** (`/tmp/stride-bug1-frequency-guards.log`).
 
 The initial failures caused by genuine new generation refusals or hard-day adjacency were retained for production investigation. They were not changed into expected errors or removed to obtain passing tests.
+
+## Bug 2: separate short-race taper windows
+
+The supplied 5K table keeps the full long run in week 7 and tapers only week 8. Accordingly, its seven-day taper includes race day: D6 through D0, with the preceding Sunday D7 still untapered. The requested two-week 10K taper uses the same counting convention: D13 through D0; D14 remains outside taper. `mandatoryTaperWeeks` must return 1 and 2 respectively. The existing short-race reduction factor of 0.6 is retained, including both 10K taper weeks; no new reduction coefficient was inferred from the reference. Half-marathon retains its existing D14 boundary and 0.8/0.5 factors.
+
+| File | Previous assumption | Change and reason |
+| --- | --- | --- |
+| `tests/road-overhaul-matrix.test.mjs` | Both named short-race tapers begin at D7. | Assert the supplied race-inclusive 5K D6 and 10K D13 boundaries. Keep half D14 exactly unchanged. |
+| `tests/road-overhaul-contract.mjs` | The independent ordinary-week and taper-label oracle applies D7 to both 5K/10K. | Use D6/D13 to classify ordinary versus tapered weeks. The existing count, load, long-run and day-frequency requirements are unchanged. |
+| `tests/road-overhaul-edits.test.mjs` | Future frequency checks treat 10K's newly tapered second week as an ordinary build week. | Use the same independently stated D6/D13 windows after edits, with half unchanged. |
+| `tests/road-overhaul-helpers.mjs` | Opening and future capacity checks assume a shared D7 short-race boundary. | Apply D6/D13 for the named short events while preserving half/marathon offsets. This helper is also used by the declared-baseline compatibility tests. |
+| `tests/road-taper-phase.test.mjs` | Named 5K and 10K both start on D7. | Preserve custom/endurance expectations and change only named 5K/10K boundary and factor probes. The 5K D7 probe is now 1; D6 is tapered. |
+| `tests/plan-generation-stages.test.mjs` | Shared short-road factor table expects 5K reduction on D7 and no 10K reduction on D8. | Split the two literal expected tables. Check 5K D7=1/D6=0.6 and 10K D14=1/D13=0.6, leaving half's full table unchanged. |
+| `tests/taper-reference.test.mjs` | Repeated 10K reviews are checked at the old single-week boundary. | Check the first day of the two-week taper (D13), confirm D14 is untapered, and retain the repeated-review no-compounding assertion. |
+| `tests/taper-weekdays.test.mjs` | Only one 10K taper-volume bucket is checked, using D1..D7. | Check both 0.6 buckets with race-inclusive D0..D6 and D7..D13 windows across every race weekday. Half/marathon bucket factors and boundaries remain unchanged. |
+| `tests/five-k-endurance.test.mjs` | Every 5K long run must finish at least eight days before the race; an unused branch still assumes periodic recovery. | Retain the user's week-7 long-run slot at D7, enforce the familiar duration ceiling, and explicitly disallow a full recovery label. Keep partial-start and alternate race-weekday coverage. |
+
+No taper test is updated by copying a fresh generated distance or template identifier. The reference-derived timing determines each changed expected boundary; all custom/endurance expectations stay in place.
+
+The existing `tests/workout-variety.test.mjs` requirement to retain a previously encountered recipe in taper was **not weakened**. The longer 10K taper exposed a genuine fallback regression: the most recent five-minute recipe no longer fit the final reduced budget, and selection introduced an unfamiliar two-minute recipe. Production now tries earlier familiar recipes before creating a new selection. The original variety guard passes unchanged.
+
+The existing custom-5K taper-note assertion was also retained. It exposed a mismatch when the generic family helper's one-week result leaked into custom events whose daily taper remained two weeks. Production keeps that custom branch unchanged. After these corrections, the combined daily-phase, original workout-variety and new reference-taper suites pass **49/49 tests** (`/tmp/stride-bug2-boundary-and-variety-guards.log`).
+
+## Final policy-version assertion
+
+`tests/plan-refactor-compatibility.test.mjs` now expects `provisional-2026-09-27-v35`. The request described an older v30→v31 transition; the actual baseline was already v34, so the verified policy advances to v35. Its review status distinguishes the supplied reference-property checks and unchanged protected-family regressions from independent coaching review, which is still pending. No historical workout snapshots were rewritten.

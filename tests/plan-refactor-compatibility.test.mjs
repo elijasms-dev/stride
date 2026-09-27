@@ -212,7 +212,7 @@ function resultFor(c, reviewed = false) {
 }
 
 test('engine barrel preserves the complete runtime public API', () => {
-  assert.equal(engine.TRAINING_POLICY.version, 'provisional-2026-09-24-v34');
+  assert.equal(engine.TRAINING_POLICY.version, 'provisional-2026-09-27-v35');
   assert.deepEqual(Object.keys(engine).sort(), baseline.exports);
 });
 test('pace fixture only versions the 18 numeric base, marathon and custom cases', () => {

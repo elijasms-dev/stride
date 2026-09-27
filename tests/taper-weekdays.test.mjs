@@ -70,7 +70,10 @@ function verify(p) {
   assert.ok(baseline > 0);
   const buckets =
     p.profile.goal === '10k'
-      ? [[1, 0.6]]
+      ? [
+          [1, 0.6],
+          [2, 0.6],
+        ]
       : p.profile.goal === 'half'
         ? [
             [1, 0.5],
@@ -87,7 +90,7 @@ function verify(p) {
   for (const [bucket, factor] of buckets) {
     const window = runs.filter((w) => {
       const d = dayDiff(w.date, p.profile.raceDate);
-      return usesMarathonBook(p.profile)
+      return p.profile.goal === '10k' || usesMarathonBook(p.profile)
         ? d >= (bucket - 1) * 7 && d < bucket * 7
         : d >= (bucket - 1) * 7 + 1 && d <= bucket * 7;
     });

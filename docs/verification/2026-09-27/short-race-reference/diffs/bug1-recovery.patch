@@ -1,0 +1,1723 @@
+diff --git a/components/training-controls.tsx b/components/training-controls.tsx
+index a791338..1d91830 100644
+--- a/components/training-controls.tsx
++++ b/components/training-controls.tsx
+@@ -7,7 +7,10 @@ import { RadioGroup, RadioGroupItem } from './ui/radio-group';
+ import { ChevronDown, SlidersHorizontal, Check } from 'lucide-react';
+ import { isLongUltra } from '@/lib/ultra-policy';
+ import { usesMarathonBook } from '@/lib/marathon-book';
+-import { isRoadRaceProfile } from '@/lib/road-training-policy';
++import {
++  isRoadRaceProfile,
++  isShortRoadRaceProfile,
++} from '@/lib/road-training-policy';
+ import {
+   ScheduleCustomizationFields,
+   WorkoutCustomizationFields,
+@@ -27,6 +30,9 @@ import {
+ import { dayNames, trainingFamily, type Profile } from '@/lib/engine';
+ import { qualitySchedule } from '@/lib/training-structure';
+ 
++const usesShortRaceRhythm = (p: Profile) =>
++  isShortRoadRaceProfile(p) && p.planLevel !== 'beginner';
++
+ function PlanChoice({
+   label,
+   value,
+@@ -147,7 +153,9 @@ export function WorkoutFrequencyField({
+       <p className="plan-control-hint">
+         {easyOnly
+           ? 'This plan keeps your runs easy.'
+-          : 'Tempo, intervals or marathon-effort work. An easy long run is separate. Recovery and taper weeks can be lighter.'}
++          : usesShortRaceRhythm(p)
++            ? `Tempo, intervals or fartlek. An easy long run is separate. Before taper, selecting two workouts reduces to one every ${p.recoveryWeeks ?? 4} weeks; selecting one keeps one. There are no scheduled full recovery weeks.`
++            : 'Tempo, intervals or marathon-effort work. An easy long run is separate. Recovery and taper weeks can be lighter.'}
+         {automatic &&
+           !easyOnly &&
+           ' The count follows your current routine and goal.'}
+@@ -250,8 +258,9 @@ export function PlanCustomizationFields({
+           </div>
+         </div>
+         <p className="plan-control-hint">
+-          Your routine sets the starting workload. Recovery, taper and partial
+-          weeks are shorter.
++          {usesShortRaceRhythm(profile)
++            ? 'Your routine sets the starting workload. Taper and partial weeks can be shorter. There are no scheduled full recovery weeks.'
++            : 'Your routine sets the starting workload. Recovery, taper and partial weeks are shorter.'}
+         </p>
+         {(profile.weekdayMinutes < 120 || profile.longMinutes < 300) && (
+           <div className="plan-distance-limits">
+@@ -644,8 +653,10 @@ export function ScheduleFields({
+               <legend className="field-title">Cross-training days</legend>
+               <p className="subtle">
+                 Reserve these days without running. Keep the activity easy or
+-                familiar; its minutes are separate from running load. Recovery
+-                and taper weeks contain less supporting work.
++                familiar; its minutes are separate from running load.{' '}
++                {usesShortRaceRhythm(p)
++                  ? 'Taper weeks contain less supporting work.'
++                  : 'Recovery and taper weeks contain less supporting work.'}
+               </p>
+               {(p.crossTraining ?? []).map((s, i) => (
+                 <div className="supporting-session-fields" key={i}>
+@@ -1110,14 +1121,39 @@ export function TrainingPreferenceFields({
+           )}
+ 
+           <div className="form-grid">
+-            <Field label="Recovery rhythm">
++            <Field
++              label={
++                usesShortRaceRhythm(p)
++                  ? 'Workout reduction rhythm'
++                  : 'Recovery rhythm'
++              }
++              hint={
++                usesShortRaceRhythm(p)
++                  ? 'Before taper, two selected workouts reduce to one on this cadence. Zero or one selected workout stays unchanged; the week is not a full recovery week.'
++                  : undefined
++              }
++            >
+               <Choice
+-                label="Recovery rhythm"
++                label={
++                  usesShortRaceRhythm(p)
++                    ? 'Workout reduction rhythm'
++                    : 'Recovery rhythm'
++                }
+                 value={String(p.recoveryWeeks ?? 4)}
+                 onChange={(v) => update('recoveryWeeks', Number(v) as 3 | 4)}
+                 options={[
+-                  { value: '4', label: 'Lighter every fourth week' },
+-                  { value: '3', label: 'Lighter every third week' },
++                  {
++                    value: '4',
++                    label: usesShortRaceRhythm(p)
++                      ? 'Reduce two workouts to one every fourth week'
++                      : 'Lighter every fourth week',
++                  },
++                  {
++                    value: '3',
++                    label: usesShortRaceRhythm(p)
++                      ? 'Reduce two workouts to one every third week'
++                      : 'Lighter every third week',
++                  },
+                 ]}
+               />
+             </Field>
+diff --git a/components/training-pattern.tsx b/components/training-pattern.tsx
+index 70dfc15..55aeec1 100644
+--- a/components/training-pattern.tsx
++++ b/components/training-pattern.tsx
+@@ -1,6 +1,7 @@
+ import { isBeginnerProfile } from '@/lib/beginner-course';
+ import { dayNames, type Profile } from '@/lib/engine';
+ import { usesMarathonBook } from '@/lib/marathon-book';
++import { isShortRoadRaceProfile } from '@/lib/road-training-policy';
+ import {
+   desiredRuns,
+   qualitySchedule,
+@@ -66,7 +67,10 @@ export function TrainingPattern({
+           ? 'Timed beginner lessons, no speed workouts. Keep a rest day between runs and review each stage after comfortable completion.'
+           : usesMarathonBook(profile)
+             ? `${medium === undefined ? 'Endurance follows your selected running days.' : 'Midweek endurance fits your baseline and time limits.'} ${quality.length && profile.intent !== 'finish' && profile.difficulty !== 'gentle' ? 'Marathon-effort long runs count as one of your workouts. ' : ''}Recovery and taper weeks are lighter.`
+-            : 'Recovery, taper and race weeks can be lighter. Your available days are options, not extra runs.'}
++            : isShortRoadRaceProfile(profile) &&
++                profile.planLevel !== 'beginner'
++              ? `${quality.length === 2 ? `Before taper, two workouts reduce to one every ${profile.recoveryWeeks ?? 4} weeks. ` : quality.length === 1 ? 'One workout remains each week before taper. ' : 'Your all-easy choice stays all easy. '}There are no scheduled full recovery weeks. Taper and race weeks are lighter.`
++              : 'Recovery, taper and race weeks can be lighter. Your available days are options, not extra runs.'}
+       </p>
+     </section>
+   );
+diff --git a/components/training/training-comparison.tsx b/components/training/training-comparison.tsx
+index 3705827..89ba49f 100644
+--- a/components/training/training-comparison.tsx
++++ b/components/training/training-comparison.tsx
+@@ -1,6 +1,7 @@
+ 'use client';
+ 
+ import { dateLabel } from '@/lib/engine';
++import { isShortRoadRaceProfile } from '@/lib/road-training-policy';
+ import { ArrowRight } from 'lucide-react';
+ import { Choice } from '../stride-ui';
+ import { weeklyTraining } from './comparison-metrics';
+@@ -24,6 +25,9 @@ export function TrainingComparison({
+   scale,
+   trainingDisplay,
+ }: ReturnType<typeof useTrainingTools>) {
++  const shortRace =
++    isShortRoadRaceProfile(plan.profile) &&
++    plan.profile.planLevel !== 'beginner';
+   return (
+     <section className="training-section" hidden={section !== 'compare'}>
+       <div className="section-heading">
+@@ -40,13 +44,21 @@ export function TrainingComparison({
+           options={[
+             { value: 'gentle', label: 'Gentler quality sessions' },
+             { value: 'maintain', label: 'Maintain starting volume' },
+-            { value: 'recover', label: 'Recovery every third week' },
++            {
++              value: 'recover',
++              label: shortRace
++                ? 'Reduce two workouts to one every third week'
++                : 'Recovery every third week',
++            },
+             { value: 'finish', label: 'Easy endurance, finish focus' },
+           ]}
+         />
+         <p className="subtle">
+           Compare remaining prescriptions from today. Completed runs and manual
+           changes stay in place.
++          {shortRace &&
++            option === 'recover' &&
++            ' This option changes the count only when two workouts are selected; it does not add full recovery weeks.'}
+         </p>
+       </div>
+       {compare.error && <p className="notice">{compare.error}</p>}
+diff --git a/components/training/training-overview.tsx b/components/training/training-overview.tsx
+index 6da0812..d439f65 100644
+--- a/components/training/training-overview.tsx
++++ b/components/training/training-overview.tsx
+@@ -1,6 +1,13 @@
+ 'use client';
+ 
+-import { dateLabel, kmDisplay, raceDistance } from '@/lib/engine';
++import {
++  dateLabel,
++  kmDisplay,
++  raceDistance,
++  TRAINING_POLICY,
++} from '@/lib/engine';
++import { isShortRoadRaceProfile } from '@/lib/road-training-policy';
++import { requestedQualityCount } from '@/lib/training-structure';
+ import type { useTrainingTools } from './use-training-tools';
+ 
+ export function TrainingOverview({
+@@ -9,6 +16,11 @@ export function TrainingOverview({
+   section,
+   unit,
+ }: ReturnType<typeof useTrainingTools>) {
++  const shortRace =
++    isShortRoadRaceProfile(plan.profile) &&
++    plan.profile.planLevel !== 'beginner' &&
++    plan.policyVersion === TRAINING_POLICY.version;
++  const quality = requestedQualityCount(plan.profile);
+   return (
+     <section className="training-baseline" hidden={section !== 'overview'}>
+       <span className="eyebrow">Your starting point</span>
+@@ -57,8 +69,16 @@ export function TrainingOverview({
+               ? 'Hold steady'
+               : 'Gradual build'}
+           </dd>
+-          <dt>Recovery week</dt>
+-          <dd>Every {plan.profile.recoveryWeeks ?? 4} weeks</dd>
++          <dt>{shortRace ? 'Workout rhythm' : 'Recovery week'}</dt>
++          <dd>
++            {shortRace
++              ? quality === 2
++                ? `Two workouts reduce to one every ${plan.profile.recoveryWeeks ?? 4} weeks before taper`
++                : quality === 1
++                  ? 'One per week before taper; no full recovery weeks'
++                  : 'All easy; no full recovery weeks'
++              : `Every ${plan.profile.recoveryWeeks ?? 4} weeks`}
++          </dd>
+           <dt>Quality ceiling</dt>
+           <dd>
+             {['threshold-singles', 'double-threshold'].includes(
+diff --git a/lib/plan/generate.ts b/lib/plan/generate.ts
+index 1544c95..396ac7a 100644
+--- a/lib/plan/generate.ts
++++ b/lib/plan/generate.ts
+@@ -7,6 +7,7 @@ import { applyAdvancedMethod } from '../advanced-methods.ts';
+ import { roadPreparationConstraint } from '../road-feasibility.ts';
+ import {
+   isRoadRaceProfile,
++  isShortRoadRaceProfile,
+   roadTrainingPolicy,
+   roadTaperDays,
+ } from '../road-training-policy.ts';
+@@ -57,6 +58,7 @@ import {
+ } from './generation-policy.ts';
+ import {
+   fundWeek,
++  maximumFundedWeekKm,
+   reconcileOpeningBaseline,
+   reconcileOrdinaryWeeklyProgression,
+ } from './generation-baseline.ts';
+@@ -295,7 +297,7 @@ function makeValidatedPlan(
+       ...(isRoadRaceProfile(p)
+         ? [
+             `${p.goal === 'half' ? 'Half-marathon' : p.goal.toUpperCase()} preparation uses the ${roadTrainingPolicy(p).ability} running-capacity band. The first long run starts from your declared routine. Supporting easy runs stay shorter; any opening weekly-distance adjustment is explained separately. Later long runs progress in whole kilometres or hold, within your available time and weekly allocation.`,
+-            `Your ${requestedQuality} weekday ${requestedQuality === 1 ? 'workout is' : 'workouts are'} separate from the easy long run. Recovery weeks reduce the workload; the final ${roadTaperDays(p)} days taper toward race day. Workout doses follow your background and planned exposures, not spare time in your schedule.`,
++            `Your ${requestedQuality} weekday ${requestedQuality === 1 ? 'workout is' : 'workouts are'} separate from the easy long run. ${p.goal === 'half' ? 'Recovery weeks reduce the workload' : `Every ${p.recoveryWeeks ?? TRAINING_POLICY.recoveryEveryWeeks} weeks, a two-workout choice reduces to one; a single workout stays in place, with no scheduled full recovery week`}; the final ${roadTaperDays(p)} days taper toward race day. Workout doses follow your background and planned exposures, not spare time in your schedule.`,
+           ]
+         : []),
+       ...(!isRoadRaceProfile(p) &&
+@@ -406,7 +408,12 @@ function makeValidatedPlan(
+         fundWeek(
+           plan,
+           runs,
+-          allocatedKm,
++          // Continuous short-race quality can reach its padding cap before
++          // the preliminary easy-pace estimate. Fund only executable mileage;
++          // opening-baseline and progression reconciliation still apply below.
++          isShortRoadRaceProfile(p)
++            ? Math.min(allocatedKm, maximumFundedWeekKm(plan, runs, false))
++            : allocatedKm,
+           'The planned weekly distance cannot fit the prescribed pace ranges and session limits. Review the pace and available time together.',
+           undefined,
+           false,
+diff --git a/lib/plan/generation-allocation.ts b/lib/plan/generation-allocation.ts
+index 7124a0b..9d9f91e 100644
+--- a/lib/plan/generation-allocation.ts
++++ b/lib/plan/generation-allocation.ts
+@@ -10,10 +10,14 @@ import {
+   marathonPaceOpportunity,
+ } from '../marathon-book.ts';
+ import { runningDayLimit } from '../runner-customization.ts';
+-import { roadQualitySessionCap } from '../road-training-policy.ts';
++import {
++  isShortRoadRaceProfile,
++  roadQualitySessionCap,
++} from '../road-training-policy.ts';
+ 
+ import { isLongUltra, LONG_ULTRA_POLICY } from '../ultra-policy.ts';
+ import {
++  qualitySchedule,
+   usesMarathonRhythm,
+   usesStandardQualityRhythm,
+   desiredRuns,
+@@ -70,6 +74,9 @@ export function allocateGenerationWeek(
+     mediumDay,
+   } = context;
+   const { taper, recovery, phase, long, load } = weekLoad;
++  const scheduledQualityDays = isShortRoadRaceProfile(p)
++    ? qualitySchedule(p, w)
++    : qualityDays;
+   const retainedPrefix = (replan?.retainedPrefix ?? []).filter(
+     (s) => s.week === w && s.kind !== 'race',
+   );
+@@ -199,11 +206,11 @@ export function allocateGenerationWeek(
+   const qualityReserve =
+     !recovery &&
+     !taper &&
+-    (road ? qualityDays.length > 0 : usesStandardQualityRhythm(p)) &&
+-    dates.some((d) => qualityDays.includes(weekday(d)))
++    (road ? scheduledQualityDays.length > 0 : usesStandardQualityRhythm(p)) &&
++    dates.some((d) => scheduledQualityDays.includes(weekday(d)))
+       ? (SESSION_POLICY.introductoryWorkoutMinutes -
+           GENERATION_POLICY.minimumSessionMinutes) *
+-        (road ? qualityDays.length : 1)
++        (road ? scheduledQualityDays.length : 1)
+       : 0;
+   const usualLongDistance = Math.min(
+     long,
+@@ -326,7 +333,7 @@ export function allocateGenerationWeek(
+         p.qualitySessions === SESSION_POLICY.mixedLongMinimumQualitySessions
+         ? qualityDays.slice(0, -1)
+         : qualityDays.slice(1)
+-      : qualityDays;
++      : scheduledQualityDays;
+   const support =
+     !recovery &&
+     !taper &&
+@@ -462,7 +469,7 @@ export function allocateGenerationWeek(
+   if (
+     !isNovice &&
+     !recovery &&
+-    !taper &&
++    (!taper || isShortRoadRaceProfile(p)) &&
+     p.goal !== 'base' &&
+     (road || p.intent !== 'finish' || usesStandardQualityRhythm(p))
+   ) {
+diff --git a/lib/plan/generation-baseline.ts b/lib/plan/generation-baseline.ts
+index e4e135f..375cfa0 100644
+--- a/lib/plan/generation-baseline.ts
++++ b/lib/plan/generation-baseline.ts
+@@ -209,7 +209,11 @@ function fundedMetres(run: Workout, seconds: number, pace: number) {
+ 
+ /** Maximum easy-running funding with complete faster blocks and existing long
+  * targets fixed. Temporary second budgets do not mutate the plan or workouts. */
+-function maximumFundedWeekKm(plan: Plan, runs: Workout[], balance = true) {
++export function maximumFundedWeekKm(
++  plan: Plan,
++  runs: Workout[],
++  balance = true,
++) {
+   const p = plan.profile;
+   const familiar = familiarDayLimits(plan);
+   const pace = Math.max(
+diff --git a/lib/plan/generation-load.ts b/lib/plan/generation-load.ts
+index 4fc1a27..1f2e748 100644
+--- a/lib/plan/generation-load.ts
++++ b/lib/plan/generation-load.ts
+@@ -6,6 +6,7 @@ import {
+ 
+ import { marathonBlockPhase, marathonTaperDays } from '../marathon-book.ts';
+ 
++import { isShortRoadRaceProfile } from '../road-training-policy.ts';
+ import { longRunForWeek } from '../progression-engine.ts';
+ import { dayDiff, addDays } from './calendar.ts';
+ import { TRAINING_POLICY } from './policy.ts';
+@@ -62,6 +63,7 @@ export function calculateWeekLoad(
+     dayDiff(addDays(start, w * DAYS_PER_WEEK), p.raceDate) <=
+       (bookMarathon ? marathonTaperDays(p) - 1 : taperWeeks * DAYS_PER_WEEK);
+   const recovery =
++    !isShortRoadRaceProfile(p) &&
+     !taper &&
+     w > 0 &&
+     (w + 1) % (p.recoveryWeeks ?? TRAINING_POLICY.recoveryEveryWeeks) === 0;
+@@ -104,7 +106,7 @@ export function calculateWeekLoad(
+     taper: taper || taperAtWeekStart,
+     taperFraction: weekTaperFraction,
+     wholeKilometres: true,
+-    recoveryEveryWeeks: p.recoveryWeeks,
++    recoveryEveryWeeks: isShortRoadRaceProfile(p) ? null : p.recoveryWeeks,
+     recoveryOffset: longProgressionStart,
+     maximumStepKm: road?.longStepKm,
+   });
+diff --git a/lib/plan/generation-rhythm.ts b/lib/plan/generation-rhythm.ts
+index e5b68c3..4e3c18a 100644
+--- a/lib/plan/generation-rhythm.ts
++++ b/lib/plan/generation-rhythm.ts
+@@ -1,10 +1,14 @@
+ import { schedulingEasyPace } from '../fitness-pacing.ts';
+ import { qualityWorkMinutes } from '../prescription.ts';
+ import { runningDayLimit } from '../runner-customization.ts';
+-import { isRoadRaceProfile } from '../road-training-policy.ts';
++import {
++  isRoadRaceProfile,
++  isShortRoadRaceProfile,
++} from '../road-training-policy.ts';
+ import {
+   qualitySchedule,
+   requestedQualityCount,
++  weeklyQualityCount,
+   usesMarathonRhythm,
+   usesStandardQualityRhythm,
+ } from '../training-structure.ts';
+@@ -14,7 +18,7 @@ import {
+   WORKOUT_LIBRARY,
+ } from '../workout-library.ts';
+ import { withAllocatedWorkoutTargets as withWorkoutTargets } from '../workout-targets.ts';
+-import { addDays, weekday } from './calendar.ts';
++import { addDays, dayDiff, weekday } from './calendar.ts';
+ import { PlanError } from './errors.ts';
+ import { taperFactor, weekIncludesTaper } from './generation-calendar.ts';
+ import { round } from './math.ts';
+@@ -153,7 +157,6 @@ export function roadQualityFrequencyErrors(
+   )
+     return [];
+   const from = plan.constraintsFrom ?? p.startDate;
+-  const expected = requestedQualityCount(p);
+   const errors: string[] = [];
+   // A replan can reserve a recorded day before the caller merges its immutable
+   // journal prefix. Only actual completed records qualify as this context;
+@@ -188,9 +191,6 @@ export function roadQualityFrequencyErrors(
+     if (
+       week.start < from ||
+       week.start < p.startDate ||
+-      end >= p.raceDate ||
+-      ['Recovery', 'Taper', 'Race week'].includes(week.phase) ||
+-      weekIncludesTaper(p, week.start) ||
+       recordedDates.some((date) => date >= week.start && date <= end) ||
+       demandingDates.some((date) => addDays(date, 1) === week.start)
+     )
+@@ -207,6 +207,45 @@ export function roadQualityFrequencyErrors(
+       )
+     )
+       continue;
++    const reducedWeek =
++      end >= p.raceDate ||
++      ['Recovery', 'Taper', 'Race week'].includes(week.phase) ||
++      weekIncludesTaper(p, week.start);
++    if (reducedWeek) {
++      // The supplied eight-week intermediate reference retains a familiar
++      // stimulus in taper/race weeks. Partial race weeks without an eligible
++      // pre-race slot and separate beginner/return courses are not that contract.
++      if (
++        isShortRoadRaceProfile(p) &&
++        !plan.firstRace &&
++        !plan.beginner &&
++        (!plan.constraintsFrom || plan.constraintsFrom === p.startDate) &&
++        !plan.baselineEvidence &&
++        !runs.some((run) => run.changed) &&
++        dayDiff(p.startDate, p.raceDate) >= 55 &&
++        requestedQualityCount(p) > 0 &&
++        qualitySchedule(p, week.index).some(
++          (day) => dayDiff(addDays(week.start, day), p.raceDate) >= 3,
++        )
++      ) {
++        const quality = runs.filter(
++          (run) =>
++            ['tempo', 'intervals', 'fartlek'].includes(run.kind) &&
++            run.hard &&
++            !['aerobic', 'economy'].includes(run.stimulus ?? '') &&
++            roadWorkMinutes(run) > 0,
++        );
++        if (!quality.length)
++          errors.push(
++            `Week ${week.index + 1} must retain a running quality session during short-race consolidation or taper.`,
++          );
++        if (week.phase === 'Recovery')
++          errors.push(
++            `Week ${week.index + 1} cannot use a full recovery week in this short-race block.`,
++          );
++      }
++      continue;
++    }
+     const expectedDates = Array.from({ length: 7 }, (_, day) =>
+       addDays(week.start, day),
+     ).filter((date) => p.days.includes(weekday(date)));
+@@ -219,6 +258,7 @@ export function roadQualityFrequencyErrors(
+       errors.push(
+         `Week ${week.index + 1} must retain all ${p.days.length} selected running days; a missing or duplicated run cannot satisfy the workout frequency.`,
+       );
++    const expected = weeklyQualityCount(p, week.index);
+     const weekdayRuns = runs.filter((run) => run.kind !== 'long');
+     const useful = weekdayRuns.filter(
+       (run) =>
+diff --git a/lib/plan/generation-weeks.ts b/lib/plan/generation-weeks.ts
+index 5deae4e..6997392 100644
+--- a/lib/plan/generation-weeks.ts
++++ b/lib/plan/generation-weeks.ts
+@@ -1,3 +1,4 @@
++import { isShortRoadRaceProfile } from '../road-training-policy.ts';
+ import {
+   GENERATION_POLICY,
+   SESSION_POLICY,
+@@ -209,7 +210,9 @@ export function generatePlanWeeks(
+             : 'Comfortable running that builds your aerobic base and leaves room to recover.';
+       if (
+         isQuality &&
+-        minutes >= SESSION_POLICY.introductoryWorkoutMinutes &&
++        (minutes >= SESSION_POLICY.introductoryWorkoutMinutes ||
++          (isShortRoadRaceProfile(p) &&
++            ['Taper', 'Race week'].includes(sessionPhase))) &&
+         (p.method !== 'double-threshold' || phase === 'Maintenance')
+       ) {
+         const workAllowanceMinutes =
+@@ -217,9 +220,20 @@ export function generatePlanWeeks(
+             ? Math.min(
+                 desired * pace * SESSION_POLICY.thresholdSinglesWorkFraction,
+                 p.recentQualityMinutes ?? 0,
+-              ) / Math.max(1, qualityDays.length)
++              ) /
++              Math.max(
++                1,
++                isShortRoadRaceProfile(p)
++                  ? weekQualityDays.length
++                  : qualityDays.length,
++              )
+             : (desired * pace * SESSION_POLICY.qualityWorkFraction) /
+-              Math.max(1, qualityDays.length);
++              Math.max(
++                1,
++                isShortRoadRaceProfile(p)
++                  ? weekQualityDays.length
++                  : qualityDays.length,
++              );
+         const decision = selectTemplate(
+           { ...p, goal: trainingFamily(p) },
+           sessionPhase,
+diff --git a/lib/progression-engine.ts b/lib/progression-engine.ts
+index c736fb8..0009ecc 100644
+--- a/lib/progression-engine.ts
++++ b/lib/progression-engine.ts
+@@ -85,7 +85,8 @@ export function longRunForWeek(options: {
+   taper: boolean;
+   taperFraction: number;
+   wholeKilometres?: boolean;
+-  recoveryEveryWeeks?: number;
++  /** null means no periodic full recovery weeks (named short-road plans). */
++  recoveryEveryWeeks?: number | null;
+   recoveryOffset?: number;
+   maximumStepKm?: number;
+ }): number {
+@@ -108,12 +109,14 @@ export function longRunForWeek(options: {
+     const every = options.recoveryEveryWeeks ?? DEFAULT_LONG_RUN_RECOVERY_WEEKS;
+     const offset = options.recoveryOffset ?? 0;
+     const builds = (end: number) =>
+-      Math.max(
+-        0,
+-        end -
+-          Math.floor((end + offset + 1) / every) +
+-          Math.floor((offset + 1) / every),
+-      );
++      options.recoveryEveryWeeks === null
++        ? Math.max(0, end)
++        : Math.max(
++            0,
++            end -
++              Math.floor((end + offset + 1) / every) +
++              Math.floor((offset + 1) / every),
++          );
+     const available = builds(peakWeekIndex);
+     const ordinal = builds(Math.min(weekIndex, peakWeekIndex));
+     // Count only ordinary build opportunities. The first increase reaches the
+diff --git a/lib/road-training-policy.ts b/lib/road-training-policy.ts
+index ebeb41b..0d540d1 100644
+--- a/lib/road-training-policy.ts
++++ b/lib/road-training-policy.ts
+@@ -11,6 +11,11 @@ export function isRoadRaceProfile(
+   return p.goal === '5k' || p.goal === '10k' || p.goal === 'half';
+ }
+ 
++/** The supplied short-race reference keeps quality during mid-block consolidation. */
++export function isShortRoadRaceProfile(p: Pick<Profile, 'goal'>): boolean {
++  return p.goal === '5k' || p.goal === '10k';
++}
++
+ /** Capacity is evidenced by the existing routine, not a predicted finishing time. */
+ export function roadAbility(p: Profile): RoadAbility {
+   const half = p.goal === 'half';
+diff --git a/lib/training-structure.ts b/lib/training-structure.ts
+index 4beb7b0..ec823d0 100644
+--- a/lib/training-structure.ts
++++ b/lib/training-structure.ts
+@@ -4,7 +4,13 @@ import { isLongUltra } from './ultra-policy.ts';
+ import type { Profile } from './engine';
+ import { runningDayLimit } from './runner-customization.ts';
+ import { marathonSupportsMedium, usesMarathonBook } from './marathon-book.ts';
+-import { isRoadRaceProfile, roadAbility } from './road-training-policy.ts';
++import {
++  isRoadRaceProfile,
++  isShortRoadRaceProfile,
++  roadAbility,
++} from './road-training-policy.ts';
++
++import { TRAINING_POLICY } from './plan/policy.ts';
+ 
+ const separation = (a: number, b: number) =>
+   Math.min(Math.abs(a - b), 7 - Math.abs(a - b));
+@@ -86,6 +92,19 @@ export function requestedQualityCount(p: Profile): 0 | 1 | 2 {
+     : requested;
+ }
+ 
++/** Short-race consolidation retains one stimulus instead of a full deload.
++ * The stored workout choice stays intact; other distances use their existing rhythm. */
++export function weeklyQualityCount(p: Profile, weekIndex: number): 0 | 1 | 2 {
++  const requested = requestedQualityCount(p);
++  return isShortRoadRaceProfile(p) &&
++    weekIndex > 0 &&
++    (weekIndex + 1) %
++      (p.recoveryWeeks ?? TRAINING_POLICY.recoveryEveryWeeks) ===
++      0
++    ? (Math.min(1, requested) as 0 | 1)
++    : requested;
++}
++
+ /** Original classic templates, rotated around the chosen long-run day. */
+ export function classicRunningDays(count: number, longDay: number): number[] {
+   const offsets: Record<number, number[]> = {
+@@ -147,8 +166,16 @@ export function resolveRunningDays(p: Profile): number[] {
+ }
+ 
+ /** Solve the whole week: a greedy first choice can hide a feasible second slot. */
+-export function qualitySchedule(p: Profile): number[] {
++export function qualitySchedule(p: Profile, weekIndex?: number): number[] {
+   if (desiredRuns(p) === 2) return [];
++  const requested =
++    weekIndex === undefined
++      ? requestedQualityCount(p)
++      : weeklyQualityCount(p, weekIndex);
++  // A lighter week removes a familiar slot; re-solving a single slot can move
++  // Sunday's usual workout to Monday and place hard runs on consecutive days.
++  if (weekIndex !== undefined && requested < requestedQualityCount(p))
++    return qualitySchedule(p).slice(0, requested);
+   const available = (
+     p.method === 'double-threshold' ? (p.doubleDays ?? []) : p.days
+   )
+@@ -160,7 +187,6 @@ export function qualitySchedule(p: Profile): number[] {
+         !(p.method === 'easy-doubles' && p.doubleDays?.includes(d)),
+     )
+     .sort((a, b) => a - b);
+-  const requested = requestedQualityCount(p);
+   let best: number[] = [],
+     bestScore = -Infinity;
+   for (let mask = 0; mask < 1 << available.length; mask++) {
+diff --git a/package.json b/package.json
+index 81f04bc..000a713 100644
+--- a/package.json
++++ b/package.json
+@@ -12,7 +12,7 @@
+     "lint": "oxlint",
+     "format": "oxfmt",
+     "db:generate": "drizzle-kit generate",
+-    "test": "node --experimental-strip-types --test tests/ultra-baseline-consistency.test.mjs tests/quality-baseline-funding.test.mjs tests/calendar-fractional-regressions.test.mjs tests/measurement-baseline-migration.test.mjs tests/standard-quality-rhythm.test.mjs tests/weekly-progression-contract.test.mjs tests/baseline-edge-cases.test.mjs tests/baseline-progression-validation.test.mjs tests/input-baseline-contract.test.mjs tests/long-run-baseline-progression.test.mjs tests/run-distance-baseline.test.mjs tests/ui-refactor.test.mjs tests/plan-refactor-compatibility.test.mjs tests/plan-generation-stages.test.mjs tests/fitness-marathon-overhaul.test.mjs tests/engine.test.mjs tests/form-values.test.mjs tests/measurement.test.mjs tests/activity-status.test.mjs tests/journal-loading.test.mjs tests/journal-dates.test.mjs tests/journal-view.test.mjs tests/round2-training.test.mjs tests/round2-import.test.mjs tests/phase2.test.mjs tests/training-quality.test.mjs tests/adaptation.test.mjs tests/algorithm-review.test.mjs tests/training-evidence.test.mjs tests/delivery.test.mjs tests/recovery.test.mjs tests/account-recovery.test.cjs tests/event-calendar.test.mjs tests/billing.test.mjs tests/operations.test.mjs tests/return-duration.test.mjs tests/import-review.test.mjs tests/schedule-guidance.test.mjs tests/intervals-readback.test.mjs tests/personalization.test.mjs tests/historical-start.test.mjs tests/personalization-matrix.test.mjs tests/allocation-minimums.test.mjs tests/taper-weekdays.test.mjs tests/availability-frequency.test.mjs tests/outbound-delivery-acceptance.mjs tests/action-progress.test.mjs tests/upcoming-delivery.test.mjs tests/recovery-allocation.test.mjs tests/plan-coherence.test.mjs tests/plan-experience.test.mjs tests/midweek-review.test.mjs tests/endurance-brief.test.mjs tests/taper-reference.test.mjs tests/day-sessions.test.mjs tests/classic-schedule.test.mjs tests/long-ultra.test.mjs tests/workout-variety.test.mjs tests/workout-variety-route.test.mjs tests/workout-targets.test.mjs tests/workout-recipes.test.mjs tests/appearance.test.mjs tests/marathon-model.test.mjs tests/structured-formats.test.mjs tests/runner-customization.test.mjs tests/client-session.test.mjs tests/auth-navigation.test.mjs tests/run-distance.test.mjs tests/daily-guide.test.mjs tests/short-blocks.test.mjs tests/marathon-book.test.mjs tests/custom-event-context.test.mjs tests/five-k-endurance.test.mjs tests/half-taper.test.mjs tests/two-day-progression.test.mjs tests/steady-race-workout.test.mjs tests/prescribed-work-cap.test.mjs tests/run-walk-confirmation.test.mjs tests/road-taper-phase.test.mjs tests/plan-guidance.test.mjs tests/gentle-marathon.test.mjs tests/workout-frequency-choice.test.mjs tests/half-build-rhythm.test.mjs tests/marathon-dynamic-workouts.test.mjs tests/race-relative-entry.test.mjs tests/plan-print.test.mjs tests/workout-inspection.test.mjs tests/plan-explorer.test.mjs tests/today-summary.test.mjs tests/onboarding-preview.test.mjs tests/feasibility-evidence.test.mjs tests/watch-setup.test.mjs tests/benchmark-input.test.mjs tests/weekly-review-preferences.test.mjs tests/revision-review.test.mjs tests/training-contract-sequences.test.mjs tests/explicit-workout-contract.test.mjs tests/road-workout-policy.test.mjs tests/road-frequency-validation.test.mjs tests/road-overhaul-matrix.test.mjs tests/road-overhaul-edits.test.mjs tests/road-overhaul-marathon.test.mjs tests/workout-settings-contract.test.mjs tests/mobile-usability.test.mjs tests/security-hardening.test.mjs tests/offline-journal.test.mjs tests/journal-integrity.test.mjs tests/delivery-jobs.test.mjs tests/billing-inbox.test.mjs tests/deferred-dialog.test.mjs tests/offline-shell.test.mjs tests/journal-store-runtime.test.mjs tests/onboarding-draft.test.mjs tests/forecast-validation.test.mjs tests/road-steady-targets.test.mjs tests/endurance-calendar-regressions.test.mjs tests/road-allocation-viability.test.mjs tests/beginner-course.test.mjs tests/first-race-plans.test.mjs tests/first-race-integration.test.mjs tests/fitness-model.test.mjs tests/pace-target-roles.test.mjs tests/pacing-prescription-contract.test.mjs tests/stress-road-pacing-regressions.test.mjs tests/endurance-quality-stress.test.mjs tests/marathon-purposeful-variety.test.mjs tests/plan-quality-review.test.mjs tests/distinct-long-run-balance.test.mjs",
++    "test": "node --experimental-strip-types --test tests/ultra-baseline-consistency.test.mjs tests/quality-baseline-funding.test.mjs tests/calendar-fractional-regressions.test.mjs tests/measurement-baseline-migration.test.mjs tests/standard-quality-rhythm.test.mjs tests/weekly-progression-contract.test.mjs tests/baseline-edge-cases.test.mjs tests/baseline-progression-validation.test.mjs tests/input-baseline-contract.test.mjs tests/long-run-baseline-progression.test.mjs tests/run-distance-baseline.test.mjs tests/ui-refactor.test.mjs tests/plan-refactor-compatibility.test.mjs tests/plan-generation-stages.test.mjs tests/fitness-marathon-overhaul.test.mjs tests/engine.test.mjs tests/form-values.test.mjs tests/measurement.test.mjs tests/activity-status.test.mjs tests/journal-loading.test.mjs tests/journal-dates.test.mjs tests/journal-view.test.mjs tests/round2-training.test.mjs tests/round2-import.test.mjs tests/phase2.test.mjs tests/training-quality.test.mjs tests/adaptation.test.mjs tests/algorithm-review.test.mjs tests/training-evidence.test.mjs tests/delivery.test.mjs tests/recovery.test.mjs tests/account-recovery.test.cjs tests/event-calendar.test.mjs tests/billing.test.mjs tests/operations.test.mjs tests/return-duration.test.mjs tests/import-review.test.mjs tests/schedule-guidance.test.mjs tests/intervals-readback.test.mjs tests/personalization.test.mjs tests/historical-start.test.mjs tests/personalization-matrix.test.mjs tests/allocation-minimums.test.mjs tests/taper-weekdays.test.mjs tests/availability-frequency.test.mjs tests/outbound-delivery-acceptance.mjs tests/action-progress.test.mjs tests/upcoming-delivery.test.mjs tests/recovery-allocation.test.mjs tests/plan-coherence.test.mjs tests/plan-experience.test.mjs tests/midweek-review.test.mjs tests/endurance-brief.test.mjs tests/taper-reference.test.mjs tests/day-sessions.test.mjs tests/classic-schedule.test.mjs tests/long-ultra.test.mjs tests/workout-variety.test.mjs tests/workout-variety-route.test.mjs tests/workout-targets.test.mjs tests/workout-recipes.test.mjs tests/appearance.test.mjs tests/marathon-model.test.mjs tests/structured-formats.test.mjs tests/runner-customization.test.mjs tests/client-session.test.mjs tests/auth-navigation.test.mjs tests/run-distance.test.mjs tests/daily-guide.test.mjs tests/short-blocks.test.mjs tests/marathon-book.test.mjs tests/custom-event-context.test.mjs tests/five-k-endurance.test.mjs tests/half-taper.test.mjs tests/two-day-progression.test.mjs tests/steady-race-workout.test.mjs tests/prescribed-work-cap.test.mjs tests/run-walk-confirmation.test.mjs tests/road-taper-phase.test.mjs tests/plan-guidance.test.mjs tests/gentle-marathon.test.mjs tests/workout-frequency-choice.test.mjs tests/half-build-rhythm.test.mjs tests/marathon-dynamic-workouts.test.mjs tests/race-relative-entry.test.mjs tests/plan-print.test.mjs tests/workout-inspection.test.mjs tests/plan-explorer.test.mjs tests/today-summary.test.mjs tests/onboarding-preview.test.mjs tests/feasibility-evidence.test.mjs tests/watch-setup.test.mjs tests/benchmark-input.test.mjs tests/weekly-review-preferences.test.mjs tests/revision-review.test.mjs tests/training-contract-sequences.test.mjs tests/explicit-workout-contract.test.mjs tests/road-workout-policy.test.mjs tests/road-frequency-validation.test.mjs tests/road-overhaul-matrix.test.mjs tests/road-overhaul-edits.test.mjs tests/road-overhaul-marathon.test.mjs tests/workout-settings-contract.test.mjs tests/mobile-usability.test.mjs tests/security-hardening.test.mjs tests/offline-journal.test.mjs tests/journal-integrity.test.mjs tests/delivery-jobs.test.mjs tests/billing-inbox.test.mjs tests/deferred-dialog.test.mjs tests/offline-shell.test.mjs tests/journal-store-runtime.test.mjs tests/onboarding-draft.test.mjs tests/forecast-validation.test.mjs tests/road-steady-targets.test.mjs tests/endurance-calendar-regressions.test.mjs tests/road-allocation-viability.test.mjs tests/beginner-course.test.mjs tests/first-race-plans.test.mjs tests/first-race-integration.test.mjs tests/fitness-model.test.mjs tests/pace-target-roles.test.mjs tests/pacing-prescription-contract.test.mjs tests/stress-road-pacing-regressions.test.mjs tests/endurance-quality-stress.test.mjs tests/marathon-purposeful-variety.test.mjs tests/plan-quality-review.test.mjs tests/distinct-long-run-balance.test.mjs tests/short-race-recovery-reference.test.mjs tests/short-race-protected-regression.test.mjs",
+     "test:api": "node --experimental-strip-types tests/api.test.mjs",
+     "test:engine": "node --experimental-strip-types --test tests/trainingEngine.test.ts",
+     "typecheck": "tsc --noEmit",
+@@ -22,7 +22,8 @@
+     "verify:viability": "node --experimental-strip-types scripts/verify-plan-viability.mjs",
+     "verify:beginner": "node --experimental-strip-types scripts/verify-beginner-course.mjs",
+     "verify:first-race": "node --experimental-strip-types scripts/verify-first-race.mjs",
+-    "verify:pacing": "node --experimental-strip-types scripts/audit-pacing.mjs"
++    "verify:pacing": "node --experimental-strip-types scripts/audit-pacing.mjs",
++    "verify:short-race": "node --experimental-strip-types scripts/verify-short-race-reference.mjs"
+   },
+   "dependencies": {
+     "@base-ui/react": "1.7.0",
+diff --git a/scripts/audit-plan-quality.mjs b/scripts/audit-plan-quality.mjs
+index 80ddf55..0081e82 100644
+--- a/scripts/audit-plan-quality.mjs
++++ b/scripts/audit-plan-quality.mjs
+@@ -13,6 +13,7 @@ import {
+   validatePlan,
+   refreshWorkoutVariety,
+ } from '../lib/engine.ts';
++import { referenceOrdinaryQualityCount } from './short-race-reference-oracle.mjs';
+ 
+ const root = fileURLToPath(new URL('../', import.meta.url));
+ const source = resolve(
+@@ -239,12 +240,17 @@ export function auditPlanQuality(plan) {
+         ratio: row.easyLongRatio,
+       });
+     if (fullCalendar && scope === 'ordinary') {
+-      if (quality.length !== (plan.profile.qualitySessions ?? 1))
++      const expectedQuality = referenceOrdinaryQualityCount(
++        plan.profile,
++        week.index,
++        plan.profile.qualitySessions ?? 1,
++      );
++      if (quality.length !== expectedQuality)
+         issues.push({
+           type: 'quality-frequency',
+           week: row.week,
+           actual: quality.length,
+-          expected: plan.profile.qualitySessions ?? 1,
++          expected: expectedQuality,
+         });
+       if (long) {
+         if (
+diff --git a/scripts/short-race-reference-oracle.mjs b/scripts/short-race-reference-oracle.mjs
+new file mode 100644
+index 0000000..dae9768
+--- /dev/null
++++ b/scripts/short-race-reference-oracle.mjs
+@@ -0,0 +1,17 @@
++/** Independent expectation from TRAINING_REFERENCE.md (2026-09-27).
++ * The requested short-race back-off replaces a full recovery week with one
++ * quality outing when two were selected. Its existing configurable cadence
++ * remains four weeks by default. Call only for complete ordinary weeks;
++ * taper, recorded/manual exceptions and beginner courses have separate checks.
++ * Do not import the production scheduler to calculate expected test results.
++ */
++export function referenceOrdinaryQualityCount(profile, weekIndex, requested) {
++  if (
++    ['5k', '10k'].includes(profile.goal) &&
++    profile.planLevel !== 'beginner' &&
++    weekIndex > 0 &&
++    (weekIndex + 1) % (profile.recoveryWeeks ?? 4) === 0
++  )
++    return Math.min(1, requested);
++  return requested;
++}
+diff --git a/scripts/verify-short-race-reference.mjs b/scripts/verify-short-race-reference.mjs
+new file mode 100644
+index 0000000..0d92b12
+--- /dev/null
++++ b/scripts/verify-short-race-reference.mjs
+@@ -0,0 +1,444 @@
++/** Reference-property audit, with immutable before/after evidence.
++ * Run before production edits, then after each individually reviewed fix:
++ * node --experimental-strip-types scripts/verify-short-race-reference.mjs --stage before
++ * node --experimental-strip-types scripts/verify-short-race-reference.mjs --stage after-bug1
++ * node --experimental-strip-types scripts/verify-short-race-reference.mjs --stage after-bug2
++ * --stage verify-<label> verifies the final contract without replacing prior evidence.
++ * This is not an exact reproduction of a published schedule. Assertions concern
++ * only the properties explicitly requested in the user's supplied reference.
++ */
++import assert from 'node:assert/strict';
++import { createHash } from 'node:crypto';
++import { readFile, readdir, mkdir, writeFile } from 'node:fs/promises';
++import { execFileSync } from 'node:child_process';
++import { fileURLToPath } from 'node:url';
++import {
++  addDays,
++  demoProfile,
++  makePlan,
++  validatePlan,
++  taperFactor,
++} from '../lib/engine.ts';
++import { mandatoryTaperWeeks } from '../lib/progression-engine.ts';
++
++const root = new URL('../', import.meta.url);
++const folder = new URL(
++  'docs/verification/2026-09-27/short-race-reference/',
++  root,
++);
++const stageIndex = process.argv.indexOf('--stage');
++const stage = stageIndex < 0 ? undefined : process.argv[stageIndex + 1];
++assert.ok(
++  stage &&
++    /^(before|after-bug[12](?:-[a-z0-9-]+)?|verify-[a-z0-9-]+)$/.test(stage),
++  'Choose a unique --stage before, after-bug1[-label], after-bug2[-label] or verify-<label>',
++);
++const fixedStart = '2026-09-28';
++const protectedGoals = ['half', 'marathon', 'ultra'];
++const config = {
++  '5k': { weeks: [8, 10, 12, 16, 20], long: 10, kmPerDay: 7, raceKm: 5 },
++  '10k': { weeks: [8, 10, 12, 16, 20], long: 12, kmPerDay: 8, raceKm: 10 },
++  half: { weeks: [8, 12, 16, 20], long: 16, kmPerDay: 10, raceKm: 21.0975 },
++  marathon: { weeks: [8, 12, 16, 20], long: 23, kmPerDay: 13, raceKm: 42.195 },
++  ultra: { weeks: [12, 16, 20], long: 25, kmPerDay: 15, raceKm: 50 },
++};
++const daysByCount = {
++  3: [1, 3, 6],
++  4: [0, 2, 4, 6],
++  5: [0, 1, 2, 4, 6],
++  6: [0, 1, 2, 3, 4, 6],
++};
++const cases = [];
++for (const [goal, settings] of Object.entries(config))
++  for (const days of [3, 4, 5, 6])
++    for (const weeks of settings.weeks)
++      for (const q of [0, 1, 2]) {
++        cases.push({
++          id: `${goal}-${weeks}w-${days}d-q${q}`,
++          group: 'main',
++          input: {
++            ...demoProfile(fixedStart),
++            goal,
++            raceName: `${goal} reference-property regression`,
++            raceDate: addDays(fixedStart, weeks * 7 - 1),
++            ...(goal === 'ultra' ? { raceDistanceKm: settings.raceKm } : {}),
++            weeklyKm: settings.kmPerDay * days,
++            longestKm: settings.long,
++            days: daysByCount[days],
++            availableDays: [0, 1, 2, 3, 4, 5, 6],
++            currentRuns: days,
++            runsPerWeek: days,
++            longDay: 6,
++            weekdayMinutes: 120,
++            longMinutes: 300,
++            easyPace: 6,
++            recentRace: {
++              distanceKm: 5,
++              timeMinutes: 25,
++              date: '2026-09-20',
++              source: 'race',
++              course: 'road',
++            },
++            qualityMode: 'custom',
++            qualitySessions: q,
++            recentQualitySessions: 2,
++            recentQualityMinutes: 40,
++            method: 'balanced',
++            experience: 'established',
++            stableWeeks: 16,
++            runMeasure: 'distance',
++          },
++        });
++      }
++
++// Advanced 5K inputs support the existing explicit two-workout prerequisite.
++// Q0/Q1/Q2 remain input-identical within each matched advanced group.
++for (const days of [5, 6])
++  for (const weeks of config['5k'].weeks)
++    for (const q of [0, 1, 2]) {
++      const base = cases.find(
++        (item) => item.id === `5k-${weeks}w-${days}d-q${q}`,
++      );
++      cases.push({
++        id: `5k-${weeks}w-${days}d-q${q}-advanced`,
++        group: 'main',
++        input: {
++          ...base.input,
++          weeklyKm: days * 9,
++          longestKm: 13,
++        },
++      });
++    }
++
++// Exceptions to the intermediate reference: choosing zero weekday workouts or
++// a foundation course must not manufacture unrequested quality workouts.
++for (const goal of ['5k', '10k']) {
++  const base = cases.find((item) => item.id === `${goal}-8w-4d-q1`).input;
++  cases.push({
++    id: `${goal}-8w-foundation`,
++    group: 'foundation',
++    input: {
++      ...base,
++      weeklyKm: 0,
++      longestKm: 0,
++      currentRuns: 0,
++      runsPerWeek: 3,
++      days: [1, 3, 6],
++      experience: 'new',
++      planLevel: 'beginner',
++      recentRace: undefined,
++      easyPace: null,
++      qualitySessions: 0,
++      recentQualitySessions: 0,
++      recentQualityMinutes: 0,
++      runMeasure: 'time',
++    },
++  });
++}
++
++const round = (value) => Number(value.toFixed(3));
++function canonical(value) {
++  if (Array.isArray(value)) return value.map(canonical);
++  if (value && typeof value === 'object')
++    return Object.fromEntries(
++      Object.keys(value)
++        // Only the declared policy/engine version is ignored. Identity, notes,
++        // pace targets, recipe steps, dose, profile and feasibility remain checked.
++        .filter((key) => !['engineVersion', 'policyVersion'].includes(key))
++        .sort()
++        .map((key) => [key, canonical(value[key])]),
++    );
++  return value;
++}
++function digest(value) {
++  return createHash('sha256')
++    .update(JSON.stringify(canonical(value)))
++    .digest('hex');
++}
++async function fingerprint() {
++  const hash = createHash('sha256');
++  async function walk(url) {
++    for (const entry of (await readdir(url, { withFileTypes: true })).sort(
++      (a, b) => a.name.localeCompare(b.name),
++    )) {
++      const child = new URL(entry.name + (entry.isDirectory() ? '/' : ''), url);
++      if (entry.isDirectory()) await walk(child);
++      else if (entry.name.endsWith('.ts')) {
++        hash.update(child.href.slice(root.href.length));
++        hash.update(await readFile(child));
++      }
++    }
++  }
++  await walk(new URL('lib/', root));
++  return hash.digest('hex');
++}
++const quality = (workout) =>
++  !['race', 'long', 'easy'].includes(workout.kind) &&
++  workout.status !== 'skipped' &&
++  workout.steps.some(
++    (step) =>
++      step.kind === 'work' && step.intensity >= 4 && step.movement !== 'walk',
++  );
++function weekRows(plan) {
++  return plan.weeks.map((week) => {
++    const runs = plan.workouts.filter(
++      (workout) => workout.week === week.index && workout.status !== 'skipped',
++    );
++    const training = runs.filter((workout) => workout.kind !== 'race');
++    return {
++      week: week.index + 1,
++      phase: week.phase,
++      targetKm: week.targetKm,
++      actualKm: round(
++        training.reduce((sum, workout) => sum + workout.estimatedKm, 0),
++      ),
++      longKm:
++        training.find((workout) => workout.kind === 'long')?.estimatedKm ??
++        null,
++      weekdayQuality: training.filter(quality).length,
++      hardOutings: training.filter((workout) => workout.hard).length,
++      kinds: runs.map((workout) => workout.kind),
++      runs: runs.map((workout) => ({
++        date: workout.date,
++        phase: workout.phase,
++        kind: workout.kind,
++        km: round(workout.estimatedKm),
++        minutes: round(workout.minutes),
++        title: workout.title,
++      })),
++      prescriptionHash: digest({
++        week,
++        workouts: plan.workouts.filter(
++          (workout) => workout.week === week.index,
++        ),
++      }),
++    };
++  });
++}
++const sourceBefore = await fingerprint();
++const records = cases.map(({ id, group, input }) => {
++  const pristine = structuredClone(input);
++  try {
++    const plan = makePlan(input, fixedStart, false);
++    assert.deepEqual(input, pristine, 'Generation mutated input');
++    return {
++      id,
++      group,
++      input,
++      status: 'generated',
++      validationErrors: validatePlan(plan),
++      protectedHash: digest(plan),
++      mandatoryTaperWeeks: mandatoryTaperWeeks(
++        input.goal,
++        plan.weeks.length,
++        input.goal,
++      ),
++      dailyTaperDays: Array.from(
++        { length: 29 },
++        (_, index) => 28 - index,
++      ).filter(
++        (days) => taperFactor(plan.profile, addDays(input.raceDate, -days)) < 1,
++      ),
++      beginner: plan.beginner,
++      firstRace: plan.firstRace,
++      weeks: weekRows(plan),
++    };
++  } catch (error) {
++    assert.deepEqual(input, pristine, 'Rejected generation mutated input');
++    return {
++      id,
++      group,
++      input,
++      status: 'rejected',
++      error: { name: error.name, message: error.message },
++    };
++  }
++});
++const sourceAfter = await fingerprint();
++assert.equal(
++  sourceBefore,
++  sourceAfter,
++  'Source changed while the matrix was running; rerun with a fresh stage label',
++);
++const failures = [];
++const expect = (condition, message) => {
++  if (!condition) failures.push(message);
++};
++for (const record of records.filter((item) => item.status === 'generated')) {
++  expect(
++    record.validationErrors.length === 0,
++    `${record.id}: validatePlan: ${record.validationErrors.join('; ')}`,
++  );
++  if (record.input.qualitySessions === 0 || record.beginner) {
++    expect(
++      record.weeks.every((week) => week.weekdayQuality === 0),
++      `${record.id}: zero-workout choice gained a weekday quality workout`,
++    );
++  }
++  if (record.input.goal === 'half' && record.group === 'main') {
++    const expectedRecoveryWeeks = record.weeks.filter(
++      (week) =>
++        week.week % 4 === 0 &&
++        week.week < record.weeks.length - record.mandatoryTaperWeeks,
++    );
++    expect(
++      expectedRecoveryWeeks.every((week) => week.phase === 'Recovery'),
++      `${record.id}: half cutback missing at ${expectedRecoveryWeeks
++        .filter((week) => week.phase !== 'Recovery')
++        .map((week) => week.week)
++        .join(', ')}`,
++    );
++  }
++  if (
++    stage !== 'before' &&
++    ['5k', '10k'].includes(record.input.goal) &&
++    record.group === 'main'
++  ) {
++    expect(
++      record.weeks.every((week) => week.phase !== 'Recovery'),
++      `${record.id}: short race still has a full recovery week`,
++    );
++    if (record.input.qualitySessions > 0)
++      expect(
++        record.weeks.every((week) => week.weekdayQuality >= 1),
++        `${record.id}: quality missing in week(s) ${record.weeks
++          .filter((week) => week.weekdayQuality === 0)
++          .map((week) => week.week)
++          .join(', ')}`,
++      );
++    if (!stage.startsWith('after-bug1')) {
++      const taperDays = record.input.goal === '5k' ? 7 : 14;
++      expect(
++        record.mandatoryTaperWeeks === taperDays / 7,
++        `${record.id}: mandatory taper does not match reference`,
++      );
++      expect(
++        JSON.stringify(record.dailyTaperDays) ===
++          JSON.stringify(
++            Array.from(
++              { length: taperDays },
++              (_, index) => taperDays - 1 - index,
++            ),
++          ),
++        `${record.id}: executable daily taper does not match ${taperDays} inclusive days ending on race day`,
++      );
++    }
++  }
++}
++for (const goal of ['5k', '10k']) {
++  const minimum = records.find((record) => record.id === `${goal}-8w-4d-q1`);
++  expect(
++    minimum?.status === 'generated',
++    `${goal}: required eight-week q1 reference example was rejected`,
++  );
++}
++let protectedCompared = 0;
++if (stage !== 'before') {
++  const baseline = JSON.parse(
++    await readFile(new URL('before.json', folder), 'utf8'),
++  );
++  for (const prior of baseline.records.filter(
++    (item) => item.status === 'generated',
++  )) {
++    expect(
++      records.find((item) => item.id === prior.id)?.status === 'generated',
++      `${prior.id}: previously generated input now refuses generation`,
++    );
++  }
++  for (const record of records.filter((item) =>
++    protectedGoals.includes(item.input.goal),
++  )) {
++    const prior = baseline.records.find((item) => item.id === record.id);
++    expect(!!prior, `${record.id}: missing immutable baseline`);
++    expect(
++      record.status === prior?.status,
++      `${record.id}: protected outcome changed`,
++    );
++    if (record.status === 'generated') {
++      expect(
++        record.protectedHash === prior?.protectedHash,
++        `${record.id}: protected prescription/profile/notes changed`,
++      );
++      protectedCompared++;
++    } else
++      expect(
++        JSON.stringify(record.error) === JSON.stringify(prior?.error),
++        `${record.id}: protected refusal changed`,
++      );
++  }
++}
++const summary = {
++  stage,
++  commit: execFileSync('git', ['rev-parse', 'HEAD'], {
++    cwd: fileURLToPath(root),
++    encoding: 'utf8',
++  }).trim(),
++  sourceSha256: sourceBefore,
++  cases: records.length,
++  generated: records.filter((record) => record.status === 'generated').length,
++  rejected: records.filter((record) => record.status === 'rejected').length,
++  weeks: records.reduce(
++    (total, record) => total + (record.weeks?.length ?? 0),
++    0,
++  ),
++  protectedCompared,
++  failures,
++  goalCounts: Object.fromEntries(
++    Object.keys(config).map((goal) => [
++      goal,
++      {
++        generated: records.filter(
++          (record) =>
++            record.input.goal === goal && record.status === 'generated',
++        ).length,
++        rejected: records.filter(
++          (record) =>
++            record.input.goal === goal && record.status === 'rejected',
++        ).length,
++      },
++    ]),
++  ),
++};
++await mkdir(folder, { recursive: true });
++await writeFile(
++  new URL(`${stage}.json`, folder),
++  JSON.stringify({ summary, records }, null, 2) + '\n',
++  { flag: 'wx' },
++);
++const lines = [
++  `# Short-race reference regression: ${stage}`,
++  '',
++  'Synthetic matched inputs; each quality choice retains exactly the same fitness, available time, long run and weekly baseline. Counts exclude race and long outings. Refusals are listed separately and are not passing generated plans. Only metadata engineVersion/policyVersion is excluded from protected full-output hashes. The fixture protects half/marathon/ultra from this scoped change; it does not certify their coaching quality.',
++  '',
++  '```json',
++  JSON.stringify(summary, null, 2),
++  '```',
++  '',
++  '## Every generated week',
++  '',
++];
++for (const record of records.filter((item) => item.status === 'generated')) {
++  lines.push(
++    `### ${record.id}`,
++    '',
++    `Input: ${record.input.weeklyKm} km/week, ${record.input.longestKm} km long, ${record.input.runsPerWeek} days; ${record.input.qualitySessions} requested weekday workouts. Mandatory taper: ${record.mandatoryTaperWeeks} week(s). Daily taper offsets: ${record.dailyTaperDays.join(', ')} days before race.`,
++    '',
++    '| Week | Phase | Target km | Actual training km | Long km | Weekday Q | Kinds |',
++    '| --- | --- | ---: | ---: | ---: | ---: | --- |',
++  );
++  for (const week of record.weeks)
++    lines.push(
++      `| ${week.week} | ${week.phase} | ${round(week.targetKm)} | ${week.actualKm} | ${week.longKm === null ? '—' : round(week.longKm)} | ${week.weekdayQuality} | ${week.kinds.join(', ')} |`,
++    );
++  lines.push('');
++}
++lines.push('## Explicit refusals', '', '| Case | Refusal |', '| --- | --- |');
++for (const record of records.filter((item) => item.status === 'rejected'))
++  lines.push(
++    `| ${record.id} | ${record.error.name}: ${record.error.message.replaceAll('|', '/').replaceAll('\n', ' ')} |`,
++  );
++await writeFile(new URL(`${stage}.md`, folder), lines.join('\n') + '\n', {
++  flag: 'wx',
++});
++console.log(JSON.stringify(summary, null, 2));
++if (failures.length) process.exitCode = 1;
+diff --git a/scripts/verify-training-contracts.mjs b/scripts/verify-training-contracts.mjs
+index 3a3b42c..6910e15 100644
+--- a/scripts/verify-training-contracts.mjs
++++ b/scripts/verify-training-contracts.mjs
+@@ -18,6 +18,7 @@ import {
+ import { distanceEstimate, qualityWorkMinutes } from '../lib/prescription.ts';
+ import { updateRunMeasure } from '../lib/run-distance.ts';
+ import { roadOpeningFailures } from '../tests/road-overhaul-helpers.mjs';
++import { referenceOrdinaryQualityCount } from './short-race-reference-oracle.mjs';
+ 
+ export const DEFAULT_SEED = 20260919;
+ const start = '2026-09-14';
+@@ -283,9 +284,14 @@ function assertContract(plan, input, asOf) {
+       const hard = runs.filter(
+         (w) => w.kind !== 'long' && w.hard && qualityWorkMinutes(w) > 0,
+       );
++      const expectedQuality = referenceOrdinaryQualityCount(
++        plan.profile,
++        week.index,
++        input.qualitySessions,
++      );
+       check(
+-        hard.length === input.qualitySessions,
+-        `Week ${week.index + 1} lost the requested frequency: expected ${input.qualitySessions} weekday workouts, received ${hard.length}`,
++        hard.length === expectedQuality,
++        `Week ${week.index + 1} lost the reference frequency: expected ${expectedQuality} weekday workouts for selected ${input.qualitySessions}, received ${hard.length}`,
+       );
+       check(
+         new Set(runs.map((w) => w.date)).size === 5,
+diff --git a/tests/distinct-long-run-balance.test.mjs b/tests/distinct-long-run-balance.test.mjs
+index 4941862..bc9c3d4 100644
+--- a/tests/distinct-long-run-balance.test.mjs
++++ b/tests/distinct-long-run-balance.test.mjs
+@@ -39,16 +39,21 @@ void test('the reported 30/8 km four-day 5K example has distinct roles and a dis
+   assert.deepEqual(validatePlan(p), []);
+ });
+ 
+-void test('recovery reduces the supporting runs with the long run instead of producing 5.9/5.9/5.9/6', () => {
+-  const p = example('5k-q0');
++void test('half-marathon recovery retains distinct supporting roles beside its reduced long run', () => {
++  // The supplied reference retains recovery for half and removes it from 5K.
++  const p = example('half-q0');
+   assert.equal(p.weeks[3].phase, 'Recovery');
+-  assert.deepEqual(
+-    runs(p, 3).map((w) => w.estimatedKm),
+-    [3.9, 4.8, 4.8, 6],
++  const recoveryLong = runs(p, 3).find((w) => w.kind === 'long');
++  const previousLong = runs(p, 2).find((w) => w.kind === 'long');
++  assert.ok(recoveryLong.estimatedKm < previousLong.estimatedKm);
++  assert.ok(
++    runs(p, 3)
++      .filter((w) => w.kind === 'easy')
++      .every((w) => w.estimatedKm <= recoveryLong.estimatedKm * 0.8 + 0.001),
+   );
+   const mutated = structuredClone(p);
+   const easy = runs(mutated, 3).find((w) => w.kind === 'easy');
+-  easy.estimatedKm = 5.9;
++  easy.estimatedKm = recoveryLong.estimatedKm * 0.99;
+   assert.ok(validatePlan(mutated).some((e) => /crowds the long run/.test(e)));
+ });
+ 
+diff --git a/tests/engine.test.mjs b/tests/engine.test.mjs
+index 7f42ae5..c94e067 100644
+--- a/tests/engine.test.mjs
++++ b/tests/engine.test.mjs
+@@ -111,8 +111,9 @@ void test('insufficient time to prepare for a 10K is rejected', () => {
+     /starting weekly distance.*cannot fit/,
+   );
+ });
+-void test('recovery and taper reduce load without treating recovery as new build baseline', () => {
+-  const plan = makePlan(p, date);
++void test('half-marathon recovery and taper reduce load without treating recovery as new build baseline', () => {
++  // TRAINING_REFERENCE.md preserves fourth-week recovery for half, not 10K.
++  const plan = makePlan({ ...p, goal: 'half' }, date);
+   assert.equal(plan.weeks[3].phase, 'Recovery');
+   assert.ok(plan.weeks[3].targetKm < plan.weeks[2].targetKm);
+   assert.ok(plan.weeks[4].targetKm > plan.weeks[3].targetKm);
+diff --git a/tests/prescribed-work-cap.test.mjs b/tests/prescribed-work-cap.test.mjs
+index 5b15644..5b6f267 100644
+--- a/tests/prescribed-work-cap.test.mjs
++++ b/tests/prescribed-work-cap.test.mjs
+@@ -216,7 +216,17 @@ test('public shorten and lower-limit preference edits preserve history, schedule
+ 
+ test('alternatives can use a full saved gentle allowance without exceeding it', () => {
+   const p = make(),
+-    w = target(p);
++    // This alternative is authored for Race preparation. Continuous quality
++    // after removal of full short-race recovery creates an earlier Build
++    // race-rhythm exposure, which must not accidentally select this fixture.
++    w = p.workouts.find(
++      (run) =>
++        run.stimulus === 'race-rhythm' &&
++        run.qualityMinutes >= 9 &&
++        run.qualityMinutes < 12 &&
++        p.weeks[run.week].phase === 'Race preparation',
++    );
++  assert.ok(w);
+   const option = workoutAlternatives(p, w.id).find(
+     (t) => t.id === 'race-rhythm-10-short',
+   );
+diff --git a/tests/road-frequency-validation.test.mjs b/tests/road-frequency-validation.test.mjs
+index a3585fc..9227070 100644
+--- a/tests/road-frequency-validation.test.mjs
++++ b/tests/road-frequency-validation.test.mjs
+@@ -440,9 +440,8 @@ test('zero-history runners still need a base before longer race blocks', () => {
+     );
+ });
+ 
+-test('recorded history, recovery weeks and deliberate edits keep their meaning', () => {
++test('recorded history and deliberate edits keep their meaning', () => {
+   for (const change of [
+-    (p) => (p.weeks[0].phase = 'Recovery'),
+     (p) => (p.workouts[0].status = 'completed'),
+     (p) => {
+       p.workouts[0].changed = true;
+@@ -456,6 +455,28 @@ test('recorded history, recovery weeks and deliberate edits keep their meaning',
+   }
+ });
+ 
++test('half-marathon recovery retains its reference exemption, while a forged short-race Recovery label cannot hide missing quality', () => {
++  const half = fixture('half', 1);
++  firstQuality(half).steps = [easyStep(1560)];
++  half.weeks[0].phase = 'Recovery';
++  assert.deepEqual(roadQualityFrequencyErrors(half), []);
++  for (const goal of ['5k', '10k']) {
++    const plan = fixture(goal, 1);
++    firstQuality(plan).steps = [easyStep(1560)];
++    plan.weeks[0].phase = 'Recovery';
++    assert.ok(
++      roadQualityFrequencyErrors(plan).some((error) =>
++        /cannot use a full recovery week/.test(error),
++      ),
++    );
++    assert.ok(
++      roadQualityFrequencyErrors(plan).some((error) =>
++        /must retain a running quality session/.test(error),
++      ),
++    );
++  }
++});
++
+ test('an actual archived or separately recorded run explains only its own interrupted week', () => {
+   for (const source of ['archived', 'extra', 'pending-history-merge']) {
+     const plan = fixture('10k', 1);
+diff --git a/tests/road-overhaul-contract.mjs b/tests/road-overhaul-contract.mjs
+index 234a866..12bb9d4 100644
+--- a/tests/road-overhaul-contract.mjs
++++ b/tests/road-overhaul-contract.mjs
+@@ -6,6 +6,7 @@ import {
+   roadOpeningFailures,
+ } from './road-overhaul-helpers.mjs';
+ import { ROAD_DISTANCES } from './road-overhaul-cases.mjs';
++import { referenceOrdinaryQualityCount } from '../scripts/short-race-reference-oracle.mjs';
+ 
+ const gap = (a, b) =>
+   Math.round(
+@@ -118,9 +119,14 @@ export function independentRoadChecks(plan, input) {
+         );
+     }
+     if (ordinary) {
++      const expectedQuality = referenceOrdinaryQualityCount(
++        p,
++        week.index,
++        requested,
++      );
+       check(
+-        quality.length === requested,
+-        `Week ${week.index + 1}: requested ${requested} weekday workouts, received ${quality.length}`,
++        quality.length === expectedQuality,
++        `Week ${week.index + 1}: selected ${requested}, reference requires ${expectedQuality} weekday workouts, received ${quality.length}`,
+       );
+       check(
+         new Set(runs.map((w) => w.date)).size === input.runsPerWeek,
+diff --git a/tests/road-overhaul-edits.test.mjs b/tests/road-overhaul-edits.test.mjs
+index 2b6ac92..12ba41e 100644
+--- a/tests/road-overhaul-edits.test.mjs
++++ b/tests/road-overhaul-edits.test.mjs
+@@ -10,6 +10,7 @@ import {
+ import { updateRunMeasure } from '../lib/run-distance.ts';
+ import { roadProfile } from './road-overhaul-cases.mjs';
+ import { dayAfter, weekdayQuality } from './road-overhaul-helpers.mjs';
++import { referenceOrdinaryQualityCount } from '../scripts/short-race-reference-oracle.mjs';
+ 
+ const gap = (a, b) =>
+   Math.round(
+@@ -31,7 +32,7 @@ function assertSavedFrequency(plan, requested, asOf = plan.profile.startDate) {
+     );
+     assert.equal(
+       runs.filter(weekdayQuality).length,
+-      requested,
++      referenceOrdinaryQualityCount(plan.profile, week.index, requested),
+       `${plan.profile.goal}, week ${week.index + 1}: selected ${requested}`,
+     );
+   }
+diff --git a/tests/short-race-protected-regression.test.mjs b/tests/short-race-protected-regression.test.mjs
+new file mode 100644
+index 0000000..8fc2c7a
+--- /dev/null
++++ b/tests/short-race-protected-regression.test.mjs
+@@ -0,0 +1,97 @@
++/** User-requested regression guard: half/marathon/ultra are outside these fixes.
++ * Snapshots preserve their pre-change behavior; they do not establish coaching
++ * correctness. Short-race correctness is asserted by separate reference tests.
++ */
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import { createHash } from 'node:crypto';
++import { readFileSync } from 'node:fs';
++import { makePlan, validatePlan } from '../lib/engine.ts';
++
++const baseline = JSON.parse(
++  readFileSync(
++    new URL(
++      '../docs/verification/2026-09-27/short-race-reference/before.json',
++      import.meta.url,
++    ),
++    'utf8',
++  ),
++);
++const protectedCases = baseline.records.filter((record) =>
++  ['half', 'marathon', 'ultra'].includes(record.input.goal),
++);
++
++function canonical(value) {
++  if (Array.isArray(value)) return value.map(canonical);
++  if (value && typeof value === 'object')
++    return Object.fromEntries(
++      Object.keys(value)
++        .filter((key) => !['engineVersion', 'policyVersion'].includes(key))
++        .sort()
++        .map((key) => [key, canonical(value[key])]),
++    );
++  return value;
++}
++function hash(value) {
++  return createHash('sha256')
++    .update(JSON.stringify(canonical(value)))
++    .digest('hex');
++}
++
++void test('protected baseline was captured before the two short-race edits', () => {
++  assert.equal(
++    baseline.summary.commit,
++    '00416a6355cd6734732eb43b2f7f69bd68bd76ad',
++  );
++  assert.equal(
++    baseline.summary.sourceSha256,
++    '5421e89f012490ef32b09c0e2740f1d79fd21f07d430a0cfbf5eb92656ad1cea',
++  );
++  assert.equal(
++    protectedCases.filter((record) => record.status === 'generated').length,
++    90,
++  );
++  assert.equal(
++    protectedCases.filter((record) => record.status === 'rejected').length,
++    42,
++  );
++});
++
++for (const record of protectedCases) {
++  void test(`${record.id}: protected ${record.status === 'generated' ? 'complete prescription' : 'explicit refusal'} is unchanged`, () => {
++    const input = structuredClone(record.input);
++    const before = structuredClone(input);
++    if (record.status === 'rejected') {
++      assert.throws(
++        () => makePlan(input, input.startDate, false),
++        (error) => {
++          assert.equal(error.name, record.error.name);
++          assert.equal(error.message, record.error.message);
++          return true;
++        },
++      );
++    } else {
++      const plan = makePlan(input, input.startDate, false);
++      assert.deepEqual(validatePlan(plan), []);
++      assert.equal(plan.weeks.length, record.weeks.length);
++      for (const week of plan.weeks) {
++        assert.equal(
++          hash({
++            week,
++            workouts: plan.workouts.filter(
++              (workout) => workout.week === week.index,
++            ),
++          }),
++          record.weeks[week.index].prescriptionHash,
++          `Week ${week.index + 1} prescription changed`,
++        );
++      }
++      assert.equal(
++        hash(plan),
++        record.protectedHash,
++        'Full plan/profile/notes/feasibility changed',
++      );
++    }
++    assert.deepEqual(input, before, 'Generation mutated profile input');
++  });
++}
+diff --git a/tests/short-race-recovery-reference.test.mjs b/tests/short-race-recovery-reference.test.mjs
+new file mode 100644
+index 0000000..f7b8e5f
+--- /dev/null
++++ b/tests/short-race-recovery-reference.test.mjs
+@@ -0,0 +1,197 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import {
++  addDays,
++  dayDiff,
++  makePlan,
++  validatePlan,
++  weekday,
++} from '../lib/engine.ts';
++import { FIRST_RACE_CASES, firstRaceProfile } from './first-race-cases.mjs';
++import { roadQualityFrequencyErrors } from '../lib/plan/generation-rhythm.ts';
++import {
++  profile,
++  qualityByWeek,
++  start,
++} from './short-race-reference-fixtures.mjs';
++
++// Acceptance source: the user's TRAINING_REFERENCE.md, supplied 2026-09-27.
++// Higdon Intermediate 5K/10K retain quality in every week, including the
++// mid-block cutback and race week. These tests check the requested properties,
++// not reproduction of any provider's entire schedule. The separate half
++// reference explicitly retains periodic fourth-week recovery.
++for (const goal of ['5k', '10k']) {
++  for (const requested of [1, 2]) {
++    void test(`${goal} q${requested}: supplied reference retains actual quality in all eight weeks, including week 4 and race week`, () => {
++      const input = profile(goal, requested);
++      const plan = makePlan(input, start, false);
++      assert.equal(plan.weeks.length, 8);
++      const missing = qualityByWeek(plan)
++        .map((sessions, index) => (sessions.length ? null : index + 1))
++        .filter((week) => week !== null);
++      assert.deepEqual(
++        missing,
++        [],
++        'The supplied short-race schedules never replace all quality with easy/long running.',
++      );
++      assert.equal(plan.weeks.at(-1).phase, 'Race week');
++      assert.deepEqual(validatePlan(plan), []);
++    });
++
++    void test(`${goal} q${requested}: supplied reference forbids periodic full recovery weeks`, () => {
++      const plan = makePlan(profile(goal, requested), start, false);
++      assert.deepEqual(
++        plan.weeks
++          .filter((week) => week.phase === 'Recovery')
++          .map((week) => week.index + 1),
++        [],
++      );
++    });
++  }
++
++  void test(`${goal}: the supplied short-race back-off mechanism reduces two quality outings to one, never zero`, () => {
++    const plan = makePlan(profile(goal, 2), start, false);
++    const quality = qualityByWeek(plan);
++    // The existing default back-off cadence is week four. The request changes
++    // its mechanism, not the cadence: preserve one of the selected workouts.
++    assert.equal(quality[2].length, 2);
++    assert.equal(quality[3].length, 1);
++    assert.equal(quality[4].length, 2);
++    assert.notEqual(plan.weeks[3].phase, 'Recovery');
++    assert.deepEqual(validatePlan(plan), []);
++  });
++
++  void test(`${goal}: removing actual work from a race-week session violates the supplied every-week reference`, () => {
++    const plan = makePlan(profile(goal, 1), start, false);
++    const finalQuality = qualityByWeek(plan).at(-1);
++    assert.ok(finalQuality.length > 0);
++    for (const workout of finalQuality) {
++      workout.steps = workout.steps.map((step) =>
++        step.kind === 'work'
++          ? { ...step, kind: 'aerobic', intensity: 2, effortRole: 'easy' }
++          : step,
++      );
++      workout.qualityMinutes = 0;
++    }
++    assert.ok(
++      roadQualityFrequencyErrors(plan).some((error) =>
++        /must retain a running quality session/.test(error),
++      ),
++      'A hard flag, workout title or the race itself cannot replace executable training work.',
++    );
++  });
++
++  for (const recoveryWeeks of [3, 4]) {
++    void test(`${goal}: reducing the workout count every ${recoveryWeeks} weeks retains a familiar slot without creating adjacent hard days`, () => {
++      // The reference changes the NUMBER of quality sessions during back-off.
++      // Removing a session must not move the retained session onto Monday
++      // immediately after the preceding week's Sunday quality workout.
++      const plan = makePlan(
++        profile(goal, 2, {
++          longDay: 4,
++          days: [0, 1, 3, 4, 6],
++          availableDays: [0, 1, 3, 4, 6],
++          recoveryWeeks,
++        }),
++        start,
++        false,
++      );
++      const quality = qualityByWeek(plan);
++      const normal = quality[recoveryWeeks - 2];
++      const reduced = quality[recoveryWeeks - 1];
++      assert.equal(normal.length, 2);
++      assert.equal(reduced.length, 1);
++      assert.ok(
++        normal.some((run) => weekday(run.date) === weekday(reduced[0].date)),
++        'The back-off week removes an existing quality slot instead of moving it to a new day.',
++      );
++      const hardRuns = quality
++        .flat()
++        .sort((a, b) => a.date.localeCompare(b.date));
++      for (let i = 1; i < hardRuns.length; i++)
++        assert.ok(
++          dayDiff(hardRuns[i - 1].date, hardRuns[i].date) >= 2,
++          `Back-off must retain an easy or rest day between ${hardRuns[i - 1].date} and ${hardRuns[i].date}.`,
++        );
++      assert.deepEqual(validatePlan(plan), []);
++    });
++  }
++
++  void test(`${goal}: explicit zero-quality choice is outside the intermediate reference and stays easy`, () => {
++    const plan = makePlan(profile(goal, 0), start, false);
++    assert.ok(qualityByWeek(plan).every((sessions) => sessions.length === 0));
++    assert.ok(
++      plan.workouts
++        .filter((workout) => workout.kind !== 'race')
++        .every((workout) => !workout.hard),
++    );
++    assert.deepEqual(validatePlan(plan), []);
++  });
++
++  void test(`${goal}: an automatic developing routine is not upgraded to intermediate quality`, () => {
++    const plan = makePlan(
++      profile(goal, 0, {
++        qualityMode: 'automatic',
++        weeklyKm: goal === '10k' ? 18 : 15,
++        longestKm: 6,
++        currentRuns: 3,
++        runsPerWeek: 3,
++        days: [1, 3, 6],
++        experience: 'new',
++        intent: 'finish',
++      }),
++      start,
++      false,
++    );
++    assert.ok(qualityByWeek(plan).every((sessions) => sessions.length === 0));
++    assert.deepEqual(validatePlan(plan), []);
++  });
++
++  void test(`${goal}: beginner first-race and zero-experience foundation remain outside the intermediate reference`, () => {
++    const beginner = FIRST_RACE_CASES.find(
++      (scenario) => scenario.goal === goal,
++    );
++    for (const patch of [
++      {},
++      {
++        weeklyKm: 0,
++        longestKm: 0,
++        currentRuns: 0,
++        days: [0, 2, 4],
++        weekdayMinutes: 40,
++        easyPace: null,
++      },
++    ]) {
++      const input = firstRaceProfile(beginner, patch);
++      const plan = makePlan(input, input.startDate, false);
++      assert.ok(plan.beginner || plan.firstRace);
++      assert.ok(qualityByWeek(plan).every((sessions) => sessions.length === 0));
++      assert.deepEqual(validatePlan(plan), []);
++    }
++  });
++}
++
++for (const blockWeeks of [12, 16]) {
++  void test(`half: supplied reference preserves fourth-week recovery through a ${blockWeeks}-week block`, () => {
++    const plan = makePlan(
++      profile('half', 1, {
++        raceDate: addDays(start, blockWeeks * 7 - 1),
++        weeklyKm: 45,
++        longestKm: 16,
++      }),
++      start,
++      false,
++    );
++    const expected = Array.from(
++      { length: blockWeeks },
++      (_, index) => index,
++    ).filter((index) => (index + 1) % 4 === 0 && index < blockWeeks - 3);
++    assert.deepEqual(
++      plan.weeks
++        .filter((week) => week.phase === 'Recovery')
++        .map((week) => week.index),
++      expected,
++    );
++    assert.deepEqual(validatePlan(plan), []);
++  });
++}
+diff --git a/tests/short-race-reference-fixtures.mjs b/tests/short-race-reference-fixtures.mjs
+new file mode 100644
+index 0000000..a34e3a2
+--- /dev/null
++++ b/tests/short-race-reference-fixtures.mjs
+@@ -0,0 +1,39 @@
++import { addDays, demoProfile } from '../lib/engine.ts';
++
++export const start = '2026-09-28';
++export const profile = (goal, qualitySessions, patch = {}) => ({
++  ...demoProfile(start),
++  planLevel: 'standard',
++  goal,
++  startDate: start,
++  raceDate: addDays(start, 8 * 7 - 1),
++  weeklyKm: 45,
++  longestKm: 12,
++  currentRuns: 5,
++  runsPerWeek: 5,
++  days: [0, 1, 3, 4, 6],
++  availableDays: [0, 1, 2, 3, 4, 5, 6],
++  longDay: 6,
++  weekdayMinutes: 120,
++  longMinutes: 240,
++  experience: 'established',
++  intent: 'improve',
++  method: 'balanced',
++  qualityMode: 'custom',
++  qualitySessions,
++  recentQualitySessions: qualitySessions,
++  recentQualityMinutes: qualitySessions * 20,
++  runMeasure: 'distance',
++  workoutFormat: 'automatic',
++  ...patch,
++});
++const isQuality = (workout) =>
++  workout.hard &&
++  ['intervals', 'tempo', 'fartlek'].includes(workout.kind) &&
++  workout.steps.some((step) => step.kind === 'work' && step.seconds > 0);
++export const qualityByWeek = (plan) =>
++  plan.weeks.map((week) =>
++    plan.workouts.filter(
++      (workout) => workout.week === week.index && isQuality(workout),
++    ),
++  );
+diff --git a/tests/ui-refactor.test.mjs b/tests/ui-refactor.test.mjs
+index 032890a..5f9ff84 100644
+--- a/tests/ui-refactor.test.mjs
++++ b/tests/ui-refactor.test.mjs
+@@ -80,7 +80,7 @@ test('comparison tab preserves current and alternative training metrics', () =>
+   assert.match(html, /Quality sessions/);
+   assert.match(html, /Total training time/);
+   assert.match(html, /Review this option/);
+-  assert.equal(alternative.minutes, current.minutes + 10);
++  assert.ok(Math.abs(alternative.minutes - current.minutes - 10) < 1e-9);
+ });
+ 
+ test('training preferences retain preview-first form and busy protection', () => {

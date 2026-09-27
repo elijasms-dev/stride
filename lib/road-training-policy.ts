@@ -124,14 +124,21 @@ export function roadTrainingPolicy(p: Profile) {
 }
 
 export function roadTaperDays(p: Pick<Profile, 'goal'>) {
-  return p.goal === 'half' ? 14 : 7;
+  return p.goal === '5k' ? 7 : 14;
 }
 
 export function roadTaperFraction(
   p: Pick<Profile, 'goal'>,
   daysBeforeRace: number,
 ) {
-  if (daysBeforeRace > roadTaperDays(p)) return 1;
+  // Count race day inside the short-race window: D7 remains the final
+  // normal 5K long run; D14 remains outside the two-week 10K taper.
+  if (
+    isShortRoadRaceProfile(p)
+      ? daysBeforeRace >= roadTaperDays(p)
+      : daysBeforeRace > roadTaperDays(p)
+  )
+    return 1;
   if (p.goal === 'half') return daysBeforeRace > 7 ? 0.8 : 0.5;
   return 0.6;
 }

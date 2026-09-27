@@ -24,7 +24,7 @@ function assertSavedFrequency(plan, requested, asOf = plan.profile.startDate) {
       week.start < asOf ||
       week.phase === 'Recovery' ||
       gap(dayAfter(week.start, 6), plan.profile.raceDate) <=
-        (plan.profile.goal === 'half' ? 14 : 7)
+        (plan.profile.goal === '5k' ? 6 : plan.profile.goal === '10k' ? 13 : 14)
     )
       continue;
     const runs = plan.workouts.filter(

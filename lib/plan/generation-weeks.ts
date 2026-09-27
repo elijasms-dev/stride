@@ -93,9 +93,11 @@ export function generatePlanWeeks(
         weekday(date) === p.longDay &&
         (p.goal === 'base' ||
           dayDiff(date, p.raceDate) >=
-            (bookMarathon
-              ? SESSION_POLICY.bookLongMinimumDaysBeforeRace
-              : SESSION_POLICY.longMinimumDaysBeforeRace));
+            (p.goal === '5k'
+              ? DAYS_PER_WEEK
+              : bookMarathon
+                ? SESSION_POLICY.bookLongMinimumDaysBeforeRace
+                : SESSION_POLICY.longMinimumDaysBeforeRace));
       const isQuality =
         !isNovice &&
         p.goal !== 'base' &&

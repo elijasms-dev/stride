@@ -56,6 +56,7 @@ export function mandatoryTaperWeeks(
   goal: Goal,
 ): number {
   if (goal === 'base') return 0;
+  if (family === '5k' && goal === '5k') return 1;
   if (['half', 'marathon', 'ultra'].includes(family))
     return weeksUntilRace <= 8 ? 2 : 3;
   return 2;

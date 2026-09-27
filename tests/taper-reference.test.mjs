@@ -90,7 +90,7 @@ void test('same-effective calendar preferences preserve a Sunday-race marathon t
     assert.equal(before.workouts.length, current.workouts.length);
   }
 });
-void test('Sunday 10K taper never uses the already-reduced day at its 7-day boundary as its own reference', () => {
+void test('Sunday 10K taper never uses an already-reduced day inside its two-week window as its own reference', () => {
   const original = makePlan(
     inputs({
       goal: '10k',
@@ -108,8 +108,12 @@ void test('Sunday 10K taper never uses the already-reduced day at its 7-day boun
     start,
   );
   assert.equal(
-    taperFactor(original.profile, addDays(original.profile.raceDate, -7)),
+    taperFactor(original.profile, addDays(original.profile.raceDate, -13)),
     0.6,
+  );
+  assert.equal(
+    taperFactor(original.profile, addDays(original.profile.raceDate, -14)),
+    1,
   );
   let current = original;
   for (let i = 0; i < 4; i++) {
@@ -117,7 +121,7 @@ void test('Sunday 10K taper never uses the already-reduced day at its 7-day boun
     assert.deepEqual(
       changes(original, current),
       [],
-      `Full review ${i + 1} must not multiply the 7-day taper factor again`,
+      `Full review ${i + 1} must not multiply the two-week taper factor again`,
     );
     assert.deepEqual(validatePlan(current), []);
   }
