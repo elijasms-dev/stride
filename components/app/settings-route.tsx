@@ -4,6 +4,7 @@
 import { TabsContent } from '@/components/ui/tabs';
 import { Settings } from '../settings';
 import { useAppContext } from './app-context';
+import { DeviceJournalSettings } from './device-journal-settings';
 
 export function SettingsRoute() {
   const {
@@ -32,7 +33,10 @@ export function SettingsRoute() {
         onTargets={() => openModal(isDemo ? 'onboarding' : 'targets')}
         onRunMeasure={() => openModal(isDemo ? 'onboarding' : 'run-measure')}
         runMeasure={plan.profile.runMeasure ?? 'time'}
-        targetMode={plan.profile.workoutTargets?.mode ?? 'effort'}
+        targetMode={
+          plan.profile.workoutTargets?.mode ??
+          (plan.profile.recentRace ? 'automatic-benchmark' : 'automatic-effort')
+        }
         onTools={() => openModal('plan-tools')}
         onVariety={() => openModal(isDemo ? 'onboarding' : 'variety-review')}
         onProfile={() => openModal('profile')}
@@ -46,11 +50,13 @@ export function SettingsRoute() {
         onEvent={() => openModal(isDemo ? 'onboarding' : 'event')}
         isDemo={isDemo}
         history={data.history}
+        currentVersion={data.version}
         onUndo={() =>
           void act('undo').catch((e) => setToast((e as Error).message))
         }
         busy={busy}
       />
+      <DeviceJournalSettings />
     </TabsContent>
   );
 }

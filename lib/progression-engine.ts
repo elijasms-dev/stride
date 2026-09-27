@@ -87,6 +87,7 @@ export function longRunForWeek(options: {
   wholeKilometres?: boolean;
   recoveryEveryWeeks?: number;
   recoveryOffset?: number;
+  maximumStepKm?: number;
 }): number {
   const {
     weekIndex,
@@ -101,6 +102,7 @@ export function longRunForWeek(options: {
     // The first outing is the runner's actual baseline, even when fractional.
     // Event-specific ceilings belong to the caller; ultra targets may exceed 35 km.
     const start = startLongKm;
+    const maximumStep = options.maximumStepKm ?? MAXIMUM_LONG_RUN_BUILD_STEP_KM;
     const wholeStart = Math.floor(start);
     const peak = Math.max(start, Math.floor(peakKm));
     const every = options.recoveryEveryWeeks ?? DEFAULT_LONG_RUN_RECOVERY_WEEKS;
@@ -118,21 +120,16 @@ export function longRunForWeek(options: {
     // integer grid without rounding the baseline upward or exceeding a 2 km jump.
     const reachable = Math.max(
       start,
-      Math.min(peak, wholeStart + available * MAXIMUM_LONG_RUN_BUILD_STEP_KM),
+      Math.min(peak, wholeStart + available * maximumStep),
     );
     const steps =
-      reachable > start
-        ? Math.ceil((reachable - wholeStart) / MAXIMUM_LONG_RUN_BUILD_STEP_KM)
-        : 0;
+      reachable > start ? Math.ceil((reachable - wholeStart) / maximumStep) : 0;
     const advances =
       available > 0 ? Math.floor((ordinal * steps) / available) : 0;
     const progressed =
       advances === 0
         ? start
-        : Math.min(
-            reachable,
-            wholeStart + advances * MAXIMUM_LONG_RUN_BUILD_STEP_KM,
-          );
+        : Math.min(reachable, wholeStart + advances * maximumStep);
     // Rounding a cutback down must never turn a sub-kilometre baseline into
     // a longer run; session feasibility remains the caller's responsibility.
     if (taper) return Math.max(0, Math.floor(progressed * taperFraction));

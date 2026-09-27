@@ -1,0 +1,1092 @@
+{
+  "format": "stride-road-validator-audit-1",
+  "generatedAt": "2026-09-19T19:20:07.038Z",
+  "source": "plans.json input profiles regenerated through current makePlan; mutated copies checked by current validatePlan",
+  "scope": "Four road distances, two selected weekday workouts, complete ordinary week 3; no custom or ultra plans.",
+  "severity": "P2 validation-gate gaps: current generated examples are valid; these deliberately invalid mutations should be rejected before saving.",
+  "productionModified": false,
+  "summary": {
+    "generatedBaselines": 4,
+    "invalidGeneratedBaselines": 0,
+    "deliberateNegativeCases": 8,
+    "invalidMutationsAccepted": 8
+  },
+  "findings": [
+    {
+      "caseId": "5k-q2-missing-session",
+      "sourcePlan": "5k-q2",
+      "category": "unmarked-missing-session",
+      "mutation": "Remove one ordinary-week weekday quality session without recording a skip or manual change.",
+      "input": {
+        "name": "Synthetic audit runner",
+        "goal": "5k",
+        "raceName": "5K audit",
+        "startDate": "2026-09-21",
+        "raceDate": "2026-12-13",
+        "weeklyKm": 50,
+        "longestKm": 10,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "custom",
+        "qualitySessions": 2,
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 40,
+        "runMeasure": "distance",
+        "workoutVariety": "varied",
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50,
+          "date": "2026-09-01",
+          "source": "race",
+          "course": "road"
+        }
+      },
+      "week": 3,
+      "date": "2026-10-07",
+      "before": {
+        "runs": 5,
+        "selectedWeekdayWorkouts": 2,
+        "meaningfulWeekdayWorkouts": 2,
+        "hardFlaggedNonLongSessions": 2,
+        "allocatedKm": 52.675000000000004
+      },
+      "after": {
+        "runs": 4,
+        "selectedWeekdayWorkouts": 2,
+        "meaningfulWeekdayWorkouts": 1,
+        "hardFlaggedNonLongSessions": 1,
+        "allocatedKm": 40.162
+      },
+      "baselineErrors": [],
+      "validatorErrors": [],
+      "invalidMutationAccepted": true
+    },
+    {
+      "caseId": "5k-q2-strides-stale-hard-flag",
+      "sourcePlan": "5k-q2",
+      "category": "economy-counted-as-workout",
+      "mutation": "Replace one quality prescription with the real economy-relaxed strides recipe while retaining its old hard:true flag.",
+      "input": {
+        "name": "Synthetic audit runner",
+        "goal": "5k",
+        "raceName": "5K audit",
+        "startDate": "2026-09-21",
+        "raceDate": "2026-12-13",
+        "weeklyKm": 50,
+        "longestKm": 10,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "custom",
+        "qualitySessions": 2,
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 40,
+        "runMeasure": "distance",
+        "workoutVariety": "varied",
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50,
+          "date": "2026-09-01",
+          "source": "race",
+          "course": "road"
+        }
+      },
+      "week": 3,
+      "date": "2026-10-07",
+      "before": {
+        "runs": 5,
+        "selectedWeekdayWorkouts": 2,
+        "meaningfulWeekdayWorkouts": 2,
+        "hardFlaggedNonLongSessions": 2,
+        "allocatedKm": 52.675000000000004
+      },
+      "after": {
+        "runs": 5,
+        "selectedWeekdayWorkouts": 2,
+        "meaningfulWeekdayWorkouts": 1,
+        "hardFlaggedNonLongSessions": 2,
+        "allocatedKm": 52.675000000000004
+      },
+      "substitutedRecipe": {
+        "templateId": "economy-relaxed",
+        "kind": "fartlek",
+        "stimulus": "economy",
+        "hard": true,
+        "mainWorkMinutes": 1.9999999999999998,
+        "steps": [
+          {
+            "label": "Warm up",
+            "seconds": 600,
+            "effort": "Start gently · full sentences · 2–3 / 10",
+            "intensity": 2,
+            "kind": "warmup",
+            "movement": "run"
+          },
+          {
+            "label": "Easy run before strides",
+            "seconds": 3460,
+            "effort": "Comfortable aerobic running · 2–3 / 10",
+            "intensity": 3,
+            "kind": "aerobic",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 1 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Easy recovery",
+            "seconds": 100,
+            "effort": "Easy jog; let breathing settle",
+            "intensity": 2,
+            "kind": "recovery",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 2 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Easy recovery",
+            "seconds": 100,
+            "effort": "Easy jog; let breathing settle",
+            "intensity": 2,
+            "kind": "recovery",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 3 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Easy recovery",
+            "seconds": 100,
+            "effort": "Easy jog; let breathing settle",
+            "intensity": 2,
+            "kind": "recovery",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 4 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Easy recovery",
+            "seconds": 100,
+            "effort": "Easy jog; let breathing settle",
+            "intensity": 2,
+            "kind": "recovery",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 5 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Easy recovery",
+            "seconds": 100,
+            "effort": "Easy jog; let breathing settle",
+            "intensity": 2,
+            "kind": "recovery",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 6 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Cool down",
+            "seconds": 300,
+            "effort": "Easy running · finish relaxed",
+            "intensity": 2,
+            "kind": "cooldown",
+            "movement": "run"
+          }
+        ]
+      },
+      "baselineErrors": [],
+      "validatorErrors": [],
+      "invalidMutationAccepted": true
+    },
+    {
+      "caseId": "10k-q2-missing-session",
+      "sourcePlan": "10k-q2",
+      "category": "unmarked-missing-session",
+      "mutation": "Remove one ordinary-week weekday quality session without recording a skip or manual change.",
+      "input": {
+        "name": "Synthetic audit runner",
+        "goal": "10k",
+        "raceName": "10K audit",
+        "startDate": "2026-09-21",
+        "raceDate": "2026-12-13",
+        "weeklyKm": 50,
+        "longestKm": 12,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "custom",
+        "qualitySessions": 2,
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 40,
+        "runMeasure": "distance",
+        "workoutVariety": "varied",
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50,
+          "date": "2026-09-01",
+          "source": "race",
+          "course": "road"
+        }
+      },
+      "week": 3,
+      "date": "2026-10-07",
+      "before": {
+        "runs": 5,
+        "selectedWeekdayWorkouts": 2,
+        "meaningfulWeekdayWorkouts": 2,
+        "hardFlaggedNonLongSessions": 2,
+        "allocatedKm": 53.818
+      },
+      "after": {
+        "runs": 4,
+        "selectedWeekdayWorkouts": 2,
+        "meaningfulWeekdayWorkouts": 1,
+        "hardFlaggedNonLongSessions": 1,
+        "allocatedKm": 42.059
+      },
+      "baselineErrors": [],
+      "validatorErrors": [],
+      "invalidMutationAccepted": true
+    },
+    {
+      "caseId": "10k-q2-strides-stale-hard-flag",
+      "sourcePlan": "10k-q2",
+      "category": "economy-counted-as-workout",
+      "mutation": "Replace one quality prescription with the real economy-relaxed strides recipe while retaining its old hard:true flag.",
+      "input": {
+        "name": "Synthetic audit runner",
+        "goal": "10k",
+        "raceName": "10K audit",
+        "startDate": "2026-09-21",
+        "raceDate": "2026-12-13",
+        "weeklyKm": 50,
+        "longestKm": 12,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "custom",
+        "qualitySessions": 2,
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 40,
+        "runMeasure": "distance",
+        "workoutVariety": "varied",
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50,
+          "date": "2026-09-01",
+          "source": "race",
+          "course": "road"
+        }
+      },
+      "week": 3,
+      "date": "2026-10-07",
+      "before": {
+        "runs": 5,
+        "selectedWeekdayWorkouts": 2,
+        "meaningfulWeekdayWorkouts": 2,
+        "hardFlaggedNonLongSessions": 2,
+        "allocatedKm": 53.818
+      },
+      "after": {
+        "runs": 5,
+        "selectedWeekdayWorkouts": 2,
+        "meaningfulWeekdayWorkouts": 1,
+        "hardFlaggedNonLongSessions": 2,
+        "allocatedKm": 53.818
+      },
+      "substitutedRecipe": {
+        "templateId": "economy-relaxed",
+        "kind": "fartlek",
+        "stimulus": "economy",
+        "hard": true,
+        "mainWorkMinutes": 1.9999999999999998,
+        "steps": [
+          {
+            "label": "Warm up",
+            "seconds": 600,
+            "effort": "Start gently · full sentences · 2–3 / 10",
+            "intensity": 2,
+            "kind": "warmup",
+            "movement": "run"
+          },
+          {
+            "label": "Easy run before strides",
+            "seconds": 3160,
+            "effort": "Comfortable aerobic running · 2–3 / 10",
+            "intensity": 3,
+            "kind": "aerobic",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 1 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Easy recovery",
+            "seconds": 100,
+            "effort": "Easy jog; let breathing settle",
+            "intensity": 2,
+            "kind": "recovery",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 2 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Easy recovery",
+            "seconds": 100,
+            "effort": "Easy jog; let breathing settle",
+            "intensity": 2,
+            "kind": "recovery",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 3 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Easy recovery",
+            "seconds": 100,
+            "effort": "Easy jog; let breathing settle",
+            "intensity": 2,
+            "kind": "recovery",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 4 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Easy recovery",
+            "seconds": 100,
+            "effort": "Easy jog; let breathing settle",
+            "intensity": 2,
+            "kind": "recovery",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 5 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Easy recovery",
+            "seconds": 100,
+            "effort": "Easy jog; let breathing settle",
+            "intensity": 2,
+            "kind": "recovery",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 6 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Cool down",
+            "seconds": 300,
+            "effort": "Easy running · finish relaxed",
+            "intensity": 2,
+            "kind": "cooldown",
+            "movement": "run"
+          }
+        ]
+      },
+      "baselineErrors": [],
+      "validatorErrors": [],
+      "invalidMutationAccepted": true
+    },
+    {
+      "caseId": "half-q2-missing-session",
+      "sourcePlan": "half-q2",
+      "category": "unmarked-missing-session",
+      "mutation": "Remove one ordinary-week weekday quality session without recording a skip or manual change.",
+      "input": {
+        "name": "Synthetic audit runner",
+        "goal": "half",
+        "raceName": "Half-marathon audit",
+        "startDate": "2026-09-21",
+        "raceDate": "2026-12-13",
+        "weeklyKm": 55,
+        "longestKm": 16,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "custom",
+        "qualitySessions": 2,
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 40,
+        "runMeasure": "distance",
+        "workoutVariety": "varied",
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50,
+          "date": "2026-09-01",
+          "source": "race",
+          "course": "road"
+        }
+      },
+      "week": 3,
+      "date": "2026-10-07",
+      "before": {
+        "runs": 5,
+        "selectedWeekdayWorkouts": 2,
+        "meaningfulWeekdayWorkouts": 2,
+        "hardFlaggedNonLongSessions": 2,
+        "allocatedKm": 59.818
+      },
+      "after": {
+        "runs": 4,
+        "selectedWeekdayWorkouts": 2,
+        "meaningfulWeekdayWorkouts": 1,
+        "hardFlaggedNonLongSessions": 1,
+        "allocatedKm": 48.059
+      },
+      "baselineErrors": [],
+      "validatorErrors": [],
+      "invalidMutationAccepted": true
+    },
+    {
+      "caseId": "half-q2-strides-stale-hard-flag",
+      "sourcePlan": "half-q2",
+      "category": "economy-counted-as-workout",
+      "mutation": "Replace one quality prescription with the real economy-relaxed strides recipe while retaining its old hard:true flag.",
+      "input": {
+        "name": "Synthetic audit runner",
+        "goal": "half",
+        "raceName": "Half-marathon audit",
+        "startDate": "2026-09-21",
+        "raceDate": "2026-12-13",
+        "weeklyKm": 55,
+        "longestKm": 16,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "custom",
+        "qualitySessions": 2,
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 40,
+        "runMeasure": "distance",
+        "workoutVariety": "varied",
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50,
+          "date": "2026-09-01",
+          "source": "race",
+          "course": "road"
+        }
+      },
+      "week": 3,
+      "date": "2026-10-07",
+      "before": {
+        "runs": 5,
+        "selectedWeekdayWorkouts": 2,
+        "meaningfulWeekdayWorkouts": 2,
+        "hardFlaggedNonLongSessions": 2,
+        "allocatedKm": 59.818
+      },
+      "after": {
+        "runs": 5,
+        "selectedWeekdayWorkouts": 2,
+        "meaningfulWeekdayWorkouts": 1,
+        "hardFlaggedNonLongSessions": 2,
+        "allocatedKm": 59.818
+      },
+      "substitutedRecipe": {
+        "templateId": "economy-relaxed",
+        "kind": "fartlek",
+        "stimulus": "economy",
+        "hard": true,
+        "mainWorkMinutes": 1.9999999999999998,
+        "steps": [
+          {
+            "label": "Warm up",
+            "seconds": 600,
+            "effort": "Start gently · full sentences · 2–3 / 10",
+            "intensity": 2,
+            "kind": "warmup",
+            "movement": "run"
+          },
+          {
+            "label": "Easy run before strides",
+            "seconds": 3160,
+            "effort": "Comfortable aerobic running · 2–3 / 10",
+            "intensity": 3,
+            "kind": "aerobic",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 1 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Easy recovery",
+            "seconds": 100,
+            "effort": "Easy jog; let breathing settle",
+            "intensity": 2,
+            "kind": "recovery",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 2 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Easy recovery",
+            "seconds": 100,
+            "effort": "Easy jog; let breathing settle",
+            "intensity": 2,
+            "kind": "recovery",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 3 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Easy recovery",
+            "seconds": 100,
+            "effort": "Easy jog; let breathing settle",
+            "intensity": 2,
+            "kind": "recovery",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 4 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Easy recovery",
+            "seconds": 100,
+            "effort": "Easy jog; let breathing settle",
+            "intensity": 2,
+            "kind": "recovery",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 5 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Easy recovery",
+            "seconds": 100,
+            "effort": "Easy jog; let breathing settle",
+            "intensity": 2,
+            "kind": "recovery",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 6 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Cool down",
+            "seconds": 300,
+            "effort": "Easy running · finish relaxed",
+            "intensity": 2,
+            "kind": "cooldown",
+            "movement": "run"
+          }
+        ]
+      },
+      "baselineErrors": [],
+      "validatorErrors": [],
+      "invalidMutationAccepted": true
+    },
+    {
+      "caseId": "marathon-q2-missing-session",
+      "sourcePlan": "marathon-q2",
+      "category": "unmarked-missing-session",
+      "mutation": "Remove one ordinary-week weekday quality session without recording a skip or manual change.",
+      "input": {
+        "name": "Synthetic audit runner",
+        "goal": "marathon",
+        "raceName": "Marathon audit",
+        "startDate": "2026-09-21",
+        "raceDate": "2026-12-13",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "custom",
+        "qualitySessions": 2,
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 40,
+        "runMeasure": "distance",
+        "workoutVariety": "varied",
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50,
+          "date": "2026-09-01",
+          "source": "race",
+          "course": "road"
+        }
+      },
+      "week": 3,
+      "date": "2026-10-07",
+      "before": {
+        "runs": 5,
+        "selectedWeekdayWorkouts": 2,
+        "meaningfulWeekdayWorkouts": 2,
+        "hardFlaggedNonLongSessions": 2,
+        "allocatedKm": 72.738
+      },
+      "after": {
+        "runs": 4,
+        "selectedWeekdayWorkouts": 2,
+        "meaningfulWeekdayWorkouts": 1,
+        "hardFlaggedNonLongSessions": 1,
+        "allocatedKm": 59.772999999999996
+      },
+      "baselineErrors": [],
+      "validatorErrors": [],
+      "invalidMutationAccepted": true
+    },
+    {
+      "caseId": "marathon-q2-strides-stale-hard-flag",
+      "sourcePlan": "marathon-q2",
+      "category": "economy-counted-as-workout",
+      "mutation": "Replace one quality prescription with the real economy-relaxed strides recipe while retaining its old hard:true flag.",
+      "input": {
+        "name": "Synthetic audit runner",
+        "goal": "marathon",
+        "raceName": "Marathon audit",
+        "startDate": "2026-09-21",
+        "raceDate": "2026-12-13",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "qualityMode": "custom",
+        "qualitySessions": 2,
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 40,
+        "runMeasure": "distance",
+        "workoutVariety": "varied",
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50,
+          "date": "2026-09-01",
+          "source": "race",
+          "course": "road"
+        }
+      },
+      "week": 3,
+      "date": "2026-10-07",
+      "before": {
+        "runs": 5,
+        "selectedWeekdayWorkouts": 2,
+        "meaningfulWeekdayWorkouts": 2,
+        "hardFlaggedNonLongSessions": 2,
+        "allocatedKm": 72.738
+      },
+      "after": {
+        "runs": 5,
+        "selectedWeekdayWorkouts": 2,
+        "meaningfulWeekdayWorkouts": 1,
+        "hardFlaggedNonLongSessions": 2,
+        "allocatedKm": 72.738
+      },
+      "substitutedRecipe": {
+        "templateId": "economy-relaxed",
+        "kind": "fartlek",
+        "stimulus": "economy",
+        "hard": true,
+        "mainWorkMinutes": 1.9999999999999998,
+        "steps": [
+          {
+            "label": "Warm up",
+            "seconds": 600,
+            "effort": "Start gently · full sentences · 2–3 / 10",
+            "intensity": 2,
+            "kind": "warmup",
+            "movement": "run"
+          },
+          {
+            "label": "Easy run before strides",
+            "seconds": 3640,
+            "effort": "Comfortable aerobic running · 2–3 / 10",
+            "intensity": 3,
+            "kind": "aerobic",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 1 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Easy recovery",
+            "seconds": 100,
+            "effort": "Easy jog; let breathing settle",
+            "intensity": 2,
+            "kind": "recovery",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 2 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Easy recovery",
+            "seconds": 100,
+            "effort": "Easy jog; let breathing settle",
+            "intensity": 2,
+            "kind": "recovery",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 3 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Easy recovery",
+            "seconds": 100,
+            "effort": "Easy jog; let breathing settle",
+            "intensity": 2,
+            "kind": "recovery",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 4 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Easy recovery",
+            "seconds": 100,
+            "effort": "Easy jog; let breathing settle",
+            "intensity": 2,
+            "kind": "recovery",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 5 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Easy recovery",
+            "seconds": 100,
+            "effort": "Easy jog; let breathing settle",
+            "intensity": 2,
+            "kind": "recovery",
+            "movement": "run"
+          },
+          {
+            "label": "20 sec stride · 6 of 6",
+            "seconds": 20,
+            "effort": "Smooth acceleration · relaxed form · no sprinting",
+            "intensity": 6,
+            "kind": "work",
+            "movement": "run"
+          },
+          {
+            "label": "Cool down",
+            "seconds": 300,
+            "effort": "Easy running · finish relaxed",
+            "intensity": 2,
+            "kind": "cooldown",
+            "movement": "run"
+          }
+        ]
+      },
+      "baselineErrors": [],
+      "validatorErrors": [],
+      "invalidMutationAccepted": true
+    }
+  ]
+}

@@ -3,6 +3,7 @@ import { type Plan, type Step, type Workout } from './plan/types.ts';
 import { distanceEstimate } from './prescription.ts';
 import { supportingSession, workoutGuidance } from './coaching-context.ts';
 import { planWeekFocus } from './plan-guidance.ts';
+import { resolveEffortRole } from './workout-targets.ts';
 
 function targetMetrics(step: Step, workout: Workout, plan: Plan) {
   const match = step.effort.match(/(\d+)(?:[–-](\d+))?\s*\/\s*10/);
@@ -33,9 +34,15 @@ function targetMetrics(step: Step, workout: Workout, plan: Plan) {
         }
       : null,
     cue: step.effort,
-    basis: step.target
-      ? 'Explicit runner-supplied range, with effort cues retained.'
-      : 'Effort-led prescription. No race-equivalent pace, age-derived heart-rate zone, or unmeasured threshold is inferred.',
+    source: step.target ? (step.target.source ?? 'unknown') : 'effort',
+    model: step.target?.model ?? null,
+    basis: !step.target
+      ? 'Effort-led prescription. No numeric target is prescribed.'
+      : step.target.source === 'benchmark'
+        ? 'Estimated from a recorded performance benchmark, with effort cues retained.'
+        : step.target.source === 'manual'
+          ? 'Explicit runner-supplied range, with effort cues retained.'
+          : 'Saved numeric range; its original source was not recorded.',
   };
 }
 const category = (w: Workout) =>
@@ -55,6 +62,7 @@ function session(workout: Workout, plan: Plan) {
     distance_metres: step.metres ?? null,
     movement: step.movement ?? 'run',
     kind: step.kind,
+    effort_role: resolveEffortRole(workout, step, plan.profile),
     target_metrics: targetMetrics(step, workout, plan),
   }));
   return {

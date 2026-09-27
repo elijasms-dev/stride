@@ -12,6 +12,7 @@ import './plan-customization.css';
 import './notifications.css';
 import './plan-explorer.css';
 import './workout-inspection.css';
+import './device-journal.css';
 import { APPEARANCE_BOOTSTRAP } from '@/lib/appearance';
 
 const journalSans = Manrope({
@@ -27,7 +28,7 @@ const spatialDisplay = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: 'Stride — Marathon training that fits your week',
+  title: 'Stride — Running training that fits your week',
   description:
     'Build around your recent running and the time you actually have. Compare training plans, understand the tradeoffs, and stay in control of every change.',
   robots: { index: false, follow: false },

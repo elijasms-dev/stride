@@ -56,7 +56,7 @@ test('full plan renders all 84 calendar days, while week view renders seven', ()
   assert.match(full, new RegExp(`dateTime="${plan.profile.raceDate}"`, 'i'));
   assert.match(full, /Rest day/);
   assert.match(full, /Jump to plan week/);
-  assert.match(full, /Print plan/);
+  assert.match(full, /More plan options/);
   assert.match(full, /View steps/);
 });
 

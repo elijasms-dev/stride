@@ -16,8 +16,8 @@ const declineError = /reduces the long run outside/;
 // Independently authored prescriptions isolate validation from generation and
 // prevent a generator and its validator from agreeing on the same bad output.
 function planFixture({
-  longs = [20, 21],
-  totals = [30, 31],
+  longs = [20, 20],
+  totals = [30, 30],
   phases = [],
   profile = {},
 } = {}) {
@@ -123,18 +123,25 @@ void test('the start-date constraints marker still validates a fresh opening bas
 });
 
 void test('fractional user input is an exact opening anchor, then subsequent ordinary runs use whole kilometres', () => {
-  assert.deepEqual(validatePlan(planFixture({ longs: [16.5, 17] })), []);
-  const invalid = planFixture({ longs: [16.5, 17.5] });
+  assert.deepEqual(validatePlan(planFixture({ longs: [14.5, 15] })), []);
+  const invalid = planFixture({ longs: [14.5, 15.5] });
   assert.ok(validatePlan(invalid).some((error) => wholeError.test(error)));
 });
 
-void test('a fractional baseline may hold only when the next whole kilometre exceeds a hard cap', () => {
+void test('a fractional baseline may hold only when the next whole kilometre exceeds a session or ability cap', () => {
   const allowed = planFixture({
     longs: [16.5, 16.5],
     profile: { longLimitKm: 16.5 },
   });
   assert.deepEqual(validatePlan(allowed), []);
-  const uncapped = planFixture({ longs: [16.5, 16.5] });
+  // This developing half-marathon runner already exceeds the 16 km growth
+  // band. Retaining a familiar 16.5 km is allowed without rounding it upward.
+  assert.deepEqual(validatePlan(planFixture({ longs: [16.5, 16.5] })), []);
+  const uncapped = planFixture({
+    longs: [16.5, 16.5],
+    totals: [40, 41],
+    profile: { weeklyKm: 40 },
+  });
   assert.ok(validatePlan(uncapped).some((error) => wholeError.test(error)));
   const differentFraction = planFixture({
     longs: [16.5, 16.4],
@@ -158,7 +165,7 @@ void test('session and selected-day ceilings can retain a fractional baseline wi
 
 void test('ordinary long runs cannot regress even across a designated recovery week', () => {
   const valid = planFixture({
-    longs: [20, 16, 21],
+    longs: [20, 16, 20],
     phases: ['Build', 'Recovery', 'Build'],
   });
   assert.deepEqual(validatePlan(valid), []);

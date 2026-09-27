@@ -1,0 +1,2731 @@
+{
+  "format": "stride-training-contracts-1",
+  "seed": 20260919,
+  "engineVersion": "stride-0.10.1",
+  "policyVersion": "provisional-2026-09-16-v32",
+  "scope": "Synthetic production-engine invariants and mutation sequences; not coaching validation or hosted API/browser verification.",
+  "summary": {
+    "acceptedCases": 48,
+    "passedCases": 48,
+    "rejectedCases": 4,
+    "failures": 0,
+    "operations": 576
+  },
+  "results": [
+    {
+      "id": "5k-q0-distance",
+      "status": "passed",
+      "caseSeed": 3091288517,
+      "operations": [
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-27"
+        }
+      ],
+      "workouts": 60
+    },
+    {
+      "id": "5k-q0-time",
+      "status": "passed",
+      "caseSeed": 2664759863,
+      "operations": [
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-27"
+        }
+      ],
+      "workouts": 60
+    },
+    {
+      "id": "5k-q1-distance",
+      "status": "passed",
+      "caseSeed": 2690195156,
+      "operations": [
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-27"
+        }
+      ],
+      "workouts": 60
+    },
+    {
+      "id": "5k-q1-time",
+      "status": "passed",
+      "caseSeed": 2244480722,
+      "operations": [
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-29"
+        }
+      ],
+      "workouts": 60
+    },
+    {
+      "id": "5k-q2-distance",
+      "status": "passed",
+      "caseSeed": 2600792859,
+      "operations": [
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-20"
+        }
+      ],
+      "workouts": 60
+    },
+    {
+      "id": "5k-q2-time",
+      "status": "passed",
+      "caseSeed": 2919525625,
+      "operations": [
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-25"
+        }
+      ],
+      "workouts": 60
+    },
+    {
+      "id": "10k-q0-distance",
+      "status": "passed",
+      "caseSeed": 1400292357,
+      "operations": [
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-25"
+        }
+      ],
+      "workouts": 60
+    },
+    {
+      "id": "10k-q0-time",
+      "status": "passed",
+      "caseSeed": 2395936631,
+      "operations": [
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-28"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-28"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-28"
+        }
+      ],
+      "workouts": 60
+    },
+    {
+      "id": "10k-q1-distance",
+      "status": "passed",
+      "caseSeed": 506768148,
+      "operations": [
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-29"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-29"
+        }
+      ],
+      "workouts": 60
+    },
+    {
+      "id": "10k-q1-time",
+      "status": "passed",
+      "caseSeed": 1551303186,
+      "operations": [
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-20"
+        }
+      ],
+      "workouts": 60
+    },
+    {
+      "id": "10k-q2-distance",
+      "status": "passed",
+      "caseSeed": 2288715867,
+      "operations": [
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-25"
+        }
+      ],
+      "workouts": 60
+    },
+    {
+      "id": "10k-q2-time",
+      "status": "passed",
+      "caseSeed": 2226244921,
+      "operations": [
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-25"
+        }
+      ],
+      "workouts": 60
+    },
+    {
+      "id": "half-q0-distance",
+      "status": "passed",
+      "caseSeed": 22971092,
+      "operations": [
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-26"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "half-q0-time",
+      "status": "passed",
+      "caseSeed": 1769943762,
+      "operations": [
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-28"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "half-q1-distance",
+      "status": "passed",
+      "caseSeed": 424064453,
+      "operations": [
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-23"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "half-q1-time",
+      "status": "passed",
+      "caseSeed": 2190222903,
+      "operations": [
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-25"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "half-q2-distance",
+      "status": "passed",
+      "caseSeed": 2654217842,
+      "operations": [
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-18"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "half-q2-time",
+      "status": "passed",
+      "caseSeed": 2211214932,
+      "operations": [
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-25"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "marathon-q0-distance",
+      "status": "passed",
+      "caseSeed": 1661771611,
+      "operations": [
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-24"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-24"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "marathon-q0-time",
+      "status": "passed",
+      "caseSeed": 1029174329,
+      "operations": [
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-24"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-24"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-24"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-24"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-24"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-24"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-24"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-24"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-24"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "marathon-q1-distance",
+      "status": "passed",
+      "caseSeed": 3594038450,
+      "operations": [
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-20"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "marathon-q1-time",
+      "status": "passed",
+      "caseSeed": 795400596,
+      "operations": [
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-26"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "marathon-q2-distance",
+      "status": "passed",
+      "caseSeed": 773348101,
+      "operations": [
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-29"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "marathon-q2-time",
+      "status": "passed",
+      "caseSeed": 1198866039,
+      "operations": [
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-26"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "custom-7.5k-q0-distance",
+      "status": "passed",
+      "caseSeed": 1335794936,
+      "operations": [
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-19"
+        }
+      ],
+      "workouts": 60
+    },
+    {
+      "id": "custom-7.5k-q0-time",
+      "status": "passed",
+      "caseSeed": 1273278158,
+      "operations": [
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-22"
+        }
+      ],
+      "workouts": 60
+    },
+    {
+      "id": "custom-7.5k-q1-distance",
+      "status": "passed",
+      "caseSeed": 377270313,
+      "operations": [
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-25"
+        }
+      ],
+      "workouts": 60
+    },
+    {
+      "id": "custom-7.5k-q1-time",
+      "status": "passed",
+      "caseSeed": 1857642659,
+      "operations": [
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-29"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-29"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-29"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-29"
+        }
+      ],
+      "workouts": 60
+    },
+    {
+      "id": "custom-7.5k-q2-distance",
+      "status": "passed",
+      "caseSeed": 3295164950,
+      "operations": [
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-27"
+        }
+      ],
+      "workouts": 60
+    },
+    {
+      "id": "custom-7.5k-q2-time",
+      "status": "passed",
+      "caseSeed": 1832516208,
+      "operations": [
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-27"
+        }
+      ],
+      "workouts": 60
+    },
+    {
+      "id": "custom-15k-q0-distance",
+      "status": "passed",
+      "caseSeed": 1403085976,
+      "operations": [
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-27"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "custom-15k-q0-time",
+      "status": "passed",
+      "caseSeed": 768081518,
+      "operations": [
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-25"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "custom-15k-q1-distance",
+      "status": "passed",
+      "caseSeed": 3255637449,
+      "operations": [
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-29"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-29"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-29"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "custom-15k-q1-time",
+      "status": "passed",
+      "caseSeed": 1310869315,
+      "operations": [
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-21"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "custom-15k-q2-distance",
+      "status": "passed",
+      "caseSeed": 709528630,
+      "operations": [
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-19"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "custom-15k-q2-time",
+      "status": "passed",
+      "caseSeed": 2730568592,
+      "operations": [
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-25"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "custom-30k-q0-distance",
+      "status": "passed",
+      "caseSeed": 3863679795,
+      "operations": [
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-25"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-25"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "custom-30k-q0-time",
+      "status": "passed",
+      "caseSeed": 123945713,
+      "operations": [
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-26"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "custom-30k-q1-distance",
+      "status": "passed",
+      "caseSeed": 436604170,
+      "operations": [
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-27"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "custom-30k-q1-time",
+      "status": "passed",
+      "caseSeed": 1416545004,
+      "operations": [
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-28"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-28"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-28"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-28"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "custom-30k-q2-distance",
+      "status": "passed",
+      "caseSeed": 1856429117,
+      "operations": [
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-21"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-28"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-28"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-28"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-28"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "custom-30k-q2-time",
+      "status": "passed",
+      "caseSeed": 2508417871,
+      "operations": [
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-28"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-28"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-28"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-28"
+        }
+      ],
+      "workouts": 80
+    },
+    {
+      "id": "ultra-50k-q0-distance",
+      "status": "passed",
+      "caseSeed": 1328963278,
+      "operations": [
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-26"
+        }
+      ],
+      "workouts": 100
+    },
+    {
+      "id": "ultra-50k-q0-time",
+      "status": "passed",
+      "caseSeed": 457457928,
+      "operations": [
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-27"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-27"
+        }
+      ],
+      "workouts": 100
+    },
+    {
+      "id": "ultra-50k-q1-distance",
+      "status": "passed",
+      "caseSeed": 1742491015,
+      "operations": [
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-24"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-24"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-24"
+        }
+      ],
+      "workouts": 100
+    },
+    {
+      "id": "ultra-50k-q1-time",
+      "status": "passed",
+      "caseSeed": 3931378653,
+      "operations": [
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-19"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-19"
+        }
+      ],
+      "workouts": 100
+    },
+    {
+      "id": "ultra-50k-q2-distance",
+      "status": "passed",
+      "caseSeed": 778124528,
+      "operations": [
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-18"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-22"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-22"
+        }
+      ],
+      "workouts": 100
+    },
+    {
+      "id": "ultra-50k-q2-time",
+      "status": "passed",
+      "caseSeed": 1685039590,
+      "operations": [
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "measure-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "unit-roundtrip",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "variety-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "benchmark-context",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "terrain-preference",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-14"
+        },
+        {
+          "operation": "fuel-preference",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "advance-recorded-days",
+          "asOf": "2026-09-20"
+        },
+        {
+          "operation": "refresh-variety",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-26"
+        },
+        {
+          "operation": "json-roundtrip",
+          "asOf": "2026-09-26"
+        }
+      ],
+      "workouts": 100
+    }
+  ],
+  "rejected": [
+    {
+      "id": "reject-two-workouts-without-background",
+      "status": "rejected-as-expected",
+      "error": "Two quality sessions need an established routine of at least 5 runs, 45 km and two quality sessions per week. Choose one quality session for now."
+    },
+    {
+      "id": "reject-nonfinite-baseline",
+      "status": "rejected-as-expected",
+      "error": "Check your recent weekly distance; enter a number between 0 and 150."
+    },
+    {
+      "id": "reject-invalid-benchmark-date",
+      "status": "rejected-as-expected",
+      "error": "Recent race: enter a real calendar date, or leave it blank."
+    },
+    {
+      "id": "reject-future-benchmark",
+      "status": "rejected-as-expected",
+      "error": "Recent race: a completed result cannot be in the future."
+    }
+  ],
+  "git": {
+    "sha": "f6e80a3352ec8539a98c5dcb7ec1598202e88eaa",
+    "dirty": true
+  },
+  "generatedAt": "2026-09-19T17:55:57.321Z"
+}

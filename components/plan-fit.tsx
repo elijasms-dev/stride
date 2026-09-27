@@ -1,7 +1,11 @@
 import { isLongUltra, longUltraCapacity } from '@/lib/ultra-policy';
 import { CustomizationSummary } from './runner-customization-fields';
-import { dayNames, kmDisplay, type Plan } from '@/lib/engine';
-import { qualitySchedule } from '@/lib/training-structure';
+import { dateLabel, dayNames, kmDisplay, type Plan } from '@/lib/engine';
+import {
+  qualitySchedule,
+  requestedQualityCount,
+} from '@/lib/training-structure';
+import { assessFeasibility } from '@/lib/plan/feasibility';
 import { runDuration } from '@/lib/journal-view';
 import { weeklyRhythm } from '@/lib/weekly-rhythm';
 import { usesMarathonBook } from '@/lib/marathon-book';
@@ -9,6 +13,12 @@ import { marathonPlanDescription } from '@/lib/plan-guidance';
 
 export function PlanFit({ plan, asOf }: { plan: Plan; asOf: string }) {
   const p = plan.profile;
+  const qualityCount = requestedQualityCount(p);
+  const evidence = assessFeasibility(plan, asOf)?.evidence;
+  const exposure = (value: number) =>
+    evidence?.unit === 'minutes'
+      ? runDuration(value)
+      : `${kmDisplay(value, p.units)} ${p.units}`;
   const firstFull =
     plan.weeks.find((week) => week.start >= p.startDate) ?? plan.weeks[0];
   const initial = weeklyRhythm(plan, firstFull.index);
@@ -20,6 +30,47 @@ export function PlanFit({ plan, asOf }: { plan: Plan; asOf: string }) {
     <div className="plan-fit">
       <h3>Built around your running</h3>
       <CustomizationSummary profile={p} />
+      {evidence && (
+        <details className="reason-details">
+          <summary>Recorded preparation and remaining plan</summary>
+          <p>
+            Assessed {dateLabel(asOf)}. This describes the available training
+            evidence, not a prediction of race readiness. Recorded exposure uses
+            logged long-run slots, or easy slots in two-day plans. Extra runs
+            appear in weekly totals.
+          </p>
+          <dl className="weekly-review-totals">
+            <div>
+              <dt>Longest logged preparation run</dt>
+              <dd>
+                {exposure(evidence.recorded.longest)}
+                <small>
+                  {evidence.recorded.sessions} recorded sessions
+                  {evidence.recorded.unknownDistanceSessions
+                    ? `; ${evidence.recorded.unknownDistanceSessions} without measured distance`
+                    : ''}
+                </small>
+              </dd>
+            </div>
+            <div>
+              <dt>Longest remaining planned run</dt>
+              <dd>
+                {exposure(evidence.remaining.longest)}
+                <small>
+                  {evidence.remaining.sessions} upcoming sessions; not yet
+                  completed
+                </small>
+              </dd>
+            </div>
+          </dl>
+          <p>
+            {evidence.unresolved.sessions} past preparation sessions are
+            unlogged and remain unknown. The event’s planning policy calls for{' '}
+            {exposure(evidence.required)} of preparation exposure; missing
+            training is never made up.
+          </p>
+        </details>
+      )}
       {isLongUltra(p) && (
         <p>
           Your long-ultra block includes at most one controlled workout each
@@ -61,12 +112,12 @@ export function PlanFit({ plan, asOf }: { plan: Plan; asOf: string }) {
         <p>{marathonPlanDescription(plan)}</p>
       ) : (
         <p>
-          {p.qualitySessions === 0 || p.intent === 'finish'
+          {qualityCount === 0
             ? 'Your focus is easy endurance. Any relaxed strides provide changes of rhythm rather than a hard speed session.'
-            : `${p.qualityMode === 'automatic' ? 'Your classic structure allows' : 'You requested'} up to ${p.qualitySessions ?? 1} quality sessions per week. ${p.recentQualitySessions == null ? 'Recent workout history was not supplied, so the introduction starts conservatively.' : `You reported ${p.recentQualitySessions} recent quality sessions${p.recentQualityMinutes != null ? ` and ${p.recentQualityMinutes} work minutes per week` : ', with work duration unspecified'}.`}`}{' '}
+            : `Your routine requests ${qualityCount} weekday quality ${qualityCount === 1 ? 'workout' : 'workouts'}, separate from the long run. Recovery, taper and reviewed return weeks can be lighter. ${p.recentQualitySessions == null ? 'Recent workout history was not supplied, so the introduction starts conservatively.' : `You reported ${p.recentQualitySessions} recent quality sessions${p.recentQualityMinutes != null ? ` and ${p.recentQualityMinutes} work minutes per week` : ', with work duration unspecified'}.`}`}{' '}
           {opening
             ? `First structured session: ${opening.title.toLowerCase()}, with ${runDuration(opening.qualityMinutes ?? 0)} of ${opening.stimulus === 'economy' ? 'relaxed accelerations' : 'controlled work'}.`
-            : (p.qualitySessions ?? 0) > 0 && p.intent !== 'finish'
+            : qualityCount > 0
               ? 'Your current schedule and session limits do not fit a complete structured session. Review those limits if you want quality work in this block.'
               : ''}
           {roles.some((w) => w.role === 'medium-long')
@@ -80,8 +131,8 @@ export function PlanFit({ plan, asOf }: { plan: Plan; asOf: string }) {
         ) && (
           <p>
             Selected race-preparation weeks include controlled marathon effort
-            in the long run. Those weeks replace one weekday workout, keeping
-            the rest of the long run easy.
+            in the long run. The saved daily schedule shows the weekday workouts
+            alongside that endurance session.
           </p>
         )}
       {plan.notes
@@ -94,9 +145,8 @@ export function PlanFit({ plan, asOf }: { plan: Plan; asOf: string }) {
           <p key={n}>{n}</p>
         ))}
       {!!p.preferredHardDays?.length &&
-        p.intent !== 'finish' &&
         p.goal !== 'base' &&
-        p.qualitySessions !== 0 && (
+        qualityCount > 0 && (
           <p>
             Preferred workout days:{' '}
             {p.preferredHardDays.map((d) => dayNames[d]).join(', ')}. Available

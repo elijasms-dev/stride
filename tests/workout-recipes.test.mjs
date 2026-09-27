@@ -161,27 +161,38 @@ void test('distance pyramids preserve metres and rounded budgets after repeated 
   );
   assert.ok(b.minutes < w.minutes);
 });
-void test('slower pace updates show a truthful timed alternative and preserve protected snapshots', () => {
+void test('slower pace updates retain distance repetitions and recoveries while preserving protected snapshots', () => {
   const p = profile(),
     w = session('power-400-metres', 30, p);
   const slower = {
     ...p,
     workoutTargets: {
       ...config,
-      pace: { ...config.pace, interval: { low: 420, high: 450 } },
+      pace: {
+        easy: { low: 480, high: 510 },
+        tempo: { low: 450, high: 480 },
+        interval: { low: 420, high: 450 },
+        race: { low: 430, high: 460 },
+      },
     },
   };
   const next = withWorkoutTargets(w, slower);
-  assert.equal(next.minutes, w.minutes);
+  assert.ok(next.minutes > w.minutes);
   assert.deepEqual(
-    next.steps.map((s) => s.seconds),
-    w.steps.map((s) => s.seconds),
+    next.steps.map((s) => s.metres),
+    w.steps.map((s) => s.metres),
   );
-  assert.ok(next.steps.every((s) => s.metres === undefined));
-  assert.doesNotMatch(next.title, /400/);
-  assert.doesNotMatch(next.purpose, /400/);
-  assert.match(next.reason, /timed alternative/);
-  const plan = makePlan(p, start);
+  assert.deepEqual(
+    next.steps.filter((s) => s.kind === 'recovery').map((s) => s.seconds),
+    w.steps.filter((s) => s.kind === 'recovery').map((s) => s.seconds),
+  );
+  assert.match(next.title, /400/);
+  for (const step of next.steps.filter((s) => s.metres !== undefined))
+    assert.ok(step.seconds + 1 >= (step.metres * step.target.high) / 1000);
+  const plan = makePlan(
+    { ...p, runMeasure: 'time', workoutFormat: 'time' },
+    start,
+  );
   plan.workouts.push(w);
   assert.deepEqual(
     updateWorkoutTargets(plan, slower.workoutTargets, start, [
@@ -255,9 +266,9 @@ for (const goal of ['5k', '10k', 'half', 'marathon'])
             (s.metres * s.planningPaceSecondsPerKm) / 1000 <= s.seconds + 1,
         ),
       );
-      assert.equal(
-        w.steps.reduce((n, s) => n + s.seconds, 0),
-        w.minutes * 60,
+      assert.ok(
+        Math.abs(w.steps.reduce((n, s) => n + s.seconds, 0) - w.minutes * 60) <
+          1e-6,
       );
     }
   });

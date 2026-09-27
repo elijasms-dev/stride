@@ -1,3 +1,4 @@
+import { roadOpeningFailures } from './road-overhaul-helpers.mjs';
 // Independent synthetic availability/frequency acceptance; portable to tests/.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -15,7 +16,7 @@ const base = {
   goal: '10k',
   raceDate: addDays(start, 139),
   weeklyKm: 45,
-  longestKm: 12,
+  longestKm: 14,
   currentRuns: 7,
   days: [0, 2, 4, 6],
   longDay: 6,
@@ -111,7 +112,7 @@ for (let count = 2; count <= 7; count++)
     verify(p, input);
     assert.deepEqual(input, before);
     const ws = runs(p, build(p).index);
-    assert.equal(ws.filter((w) => w.hard).length, count === 2 ? 0 : 1);
+    assert.equal(ws.filter((w) => w.hard).length, count < 4 ? 0 : 1);
     assert.equal(
       ws.filter((w) => w.kind === 'long').length,
       count === 2 ? 0 : 1,
@@ -134,7 +135,7 @@ void test('available all7 with desired3 does not invent an increase from the rec
   verify(p, input);
   assert.equal(p.profile.currentRuns, 3);
 });
-void test('extra availability cannot become extra weekly workload when desired frequency stays3', () => {
+void test('extra availability cannot add runs or raise the declared workload when desired frequency stays3', () => {
   const common = {
     currentRuns: 3,
     runsPerWeek: 3,
@@ -145,10 +146,14 @@ void test('extra availability cannot become extra weekly workload when desired f
     b = make({ ...common, availableDays: all });
   assert.equal(a.profile.days.length, 3);
   assert.equal(b.profile.days.length, 3);
-  assert.ok(
-    Math.abs(total(runs(a, 0)) - total(runs(b, 0))) <= 3,
-    'Same frequency and baseline preserve the budget despite extra options',
-  );
+  for (const plan of [a, b]) {
+    assert.deepEqual(roadOpeningFailures(plan), []);
+    assert.equal(plan.profile.weeklyKm, common.weeklyKm);
+    assert.equal(plan.profile.longestKm, common.longestKm);
+    assert.ok(total(runs(plan, 0)) <= common.weeklyKm * base.easyPace + 1 / 60);
+  }
+  // Availability may change spacing and therefore short-support roles, but
+  // it cannot add a fourth run, raise recorded history or exceed that history.
 });
 void test('an explicit frequency review scales the budget without concentrating the old weekly volume', () => {
   const input = {
@@ -256,7 +261,12 @@ void test('custom quality0 remains explicit when five runs are requested', () =>
   assert.ok(runs(p).every((w) => !w.hard && !w.templateId));
 });
 void test('automatic mode resolves stale quality input to requested-frequency structure', () => {
-  const p = make({ runsPerWeek: 3, qualitySessions: 2 });
+  const p = make({
+    runsPerWeek: 3,
+    qualitySessions: 2,
+    weeklyKm: 30,
+    longestKm: 12,
+  });
   assert.equal(p.profile.qualitySessions, 1);
   assert.equal(runs(p, build(p).index).filter((w) => w.hard).length, 1);
 });
@@ -280,6 +290,8 @@ void test('clustered Mon/Tue/Wed with Wednesday long can still fit Monday qualit
       ...base,
       availableDays: [0, 1, 2],
       runsPerWeek: 3,
+      weeklyKm: 30,
+      longestKm: 12,
       longDay: 2,
     },
     p = makePlan(input, start);
@@ -388,26 +400,18 @@ void test('recovery round trip retains availability, desired frequency, resolved
   assert.throws(() => validateRecovery(malformed));
 });
 
-void test('partly feasible explicit two-workout structure explains the unfilled second slot', () => {
-  const p = make({
-    qualityMode: 'custom',
-    qualitySessions: 2,
-    currentRuns: 5,
-    runsPerWeek: 5,
-    availableDays: [0, 1, 2, 3, 4],
-    longDay: 1,
-  });
-  assert.equal(p.profile.qualitySessions, 2);
-  assert.equal(runs(p, build(p).index).filter((w) => w.hard).length, 1);
-  assert.ok(
-    p.notes.some(
-      (n) =>
-        /quality/i.test(n) &&
-        /spacing|space|fit|feasib|available/i.test(n) &&
-        /one|1/.test(n) &&
-        /two|2/.test(n),
-    ),
-    'A one-of-two feasible quality structure must be explained',
+void test('an explicit two-workout choice rejects availability that can fit only one', () => {
+  assert.throws(
+    () =>
+      make({
+        qualityMode: 'custom',
+        qualitySessions: 2,
+        currentRuns: 5,
+        runsPerWeek: 5,
+        availableDays: [0, 1, 2, 3, 4],
+        longDay: 1,
+      }),
+    /selected 2 weekday workouts.*running days/,
   );
 });
 
@@ -520,4 +524,12 @@ void test('repeated reviews without observations retain the frequency-reduced st
     );
   }
   assert.deepEqual(p, before);
+});
+
+void test('three days cannot fund 30 km, a 10 km long run and a bounded quality session without an oversized easy run', () => {
+  assert.throws(
+    () =>
+      make({ runsPerWeek: 3, qualitySessions: 2, weeklyKm: 30, longestKm: 10 }),
+    /starting weekly distance and long-run baseline cannot fit/,
+  );
 });

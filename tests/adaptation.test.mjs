@@ -14,6 +14,8 @@ import {
   validatePlan,
 } from '../lib/engine.ts';
 import { currentTrainingBaseline } from '../lib/training-history.ts';
+import { savedQualityExamples } from '../scripts/audit-plan-quality.mjs';
+import { validateRecovery } from '../lib/recovery.ts';
 const start = '2026-09-07',
   demo = demoProfile(start),
   gen = (p) => makePlan(p, p.startDate);
@@ -150,4 +152,194 @@ void test('a tired fourth run holds novice progression even with three comfortab
   const advanced = advanceRunWalk(p, asOf);
   assert.equal(advanced.profile.runWalkStage, 1);
   assert.ok(advanced.weeks[1].targetKm <= p.weeks[1].targetKm + 1);
+});
+
+const balancedInput = (id = '5k-q0', patch = {}) => ({
+  ...savedQualityExamples().find((example) => example.id === id).input,
+  ...patch,
+});
+const prescriptions = (plan) =>
+  plan.workouts.map((w) => ({
+    id: w.id,
+    date: w.date,
+    kind: w.kind,
+    status: w.status,
+    minutes: w.minutes,
+    estimatedKm: w.estimatedKm,
+    steps: w.steps,
+  }));
+
+for (const id of ['5k-q0', '5k-q1', 'marathon-q0', 'marathon-q2']) {
+  for (const offset of [1, 3, 7, 10, 17]) {
+    void test(`${id}: three reviews ${offset} days after starting cannot compound shorter supporting runs`, () => {
+      const input = balancedInput(id),
+        asOf = addDays(input.startDate, offset);
+      let plan = makePlan(input, input.startDate, false);
+      const past = plan.workouts.filter((w) => w.date < asOf);
+      if (past[0]) complete(past[0]);
+      if (past[1]) past[1].status = 'skipped';
+      const history = structuredClone(past),
+        original = structuredClone(plan);
+      plan = revisePreferences(plan, {}, asOf, true);
+      const first = prescriptions(plan),
+        firstBudget = structuredClone(plan.allocationBaseline);
+      for (let i = 0; i < 2; i++) {
+        plan = revisePreferences(plan, {}, asOf, true);
+        assert.deepEqual(prescriptions(plan), first);
+        assert.deepEqual(plan.allocationBaseline, firstBudget);
+        assert.deepEqual(
+          plan.workouts.filter((w) => w.date < asOf),
+          history,
+        );
+        assert.equal(plan.profile.weeklyKm, input.weeklyKm);
+        assert.equal(plan.profile.longestKm, input.longestKm);
+        assert.equal(plan.baselineEvidence.supportsProgression, false);
+        assert.deepEqual(validatePlan(plan), []);
+      }
+      assert.deepEqual(
+        original.workouts.filter((w) => w.date < asOf),
+        history,
+      );
+    });
+  }
+}
+
+void test('five-to-four-day reviews apply the frequency reduction once without restoring the old workload', () => {
+  const input = balancedInput('5k-q0', {
+      currentRuns: 5,
+      runsPerWeek: 5,
+      days: [0, 1, 3, 4, 6],
+      availableDays: [0, 1, 2, 3, 4, 5, 6],
+    }),
+    asOf = addDays(input.startDate, 7),
+    initial = makePlan(input, input.startDate, false);
+  const history = structuredClone(
+    initial.workouts.filter((w) => w.date < asOf),
+  );
+  let plan = revisePreferences(initial, { runsPerWeek: 4 }, asOf);
+  const first = prescriptions(plan);
+  for (let i = 0; i < 3; i++) {
+    assert.equal(currentTrainingBaseline(plan, asOf).weeklyKm, 24);
+    assert.equal(plan.allocationBaseline.weeklyKm, 24);
+    assert.equal(plan.profile.weeklyKm, 30);
+    assert.equal(plan.profile.currentRuns, 5);
+    assert.equal(plan.profile.runsPerWeek, 4);
+    assert.deepEqual(
+      plan.workouts.filter((w) => w.date < asOf),
+      history,
+    );
+    plan = revisePreferences(plan, {}, asOf, true);
+    assert.deepEqual(prescriptions(plan), first);
+    assert.deepEqual(validatePlan(plan), []);
+  }
+});
+
+void test('repeated full reviews retain lower weekday and weekly time ceilings', () => {
+  const input = balancedInput(),
+    asOf = addDays(input.startDate, 7);
+  let plan = makePlan(input, input.startDate, false);
+  plan = revisePreferences(
+    plan,
+    { weekdayMinutes: 35, weeklyMinutesLimit: 160 },
+    asOf,
+  );
+  plan = revisePreferences(plan, {}, asOf, true);
+  const first = prescriptions(plan);
+  for (let i = 0; i < 3; i++) {
+    const upcoming = plan.workouts.filter(
+      (w) => w.date >= asOf && w.kind !== 'race',
+    );
+    assert.ok(
+      upcoming.filter((w) => w.kind !== 'long').every((w) => w.minutes <= 35),
+    );
+    for (const week of plan.weeks.filter((w) => w.start >= asOf))
+      assert.ok(
+        upcoming
+          .filter((w) => w.week === week.index)
+          .reduce((sum, w) => sum + w.minutes, 0) <=
+          160 + 0.001,
+      );
+    assert.equal(plan.allocationBaseline.weeklyMinutes, 160);
+    plan = revisePreferences(plan, {}, asOf, true);
+    assert.deepEqual(prescriptions(plan), first);
+    assert.deepEqual(validatePlan(plan), []);
+  }
+});
+
+void test('returning-runner caution does not compound on repeated reviews of the same evidence', () => {
+  const input = balancedInput('5k-q0', { experience: 'returning' }),
+    asOf = addDays(input.startDate, 7);
+  let plan = revisePreferences(
+    makePlan(input, input.startDate, false),
+    {},
+    asOf,
+    true,
+  );
+  const first = prescriptions(plan);
+  assert.ok(
+    plan.weeks[1].targetKm < 26,
+    'The returning forecast still receives an initial reduction',
+  );
+  for (let i = 0; i < 3; i++) {
+    plan = revisePreferences(plan, {}, asOf, true);
+    assert.deepEqual(prescriptions(plan), first);
+    assert.deepEqual(validatePlan(plan), []);
+  }
+});
+
+void test('recorded lower training still supersedes the stored allocation budget', () => {
+  const input = balancedInput(),
+    asOf = addDays(input.startDate, 28);
+  let plan = revisePreferences(
+    makePlan(input, input.startDate, false),
+    {},
+    addDays(input.startDate, 1),
+    true,
+  );
+  for (const w of plan.workouts.filter((w) => w.date < asOf))
+    complete(w, {
+      actualMinutes: w.minutes * 0.5,
+      actualKm: w.estimatedKm * 0.5,
+    });
+  const history = structuredClone(plan.workouts.filter((w) => w.date < asOf)),
+    evidence = currentTrainingBaseline(plan, asOf);
+  assert.equal(evidence.source, 'recorded-plan-history');
+  assert.equal(evidence.supportsProgression, false);
+  assert.ok(evidence.weeklyKm < plan.allocationBaseline.weeklyKm * 0.6);
+  assert.ok(
+    evidence.weeklyMinutes < plan.allocationBaseline.weeklyMinutes * 0.6,
+  );
+  plan = revisePreferences(plan, {}, asOf, true);
+  assert.ok(plan.allocationBaseline.weeklyKm <= evidence.weeklyKm);
+  assert.deepEqual(
+    plan.workouts.filter((w) => w.date < asOf),
+    history,
+  );
+  assert.deepEqual(validatePlan(plan), []);
+});
+
+void test('recovery rejects malformed allocation budgets rather than using them as evidence', () => {
+  const input = balancedInput(),
+    plan = revisePreferences(
+      makePlan(input, input.startDate, false),
+      {},
+      addDays(input.startDate, 1),
+      true,
+    );
+  for (const allocationBaseline of [
+    { weeklyKm: NaN, weeklyMinutes: 217 },
+    { weeklyKm: 30, weeklyMinutes: -1 },
+    { weeklyKm: '30', weeklyMinutes: 217 },
+    { weeklyKm: 30 },
+  ])
+    assert.throws(
+      () =>
+        validateRecovery({
+          format: 'stride-recovery-2',
+          exportedAt: `${input.startDate}T18:00:00Z`,
+          profile: null,
+          plan: { ...structuredClone(plan), allocationBaseline },
+        }),
+      /recovery file/,
+    );
 });

@@ -11,6 +11,7 @@ import {
   weekday,
 } from '../lib/engine.ts';
 import { normalizeGeneratedLongRuns } from '../lib/plan/generation-reconcile.ts';
+import { roadOpeningFailures } from './road-overhaul-helpers.mjs';
 
 const monday = '2026-09-21';
 const ordinary = (plan) =>
@@ -161,11 +162,14 @@ for (const distance of [7.5001, 10, 14.9999, 15])
 
 function assertFractionalHold(input) {
   const plan = makePlan(input, monday, false);
+  if (['5k', '10k'].includes(input.goal))
+    assert.deepEqual(roadOpeningFailures(plan, input), []);
+  const openingKm = weeklyKm(plan, ordinary(plan)[0]);
   for (const week of ordinary(plan)) {
     const long = weekRuns(plan, week).find((run) => run.kind === 'long');
     assert.ok(long);
     assert.equal(long.estimatedKm, 16.5);
-    assert.ok(weeklyKm(plan, week) >= input.weeklyKm - 0.00101);
+    assert.ok(weeklyKm(plan, week) >= openingKm - 0.00101);
   }
   assert.ok(
     plan.workouts
@@ -179,7 +183,12 @@ function assertFractionalHold(input) {
 }
 
 test('below-family fractional opening still advances to a whole kilometre', () => {
-  const input = { ...fractionalProfile('5k', 'distance'), longestKm: 10.5 };
+  // Keep the weekly load compatible with a 10.5 km longest outing.
+  const input = {
+    ...fractionalProfile('5k', 'distance'),
+    weeklyKm: 45,
+    longestKm: 10.5,
+  };
   const plan = makePlan(input, monday, false);
   const longs = ordinary(plan).map((week) =>
     weekRuns(plan, week).find((run) => run.kind === 'long'),

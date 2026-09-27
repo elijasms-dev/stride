@@ -123,6 +123,7 @@ function load(file) {
       TextEncoder,
       TextDecoder,
       AbortSignal,
+      performance,
       crypto: webcrypto,
       structuredClone,
       Uint8Array,

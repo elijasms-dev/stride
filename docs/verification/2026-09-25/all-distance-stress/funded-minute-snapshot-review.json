@@ -1,0 +1,836 @@
+{
+  "method": "A/B generation using one isolated loader substitution: the new direct funded-minute expression is replaced with Math.floor(Math.min(budget * pace, cap)). Every previous numeric snapshot then matches exactly. Current plans independently retain frozen pre-pace history and frequency hashes; opening70km/23km; session caps; exact step durations; JSON validation and canonical distance-pace duration checks. No app files were reverted.",
+  "cases": [
+    {
+      "name": "base, 6 weeks, benchmark",
+      "oldSha256": "aa1fc8b3cc37b1ad37f7b7899585fafaee318d8d84e9303268482d4aa8077abe",
+      "currentSha256": "aa1fc8b3cc37b1ad37f7b7899585fafaee318d8d84e9303268482d4aa8077abe",
+      "changed": false,
+      "weeks": [],
+      "workouts": []
+    },
+    {
+      "name": "base, 6 weeks, manual",
+      "oldSha256": "cfa3df00e0ee96d0b99b8cc1f3e15447ec98b635e704ce9426487dd4c8f36c5f",
+      "currentSha256": "cfa3df00e0ee96d0b99b8cc1f3e15447ec98b635e704ce9426487dd4c8f36c5f",
+      "changed": false,
+      "weeks": [],
+      "workouts": []
+    },
+    {
+      "name": "base, 18 weeks, benchmark",
+      "oldSha256": "731dfc40827a969e096a7c9a9ff5cf288f969adddd698743f355f277b545e6d6",
+      "currentSha256": "731dfc40827a969e096a7c9a9ff5cf288f969adddd698743f355f277b545e6d6",
+      "changed": false,
+      "weeks": [],
+      "workouts": []
+    },
+    {
+      "name": "base, 18 weeks, manual",
+      "oldSha256": "838c4b41142c40a1e0391ccc82d435d043e893c814e017994f925a35db264a7c",
+      "currentSha256": "838c4b41142c40a1e0391ccc82d435d043e893c814e017994f925a35db264a7c",
+      "changed": false,
+      "weeks": [],
+      "workouts": []
+    },
+    {
+      "name": "base, 26 weeks, benchmark",
+      "oldSha256": "82876cfaa19474171e867b41d13ec7be50cf77544f88b19478907269ca18aa78",
+      "currentSha256": "82876cfaa19474171e867b41d13ec7be50cf77544f88b19478907269ca18aa78",
+      "changed": false,
+      "weeks": [],
+      "workouts": []
+    },
+    {
+      "name": "base, 26 weeks, manual",
+      "oldSha256": "b0525fc1c64d28268ab92efedf689d65382f6ecce2b4f8b140430ebb6d211a1d",
+      "currentSha256": "b0525fc1c64d28268ab92efedf689d65382f6ecce2b4f8b140430ebb6d211a1d",
+      "changed": false,
+      "weeks": [],
+      "workouts": []
+    },
+    {
+      "name": "marathon, 6 weeks, benchmark",
+      "oldSha256": "2e348c1bd5a93427298988c9fc7a5743d50a379c9b824c319ed92bf4375cef8b",
+      "currentSha256": "2e348c1bd5a93427298988c9fc7a5743d50a379c9b824c319ed92bf4375cef8b",
+      "changed": false,
+      "weeks": [],
+      "workouts": []
+    },
+    {
+      "name": "marathon, 6 weeks, manual",
+      "oldSha256": "2712725b802a6f505b84003073f35d849129f86d9789e07fbb2e828c54a35bb4",
+      "currentSha256": "858a234e78cd78cc113bf5456c19b5718bc0c6c68549439379e062a2fa8a9c2f",
+      "changed": true,
+      "weeks": [
+        {
+          "index": 5,
+          "phase": "Race week",
+          "old": {
+            "weeklyKm": 27.7,
+            "longKm": 0
+          },
+          "current": {
+            "weeklyKm": 27.9,
+            "longKm": 0
+          }
+        }
+      ],
+      "workouts": [
+        {
+          "date": "2026-09-22",
+          "kind": "easy",
+          "old": {
+            "minutes": 58.5,
+            "km": 9.001
+          },
+          "current": {
+            "minutes": 58.5,
+            "km": 9
+          },
+          "qualityMinutes": 1.3333333333333333,
+          "templateId": "marathon-book-strides"
+        },
+        {
+          "date": "2026-09-23",
+          "kind": "tempo",
+          "old": {
+            "minutes": 62,
+            "km": 9.538
+          },
+          "current": {
+            "minutes": 63,
+            "km": 9.692
+          },
+          "qualityMinutes": 20,
+          "templateId": "marathon-book-tempo-blocks-metres"
+        },
+        {
+          "date": "2026-09-24",
+          "kind": "easy",
+          "old": {
+            "minutes": 114,
+            "km": 17.538
+          },
+          "current": {
+            "minutes": 113,
+            "km": 17.385
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2026-10-22",
+          "kind": "easy",
+          "old": {
+            "minutes": 28.6,
+            "km": 4.4
+          },
+          "current": {
+            "minutes": 29.9,
+            "km": 4.6
+          },
+          "qualityMinutes": 0
+        }
+      ]
+    },
+    {
+      "name": "marathon, 18 weeks, benchmark",
+      "oldSha256": "ce3d1bad32187cd955feb023e14bb697d8d61a641d1f406260eaf7ee0aebba9d",
+      "currentSha256": "ce3d1bad32187cd955feb023e14bb697d8d61a641d1f406260eaf7ee0aebba9d",
+      "changed": false,
+      "weeks": [],
+      "workouts": []
+    },
+    {
+      "name": "marathon, 18 weeks, manual",
+      "oldSha256": "70afa9d63015a359506c06efa9d3ccd91d67158ecd9a5a6a7a3ff981982769c3",
+      "currentSha256": "6f117ac7cce3f6b8b2a6d9628a6d556689f58f99d0364e2b0fa26af2e2440753",
+      "changed": true,
+      "weeks": [
+        {
+          "index": 11,
+          "phase": "Recovery",
+          "old": {
+            "weeklyKm": 57.6,
+            "longKm": 23
+          },
+          "current": {
+            "weeklyKm": 57.5,
+            "longKm": 23
+          }
+        },
+        {
+          "index": 17,
+          "phase": "Race week",
+          "old": {
+            "weeklyKm": 33.6,
+            "longKm": 0
+          },
+          "current": {
+            "weeklyKm": 33.2,
+            "longKm": 0
+          }
+        }
+      ],
+      "workouts": [
+        {
+          "date": "2026-12-02",
+          "kind": "easy",
+          "old": {
+            "minutes": 66.95,
+            "km": 10.3
+          },
+          "current": {
+            "minutes": 65.65,
+            "km": 10.1
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2026-12-04",
+          "kind": "easy",
+          "old": {
+            "minutes": 57.85,
+            "km": 8.9
+          },
+          "current": {
+            "minutes": 58.5,
+            "km": 9
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2027-01-12",
+          "kind": "easy",
+          "old": {
+            "minutes": 58.5,
+            "km": 9
+          },
+          "current": {
+            "minutes": 58.5,
+            "km": 9
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2027-01-13",
+          "kind": "tempo",
+          "old": {
+            "minutes": 62.28333333333333,
+            "km": 10
+          },
+          "current": {
+            "minutes": 61.28333333333333,
+            "km": 9.846153846153847
+          },
+          "qualityMinutes": 9,
+          "templateId": "marathon-book-lt-9"
+        },
+        {
+          "date": "2027-01-14",
+          "kind": "easy",
+          "old": {
+            "minutes": 36.4,
+            "km": 5.6
+          },
+          "current": {
+            "minutes": 35.75,
+            "km": 5.5
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2027-01-15",
+          "kind": "easy",
+          "old": {
+            "minutes": 58.5,
+            "km": 9
+          },
+          "current": {
+            "minutes": 57.85,
+            "km": 8.9
+          },
+          "qualityMinutes": 0
+        }
+      ]
+    },
+    {
+      "name": "marathon, 26 weeks, benchmark",
+      "oldSha256": "533dfbbd06c7f2ffe6b5be7b876c2aa72f042e9e5711427fdea8d966d0629c7a",
+      "currentSha256": "20e969d5f079ac042ee948585e596fb85c407a24dce72d65699a368124e976a5",
+      "changed": true,
+      "weeks": [
+        {
+          "index": 11,
+          "phase": "Recovery",
+          "old": {
+            "weeklyKm": 51.3,
+            "longKm": 19
+          },
+          "current": {
+            "weeklyKm": 51.2,
+            "longKm": 19
+          }
+        }
+      ],
+      "workouts": [
+        {
+          "date": "2026-12-01",
+          "kind": "easy",
+          "old": {
+            "minutes": 58.8,
+            "km": 8.4
+          },
+          "current": {
+            "minutes": 59.5,
+            "km": 8.5
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2026-12-02",
+          "kind": "easy",
+          "old": {
+            "minutes": 65.8,
+            "km": 9.4
+          },
+          "current": {
+            "minutes": 64.4,
+            "km": 9.2
+          },
+          "qualityMinutes": 0
+        }
+      ]
+    },
+    {
+      "name": "marathon, 26 weeks, manual",
+      "oldSha256": "da123d97502a97670beb6740337f0c83558a9fd97cd1b5b58b1b017677d7237b",
+      "currentSha256": "ab4143b0524a9fd6d9be496e8d4478a9624c29eddda4c67221ed7dd213bdbd13",
+      "changed": true,
+      "weeks": [
+        {
+          "index": 25,
+          "phase": "Race week",
+          "old": {
+            "weeklyKm": 34.8,
+            "longKm": 0
+          },
+          "current": {
+            "weeklyKm": 35,
+            "longKm": 0
+          }
+        }
+      ],
+      "workouts": [
+        {
+          "date": "2027-03-12",
+          "kind": "easy",
+          "old": {
+            "minutes": 58.5,
+            "km": 9
+          },
+          "current": {
+            "minutes": 59.8,
+            "km": 9.2
+          },
+          "qualityMinutes": 0
+        }
+      ]
+    },
+    {
+      "name": "custom, 6 weeks, benchmark",
+      "oldSha256": "85653562ef444626c2aaa31b92433ed92df3860094745a392afd5971c6e4c4fe",
+      "currentSha256": "85653562ef444626c2aaa31b92433ed92df3860094745a392afd5971c6e4c4fe",
+      "changed": false,
+      "weeks": [],
+      "workouts": []
+    },
+    {
+      "name": "custom, 6 weeks, manual",
+      "oldSha256": "1f7dab0eecbe477540e05fc3509182586b8a47e509bd6384e56eff808040c90b",
+      "currentSha256": "1f7dab0eecbe477540e05fc3509182586b8a47e509bd6384e56eff808040c90b",
+      "changed": false,
+      "weeks": [],
+      "workouts": []
+    },
+    {
+      "name": "custom, 18 weeks, benchmark",
+      "oldSha256": "3a4c41faf2aac9fb2a753486572a29d16a4215ecf8b8ff69fa8b84d7ed4db78e",
+      "currentSha256": "3a4c41faf2aac9fb2a753486572a29d16a4215ecf8b8ff69fa8b84d7ed4db78e",
+      "changed": false,
+      "weeks": [],
+      "workouts": []
+    },
+    {
+      "name": "custom, 18 weeks, manual",
+      "oldSha256": "cf8cb74ed6038ef109822f90a7ca3ddba551d7c29108abcf439b2f5d875877f6",
+      "currentSha256": "5babd855738f1c2ea764ef2e046477e415cb4b45f708440fc91ebb20e8b1d29e",
+      "changed": true,
+      "weeks": [
+        {
+          "index": 11,
+          "phase": "Recovery",
+          "old": {
+            "weeklyKm": 75.8,
+            "longKm": 23
+          },
+          "current": {
+            "weeklyKm": 74.3,
+            "longKm": 22
+          }
+        },
+        {
+          "index": 14,
+          "phase": "Race preparation",
+          "old": {
+            "weeklyKm": 85.8,
+            "longKm": 29
+          },
+          "current": {
+            "weeklyKm": 86.2,
+            "longKm": 29
+          }
+        },
+        {
+          "index": 15,
+          "phase": "Taper",
+          "old": {
+            "weeklyKm": 56,
+            "longKm": 13
+          },
+          "current": {
+            "weeklyKm": 56.2,
+            "longKm": 13
+          }
+        },
+        {
+          "index": 16,
+          "phase": "Taper",
+          "old": {
+            "weeklyKm": 43.9,
+            "longKm": 0
+          },
+          "current": {
+            "weeklyKm": 44.1,
+            "longKm": 0
+          }
+        },
+        {
+          "index": 17,
+          "phase": "Race week",
+          "old": {
+            "weeklyKm": 19.1,
+            "longKm": 0
+          },
+          "current": {
+            "weeklyKm": 19.3,
+            "longKm": 0
+          }
+        }
+      ],
+      "workouts": [
+        {
+          "date": "2026-12-01",
+          "kind": "easy",
+          "old": {
+            "minutes": 91.65,
+            "km": 14.1
+          },
+          "current": {
+            "minutes": 91,
+            "km": 14
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2026-12-02",
+          "kind": "easy",
+          "old": {
+            "minutes": 101.4,
+            "km": 15.6
+          },
+          "current": {
+            "minutes": 99.45,
+            "km": 15.3
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2026-12-03",
+          "kind": "easy",
+          "old": {
+            "minutes": 58.5,
+            "km": 9
+          },
+          "current": {
+            "minutes": 58.5,
+            "km": 9
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2026-12-04",
+          "kind": "easy",
+          "old": {
+            "minutes": 91.65,
+            "km": 14.1
+          },
+          "current": {
+            "minutes": 91,
+            "km": 14
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2026-12-06",
+          "kind": "long",
+          "old": {
+            "minutes": 149.5,
+            "km": 23
+          },
+          "current": {
+            "minutes": 143,
+            "km": 22
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2026-12-22",
+          "kind": "easy",
+          "old": {
+            "minutes": 118.95,
+            "km": 18.3
+          },
+          "current": {
+            "minutes": 119.6,
+            "km": 18.4
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2026-12-24",
+          "kind": "easy",
+          "old": {
+            "minutes": 58.5,
+            "km": 9
+          },
+          "current": {
+            "minutes": 59.8,
+            "km": 9.2
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2026-12-25",
+          "kind": "easy",
+          "old": {
+            "minutes": 118.95,
+            "km": 18.3
+          },
+          "current": {
+            "minutes": 119.6,
+            "km": 18.4
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2026-12-31",
+          "kind": "easy",
+          "old": {
+            "minutes": 58.5,
+            "km": 9
+          },
+          "current": {
+            "minutes": 59.8,
+            "km": 9.2
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2027-01-07",
+          "kind": "easy",
+          "old": {
+            "minutes": 58.5,
+            "km": 9
+          },
+          "current": {
+            "minutes": 59.8,
+            "km": 9.2
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2027-01-14",
+          "kind": "easy",
+          "old": {
+            "minutes": 28.6,
+            "km": 4.4
+          },
+          "current": {
+            "minutes": 29.9,
+            "km": 4.6
+          },
+          "qualityMinutes": 0
+        }
+      ]
+    },
+    {
+      "name": "custom, 26 weeks, benchmark",
+      "oldSha256": "6733904a6ac205d93194d943cb5d8edb43fae4e2c181fdf09d43d759e13dbb58",
+      "currentSha256": "6733904a6ac205d93194d943cb5d8edb43fae4e2c181fdf09d43d759e13dbb58",
+      "changed": false,
+      "weeks": [],
+      "workouts": []
+    },
+    {
+      "name": "custom, 26 weeks, manual",
+      "oldSha256": "7aff8088eb06e47eea63319428ad0c0387243940fa27397a2e5366843e536ad4",
+      "currentSha256": "bde81a187a07a7deb5674584dd3870d56d4bfadaeb705060a6db841cce9fc666",
+      "changed": true,
+      "weeks": [
+        {
+          "index": 11,
+          "phase": "Recovery",
+          "old": {
+            "weeklyKm": 70.9,
+            "longKm": 19
+          },
+          "current": {
+            "weeklyKm": 71,
+            "longKm": 19
+          }
+        },
+        {
+          "index": 15,
+          "phase": "Recovery",
+          "old": {
+            "weeklyKm": 75.6,
+            "longKm": 20
+          },
+          "current": {
+            "weeklyKm": 75.6,
+            "longKm": 20
+          }
+        },
+        {
+          "index": 19,
+          "phase": "Recovery",
+          "old": {
+            "weeklyKm": 80,
+            "longKm": 25
+          },
+          "current": {
+            "weeklyKm": 80.1,
+            "longKm": 25
+          }
+        },
+        {
+          "index": 22,
+          "phase": "Race preparation",
+          "old": {
+            "weeklyKm": 86.4,
+            "longKm": 29
+          },
+          "current": {
+            "weeklyKm": 86.8,
+            "longKm": 29
+          }
+        },
+        {
+          "index": 23,
+          "phase": "Taper",
+          "old": {
+            "weeklyKm": 56.4,
+            "longKm": 13
+          },
+          "current": {
+            "weeklyKm": 56.6,
+            "longKm": 13
+          }
+        },
+        {
+          "index": 24,
+          "phase": "Taper",
+          "old": {
+            "weeklyKm": 44.2,
+            "longKm": 0
+          },
+          "current": {
+            "weeklyKm": 44.4,
+            "longKm": 0
+          }
+        },
+        {
+          "index": 25,
+          "phase": "Race week",
+          "old": {
+            "weeklyKm": 19.1,
+            "longKm": 0
+          },
+          "current": {
+            "weeklyKm": 19.3,
+            "longKm": 0
+          }
+        }
+      ],
+      "workouts": [
+        {
+          "date": "2026-12-02",
+          "kind": "easy",
+          "old": {
+            "minutes": 99.45,
+            "km": 15.3
+          },
+          "current": {
+            "minutes": 98.8,
+            "km": 15.2
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2026-12-03",
+          "kind": "easy",
+          "old": {
+            "minutes": 58.5,
+            "km": 9
+          },
+          "current": {
+            "minutes": 59.8,
+            "km": 9.2
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2026-12-30",
+          "kind": "easy",
+          "old": {
+            "minutes": 108.55,
+            "km": 16.7
+          },
+          "current": {
+            "minutes": 107.9,
+            "km": 16.6
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2026-12-31",
+          "kind": "easy",
+          "old": {
+            "minutes": 57.85,
+            "km": 8.9
+          },
+          "current": {
+            "minutes": 58.5,
+            "km": 9
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2027-01-27",
+          "kind": "easy",
+          "old": {
+            "minutes": 106.6,
+            "km": 16.4
+          },
+          "current": {
+            "minutes": 105.95,
+            "km": 16.3
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2027-01-28",
+          "kind": "easy",
+          "old": {
+            "minutes": 58.5,
+            "km": 9
+          },
+          "current": {
+            "minutes": 59.8,
+            "km": 9.2
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2027-02-16",
+          "kind": "easy",
+          "old": {
+            "minutes": 118.95,
+            "km": 18.3
+          },
+          "current": {
+            "minutes": 119.6,
+            "km": 18.4
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2027-02-18",
+          "kind": "easy",
+          "old": {
+            "minutes": 58.5,
+            "km": 9
+          },
+          "current": {
+            "minutes": 59.8,
+            "km": 9.2
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2027-02-19",
+          "kind": "easy",
+          "old": {
+            "minutes": 118.95,
+            "km": 18.3
+          },
+          "current": {
+            "minutes": 119.6,
+            "km": 18.4
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2027-02-25",
+          "kind": "easy",
+          "old": {
+            "minutes": 58.5,
+            "km": 9
+          },
+          "current": {
+            "minutes": 59.8,
+            "km": 9.2
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2027-03-04",
+          "kind": "easy",
+          "old": {
+            "minutes": 58.5,
+            "km": 9
+          },
+          "current": {
+            "minutes": 59.8,
+            "km": 9.2
+          },
+          "qualityMinutes": 0
+        },
+        {
+          "date": "2027-03-11",
+          "kind": "easy",
+          "old": {
+            "minutes": 28.6,
+            "km": 4.4
+          },
+          "current": {
+            "minutes": 29.9,
+            "km": 4.6
+          },
+          "qualityMinutes": 0
+        }
+      ]
+    }
+  ]
+}

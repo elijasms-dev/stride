@@ -1,7 +1,9 @@
+import { beginRequestObservation } from '@/lib/request-observation';
 import type { ConnectionSummary } from '@/lib/connection-status';
 import { prescriptionHash } from '@/lib/garmin';
 import { ownerId, readState, json, failure, database } from '@/lib/server';
 export async function GET(request: Request) {
+  const observation = beginRequestObservation(request);
   try {
     const owner = ownerId(request);
     const [state, history, deliveries, connection] = await Promise.all([
@@ -62,6 +64,6 @@ export async function GET(request: Request) {
         : null,
     });
   } catch (e) {
-    return failure(e);
+    return failure(e, observation);
   }
 }

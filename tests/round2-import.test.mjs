@@ -731,7 +731,7 @@ void test('R19: saving a run refuses an account closure between validation and t
   const result = await planAction({
     action: 'freeRun',
     version: 0,
-    run: run({ activityId: undefined, source: 'Manual' }),
+    run: run({ activityId: undefined, source: 'Manual', km: 9 }),
   });
   assert.equal(result.status, 409);
   assert.equal(countRuns(f), 0);
@@ -787,7 +787,7 @@ void test('R22: every accepted standalone journal export fits the recovery ingre
   const saved = await planAction({
     action: 'freeRun',
     version: 0,
-    run: run({ activityId: undefined, note: 'x'.repeat(2000) }),
+    run: run({ activityId: undefined, note: 'x'.repeat(2000), km: 9 }),
   });
   if (saved.status === 413) {
     assert.equal(countRuns(f), 1100);

@@ -6,7 +6,10 @@ import {
   updateRunMeasure,
   withRunDistance,
 } from '../lib/run-distance.ts';
-import { withWorkoutTargets } from '../lib/workout-targets.ts';
+import {
+  withAllocatedWorkoutTargets,
+  withWorkoutTargets,
+} from '../lib/workout-targets.ts';
 
 const start = '2026-09-21';
 const profile = (goal, easyPace = 6) => ({
@@ -70,7 +73,7 @@ for (const [goal, km, pace] of [
     // A time allowance can include a little spare time; it must not redefine
     // the supplied distance when switching to time measurement and back.
     const original = longRun(km, Math.ceil(km * pace * 60) + 30);
-    let run = withWorkoutTargets(original, p);
+    let run = withAllocatedWorkoutTargets(original, p);
     for (let i = 0; i < 5; i++)
       run = withWorkoutTargets(JSON.parse(JSON.stringify(run)), p);
     assert.equal(run.estimatedKm, km);
@@ -95,7 +98,7 @@ for (const [goal, km, pace] of [
   });
 }
 
-void test('slower targets reduce a long distance to the funded metre without adding seconds', () => {
+void test('initial long-run allocation fits slower targets within its time allowance', () => {
   const p = {
     ...profile('half'),
     workoutTargets: {
@@ -104,7 +107,7 @@ void test('slower targets reduce a long distance to the funded metre without add
     },
   };
   const before = longRun(20, 7200);
-  const after = withWorkoutTargets(before, p);
+  const after = withAllocatedWorkoutTargets(before, p);
   assert.equal(prescribedDistanceKm(after), 18.461);
   assert.equal(after.minutes, 120);
   assert.equal(after.steps[0].seconds, 7200);
@@ -191,7 +194,7 @@ void test('an explicitly funded easy distance survives target refreshes and time
   }
 });
 
-void test('a saved easy distance shrinks to its pace-funded capacity without increasing time', () => {
+void test('a saved easy distance retains its endpoint and receives the slower target duration', () => {
   const p = {
     ...profile('half'),
     workoutTargets: {
@@ -202,12 +205,13 @@ void test('a saved easy distance shrinks to its pace-funded capacity without inc
   const run = { ...longRun(3.743, 1350), kind: 'easy' };
   run.steps[0].metres = 3743;
   const after = withWorkoutTargets(run, p);
-  assert.equal(prescribedDistanceKm(after), 3.461);
-  assert.equal(after.minutes, run.minutes);
+  assert.equal(prescribedDistanceKm(after), 3.743);
+  assert.ok(after.minutes > run.minutes);
+  assert.ok(after.minutes <= (3.743 * 390 + 1) / 60);
   assert.ok(
     after.steps.every((step) => (step.metres * 390) / 1000 <= step.seconds),
   );
-  assert.equal(after.distanceEstimate.lowerKm, 3.461);
+  assert.equal(after.distanceEstimate.lowerKm, 3.743);
   assert.deepEqual(withWorkoutTargets(after, p), after);
 });
 

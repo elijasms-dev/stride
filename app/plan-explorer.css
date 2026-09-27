@@ -1030,3 +1030,52 @@
     grid-template-columns: 54px minmax(0, 1fr);
   }
 }
+
+/* The week's runs lead; reference information stays available on demand. */
+.pe-plan-context {
+  margin-top: 28px;
+  border-block: 1px solid var(--border);
+}
+.pe-plan-context > summary {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  list-style: none;
+}
+.pe-plan-context > summary::-webkit-details-marker {
+  display: none;
+}
+.pe-plan-context[open] > summary > svg {
+  transform: rotate(180deg);
+}
+.pe-plan-context > summary:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+.pe-plan-context .plan-preferences-summary {
+  margin-top: 8px;
+  border: 0;
+  border-radius: 0;
+  padding: 12px 0;
+}
+.plan-preferences-summary .section-heading {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.plan-explorer .plan-heading-actions .secondary-button,
+.pe-view-switch button,
+.pe-week-select select,
+.pe-today {
+  min-height: 44px;
+}
+.pe-week-navigation .icon-button,
+.plan-heading-actions .plan-options {
+  min-width: 44px;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+}

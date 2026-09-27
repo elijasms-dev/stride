@@ -1,0 +1,3108 @@
+{
+  "version": "marathon-variety-and-balance-v1",
+  "capturedAt": "2026-09-25",
+  "previousFixture": "pacing-v1-marathon.json",
+  "review": "docs/verification/2026-09-25/plan-quality-review/marathon-variety-ab.json",
+  "note": "The previous 21 snapshots are reproduced by the pre-variety selector. New threshold cruise, controlled fartlek and marathon-rhythm shapes replace repeated continuous sessions for the named marathon only. Ordinary easy runs now preserve distinct long-run roles. Independent semantic checks protect feasible opening baselines, long progression, frequency, work dose, actual pace endpoints and capacities.",
+  "cases": [
+    {
+      "name": "8 weeks, 70 km/23 km, q0",
+      "previousSnapshot": "746abea8eca781d54c3bab0dcea5d34832684364fa69fb15c5622fcad90ae941",
+      "previousExecution": "d72e5fd7095c9ed7f4c9147e80b4f0864644dfb594da802fddacbf33a3f49ba6",
+      "executionUnchanged": true,
+      "expectedExecution": "d72e5fd7095c9ed7f4c9147e80b4f0864644dfb594da802fddacbf33a3f49ba6",
+      "expected": {
+        "profile": "5bd12c31bad63ce6ef1bd06431aedda097b84ceeffcd5d83d7eb7d0d6b8f517a",
+        "notes": "d31538c05d429f9c45894e213a248e68d11b070c3b4cd31772c6495606b43fb5",
+        "feasibility": "bd5ba989b185b0eeea1c1f23c20d56bef14407f4195d48da5a1fb7ca207235f2",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Build",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "b0c7663ba9c673401b67c538318d3d33021da28224c19c8b51c1a577307a9866"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Build",
+            "trainingKm": 70,
+            "longKm": 25,
+            "hash": "134364317ab3b7afcf730a3d7bbbb4f713c3bdca090cf39d9e9c6934ca91c5c3"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Build",
+            "trainingKm": 72.8,
+            "longKm": 27,
+            "hash": "8cba6313d0fadb8f520797d0a7eb7595bac025d7c4a4e782cb86e047722f59f4"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 51,
+            "longKm": 21,
+            "hash": "5ea26c9f2bf3cfc6875adcbdc40f67702f448ebf808dc0fd6e785d984a78932d"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Race preparation",
+            "trainingKm": 72.8,
+            "longKm": 29,
+            "hash": "71adb4288db4a1dd048d60b178ae954e8a71b75f4cea8e42712ff991bfba5893"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Race preparation",
+            "trainingKm": 73,
+            "longKm": 31,
+            "hash": "a6248eb983aeb461c4bf1c6b563403fa8af252a79bb2eecdb2158e14157f147d"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Taper",
+            "trainingKm": 43.6,
+            "longKm": 18,
+            "hash": "fb4890c52e1f8a5ed775ce1c6279779d426407cd4ae014a7639b073ec88b4f63"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Race week",
+            "trainingKm": 29,
+            "longKm": 0,
+            "hash": "959c26237394cf0866531e7233ab39b3511de7a94e3e69fda2a7274f227783e0"
+          }
+        ],
+        "complete": "ac7e65e9fde4ef9caa481d0b1d65114a8f6cec54182a72ace30850bab2cc8505"
+      }
+    },
+    {
+      "name": "8 weeks, 70 km/23 km, q1",
+      "previousSnapshot": "836d134f5354e2aaa7344e8e474a3443f5ac72719e9692aa1e4a1f21007f2a1e",
+      "previousExecution": "401776c8bdd3e0d23320913340db730ce0b4887319566a346a02fd126e5a7588",
+      "executionUnchanged": false,
+      "expectedExecution": "48c0c9ee43a24e77f444b15894f5443a6a820c8549d7a6e98785cee7cdd9f580",
+      "expected": {
+        "profile": "006adcd751fe202a8db880378c677fa55529bb614e92ef56f7503e1d6cbdf100",
+        "notes": "d31538c05d429f9c45894e213a248e68d11b070c3b4cd31772c6495606b43fb5",
+        "feasibility": "bd5ba989b185b0eeea1c1f23c20d56bef14407f4195d48da5a1fb7ca207235f2",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Build",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "d99bf5c7611107a3d49b654835f0b4dbd09e8527fb0b27ca1856e77ae727c70c"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Build",
+            "trainingKm": 70,
+            "longKm": 25,
+            "hash": "3bd1151fb738b3858321142fe6886bf05d2761d55be62bfefeff8beb702f1387"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Build",
+            "trainingKm": 72.9,
+            "longKm": 27,
+            "hash": "2d0e6624e804df5f7ddcdc6db7000a4e1b0a0f9cca1fb32bcebfc98baa024a88"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 50.8,
+            "longKm": 21,
+            "hash": "ee38d6235a2b0b93c5c337d3f1e348febe2874abf245c0f93ab5f1bbe6d1c347"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Race preparation",
+            "trainingKm": 72.9,
+            "longKm": 29,
+            "hash": "36f44775f87927bf8e7cb1757a02d8278dc9d85099577da19850712aa5178ab3"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Race preparation",
+            "trainingKm": 72.9,
+            "longKm": 31,
+            "hash": "015f9743153b1c6649c6bda0c6eea3b2a55f9d60789ee799eafe1e4d2d1755ef"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Taper",
+            "trainingKm": 43.5,
+            "longKm": 18,
+            "hash": "4e99f3a3b3a365e5b2e4e0ed2ec7bf58d251046a658245864694bcddc906759e"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Race week",
+            "trainingKm": 29.1,
+            "longKm": 0,
+            "hash": "d63775496216dff1f6d189de97b33c5539574d05532e67baa44db39321098eee"
+          }
+        ],
+        "complete": "e3629068391ffdb1768275d2037c12dafab360f28642ff2df81ef587258fee6f"
+      }
+    },
+    {
+      "name": "8 weeks, 70 km/23 km, q2",
+      "previousSnapshot": "12c19ae22c928ce6997f21602c2ab1ba6ff3b4e299624edd0725437ff9722cff",
+      "previousExecution": "ff28e045223b610c0561726dc4560fbebc8a96661f8c5b35fccb4363dd5eeea5",
+      "executionUnchanged": false,
+      "expectedExecution": "d39557ab0616a704bf073864d3e2edaa8cfeeb7d0fcd9fd25ad2a2d39359e5a7",
+      "expected": {
+        "profile": "285dc0da4d74da571804e4c0a0ad3ef8c4ccf43ad07fa5f58e8d5685c4da1495",
+        "notes": "d31538c05d429f9c45894e213a248e68d11b070c3b4cd31772c6495606b43fb5",
+        "feasibility": "bd5ba989b185b0eeea1c1f23c20d56bef14407f4195d48da5a1fb7ca207235f2",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Build",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "1357133ec44e39066801ab1380c31ed750b32d4796edd03f9d83aca652aa4c74"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Build",
+            "trainingKm": 70,
+            "longKm": 25,
+            "hash": "a5de8436d796bce0091caf759e9446c1556af4a1792aea8be1d5c267c39ef43c"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Build",
+            "trainingKm": 73,
+            "longKm": 27,
+            "hash": "4130d51238e313f1c1d3c5bf8ac16c0c4475cdcc16a7154dd2c11f1836701423"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 50.9,
+            "longKm": 21,
+            "hash": "54fef66c3e7ca49d6351428790054255f0d558026a6440f4ef3271296a562eba"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Race preparation",
+            "trainingKm": 73,
+            "longKm": 29,
+            "hash": "7c2467954c1e51166a6463a1ec5c7d6da4a9a49ff6895fa1239823ee54f13ae5"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Race preparation",
+            "trainingKm": 73,
+            "longKm": 31,
+            "hash": "4a50925e93aed3f7657e66215ce111d2b3f8ea14ed5b33ce2f9224e2820a51a7"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Taper",
+            "trainingKm": 43.6,
+            "longKm": 18,
+            "hash": "bab8b106d924791547abb3ee601ccb71e2ca2adfb29a54a9ddaaaf99c631cb2b"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Race week",
+            "trainingKm": 29,
+            "longKm": 0,
+            "hash": "7691843ba837614451bf65d70e1e4c7480b6fd5408a39a37abef56d2a25ab5f6"
+          }
+        ],
+        "complete": "5b18e21648f98ef5995f4a784d9d3aa5502f1d2ef9b49c602312e2b05ca6d6dd"
+      }
+    },
+    {
+      "name": "12 weeks, 70 km/23 km, q0",
+      "previousSnapshot": "418531d2934e90592fdec1c800ac9560382dded6199bd59eeccc70ccdb7e7b56",
+      "previousExecution": "40a562ad7d480d05881631d5eaf420684a70175580673c3822b34e902993407f",
+      "executionUnchanged": true,
+      "expectedExecution": "40a562ad7d480d05881631d5eaf420684a70175580673c3822b34e902993407f",
+      "expected": {
+        "profile": "8fbf0fdcdd7a0409f03e96f62181edec9ab7906f13103c90ed2be5c4304ea9ab",
+        "notes": "71b509084061478c65fffbfa1b4e0db9f6fa8a35c538439b2ccd7e118a71ff31",
+        "feasibility": "bd5ba989b185b0eeea1c1f23c20d56bef14407f4195d48da5a1fb7ca207235f2",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Foundation",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "3a4968ac9399cf8bf42206fe3529ccc42a74c2994129ab1312a29b8364f3c3d9"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Foundation",
+            "trainingKm": 70,
+            "longKm": 25,
+            "hash": "9fc75dac51351d5477a24e2dc3455b180d6d914ab8d974bc1e7a3ceec6226b96"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Foundation",
+            "trainingKm": 72.8,
+            "longKm": 27,
+            "hash": "fdb4beed0e7dc778b05c87b4345006c2eff8c7f3314779b84c805d6753d4e94f"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 51,
+            "longKm": 21,
+            "hash": "5ea26c9f2bf3cfc6875adcbdc40f67702f448ebf808dc0fd6e785d984a78932d"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Build",
+            "trainingKm": 75.9,
+            "longKm": 29,
+            "hash": "6afd132f31754dd47e264f116e34481f8cdc6a2e0a2dfecb78323551e64a0058"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Build",
+            "trainingKm": 75.9,
+            "longKm": 31,
+            "hash": "d4f11ec52b56410d002b2984934c9a3f403b6ee5d377216abcfe2ab7d731143d"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Build",
+            "trainingKm": 78.8,
+            "longKm": 33,
+            "hash": "c00d2c265f373e83155627b933ef3fda043a1be22e13ddf85ac7773bd4347761"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Recovery",
+            "trainingKm": 55,
+            "longKm": 24,
+            "hash": "7049ca5277c6465c2481e9908d663ce5e420420e1ea032afb6826e6f398c821e"
+          },
+          {
+            "index": 8,
+            "start": "2026-11-16",
+            "phase": "Race preparation",
+            "trainingKm": 78.8,
+            "longKm": 35,
+            "hash": "cece82926c49acf741b592cdab61deacdfd5fb7874792f5370babfa40293b53a"
+          },
+          {
+            "index": 9,
+            "start": "2026-11-23",
+            "phase": "Race preparation",
+            "trainingKm": 78.8,
+            "longKm": 35,
+            "hash": "91ee4913af314ef63412d6e13c4d28dd2116c6bd64161f4e06b89a352f6745e9"
+          },
+          {
+            "index": 10,
+            "start": "2026-11-30",
+            "phase": "Taper",
+            "trainingKm": 47.2,
+            "longKm": 21,
+            "hash": "cec7de3155cbe1dcbd726e1d2de266be09bcacb851e9630733abbdca7ea8df7d"
+          },
+          {
+            "index": 11,
+            "start": "2026-12-07",
+            "phase": "Race week",
+            "trainingKm": 31.4,
+            "longKm": 0,
+            "hash": "f5de78402f2e3fbed09259fc3b3e1a861635b46ae795cc9d0ec9eef49b9c4f67"
+          }
+        ],
+        "complete": "bd7cc30ec3e5d4f11677a988b7d1d2f1ca55d1571ad6bd3eef4deb15f0986d84"
+      }
+    },
+    {
+      "name": "12 weeks, 70 km/23 km, q1",
+      "previousSnapshot": "645d007330ae1a492f2f0a7e21b05bcd2890cb5dfa5fdc1d07ce3bec77145ec7",
+      "previousExecution": "0edab01bd3b195c052246a2409296747bbfbb6892872119e3e1646e07346d4d9",
+      "executionUnchanged": false,
+      "expectedExecution": "02783b77de506c383e2fd43f26a7f8b5131b6b3ec226588cf7544b8130de3a52",
+      "expected": {
+        "profile": "042fae8eb0b694c24438f3e822c61e0cf64e59037fb4672bc75c1e65525ecfc4",
+        "notes": "71b509084061478c65fffbfa1b4e0db9f6fa8a35c538439b2ccd7e118a71ff31",
+        "feasibility": "bd5ba989b185b0eeea1c1f23c20d56bef14407f4195d48da5a1fb7ca207235f2",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Foundation",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "43f6fb96d3e5d6d1726a1220379cb438639aa7f27fa81d6ff8d743c98c98aed7"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Foundation",
+            "trainingKm": 70,
+            "longKm": 25,
+            "hash": "df4d9778e84b732377d90d98a95c103144fa9626f242be7eb345291a9053e976"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Foundation",
+            "trainingKm": 72.9,
+            "longKm": 27,
+            "hash": "8e69505cd519dbe59881f9da179447e483e5ee4844dc2cc54234958bd50403db"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 50.8,
+            "longKm": 21,
+            "hash": "ee38d6235a2b0b93c5c337d3f1e348febe2874abf245c0f93ab5f1bbe6d1c347"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Build",
+            "trainingKm": 76,
+            "longKm": 29,
+            "hash": "e0a1c0bdc382f6c9ab9e364a2efea497304db67e1ac680836a2c989a896ff68d"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Build",
+            "trainingKm": 76,
+            "longKm": 31,
+            "hash": "5fbf0b1fd9dbe484d25279a944c9359248ad9496381d054e00a7168d9301e606"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Build",
+            "trainingKm": 78.9,
+            "longKm": 33,
+            "hash": "c5c5c6964600688c1d88a767e347d9d1c652cddc3bf13c9826c59331c162f0ef"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Recovery",
+            "trainingKm": 55,
+            "longKm": 24,
+            "hash": "a9946b13f13b4f97d037a574b6ead9da04a203bf2432221eb5aa1fdc1760e960"
+          },
+          {
+            "index": 8,
+            "start": "2026-11-16",
+            "phase": "Race preparation",
+            "trainingKm": 78.9,
+            "longKm": 35,
+            "hash": "eac77237210922d53103095d82a35841e2605d79140dd8060e062a1a048bee4c"
+          },
+          {
+            "index": 9,
+            "start": "2026-11-23",
+            "phase": "Race preparation",
+            "trainingKm": 78.9,
+            "longKm": 35,
+            "hash": "a681407abd6cbbdb8aebbefb5ca7fd25e41468860bc9efaaf7e9154ac3427b73"
+          },
+          {
+            "index": 10,
+            "start": "2026-11-30",
+            "phase": "Taper",
+            "trainingKm": 46.9,
+            "longKm": 21,
+            "hash": "ee399cbdc67f1687bc0117ed5d11967bb5c873782bc34c35b97b6251d8aab73b"
+          },
+          {
+            "index": 11,
+            "start": "2026-12-07",
+            "phase": "Race week",
+            "trainingKm": 28.7,
+            "longKm": 0,
+            "hash": "30623feaec5e7f72970250df77cf82f86df662413604e5d5d1bf80dcc091b424"
+          }
+        ],
+        "complete": "2524599584968afa93a71f12d5b917b5f169fd86024dafb170166313681cb6a2"
+      }
+    },
+    {
+      "name": "12 weeks, 70 km/23 km, q2",
+      "previousSnapshot": "31ab0b25c92008a887245e96d7f8302f2c10fc6e02376f10856a5d9b2254185b",
+      "previousExecution": "a00dfa2d1c340ac08efce464f167b8f0c772e4dc9af8a4ca1367505ca21c4ed9",
+      "executionUnchanged": false,
+      "expectedExecution": "26c801f674a5a5dd111d97d8f154637aa62ab8decc0c9d41a36bf641e04905e9",
+      "expected": {
+        "profile": "52900616008e470acfa0861c40d5d4fa2f5d1355291e72c22f6e6d6cea4b65d8",
+        "notes": "71b509084061478c65fffbfa1b4e0db9f6fa8a35c538439b2ccd7e118a71ff31",
+        "feasibility": "bd5ba989b185b0eeea1c1f23c20d56bef14407f4195d48da5a1fb7ca207235f2",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Foundation",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "28ab0a57d85d77dd0b3521759526da4ade08254da46b5c3f687a44a53c6ffc7d"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Foundation",
+            "trainingKm": 70,
+            "longKm": 25,
+            "hash": "a43b16191a1a13d7a2ae44abc03da582b1739b1a19f339efd8a9a00a5395b5f6"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Foundation",
+            "trainingKm": 73,
+            "longKm": 27,
+            "hash": "17d259fc2b04494cc3ee8d63da8806e6d2383ec7ab4cd297677292f3b37eb63e"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 50.9,
+            "longKm": 21,
+            "hash": "54fef66c3e7ca49d6351428790054255f0d558026a6440f4ef3271296a562eba"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Build",
+            "trainingKm": 75.9,
+            "longKm": 29,
+            "hash": "48f662d0178f8ae40f5e3d876aad4e37466d656ff9753a30aed2426414e6ae1f"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Build",
+            "trainingKm": 75.9,
+            "longKm": 31,
+            "hash": "748f4d9e7e494293cf5d364065ad3528a757313e88c9c3586918da789c373eba"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Build",
+            "trainingKm": 79,
+            "longKm": 33,
+            "hash": "a7613ec7641415cf947c4eb924a1ab2fdb33daaa8c129ad4631de22d7d2f5465"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Recovery",
+            "trainingKm": 55,
+            "longKm": 24,
+            "hash": "7d1f95e506f7a2db7042d31ba0d76bf0df0b67843d7d73650480e0bff9197ede"
+          },
+          {
+            "index": 8,
+            "start": "2026-11-16",
+            "phase": "Race preparation",
+            "trainingKm": 79,
+            "longKm": 35,
+            "hash": "00045c9236b94b9cbfc6f20158fd2b63b0bad9f260fff1ba2ccda81d3cf3c9d8"
+          },
+          {
+            "index": 9,
+            "start": "2026-11-23",
+            "phase": "Race preparation",
+            "trainingKm": 79,
+            "longKm": 35,
+            "hash": "dfb24d69349a0b78ded1d461724a9c835faf23e898948397666bb90f024cf30c"
+          },
+          {
+            "index": 10,
+            "start": "2026-11-30",
+            "phase": "Taper",
+            "trainingKm": 47.2,
+            "longKm": 21,
+            "hash": "8699865530d439bcc97c0cde4407bd380329ed7eb5a3dfc825525ebb083e3792"
+          },
+          {
+            "index": 11,
+            "start": "2026-12-07",
+            "phase": "Race week",
+            "trainingKm": 31.4,
+            "longKm": 0,
+            "hash": "4da9c3d14b67cbaa3588d1f6f9ca3e525b89b7e368453605613486493a8064b5"
+          }
+        ],
+        "complete": "48331b5848a86aebf6737d2731c715f7e15835752e48acd016730467749f57ff"
+      }
+    },
+    {
+      "name": "18 weeks, 70 km/23 km, q0",
+      "previousSnapshot": "5874491d9479e8681e465f98a66f00e7ea5196247cbae480fb45f5407bd6a15a",
+      "previousExecution": "56bbe924cfad7b232cf7acbef794aef6c2d505b80bada62b33bf2d613f8d8897",
+      "executionUnchanged": true,
+      "expectedExecution": "56bbe924cfad7b232cf7acbef794aef6c2d505b80bada62b33bf2d613f8d8897",
+      "expected": {
+        "profile": "ed4dde4295a7335bffcfc4f6cb2a21db8f8725ca9dfcf0aef5ac9028f8c24b9f",
+        "notes": "4868351a23804aa887822824bcd044abba81eb0f68d18b5bc0d944a8e0d0f9a6",
+        "feasibility": "bd5ba989b185b0eeea1c1f23c20d56bef14407f4195d48da5a1fb7ca207235f2",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Foundation",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "3a4968ac9399cf8bf42206fe3529ccc42a74c2994129ab1312a29b8364f3c3d9"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Foundation",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "3c2374a364b89a25c08b90409ea557544ce8a47d90a9b161a705170033876947"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Foundation",
+            "trainingKm": 72.9,
+            "longKm": 25,
+            "hash": "a5254caa93f70a5eb16d76f2fa37965297ff8d42245293c99fd6a57d02d72087"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 50.8,
+            "longKm": 20,
+            "hash": "2465c08453d977b61643a048a32f7d9dad795ce4a3868d96287dfe5d0a642ca6"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Foundation",
+            "trainingKm": 75.8,
+            "longKm": 25,
+            "hash": "7ba3afb6725c990620203caf3ebf616e464342dc1f4187ed19305e0ec3166ee5"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Foundation",
+            "trainingKm": 76,
+            "longKm": 27,
+            "hash": "e332d1c2ac41a3e312afdde3d12529b100121ab58b0a105311b23150ed6932b1"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Build",
+            "trainingKm": 78.8,
+            "longKm": 27,
+            "hash": "be581bd91fd333965c0328d99e528841c0142c825da8341304175a0273f532b2"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Recovery",
+            "trainingKm": 55.1,
+            "longKm": 21,
+            "hash": "64a990597773a86b3ce698702ed58e6add735f6332f874210e10392c52e2ebe5"
+          },
+          {
+            "index": 8,
+            "start": "2026-11-16",
+            "phase": "Build",
+            "trainingKm": 81.9,
+            "longKm": 28,
+            "hash": "f095f1341de44acff703263482bab8d575e7c79b7dfb8266e0d20f25574588fb"
+          },
+          {
+            "index": 9,
+            "start": "2026-11-23",
+            "phase": "Build",
+            "trainingKm": 82,
+            "longKm": 29,
+            "hash": "f02457bc85ce803ac05d5ae22a44626ecca1cc1bd565c6ec5b3b8d58e1fd38b0"
+          },
+          {
+            "index": 10,
+            "start": "2026-11-30",
+            "phase": "Build",
+            "trainingKm": 84.9,
+            "longKm": 31,
+            "hash": "8a38b0332af9a4419093fdb09254793593a28807fbe0bcc77c7b6737b41cb77d"
+          },
+          {
+            "index": 11,
+            "start": "2026-12-07",
+            "phase": "Recovery",
+            "trainingKm": 59.2,
+            "longKm": 24,
+            "hash": "2e07a0fd9040c922feb8d32b1111617faa5bf96465991ff49db44e601c16b7a9"
+          },
+          {
+            "index": 12,
+            "start": "2026-12-14",
+            "phase": "Race preparation",
+            "trainingKm": 84.9,
+            "longKm": 31,
+            "hash": "792c76c83d48d41cdaa8057cb98b506528e13451994656622950021bf1d8cae3"
+          },
+          {
+            "index": 13,
+            "start": "2026-12-21",
+            "phase": "Race preparation",
+            "trainingKm": 84.9,
+            "longKm": 33,
+            "hash": "adcb20883a64a8853ead42e5ed28e5bad0d309e093bcbe3e0b0c813f984ac250"
+          },
+          {
+            "index": 14,
+            "start": "2026-12-28",
+            "phase": "Race preparation",
+            "trainingKm": 85,
+            "longKm": 35,
+            "hash": "922fb78ded3bb80bd27fc8468571b529b0bcbfcb5640cc0f6ebfc8578f8bbb94"
+          },
+          {
+            "index": 15,
+            "start": "2027-01-04",
+            "phase": "Taper",
+            "trainingKm": 63.6,
+            "longKm": 26,
+            "hash": "83d74c984f333c460de9f06179742fe7d75525de9b6574c898ec6433b369a8dd"
+          },
+          {
+            "index": 16,
+            "start": "2027-01-11",
+            "phase": "Taper",
+            "trainingKm": 51,
+            "longKm": 21,
+            "hash": "c59d4174eba7d61e8afb22c0ea15f0f705bfbcb7f319c7b3fefa9a1dd58084b3"
+          },
+          {
+            "index": 17,
+            "start": "2027-01-18",
+            "phase": "Race week",
+            "trainingKm": 34,
+            "longKm": 0,
+            "hash": "ef8e1ffe91c5deb4151a32b6f4fa72ce40e360ef2c9e915247c890d3c6f8811f"
+          }
+        ],
+        "complete": "6a3afedf09a3ec4354d579ca80e653944e94421b036b2685a617a0355bbc2d12"
+      }
+    },
+    {
+      "name": "18 weeks, 70 km/23 km, q1",
+      "previousSnapshot": "ee6a6f1db70f2d9b2678460e3d52ae64202415762300f28a17074a9b6c15dfdf",
+      "previousExecution": "c458533324eae37e90f55f68555562eb0c394211acba067da9e77930f7812bab",
+      "executionUnchanged": false,
+      "expectedExecution": "064e925850ec0053ad106e7041d1213b0b7b2ee4e416dbd7bc4360a6128635cf",
+      "expected": {
+        "profile": "80e23120c527976b05de2a02dbb59122ca5a079a6617c50f3433cb9e013d5263",
+        "notes": "4868351a23804aa887822824bcd044abba81eb0f68d18b5bc0d944a8e0d0f9a6",
+        "feasibility": "bd5ba989b185b0eeea1c1f23c20d56bef14407f4195d48da5a1fb7ca207235f2",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Foundation",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "43f6fb96d3e5d6d1726a1220379cb438639aa7f27fa81d6ff8d743c98c98aed7"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Foundation",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "1b042df9c2efa5f19681b7f2cb5898d0d6ceca2986a50c798b8d543dfb837ac2"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Foundation",
+            "trainingKm": 72.9,
+            "longKm": 25,
+            "hash": "aaaf5a44af8f2ad81c07e891cb3202f60a6e737cdb04a627e727d5cf0b1720b1"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 50.8,
+            "longKm": 20,
+            "hash": "7645c8828e88299667b4119572470fa1320866c2ca2d4ca96b38ca36c44d39d6"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Foundation",
+            "trainingKm": 76,
+            "longKm": 25,
+            "hash": "bb82930871f763a200e5fac22572ee73f5087860ed2af0754bb7e794720a3b76"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Foundation",
+            "trainingKm": 76,
+            "longKm": 27,
+            "hash": "cc59f08c445f58efc2bccbf922b48708b95cca5cdf363b4b3f126548177f40b2"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Build",
+            "trainingKm": 78.9,
+            "longKm": 27,
+            "hash": "82bb23085d53665eca58c47e4652b702d05f9617862a150d4116635f5271d6d8"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Recovery",
+            "trainingKm": 55.1,
+            "longKm": 21,
+            "hash": "d0040bcd7309ca24bc6167f33f807693a00d7668837e26e6c17da0f47e84664a"
+          },
+          {
+            "index": 8,
+            "start": "2026-11-16",
+            "phase": "Build",
+            "trainingKm": 82,
+            "longKm": 28,
+            "hash": "e200a7489e4b298513d1ba8259a8dd658f6dbc68e547e6370895d37cdf881345"
+          },
+          {
+            "index": 9,
+            "start": "2026-11-23",
+            "phase": "Build",
+            "trainingKm": 82,
+            "longKm": 29,
+            "hash": "f489d9f9eb4c34af819187539fb414f381cc1764a292a6a4431927e481bf60b5"
+          },
+          {
+            "index": 10,
+            "start": "2026-11-30",
+            "phase": "Build",
+            "trainingKm": 85,
+            "longKm": 31,
+            "hash": "b12583a66967005de5fd210d24c5d05a4bb879cb8886bee27039e8423d0fe81c"
+          },
+          {
+            "index": 11,
+            "start": "2026-12-07",
+            "phase": "Recovery",
+            "trainingKm": 59.1,
+            "longKm": 24,
+            "hash": "320468ebcb54aee0499d08a22905769ce92f8b16757683fe7861e6b0fb5df29e"
+          },
+          {
+            "index": 12,
+            "start": "2026-12-14",
+            "phase": "Race preparation",
+            "trainingKm": 85,
+            "longKm": 31,
+            "hash": "fc20dda1dcf00befbb41f0a033281f2f8c91f34a7d72030c389b8cf10c860c8b"
+          },
+          {
+            "index": 13,
+            "start": "2026-12-21",
+            "phase": "Race preparation",
+            "trainingKm": 85,
+            "longKm": 33,
+            "hash": "a2a36c2ceea28e7ebf61097e2d1b1ef554177451e97e65006ad6679fe81c8d0a"
+          },
+          {
+            "index": 14,
+            "start": "2026-12-28",
+            "phase": "Race preparation",
+            "trainingKm": 85,
+            "longKm": 35,
+            "hash": "05a2938bb560c94d78cd5e3b2635021c16659ce27b0c9498450039b77b2da7cd"
+          },
+          {
+            "index": 15,
+            "start": "2027-01-04",
+            "phase": "Taper",
+            "trainingKm": 62.7,
+            "longKm": 26,
+            "hash": "f68bcb5fb8b0879d4cbea19ca8e3436a50834b2854b19bd55667445f074ac15c"
+          },
+          {
+            "index": 16,
+            "start": "2027-01-11",
+            "phase": "Taper",
+            "trainingKm": 50.9,
+            "longKm": 21,
+            "hash": "521619f0a4f62b05532ace5dfec5353a327cbed750bd91b1596ac517659d29bf"
+          },
+          {
+            "index": 17,
+            "start": "2027-01-18",
+            "phase": "Race week",
+            "trainingKm": 33.8,
+            "longKm": 0,
+            "hash": "fa0492ebec51cf8fcfda1ab9f37b2540f3920c30a1c5bbff34e697e15b6e96f7"
+          }
+        ],
+        "complete": "865240b20b9b1923468ba2af8d17273dcb8ddab396e84c698404cc76db2d9688"
+      }
+    },
+    {
+      "name": "18 weeks, 70 km/23 km, q2",
+      "previousSnapshot": "7a406f89b15f9c58c63390b185d34103424cf8ffe614bd57f97ac2139f66bac0",
+      "previousExecution": "f793fec4e261a51380504427f2ab065a41e9157f17ba1e15e50da081c25cbeb7",
+      "executionUnchanged": false,
+      "expectedExecution": "6fd2ce781cd2e52e2dd712d8af1d6095df4dfdefb8baf6a3f616c8f4dd56a002",
+      "expected": {
+        "profile": "bebd0640d3dcb249cc7089609086ced0797514368b2c2ee887505c1fa16c688b",
+        "notes": "4868351a23804aa887822824bcd044abba81eb0f68d18b5bc0d944a8e0d0f9a6",
+        "feasibility": "bd5ba989b185b0eeea1c1f23c20d56bef14407f4195d48da5a1fb7ca207235f2",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Foundation",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "28ab0a57d85d77dd0b3521759526da4ade08254da46b5c3f687a44a53c6ffc7d"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Foundation",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "15df15fb993dec328c6f8780570bec5f9e14497cc2eadfddfdfb837d36f45a73"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Foundation",
+            "trainingKm": 73,
+            "longKm": 25,
+            "hash": "c9b5bae354313a024b97bcfa25f89ee2257593dffade0ddac2e63a022bee3835"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 50.8,
+            "longKm": 20,
+            "hash": "7cd67d0b3f474c8a1a0546ca5b00a1ca7eeb565070f1062a6256230b30345ef0"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Foundation",
+            "trainingKm": 76,
+            "longKm": 25,
+            "hash": "f5e9a16f67876857cf4de805afe8eefbcd419891849d448037ae7964f16d8805"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Foundation",
+            "trainingKm": 76,
+            "longKm": 27,
+            "hash": "5c1bf9123efed531437eb491302047c703d09bb880de0f4f1fc4db1931bc82d2"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Build",
+            "trainingKm": 79,
+            "longKm": 27,
+            "hash": "8c107957c87c4a696952c3d98274f515dc04256e3f58d94723df20e0272b1975"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Recovery",
+            "trainingKm": 55,
+            "longKm": 21,
+            "hash": "96679dcc91dc6993de9127bf654281a9f3bf6fd81d5d9e531b9076a7584e64b2"
+          },
+          {
+            "index": 8,
+            "start": "2026-11-16",
+            "phase": "Build",
+            "trainingKm": 82,
+            "longKm": 28,
+            "hash": "684f6597a831989d450895d8ed3bd96a862a3406e243ab1156f016855a348fd5"
+          },
+          {
+            "index": 9,
+            "start": "2026-11-23",
+            "phase": "Build",
+            "trainingKm": 82,
+            "longKm": 29,
+            "hash": "1aeeff95885a888a5c676e2653e17c207cfeac9de21546c20dcbb7f2c837a634"
+          },
+          {
+            "index": 10,
+            "start": "2026-11-30",
+            "phase": "Build",
+            "trainingKm": 85,
+            "longKm": 31,
+            "hash": "58a4b18b8b95ae9f83a1d5fa77e338789f4917a6f14882b17698776999a9d670"
+          },
+          {
+            "index": 11,
+            "start": "2026-12-07",
+            "phase": "Recovery",
+            "trainingKm": 59.3,
+            "longKm": 24,
+            "hash": "9957289088106441f6112a7f08e66c8d77870f30f1a4986141cd63da31c35b46"
+          },
+          {
+            "index": 12,
+            "start": "2026-12-14",
+            "phase": "Race preparation",
+            "trainingKm": 85,
+            "longKm": 31,
+            "hash": "179a52def1a541e91f79ec8145f1621a535e60655562b739baa5afbdbaafe81f"
+          },
+          {
+            "index": 13,
+            "start": "2026-12-21",
+            "phase": "Race preparation",
+            "trainingKm": 85,
+            "longKm": 33,
+            "hash": "58678a20250b698ce5be4f89dafbeb39e98c5915fe5d44b27e7442ebabe596d1"
+          },
+          {
+            "index": 14,
+            "start": "2026-12-28",
+            "phase": "Race preparation",
+            "trainingKm": 85,
+            "longKm": 35,
+            "hash": "1c44b9c588fe7c63c9c03fd5f2110cc78aedc442013859ee112d362010282111"
+          },
+          {
+            "index": 15,
+            "start": "2027-01-04",
+            "phase": "Taper",
+            "trainingKm": 63.6,
+            "longKm": 26,
+            "hash": "64c17d67407f5ff62508e6b70cfcb6226836098b7b8d87b40c8b68d07c0b4b52"
+          },
+          {
+            "index": 16,
+            "start": "2027-01-11",
+            "phase": "Taper",
+            "trainingKm": 50.9,
+            "longKm": 21,
+            "hash": "07b552a3aab69ec0fe942ae626fcf1e88b1755a14f8fa39dd7c50dffee9d25ad"
+          },
+          {
+            "index": 17,
+            "start": "2027-01-18",
+            "phase": "Race week",
+            "trainingKm": 33.8,
+            "longKm": 0,
+            "hash": "9a07f2dd3bf3c3f4dd73f825d06726375d89208b44448566d4cfd77b8f2827a3"
+          }
+        ],
+        "complete": "7d078305c28795d29c96349c03e1d0d041845e6727be54a558fad5ae4e58dc3c"
+      }
+    },
+    {
+      "name": "24 weeks, 70 km/23 km, q0",
+      "previousSnapshot": "589e3d42f29aae8bd8d3563f764ad224220bcdf52a8e387bb0101ac33ce99aa7",
+      "previousExecution": "7c85859cb1f9e99baf71fa562126adc64bdcb9d0d22e054e0d9324d27617672c",
+      "executionUnchanged": true,
+      "expectedExecution": "7c85859cb1f9e99baf71fa562126adc64bdcb9d0d22e054e0d9324d27617672c",
+      "expected": {
+        "profile": "e7ffcc0169aa1eba9f50bd9da851d7556d15331624d5434ad99e0fef76ddf11b",
+        "notes": "4868351a23804aa887822824bcd044abba81eb0f68d18b5bc0d944a8e0d0f9a6",
+        "feasibility": "bd5ba989b185b0eeea1c1f23c20d56bef14407f4195d48da5a1fb7ca207235f2",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Maintenance",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "286871ceea6332dada75c1e21aa8bbb419ac3908e1ed1e739a0dd98359cc6396"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Maintenance",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "03d13e96fef7d23e7887c89a10d792b56d7f254ae5495f4ad1e0c5bf43107a58"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Maintenance",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "e74f663ed88a018947cea4a4d4f6f3950b759e8ca0b7ae4878e9c14d5b536ccb"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 48.6,
+            "longKm": 18,
+            "hash": "89e8e5b676049d4ccb6d4c493758113d3850409307525043593666ded51702e7"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Maintenance",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "31ecec92732db580a779c98f373807b0bb658e071fc464dd3a763a43515c8049"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Maintenance",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "6c7a6421adab37569b8fb328efea559c2b20036323b5b511bbab56015c6e625e"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Foundation",
+            "trainingKm": 72.8,
+            "longKm": 23,
+            "hash": "accb0cb168eb37463baaeb0f00f5ed69524b8ff58aeba50c2929b1e9434c56c9"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Recovery",
+            "trainingKm": 50.8,
+            "longKm": 18,
+            "hash": "088c6cb3bf5d49056733411a80165b000ca37879a72fa88435a874ffa4b40aba"
+          },
+          {
+            "index": 8,
+            "start": "2026-11-16",
+            "phase": "Foundation",
+            "trainingKm": 75.9,
+            "longKm": 23,
+            "hash": "e0d8a0a9d7c2bdd10d15658d212e7e0ee37df4f7c17e65df0c752832811bf82c"
+          },
+          {
+            "index": 9,
+            "start": "2026-11-23",
+            "phase": "Foundation",
+            "trainingKm": 75.9,
+            "longKm": 25,
+            "hash": "c870341b661560525649fab89976f6390e8f34da5a26b27c5ee3ed980abe670c"
+          },
+          {
+            "index": 10,
+            "start": "2026-11-30",
+            "phase": "Foundation",
+            "trainingKm": 78.9,
+            "longKm": 25,
+            "hash": "87e48d4fed7bd9c94c2eca8d6dbf3d83709e4d2c67bbd5f5bbfc65ab1e7c7a76"
+          },
+          {
+            "index": 11,
+            "start": "2026-12-07",
+            "phase": "Recovery",
+            "trainingKm": 55,
+            "longKm": 20,
+            "hash": "cff7e3e7f07bc981ea2cd19e1a46a456ed5aa29799855312eda20f8c41f27b02"
+          },
+          {
+            "index": 12,
+            "start": "2026-12-14",
+            "phase": "Build",
+            "trainingKm": 81.8,
+            "longKm": 27,
+            "hash": "075413603a38c0409ee37a289274486c052a18149c90d26b436dc7aabe5b1c89"
+          },
+          {
+            "index": 13,
+            "start": "2026-12-21",
+            "phase": "Build",
+            "trainingKm": 82,
+            "longKm": 28,
+            "hash": "082b54abb6c34f3a5c8bb4918e014669b6dafd07ea95acb31f0e59e38deb8e7c"
+          },
+          {
+            "index": 14,
+            "start": "2026-12-28",
+            "phase": "Build",
+            "trainingKm": 84.9,
+            "longKm": 28,
+            "hash": "1c4483e71de4a50e555392146c56a180fc58d0e7f9e44614484ddf94f67b2e01"
+          },
+          {
+            "index": 15,
+            "start": "2027-01-04",
+            "phase": "Recovery",
+            "trainingKm": 59.2,
+            "longKm": 22,
+            "hash": "4a453b87f33856491bd1bd4d4e2dbb0d9e852aea7af31d80e3fa9a81de7a7b41"
+          },
+          {
+            "index": 16,
+            "start": "2027-01-11",
+            "phase": "Build",
+            "trainingKm": 87.8,
+            "longKm": 30,
+            "hash": "0b2ff0cce18246ddd32cbf593eb51b67b8771def552eb0cfb245bebff790538b"
+          },
+          {
+            "index": 17,
+            "start": "2027-01-18",
+            "phase": "Race preparation",
+            "trainingKm": 88,
+            "longKm": 31,
+            "hash": "f357909d25aa089aff37c71a20541fa2d9768ccf6415e8a02c9a98c19a5c9618"
+          },
+          {
+            "index": 18,
+            "start": "2027-01-25",
+            "phase": "Race preparation",
+            "trainingKm": 88,
+            "longKm": 33,
+            "hash": "56022f5e8730bacff0cca0c8a12ac7c07b122884074a4d49e576fe6175bf8b27"
+          },
+          {
+            "index": 19,
+            "start": "2027-02-01",
+            "phase": "Recovery",
+            "trainingKm": 61.4,
+            "longKm": 26,
+            "hash": "09b4e1689b1df992417be8271df91d89076ab675eac222284e3c30f5e34e8231"
+          },
+          {
+            "index": 20,
+            "start": "2027-02-08",
+            "phase": "Race preparation",
+            "trainingKm": 88,
+            "longKm": 35,
+            "hash": "7e3a1174f38a079708b92b52c920631e9010a38c72e524b9f8d046e037e62f9c"
+          },
+          {
+            "index": 21,
+            "start": "2027-02-15",
+            "phase": "Taper",
+            "trainingKm": 66,
+            "longKm": 26,
+            "hash": "55af4ac2bb5eb0e58beefbf5a0ef549d773ab61e03291ea4db63f1472dd933c7"
+          },
+          {
+            "index": 22,
+            "start": "2027-02-22",
+            "phase": "Taper",
+            "trainingKm": 52.6,
+            "longKm": 21,
+            "hash": "4820d9bdd90cebaf856adde86e4a09bec4fd52af321ce28a0a92223efc5efa0a"
+          },
+          {
+            "index": 23,
+            "start": "2027-03-01",
+            "phase": "Race week",
+            "trainingKm": 35,
+            "longKm": 0,
+            "hash": "cf12556276c8eebbb9c3f4dc6aa43c86d69e9e24f34215257a54f016ca647eea"
+          }
+        ],
+        "complete": "2688ee5c50511436685be1497a6fcc0410269baf5ef5977d5a50835bca53b4b1"
+      }
+    },
+    {
+      "name": "24 weeks, 70 km/23 km, q1",
+      "previousSnapshot": "1fe41b031a7ee91caeeabcadc37f44cd9a13f1d68284b1012459dccfc1afd396",
+      "previousExecution": "e9c9153535e5d3e4a00bcedec28032411ef87f8b9d275259cc6e39f7bffc5d7a",
+      "executionUnchanged": false,
+      "expectedExecution": "e9335d6bc94f6e10ee3ba4ec2130cff090919d7764e879da1e93df945e233878",
+      "expected": {
+        "profile": "51690e4990a03090192f06ecefb30da147f6ac90630f50cf3e204bca667108c7",
+        "notes": "4868351a23804aa887822824bcd044abba81eb0f68d18b5bc0d944a8e0d0f9a6",
+        "feasibility": "bd5ba989b185b0eeea1c1f23c20d56bef14407f4195d48da5a1fb7ca207235f2",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Maintenance",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "839b7756bf382a693710f3ecf94906a1d8707e7c3affd8b5280cfb7248558c1b"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Maintenance",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "f396a0c4d7e3054eb60cba73ca6e18e910393c58f54ed8e8c96d9d077a552651"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Maintenance",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "45c40b7c99a246863da9019f39d033b2c6771054d85fef6ce568ef5a886fa60e"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 48.7,
+            "longKm": 18,
+            "hash": "dac394e6cdc7071380b6e6af7426e6f034e19ef9f2b47afeae49f061ec9d81ee"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Maintenance",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "6f04ee03eef772227e3c9f361d44748d860a84387c990eeedc1250bbdb564759"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Maintenance",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "219392744d87a385358cf9462ba08ae9a1c883d638d8a0e755708017aa259710"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Foundation",
+            "trainingKm": 72.9,
+            "longKm": 23,
+            "hash": "5e25cb3e998a4e42a1952f679ef674991ce6a4fd82ae400c838f72ecd7ef73bc"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Recovery",
+            "trainingKm": 50.8,
+            "longKm": 18,
+            "hash": "a6ee1e9f1fc717b3f62d6507cc4c718b23a6cee407897933b2f202bc75672a72"
+          },
+          {
+            "index": 8,
+            "start": "2026-11-16",
+            "phase": "Foundation",
+            "trainingKm": 75.9,
+            "longKm": 23,
+            "hash": "e08de322445bd97e05517dee0c80593ba81cd6d56a3f1d671afbe7504dba84fd"
+          },
+          {
+            "index": 9,
+            "start": "2026-11-23",
+            "phase": "Foundation",
+            "trainingKm": 76,
+            "longKm": 25,
+            "hash": "dc558b752cefd9a42d768493e616145038d29cc5efa6d7f749c3d902cacacfcd"
+          },
+          {
+            "index": 10,
+            "start": "2026-11-30",
+            "phase": "Foundation",
+            "trainingKm": 78.9,
+            "longKm": 25,
+            "hash": "6ccad0a47894628aac8a69cc6618db525639b31e862256f99df497635f44ece1"
+          },
+          {
+            "index": 11,
+            "start": "2026-12-07",
+            "phase": "Recovery",
+            "trainingKm": 54.9,
+            "longKm": 20,
+            "hash": "31dbfbe147af3b4bd151f80a5798ae332ec6739c78566c103befd8e3fd3934c4"
+          },
+          {
+            "index": 12,
+            "start": "2026-12-14",
+            "phase": "Build",
+            "trainingKm": 82,
+            "longKm": 27,
+            "hash": "184703fe59171f632977300830d7957e607783e76e9eadd6d95d1e64b7dccd11"
+          },
+          {
+            "index": 13,
+            "start": "2026-12-21",
+            "phase": "Build",
+            "trainingKm": 82,
+            "longKm": 28,
+            "hash": "ede6fdedc5f6b966015b51b6100c4aa1eb2a5feeb34aa7da1f565bf19a455837"
+          },
+          {
+            "index": 14,
+            "start": "2026-12-28",
+            "phase": "Build",
+            "trainingKm": 85,
+            "longKm": 28,
+            "hash": "064d19d405892eebc32b8211b3644ee8930aa61c62c4f5092a5a3b10d2a82b24"
+          },
+          {
+            "index": 15,
+            "start": "2027-01-04",
+            "phase": "Recovery",
+            "trainingKm": 59.2,
+            "longKm": 22,
+            "hash": "3507732354ef23fce5fc84dbb0ce1af20f603a77add0cc23d0db7cfa0dee661f"
+          },
+          {
+            "index": 16,
+            "start": "2027-01-11",
+            "phase": "Build",
+            "trainingKm": 87.9,
+            "longKm": 30,
+            "hash": "c8f82206c6860c0e1898eb2ae1110c73f00175a41c16054f4a88b0814c754f74"
+          },
+          {
+            "index": 17,
+            "start": "2027-01-18",
+            "phase": "Race preparation",
+            "trainingKm": 88,
+            "longKm": 31,
+            "hash": "cfead5a7b3272716781fbdbacfacbad8e148e46de7e458cb03744bd48d1b5209"
+          },
+          {
+            "index": 18,
+            "start": "2027-01-25",
+            "phase": "Race preparation",
+            "trainingKm": 88,
+            "longKm": 33,
+            "hash": "2e8a51305ac76647faa127585e3c0c751caf48313f781261cd1cfd5f0f45cf52"
+          },
+          {
+            "index": 19,
+            "start": "2027-02-01",
+            "phase": "Recovery",
+            "trainingKm": 61.3,
+            "longKm": 26,
+            "hash": "62b9a335d883c60250ef1d0b870e7620ddc9ecec03b94b2e55503d790268fb5d"
+          },
+          {
+            "index": 20,
+            "start": "2027-02-08",
+            "phase": "Race preparation",
+            "trainingKm": 88,
+            "longKm": 35,
+            "hash": "4d9b9536963ad44536d175da5048a32aed616d87c48dacdd23e81bf2b87fe002"
+          },
+          {
+            "index": 21,
+            "start": "2027-02-15",
+            "phase": "Taper",
+            "trainingKm": 66,
+            "longKm": 26,
+            "hash": "6547d5ee76fc83487aca005a499c48fc8481934ec04499137087bf7a853ffc8e"
+          },
+          {
+            "index": 22,
+            "start": "2027-02-22",
+            "phase": "Taper",
+            "trainingKm": 52.6,
+            "longKm": 21,
+            "hash": "b04d18730f58efb3ed1cbc5df62835251bcdcf357a2fc9d1b1d1c73fb09a5642"
+          },
+          {
+            "index": 23,
+            "start": "2027-03-01",
+            "phase": "Race week",
+            "trainingKm": 35.1,
+            "longKm": 0,
+            "hash": "ebb62a0c3611c8c81a840feefd8522cebab35cccc3e9d3a402531192f7f8c6b9"
+          }
+        ],
+        "complete": "26d244d893393b70f30d1e7b203cf3798edff03196fe7f3ae3c14622bd1e2815"
+      }
+    },
+    {
+      "name": "24 weeks, 70 km/23 km, q2",
+      "previousSnapshot": "c5864e0569c22d650c33bb49d355a96fef35038a3fe5baf299e033171b23d740",
+      "previousExecution": "3b21a34ef4956847a420768ae2ffdecc69be3de2801d02703413939986b6f22f",
+      "executionUnchanged": false,
+      "expectedExecution": "df0da009b61ec97e09775baa1e1aeda4f6b251bbe55c9f519bd20454c33f76ce",
+      "expected": {
+        "profile": "b070f5cb70b338fec68a215f0ff673ba10c0e28323650443f1d9a35cb34fd432",
+        "notes": "4868351a23804aa887822824bcd044abba81eb0f68d18b5bc0d944a8e0d0f9a6",
+        "feasibility": "bd5ba989b185b0eeea1c1f23c20d56bef14407f4195d48da5a1fb7ca207235f2",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Maintenance",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "3a12e87950b9f37ad29833ab336e4ad9e103c75fd3cc4c0645fa6fa7974554ce"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Maintenance",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "96d9330f544a5edfa9ae294510e3f786e54a6a9d0397754c1ef0ac747ca6c8b0"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Maintenance",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "3459deb46fb261fe44c8bac8d94485490f8aec944aee31c2e1bc90c6f4f4e9c4"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 48.6,
+            "longKm": 18,
+            "hash": "1fd07d8cfda6152f386054d669b8c278ac48f2bb18b133b075c2f7bac23ef5ee"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Maintenance",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "ea71114ef470dba099da59eef7ea04278a9d715b2391c8f1d5df58fe381370ba"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Maintenance",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "93170c4012d6c03f07fe5c8461864a0e719a98a3e70bac661598c2e458b48d7d"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Foundation",
+            "trainingKm": 72.9,
+            "longKm": 23,
+            "hash": "04517afadd24b374a0aac5eef999973d04475e09f6a9b60e5b1516929b092f8e"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Recovery",
+            "trainingKm": 50.9,
+            "longKm": 18,
+            "hash": "e725f50dce76adb5bb33440638e3ff6adb54af4f8395dc083add95f241064102"
+          },
+          {
+            "index": 8,
+            "start": "2026-11-16",
+            "phase": "Foundation",
+            "trainingKm": 75.9,
+            "longKm": 23,
+            "hash": "01d4083eb9a14e863b873ed4ff60166780c5b40017db820c16a235def38d02c9"
+          },
+          {
+            "index": 9,
+            "start": "2026-11-23",
+            "phase": "Foundation",
+            "trainingKm": 76,
+            "longKm": 25,
+            "hash": "c2950b6eb5384726eeae4496a5e6e8b7dc17ff15194b893f3f2e098bdedd8aa8"
+          },
+          {
+            "index": 10,
+            "start": "2026-11-30",
+            "phase": "Foundation",
+            "trainingKm": 79,
+            "longKm": 25,
+            "hash": "78147a09e9dfb6f04fccf29ce92762e140da8e6c0031f756d7f40f343e14149f"
+          },
+          {
+            "index": 11,
+            "start": "2026-12-07",
+            "phase": "Recovery",
+            "trainingKm": 55.1,
+            "longKm": 20,
+            "hash": "b6dc077770d5c976a221ed7d69c20026bfe3d5dada0fd8c9c7cecc2e81b14b1f"
+          },
+          {
+            "index": 12,
+            "start": "2026-12-14",
+            "phase": "Build",
+            "trainingKm": 82,
+            "longKm": 27,
+            "hash": "18520c7e218a9e001d62b7ca747882fde5640f720a708b79982c2cf3c2f1259c"
+          },
+          {
+            "index": 13,
+            "start": "2026-12-21",
+            "phase": "Build",
+            "trainingKm": 82,
+            "longKm": 28,
+            "hash": "6e6b101ba82c39cf59b588ab2b4a1b2705f4faa8e4df221dc0fa3a71deeb4232"
+          },
+          {
+            "index": 14,
+            "start": "2026-12-28",
+            "phase": "Build",
+            "trainingKm": 85,
+            "longKm": 28,
+            "hash": "cfb5019d362fcde64eee6d0cf919abada11e8fb6afadaa185ecc67f22ec1e461"
+          },
+          {
+            "index": 15,
+            "start": "2027-01-04",
+            "phase": "Recovery",
+            "trainingKm": 59.3,
+            "longKm": 22,
+            "hash": "bf47de1dd97dd84a9292a3b1cbef671861cc1c60fd1955b85ab29d56bdeb8676"
+          },
+          {
+            "index": 16,
+            "start": "2027-01-11",
+            "phase": "Build",
+            "trainingKm": 88,
+            "longKm": 30,
+            "hash": "aeb35d3f74bba1082f37ace3300460b9bb6e85f6992dc148a842a74d3e2f3182"
+          },
+          {
+            "index": 17,
+            "start": "2027-01-18",
+            "phase": "Race preparation",
+            "trainingKm": 88,
+            "longKm": 31,
+            "hash": "72d0e54d4599ae643ffb0673129eef2253fc5d1b49257610ff0f0438a50d88ec"
+          },
+          {
+            "index": 18,
+            "start": "2027-01-25",
+            "phase": "Race preparation",
+            "trainingKm": 88,
+            "longKm": 33,
+            "hash": "ac961875777f96f5924a5adbf3be664813a3d5f48671764ac8172f19fed8ad11"
+          },
+          {
+            "index": 19,
+            "start": "2027-02-01",
+            "phase": "Recovery",
+            "trainingKm": 61.5,
+            "longKm": 26,
+            "hash": "ea5699e66f2d2ac6d80557590489198a5d295899bf021e0cdd53923abcfca31d"
+          },
+          {
+            "index": 20,
+            "start": "2027-02-08",
+            "phase": "Race preparation",
+            "trainingKm": 88,
+            "longKm": 35,
+            "hash": "0b4a3d51487bb9658615bbfe66e7389538c8e012bd3524ef50e68aa66b9e8a39"
+          },
+          {
+            "index": 21,
+            "start": "2027-02-15",
+            "phase": "Taper",
+            "trainingKm": 65.8,
+            "longKm": 26,
+            "hash": "f4ece26d2f9cf850dbcc4b39c64cf3f7e54606695331568383cf87da78a5a8bc"
+          },
+          {
+            "index": 22,
+            "start": "2027-02-22",
+            "phase": "Taper",
+            "trainingKm": 52.5,
+            "longKm": 21,
+            "hash": "4f15d53841c7743d5e2bea98a2c58e96a9bac49d7c886f07d180fca1a6be0d8b"
+          },
+          {
+            "index": 23,
+            "start": "2027-03-01",
+            "phase": "Race week",
+            "trainingKm": 35.1,
+            "longKm": 0,
+            "hash": "55ed036813e843ef47f169e9a5ae3aabe77bae6668d34b87e4b53507cd599b55"
+          }
+        ],
+        "complete": "7d2df97041547e69ebe0411006eb95c91e3f4e7147c23055e48ad8d869c88a9a"
+      }
+    },
+    {
+      "name": "18 weeks, four-day 48 km/18 km, q0",
+      "previousSnapshot": "30a729a2de6c9bcdd9df50bf6f9ee5b10e457a278542743544d4f163e04dd180",
+      "previousExecution": "596759227af7feeadd54c530086250ecb85780110f35ed563aa4820578efe5ac",
+      "executionUnchanged": true,
+      "expectedExecution": "596759227af7feeadd54c530086250ecb85780110f35ed563aa4820578efe5ac",
+      "expected": {
+        "profile": "e62c47f9df4cafe12cb8a2d287f8374a3d89d305f3dda138a91f1486117a783c",
+        "notes": "4868351a23804aa887822824bcd044abba81eb0f68d18b5bc0d944a8e0d0f9a6",
+        "feasibility": "bd5ba989b185b0eeea1c1f23c20d56bef14407f4195d48da5a1fb7ca207235f2",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Foundation",
+            "trainingKm": 48,
+            "longKm": 18,
+            "hash": "e68780c3303d55b490b7d062153185bdd155f1186642b4354838b4408de04357"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Foundation",
+            "trainingKm": 48,
+            "longKm": 18,
+            "hash": "7d7fbd937e17a7b04a3b1be9b848dcadd3b94bd7a4d2b66b1ffa6d37a112c4cf"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Foundation",
+            "trainingKm": 50.7,
+            "longKm": 20,
+            "hash": "4795feaff63c4f858aa4cfb4a9b8c67ab61d2a07b819f23af327dbc7b9e4029a"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 34.5,
+            "longKm": 15,
+            "hash": "ee98f6fb867727f9cbafe17e0e70713c7f3f541f48809ec94ced6fc39641bb15"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Foundation",
+            "trainingKm": 53.7,
+            "longKm": 22,
+            "hash": "1ff8477b36a6125ddf2447e0384f5415dcd6131d78f819c39604f3e276ffc31d"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Foundation",
+            "trainingKm": 53.7,
+            "longKm": 24,
+            "hash": "34918a7c9410b5b1a38d3d96cba25abe149c05e04f0d3a99ff245c14f07184c5"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Build",
+            "trainingKm": 56.7,
+            "longKm": 25,
+            "hash": "fa3e9872b2acc8552162c38c1e6892ca4522f0c1705dc4abe839ed3bda776de4"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Recovery",
+            "trainingKm": 39.6,
+            "longKm": 17,
+            "hash": "dfbbfeec435c97c818d524a9fa248530abf21ecd992bb6be1f1a19191c19c0f4"
+          },
+          {
+            "index": 8,
+            "start": "2026-11-16",
+            "phase": "Build",
+            "trainingKm": 59.8,
+            "longKm": 26,
+            "hash": "b893391160c3663a9364a77df89907800750f1b3f49f2985909a9b739c1ae931"
+          },
+          {
+            "index": 9,
+            "start": "2026-11-23",
+            "phase": "Build",
+            "trainingKm": 59.8,
+            "longKm": 26,
+            "hash": "3b9f85d89a09032b59905b401741cce4185d1d6c04832efe56d1b3b54fa13884"
+          },
+          {
+            "index": 10,
+            "start": "2026-11-30",
+            "phase": "Build",
+            "trainingKm": 62.7,
+            "longKm": 28,
+            "hash": "cc18c8d67b4adb15a9eed33e3ded90d34a3392bf6565e82cd9ac26ecf4b05d35"
+          },
+          {
+            "index": 11,
+            "start": "2026-12-07",
+            "phase": "Recovery",
+            "trainingKm": 42.9,
+            "longKm": 18,
+            "hash": "94179b1bd7bb2f47493853f0d6943bcaa40628a849370ca9673ae1bc73116522"
+          },
+          {
+            "index": 12,
+            "start": "2026-12-14",
+            "phase": "Race preparation",
+            "trainingKm": 62.7,
+            "longKm": 28,
+            "hash": "90dd9c274f2df1fa90b5db08006369b43d4fcfe444a950347e8f8f7d422abd30"
+          },
+          {
+            "index": 13,
+            "start": "2026-12-21",
+            "phase": "Race preparation",
+            "trainingKm": 62.7,
+            "longKm": 28,
+            "hash": "c5eb6f5f0104b50750fdeb91b220e36f096b98172dfe4e1b70208cbae18d0629"
+          },
+          {
+            "index": 14,
+            "start": "2026-12-28",
+            "phase": "Race preparation",
+            "trainingKm": 62.7,
+            "longKm": 28,
+            "hash": "886634101d18b7513d4e0790418e54395cb9ec1922be50df35f7a83b0c86e9a1"
+          },
+          {
+            "index": 15,
+            "start": "2027-01-04",
+            "phase": "Taper",
+            "trainingKm": 46.8,
+            "longKm": 21,
+            "hash": "f82407d72b133337535c49fe9a052321c2c7549a1eb9d6d89b8e4c820281294a"
+          },
+          {
+            "index": 16,
+            "start": "2027-01-11",
+            "phase": "Taper",
+            "trainingKm": 37.5,
+            "longKm": 16,
+            "hash": "eee3417d8e83cab8397bfa997567a976de20c444ec9fb64a8665e96c6bc27ebb"
+          },
+          {
+            "index": 17,
+            "start": "2027-01-18",
+            "phase": "Race week",
+            "trainingKm": 24.9,
+            "longKm": 0,
+            "hash": "f21416e3183d75166523170c6e19ac207cbedcc3d901fe476fd85e139419d4a3"
+          }
+        ],
+        "complete": "b66bce791b0160627f50d7d08c2aae20f8c3e3b940767624cd3bc8570d2e9158"
+      }
+    },
+    {
+      "name": "18 weeks, four-day 48 km/18 km, q1",
+      "previousSnapshot": "84e7363d13f055dad72f024647c18100075192b75393443114cb1c15ead3e0a0",
+      "previousExecution": "bac9ba5d6d25145eff238205a400b2f8dd8b3db70bf2cf37f84136a95a6d09ca",
+      "executionUnchanged": false,
+      "expectedExecution": "d8c84fbe1fe7488a250f4527554ee33a5a6af11099672ff50531f1613d0bb57f",
+      "expected": {
+        "profile": "eadd8e8d661a601a41c55a19ff9e170e87a8f0772c92179af254637cce873664",
+        "notes": "4868351a23804aa887822824bcd044abba81eb0f68d18b5bc0d944a8e0d0f9a6",
+        "feasibility": "bd5ba989b185b0eeea1c1f23c20d56bef14407f4195d48da5a1fb7ca207235f2",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Foundation",
+            "trainingKm": 48,
+            "longKm": 18,
+            "hash": "1c0b1fcbfaf0e4fa639a2077757315b7a785afcb28b869b306812416b585bb6c"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Foundation",
+            "trainingKm": 48,
+            "longKm": 18,
+            "hash": "f05eac781410b9c26ee29b4ab045adafd29b7c248bc0cee945528f69edd12587"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Foundation",
+            "trainingKm": 50.8,
+            "longKm": 20,
+            "hash": "889566863db8fb7a79df79361821e5466bf0724ea9ff44330a464e191a8fc685"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 34.4,
+            "longKm": 15,
+            "hash": "e856b8dd41c73ee60caf1764d8333ea570cbda8f07b6fbc119e48c3b6d868ebe"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Foundation",
+            "trainingKm": 53.8,
+            "longKm": 22,
+            "hash": "5c00a23cb9e0b7e3784fe0df384b35b69a68c9c83e021126b03f981f65518f87"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Foundation",
+            "trainingKm": 53.8,
+            "longKm": 24,
+            "hash": "bb7c7e902a262e0e1a3b5bb58622e3865814e28e98733ad7b0833038e6426bf2"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Build",
+            "trainingKm": 56.8,
+            "longKm": 25,
+            "hash": "a4656ab97bc2ba9da9ba198f1d4cd8d319c2f51cf6129e5644735f73880c15d7"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Recovery",
+            "trainingKm": 39.6,
+            "longKm": 17,
+            "hash": "eedce442e0bf0cdf585102ea913df1d5265e5fe97e6c473cbc0a8766a48953b3"
+          },
+          {
+            "index": 8,
+            "start": "2026-11-16",
+            "phase": "Build",
+            "trainingKm": 59.8,
+            "longKm": 26,
+            "hash": "dbf62412591051d2fca91e5ad257bdebb010b1fc9126dd042ed47022b13b3708"
+          },
+          {
+            "index": 9,
+            "start": "2026-11-23",
+            "phase": "Build",
+            "trainingKm": 59.8,
+            "longKm": 26,
+            "hash": "a64b52b3037cad14e94781d2957ff557b3fb794fed9adf2b982ba1da81fff813"
+          },
+          {
+            "index": 10,
+            "start": "2026-11-30",
+            "phase": "Build",
+            "trainingKm": 62.8,
+            "longKm": 28,
+            "hash": "be65e04681e7303b393e891712b4cf8887914485616e6f1170a2266f9aeb6516"
+          },
+          {
+            "index": 11,
+            "start": "2026-12-07",
+            "phase": "Recovery",
+            "trainingKm": 42.9,
+            "longKm": 18,
+            "hash": "b08ccd532e7b931ba32480ff8c1948b894d4059b907c11ae39aebd266b588701"
+          },
+          {
+            "index": 12,
+            "start": "2026-12-14",
+            "phase": "Race preparation",
+            "trainingKm": 62.8,
+            "longKm": 28,
+            "hash": "cce03584b409f5d591358eff518e4c119c5c13b3cdd151518cec2978b500a014"
+          },
+          {
+            "index": 13,
+            "start": "2026-12-21",
+            "phase": "Race preparation",
+            "trainingKm": 62.8,
+            "longKm": 28,
+            "hash": "3a9358795c85a6e3102d670b7efafb38f2ea36832a234acbfd408c7370e4d0ea"
+          },
+          {
+            "index": 14,
+            "start": "2026-12-28",
+            "phase": "Race preparation",
+            "trainingKm": 62.8,
+            "longKm": 28,
+            "hash": "89d4f423df56e3df910b9e44dfbbd89d0962db11e69129f944193175622a4f6a"
+          },
+          {
+            "index": 15,
+            "start": "2027-01-04",
+            "phase": "Taper",
+            "trainingKm": 46.9,
+            "longKm": 21,
+            "hash": "c65bae31c861d4dcd1cbe3069dfde7af44d235bed1c49bc322d4284b46eba4de"
+          },
+          {
+            "index": 16,
+            "start": "2027-01-11",
+            "phase": "Taper",
+            "trainingKm": 37.7,
+            "longKm": 16,
+            "hash": "9d94fe7afd997e216e271167c28f67fa5038b5955c655925c9426566f49f0e4e"
+          },
+          {
+            "index": 17,
+            "start": "2027-01-18",
+            "phase": "Race week",
+            "trainingKm": 24.9,
+            "longKm": 0,
+            "hash": "e326d03908fed721f5b7b013f287f9535a1605f62ed6fc692025f119a4dc6468"
+          }
+        ],
+        "complete": "1973b37de98d209df2d59448e4fc95ed52cd1626cd141d1ca92d1a605ac3ed76"
+      }
+    },
+    {
+      "name": "18 weeks, six-day 100 km/26 km, q0",
+      "previousSnapshot": "2d2c626295a3cb5dad31a6f342e8112a778d5a9a14d6f8d32df16477aba3706c",
+      "previousExecution": "36c938d423bd49c17267349a67dbf2aaf748eb214be87e16c5f323976aa8cf28",
+      "executionUnchanged": true,
+      "expectedExecution": "36c938d423bd49c17267349a67dbf2aaf748eb214be87e16c5f323976aa8cf28",
+      "expected": {
+        "profile": "cd5d83cb84ddc845d14a2e41dfdbae75d27af5281aa8e710e68d6fb6bd329c1f",
+        "notes": "4868351a23804aa887822824bcd044abba81eb0f68d18b5bc0d944a8e0d0f9a6",
+        "feasibility": "bd5ba989b185b0eeea1c1f23c20d56bef14407f4195d48da5a1fb7ca207235f2",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Foundation",
+            "trainingKm": 100,
+            "longKm": 26,
+            "hash": "d6e2d4be87329543b3900f875fe7ba317ac8fd787201caf428627aab6f22526b"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Foundation",
+            "trainingKm": 100,
+            "longKm": 26,
+            "hash": "e17411189bfc059fea7dc0e0fb4450744d08ef46c74d6d3fc7b26e19bddb3aec"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Foundation",
+            "trainingKm": 103,
+            "longKm": 26,
+            "hash": "54772627e22b2a2e9c2d86c3a92beac1dd965a5923fb6a8f09746e3fe62948b2"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 72,
+            "longKm": 20,
+            "hash": "e2ed7011146f78435d0f1fb579a1005feb5d8eebe9010b36edbd43a80b3a0e7b"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Foundation",
+            "trainingKm": 106,
+            "longKm": 26,
+            "hash": "fe7276884371054e0a4e4ae5dfc9e3171aa0fb42522380d1364c6d8c4697a199"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Foundation",
+            "trainingKm": 106,
+            "longKm": 28,
+            "hash": "d902d4897a3558b9ff5527c7ad18fe07aa3b78e1c2c67672d9cf0888cb64d16e"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Build",
+            "trainingKm": 109,
+            "longKm": 28,
+            "hash": "bf8733d291040ca7bc6ec9c1c7d2464bf431c121884b389e521ec7d4e518e1c7"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Recovery",
+            "trainingKm": 76.2,
+            "longKm": 22,
+            "hash": "7ab2e645989a75a939f9efe720f17a8befa3b93e8f88dd90981f8e52d5950d57"
+          },
+          {
+            "index": 8,
+            "start": "2026-11-16",
+            "phase": "Build",
+            "trainingKm": 112,
+            "longKm": 28,
+            "hash": "b67e4a6837d95c27849ad2b61f23e7fe8a4e0cac5202e6c9ad3abe6dbb64191e"
+          },
+          {
+            "index": 9,
+            "start": "2026-11-23",
+            "phase": "Build",
+            "trainingKm": 112,
+            "longKm": 30,
+            "hash": "f3a0dd0d1f5318754d115bf11c7c7d519d326bf025e61e3f60751a92c5f1ff06"
+          },
+          {
+            "index": 10,
+            "start": "2026-11-30",
+            "phase": "Build",
+            "trainingKm": 115,
+            "longKm": 32,
+            "hash": "11120a02a6b028a8cb241946e4b47e032e0626985c97bb0813261ef0760b73c5"
+          },
+          {
+            "index": 11,
+            "start": "2026-12-07",
+            "phase": "Recovery",
+            "trainingKm": 80.4,
+            "longKm": 25,
+            "hash": "2b23166252e79746b5b2565ccae80d2b283296b5ce5df1e78e6da0338efb2d1a"
+          },
+          {
+            "index": 12,
+            "start": "2026-12-14",
+            "phase": "Race preparation",
+            "trainingKm": 115,
+            "longKm": 34,
+            "hash": "9446112a68a0d8e7c374d06ae5dd0e49106f3d1d1def2771fbe1f39bac14cf11"
+          },
+          {
+            "index": 13,
+            "start": "2026-12-21",
+            "phase": "Race preparation",
+            "trainingKm": 115,
+            "longKm": 34,
+            "hash": "c56edf30a1d629e6b0c3d6283f6800e3f1bc8b9abda826e7aa4eb6f687876c30"
+          },
+          {
+            "index": 14,
+            "start": "2026-12-28",
+            "phase": "Race preparation",
+            "trainingKm": 115,
+            "longKm": 35,
+            "hash": "5e3adc7e9d6b201cc7f4cbda8a6cc4a8b1883e6f68fdefb95daa420acf6ef10f"
+          },
+          {
+            "index": 15,
+            "start": "2027-01-04",
+            "phase": "Taper",
+            "trainingKm": 86.2,
+            "longKm": 26,
+            "hash": "8c959e94aa9ef83985e07d2dd4344d7e3313f68448810daa144fd3d2379b7e54"
+          },
+          {
+            "index": 16,
+            "start": "2027-01-11",
+            "phase": "Taper",
+            "trainingKm": 69,
+            "longKm": 21,
+            "hash": "28e658c479ef9ac8dad7ce25905af14e8578c725be617e21ae5385216b5c083b"
+          },
+          {
+            "index": 17,
+            "start": "2027-01-18",
+            "phase": "Race week",
+            "trainingKm": 46,
+            "longKm": 0,
+            "hash": "a987c7a0dcb3e6834ddb7b13ec945347d4e1e91511a4235e09c29bb53c832c90"
+          }
+        ],
+        "complete": "bd69fd4e26fc5f3b2b042ed4d91ff24cb83309e785c7e64d3c623ad2269e4819"
+      }
+    },
+    {
+      "name": "18 weeks, six-day 100 km/26 km, q1",
+      "previousSnapshot": "142acfecbff25a0bb4cf49899783423582f6c6130d3fd0c80fb6e44fa09a730e",
+      "previousExecution": "a3b14fbb4fed48c534fa7f9e1e4372adf61043c76adc965810e8a411021645a9",
+      "executionUnchanged": false,
+      "expectedExecution": "225dc1f6ac0ed5c028a6ca2e880d80c54cae7467ca5726574f6d7ca09bb4e1fa",
+      "expected": {
+        "profile": "0f61384fca865966f97498707a63f0b092ba4096792efed3170ec26964e029cf",
+        "notes": "4868351a23804aa887822824bcd044abba81eb0f68d18b5bc0d944a8e0d0f9a6",
+        "feasibility": "bd5ba989b185b0eeea1c1f23c20d56bef14407f4195d48da5a1fb7ca207235f2",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Foundation",
+            "trainingKm": 100,
+            "longKm": 26,
+            "hash": "7b8ebe67c2880aee2eca1d44639c105d542850c3e4e8d041497bc4b46c6d8835"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Foundation",
+            "trainingKm": 100,
+            "longKm": 26,
+            "hash": "37ee4155786082aa86ce04160e36b2834c4d567cedb594236fcf05e6b5d8d868"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Foundation",
+            "trainingKm": 103,
+            "longKm": 26,
+            "hash": "055aae1c14c6a27c7e4b3e38cbe77ae5d2e7d3422636746fccbb07f310df7f3e"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 72,
+            "longKm": 20,
+            "hash": "02cbdf915128672a0ca485b49b84f27416ce29a98041da8f3e3bc4315828f56a"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Foundation",
+            "trainingKm": 106,
+            "longKm": 26,
+            "hash": "aa1b2ed5cb483078718719ac61a287862452634bdf9c3e846da1d5d4899b1cfe"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Foundation",
+            "trainingKm": 106,
+            "longKm": 28,
+            "hash": "2a618402eeb4076b0b3397b40c3b396ea8bfbbf3b985e3ed202102f7002ea8e7"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Build",
+            "trainingKm": 109,
+            "longKm": 28,
+            "hash": "cfddf1e1ba28a2c59ac44b7a52d1cd6cb523f2f8a46f968f40e599e170d9eb7e"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Recovery",
+            "trainingKm": 76.2,
+            "longKm": 22,
+            "hash": "20866210b19dd5c6893a1ec66dde237d3739d70a2086cfd0e6b72bb611a83aa5"
+          },
+          {
+            "index": 8,
+            "start": "2026-11-16",
+            "phase": "Build",
+            "trainingKm": 112,
+            "longKm": 28,
+            "hash": "4e49ecf0813be021aa2eb91ae6b64e404320eacf3bc0d8712ee19d36cedcdc5d"
+          },
+          {
+            "index": 9,
+            "start": "2026-11-23",
+            "phase": "Build",
+            "trainingKm": 112,
+            "longKm": 30,
+            "hash": "b9efce26a47aefba19c5e6d697a45116eaa8acc2ad571746d809bb89e76f3cf7"
+          },
+          {
+            "index": 10,
+            "start": "2026-11-30",
+            "phase": "Build",
+            "trainingKm": 115,
+            "longKm": 32,
+            "hash": "a1fbd398cd3b8b97fe9d89ed131ca3909120a8f71cbb72669c8d22c89d64451c"
+          },
+          {
+            "index": 11,
+            "start": "2026-12-07",
+            "phase": "Recovery",
+            "trainingKm": 80.4,
+            "longKm": 25,
+            "hash": "f3f7cfa5cd5959f8f94b505588888a8ec00ad09d902b10fa68dd09258cccfce8"
+          },
+          {
+            "index": 12,
+            "start": "2026-12-14",
+            "phase": "Race preparation",
+            "trainingKm": 115,
+            "longKm": 34,
+            "hash": "e30c574aaf573020da117b4468e3c0efc6c6a24a4cb1958c39ecebc98bacce9d"
+          },
+          {
+            "index": 13,
+            "start": "2026-12-21",
+            "phase": "Race preparation",
+            "trainingKm": 115,
+            "longKm": 34,
+            "hash": "ac57ab651a9ce4882f0ffdbe656fa1e7e34023a14f7541217e7030feb82c9599"
+          },
+          {
+            "index": 14,
+            "start": "2026-12-28",
+            "phase": "Race preparation",
+            "trainingKm": 115,
+            "longKm": 35,
+            "hash": "afb627bc50080c509b76dcc58ad7b98c99e210b16b110353f001081d0ffaffb2"
+          },
+          {
+            "index": 15,
+            "start": "2027-01-04",
+            "phase": "Taper",
+            "trainingKm": 86.2,
+            "longKm": 26,
+            "hash": "9a9fd3507268d1082167279f2353a5188e2d868d105f807f7b01158594db7c2a"
+          },
+          {
+            "index": 16,
+            "start": "2027-01-11",
+            "phase": "Taper",
+            "trainingKm": 69,
+            "longKm": 21,
+            "hash": "eed9aa707f629d214a6bfa47c7fe2bb043ae591e898f19abfa609ca2c390a9ec"
+          },
+          {
+            "index": 17,
+            "start": "2027-01-18",
+            "phase": "Race week",
+            "trainingKm": 46,
+            "longKm": 0,
+            "hash": "838da016aeb3bbc834e375740d35c0ca169cf3915904ba72af58ad0874baeb09"
+          }
+        ],
+        "complete": "96d7273a16f6047c2ce50be27c40889972c011cee26a4788bcfc281498178cf1"
+      }
+    },
+    {
+      "name": "18 weeks, six-day 100 km/26 km, q2",
+      "previousSnapshot": "d2eee7ff85dffc4e4f42ae28dda981fdf8c74978738f01013db187c337da8bfc",
+      "previousExecution": "61d6a455115d69eafff05570d54c1a0dc52455bfcf7f2db87dc394eaedb9d71d",
+      "executionUnchanged": false,
+      "expectedExecution": "45b1f3aaf6d18200beba4e0f7d3aa605f13ca9384dbee261c8960f5f53a263de",
+      "expected": {
+        "profile": "761ac56c60c4c6ed92bae578e7dfe2d8f3cb2f933c830aee73442acbe6a93663",
+        "notes": "4868351a23804aa887822824bcd044abba81eb0f68d18b5bc0d944a8e0d0f9a6",
+        "feasibility": "bd5ba989b185b0eeea1c1f23c20d56bef14407f4195d48da5a1fb7ca207235f2",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Foundation",
+            "trainingKm": 100,
+            "longKm": 26,
+            "hash": "fa67e2b85881bf5f07780548a5f9991161a6b8d4480b222edd859ebe1e2397b6"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Foundation",
+            "trainingKm": 100,
+            "longKm": 26,
+            "hash": "2763a564d5439bded00fd95373a0ec92cf5fd7a256eb3ebed0a75f1248afa343"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Foundation",
+            "trainingKm": 103,
+            "longKm": 26,
+            "hash": "c0903f1a0733573636847565d750a270ce598276364f3cfd2233e7200131e737"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 72,
+            "longKm": 20,
+            "hash": "d30f373485d1bfeb1fb5c7ed0838b1c906d0c70c6066113f22708b8e3d620675"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Foundation",
+            "trainingKm": 105.3,
+            "longKm": 26,
+            "hash": "19e01ca32244cd6a395b5565339386c9858f365297bfb021133bc2e8455d9bd4"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Foundation",
+            "trainingKm": 106,
+            "longKm": 28,
+            "hash": "775d19918dfbf909ff9483838f9178d264f35e138627b6ca857100a57f8ba2fc"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Build",
+            "trainingKm": 109,
+            "longKm": 28,
+            "hash": "10ab631ade4d1a4330bbb7b5d3fb407666da8e64c1bb51327ce8d5f33c2f58fa"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Recovery",
+            "trainingKm": 76.2,
+            "longKm": 22,
+            "hash": "60f182a543b2a09babd7d1656c1eb4b4ceccadfb1337948f9455526db0d3685c"
+          },
+          {
+            "index": 8,
+            "start": "2026-11-16",
+            "phase": "Build",
+            "trainingKm": 111.4,
+            "longKm": 28,
+            "hash": "03401621fdb2a44403644aeedcc474b4c4524b9da3ad8f5b4f0830ad0e365347"
+          },
+          {
+            "index": 9,
+            "start": "2026-11-23",
+            "phase": "Build",
+            "trainingKm": 112,
+            "longKm": 30,
+            "hash": "835ac5c577f9bacec7206b76b6d3f305d3e5885ebfa6503e0f3174a08ab9a3f1"
+          },
+          {
+            "index": 10,
+            "start": "2026-11-30",
+            "phase": "Build",
+            "trainingKm": 115,
+            "longKm": 32,
+            "hash": "47709a13d94861e324817e320775929ddfecbbf25c890e411dada05da758c465"
+          },
+          {
+            "index": 11,
+            "start": "2026-12-07",
+            "phase": "Recovery",
+            "trainingKm": 80.4,
+            "longKm": 25,
+            "hash": "85cbefbf913b6e3f33229ae76d17a3209e77d12d90d9f07d67a221b7c79c6889"
+          },
+          {
+            "index": 12,
+            "start": "2026-12-14",
+            "phase": "Race preparation",
+            "trainingKm": 115,
+            "longKm": 34,
+            "hash": "917f4625e2ee51da850b3eff34494e61f8260d3ca56e924b1ca518f21551796e"
+          },
+          {
+            "index": 13,
+            "start": "2026-12-21",
+            "phase": "Race preparation",
+            "trainingKm": 115,
+            "longKm": 34,
+            "hash": "235334075c31ef385948bee2184ef9f653db19d3f4e68c5e9ee01127f63fba57"
+          },
+          {
+            "index": 14,
+            "start": "2026-12-28",
+            "phase": "Race preparation",
+            "trainingKm": 115,
+            "longKm": 35,
+            "hash": "1e102a9b8e1e80950b45cae68e208f1b9bbc8a28b7600f052c41eb8ce8c8beda"
+          },
+          {
+            "index": 15,
+            "start": "2027-01-04",
+            "phase": "Taper",
+            "trainingKm": 86.2,
+            "longKm": 26,
+            "hash": "8b6cd430bda3e8666c519746837c94eb2e2b7fc2f10d4a6f8145b76f48fb5fd9"
+          },
+          {
+            "index": 16,
+            "start": "2027-01-11",
+            "phase": "Taper",
+            "trainingKm": 69,
+            "longKm": 21,
+            "hash": "8b3ae65e31c4a2f900f95024346489d6036174dc7ca00d44c8490673ccc343f5"
+          },
+          {
+            "index": 17,
+            "start": "2027-01-18",
+            "phase": "Race week",
+            "trainingKm": 46,
+            "longKm": 0,
+            "hash": "33396fad15e8e2c75d53d75954c0af9585af81f1ca639ca48e347f21cab08959"
+          }
+        ],
+        "complete": "f3ec9b25071cc02084a8bc2ca41887dcfd686a9149c13133c8386bee3c13a36f"
+      }
+    },
+    {
+      "name": "18 weeks, benchmark-derived paces and timed easy runs",
+      "previousSnapshot": "093b7ba2c2031b28685d409826d1fcc68e39c374252c2735a6995ce0d58d62cf",
+      "previousExecution": "ec077f5831b5ed0494d60b7bdcc85e03e853d535d8d16ee7a3238879414a46d2",
+      "executionUnchanged": false,
+      "expectedExecution": "f5d3bcef9b464a56a6afd22cdfabd7239c896e0ffbd13efebc94de17416d2b9d",
+      "expected": {
+        "profile": "2fb0d6bc6f8a794fd3746029bbc113a1526c82eec4830d46983a5b4fd1ee7763",
+        "notes": "639c9cca05a7da9249de41fee54aa3f90e0a6f706548bc727ee35e01711ea03b",
+        "feasibility": "bd5ba989b185b0eeea1c1f23c20d56bef14407f4195d48da5a1fb7ca207235f2",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Foundation",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "1961c71f2c6cb3af6c91312f5f3b6350a154b18d386ba713b4a3feda2c6bc243"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Foundation",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "1bd869b90facbea75b5c8b9cec410739c8feff6e23bd8ed5e65a0aa4e14a2a1b"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Foundation",
+            "trainingKm": 73,
+            "longKm": 25,
+            "hash": "0458f0725ec6286c759430549996231a80b5acbf189188ebcc16266775e52271"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 49.6,
+            "longKm": 19,
+            "hash": "874acdfbf2617aca9a338c6e4e45fd6be5f392e27b9f22f1ef67b4126f0da24a"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Foundation",
+            "trainingKm": 76,
+            "longKm": 25,
+            "hash": "4b5d0902558d175c6974f5980b3306e7a5155d8d3f5d7bdd4b8e4ffd73fee6a3"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Foundation",
+            "trainingKm": 76,
+            "longKm": 27,
+            "hash": "b198d5abbeb9047a3c74659b4d38e262acb0c91052a8b5c13e51d165044ceed9"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Build",
+            "trainingKm": 79,
+            "longKm": 27,
+            "hash": "cbc5b60ce9612d991d7f66e8f864cad015b87a6fd12b78da0c02f644a32ee4d2"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Recovery",
+            "trainingKm": 53.7,
+            "longKm": 20,
+            "hash": "56db1914aea80f8d322ca6abb7111a8d59f83b09f35d9dcd0461cc3d04da3a2b"
+          },
+          {
+            "index": 8,
+            "start": "2026-11-16",
+            "phase": "Build",
+            "trainingKm": 82,
+            "longKm": 28,
+            "hash": "fd5e99873a4ad2585ae40ed1f7f2ce0d03e15860cc240feeefa62182afda49a7"
+          },
+          {
+            "index": 9,
+            "start": "2026-11-23",
+            "phase": "Build",
+            "trainingKm": 82,
+            "longKm": 29,
+            "hash": "fa843ef66474295531307fa39f7f01dd8864a14ef9410784d46a0bf75698c323"
+          },
+          {
+            "index": 10,
+            "start": "2026-11-30",
+            "phase": "Build",
+            "trainingKm": 85,
+            "longKm": 31,
+            "hash": "61024525f12e15ad4405bc2aa36461d97d5aced68c56f13a1ee9ea9131e82f30"
+          },
+          {
+            "index": 11,
+            "start": "2026-12-07",
+            "phase": "Recovery",
+            "trainingKm": 59.4,
+            "longKm": 24,
+            "hash": "d02cc05e19cde4856dd7556eacbfa89dc1c1ab70f6876e3ef47c3eeb0d469166"
+          },
+          {
+            "index": 12,
+            "start": "2026-12-14",
+            "phase": "Race preparation",
+            "trainingKm": 85,
+            "longKm": 31,
+            "hash": "83c909cefd68995d81127f352feff290e88a9c246ba80fd08472c582561bf162"
+          },
+          {
+            "index": 13,
+            "start": "2026-12-21",
+            "phase": "Race preparation",
+            "trainingKm": 85,
+            "longKm": 33,
+            "hash": "9dab7468df06571b1eb273ad3a235b9a0c2bf16afa3a321decfa00229aaf773a"
+          },
+          {
+            "index": 14,
+            "start": "2026-12-28",
+            "phase": "Race preparation",
+            "trainingKm": 85,
+            "longKm": 35,
+            "hash": "5799e462212fdc9ed6fd89157d18ba823096758a4165213bd07d7e6b143c2585"
+          },
+          {
+            "index": 15,
+            "start": "2027-01-04",
+            "phase": "Taper",
+            "trainingKm": 63.7,
+            "longKm": 26,
+            "hash": "20fb9f7f2285e2b2db64cd134e9aea669775957b831d32c1f99554bf9691366a"
+          },
+          {
+            "index": 16,
+            "start": "2027-01-11",
+            "phase": "Taper",
+            "trainingKm": 51,
+            "longKm": 21,
+            "hash": "1f98ed7f06994bf6c06fdbcc9a35e1624597f8eb6b317f90dac45f683465f8fb"
+          },
+          {
+            "index": 17,
+            "start": "2027-01-18",
+            "phase": "Race week",
+            "trainingKm": 34,
+            "longKm": 0,
+            "hash": "ac310df33ddec3ff6555b8ea40aa672801187c3f2b58e084ea9c9fc76e323ce0"
+          }
+        ],
+        "complete": "01068ee705e6817481fb320f3c39be290a5e41c70bf2ba04a480792bff682125"
+      }
+    },
+    {
+      "name": "18 weeks, fractional declared baseline",
+      "previousSnapshot": "3a1689172e0e3dc6e176ff9f04d6bc6d1c453a1d75e4cdf90834b611b0af01a0",
+      "previousExecution": "7d496a4c770fe339e97dd41ef86cace1557138e24a760c68e90c06dceb9d2069",
+      "executionUnchanged": false,
+      "expectedExecution": "d036de5c1073235cdabf81ead240379a25a3b4ccd1e22ec01e63497af1495772",
+      "expected": {
+        "profile": "17d36bc22c199361456ad11e1d48cd76b681fb4ac5daae554fa3175f6534744e",
+        "notes": "4868351a23804aa887822824bcd044abba81eb0f68d18b5bc0d944a8e0d0f9a6",
+        "feasibility": "bd5ba989b185b0eeea1c1f23c20d56bef14407f4195d48da5a1fb7ca207235f2",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Foundation",
+            "trainingKm": 70.5,
+            "longKm": 23.7,
+            "hash": "22b089baab954aee2957eec084f473dc3c226a05c8ba408d6befe51ef36b2112"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Foundation",
+            "trainingKm": 70.5,
+            "longKm": 24,
+            "hash": "e574d365c0f3b656a95f3adcfa415637c176c82dfae81676146774488e8f76c0"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Foundation",
+            "trainingKm": 73.4,
+            "longKm": 25,
+            "hash": "9a8b38562bee3ccb1e65bbb1f73f58a873ba5c0f7a73886f545c6197e0294aed"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 51.2,
+            "longKm": 20,
+            "hash": "7dbc037dc33590fe75211f916a28c45d82f69ea72b3586b07226e6d1fd4669d4"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Foundation",
+            "trainingKm": 76.5,
+            "longKm": 25,
+            "hash": "b6eb0ea8a3986c3674a5ac243b271e8b3181f43fb9f09e2b7002108e17eb9825"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Foundation",
+            "trainingKm": 76.5,
+            "longKm": 27,
+            "hash": "42b20a4cb549e43a58ec7d5c4eb71403e43f2ffeb9c4744f86f8b9219ae7526c"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Build",
+            "trainingKm": 79.5,
+            "longKm": 27,
+            "hash": "d0e8222c9be28055f8bf93182ee17e72f32513bf65242f19f0d878f953729dc1"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Recovery",
+            "trainingKm": 55.5,
+            "longKm": 21,
+            "hash": "6343ece16f1e9b2d42385aef97ca3678c0c1c1566ff4d7a4a52a70a21c338e0d"
+          },
+          {
+            "index": 8,
+            "start": "2026-11-16",
+            "phase": "Build",
+            "trainingKm": 82.4,
+            "longKm": 28,
+            "hash": "8fec7c64ecf8724e83f1ec11704ff93d5286dd208f41a4319f2e396e68552c80"
+          },
+          {
+            "index": 9,
+            "start": "2026-11-23",
+            "phase": "Build",
+            "trainingKm": 82.5,
+            "longKm": 29,
+            "hash": "5d5c2bfba2453c4f64b426dee7a90618a355037064b5f943fb0e8bffea74bea3"
+          },
+          {
+            "index": 10,
+            "start": "2026-11-30",
+            "phase": "Build",
+            "trainingKm": 85.4,
+            "longKm": 31,
+            "hash": "6d641c4ebeef77b758466db297c2cae3a057e9f380eaf5b0a3046dbaf4826150"
+          },
+          {
+            "index": 11,
+            "start": "2026-12-07",
+            "phase": "Recovery",
+            "trainingKm": 59.7,
+            "longKm": 24,
+            "hash": "dda69c5040839e6564a2f1293f574827b3db03a65ac88a1d442fdc403653950f"
+          },
+          {
+            "index": 12,
+            "start": "2026-12-14",
+            "phase": "Race preparation",
+            "trainingKm": 85.4,
+            "longKm": 31,
+            "hash": "d8949c80362c8338507ead01df2347fde3eb07f609728e87617ebcec91937567"
+          },
+          {
+            "index": 13,
+            "start": "2026-12-21",
+            "phase": "Race preparation",
+            "trainingKm": 85.5,
+            "longKm": 33,
+            "hash": "cb84ea4a817d93ffeaeb694309195fed6c6026a1d9e06695597879ee7d51fb11"
+          },
+          {
+            "index": 14,
+            "start": "2026-12-28",
+            "phase": "Race preparation",
+            "trainingKm": 85.5,
+            "longKm": 35,
+            "hash": "81c799fe37e263188d2c02ff9fd7449eb2a87faa49b86fdb84c7f42e7dd532d2"
+          },
+          {
+            "index": 15,
+            "start": "2027-01-04",
+            "phase": "Taper",
+            "trainingKm": 63.5,
+            "longKm": 26,
+            "hash": "5caadbbdc8f066f14ac2893c074fd7da3ac6431582579064982fcf8f80413805"
+          },
+          {
+            "index": 16,
+            "start": "2027-01-11",
+            "phase": "Taper",
+            "trainingKm": 51.1,
+            "longKm": 21,
+            "hash": "c1c2e522b299a8478f1c6ff29a40da4ad872d82ec3bfc0e588b2abc8e7491e57"
+          },
+          {
+            "index": 17,
+            "start": "2027-01-18",
+            "phase": "Race week",
+            "trainingKm": 34,
+            "longKm": 0,
+            "hash": "45259ede20063ae85d547f01e68eb1115e1008341edda18968f10302b3e19082"
+          }
+        ],
+        "complete": "c87314f84f13556a17badc06fb3e7f8f80415646b237284a454a88a9f4fc3172"
+      }
+    },
+    {
+      "name": "18 weeks, partial Wednesday start and Saturday race",
+      "previousSnapshot": "ad581594dd522c9f35f082236f24738425ef7f2ea0262687628e9e978e971266",
+      "previousExecution": "26a7b2a0bccea21d3faab685b66ce4b05c5ad9becaea7d23817cf2ae115a2e8e",
+      "executionUnchanged": false,
+      "expectedExecution": "746929fff896d6cd4bb978381a36f168f261187f668f70a91982df4a2e48076d",
+      "expected": {
+        "profile": "f221fa0d50007c0d436dd22f1e10a083ccd7ebae404069ee883e49c7529a3813",
+        "notes": "4868351a23804aa887822824bcd044abba81eb0f68d18b5bc0d944a8e0d0f9a6",
+        "feasibility": "847d2a41ea9241520bc206152b10d72a7956214dc0e7f8a0a7e8d243c328633d",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Foundation",
+            "trainingKm": 39.4,
+            "longKm": 18,
+            "hash": "68d1764c797e23dd028d1bd9b766bbb3b454329029a0012bffaddd1e25480fdc"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Foundation",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "7c8e9c0732763d5c574de89fcd2b076d55f0df46bf32b8d6306900b7477ed412"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Foundation",
+            "trainingKm": 72.9,
+            "longKm": 25,
+            "hash": "bae59bf4009664fe5fbb2569712167318b9da96e5ee4ba6d69a59b1a21b2d5ff"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 50.8,
+            "longKm": 20,
+            "hash": "7dfb8d6df1ceca4e7a80a79c75522eb5e766793100cd90bd38c2c906eecf3a06"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Foundation",
+            "trainingKm": 76,
+            "longKm": 25,
+            "hash": "2c48881d133ef5f5c30defd6ff980d6eb43ca0c254fb329b2d872a8cf3ac9a14"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Foundation",
+            "trainingKm": 76,
+            "longKm": 27,
+            "hash": "3a83aaa1c29db985d99467724c29675b441d5ba33505e7e95f81d2d5624a1ff5"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Build",
+            "trainingKm": 78.9,
+            "longKm": 27,
+            "hash": "c369aae76c3a646910e24d60b59df66d793e0a1a635ad59ad4389ef7a58bf691"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Recovery",
+            "trainingKm": 55.1,
+            "longKm": 21,
+            "hash": "03025ac51fc18ab4151264c042670e5b32f25cd1a3616b4c5764c06b0cac4771"
+          },
+          {
+            "index": 8,
+            "start": "2026-11-16",
+            "phase": "Build",
+            "trainingKm": 82,
+            "longKm": 28,
+            "hash": "36a962ed016c897aa7ff8d355b925d13d15eda0d0c8e779d9144abf449140f90"
+          },
+          {
+            "index": 9,
+            "start": "2026-11-23",
+            "phase": "Build",
+            "trainingKm": 82,
+            "longKm": 29,
+            "hash": "b53215f43ffcd83ddc4757a4986851938636451907f9b64b852184652cab4913"
+          },
+          {
+            "index": 10,
+            "start": "2026-11-30",
+            "phase": "Build",
+            "trainingKm": 85,
+            "longKm": 31,
+            "hash": "92ab5a1695995eb7e9fcb9f55d61b1ee1ec666431bda0c76b2479b6727003a96"
+          },
+          {
+            "index": 11,
+            "start": "2026-12-07",
+            "phase": "Recovery",
+            "trainingKm": 59.1,
+            "longKm": 24,
+            "hash": "2f89d3e1e37a4beefb782337bc3e7fb8c2e0e0a8f252d0feee62b2c9211d2dd9"
+          },
+          {
+            "index": 12,
+            "start": "2026-12-14",
+            "phase": "Race preparation",
+            "trainingKm": 85,
+            "longKm": 31,
+            "hash": "1b9b7232a079517085f8c6c3add8f53dc23c3c05de8f1929d89e5ac43f92860d"
+          },
+          {
+            "index": 13,
+            "start": "2026-12-21",
+            "phase": "Race preparation",
+            "trainingKm": 85,
+            "longKm": 33,
+            "hash": "47bb25712f8ff01332250a3bdd725fcdc527c17afc8d7ac16e7a6663267ddc04"
+          },
+          {
+            "index": 14,
+            "start": "2026-12-28",
+            "phase": "Race preparation",
+            "trainingKm": 84.8,
+            "longKm": 35,
+            "hash": "f8b527f743090c8019042f640ae226d185681bdd38d96c877c67c05a5b6e082e"
+          },
+          {
+            "index": 15,
+            "start": "2027-01-04",
+            "phase": "Taper",
+            "trainingKm": 63.6,
+            "longKm": 26,
+            "hash": "25ce0a44664c7262ea337a18ce7b8e76e5044a5cd74b820c6201723eba6cffa9"
+          },
+          {
+            "index": 16,
+            "start": "2027-01-11",
+            "phase": "Taper",
+            "trainingKm": 50.9,
+            "longKm": 21,
+            "hash": "872f464346b1dc6b8d73b643c75415071de9f968e2f66db6512f951d322b5dab"
+          },
+          {
+            "index": 17,
+            "start": "2027-01-18",
+            "phase": "Race week",
+            "trainingKm": 33.8,
+            "longKm": 0,
+            "hash": "f48a546860b4f90f83c1b7e950a52319566feb55c309e3ec3fcaf7975fa8aebf"
+          }
+        ],
+        "complete": "7bbf55bf95519e9cd7761f721e31985ab9afdae2495131f6a29d304f17548487"
+      }
+    },
+    {
+      "name": "18 weeks, automatic workout choice",
+      "previousSnapshot": "04a41741b012a0cd0cae3e9ad0dcabac657e06b4af236459d9605d0c5e4d2c5f",
+      "previousExecution": "03b519744fc9674feefb91799e86843a1dadfda28a71a7eca60296fbc32cb6eb",
+      "executionUnchanged": false,
+      "expectedExecution": "666733a5cf87ec4993cac01e84ff8e4c00e685cb9789dd36432eb4fec85ffe33",
+      "expected": {
+        "profile": "8549e9f31e65d3534f89ba4e68a1cdfead3df0b1b9fa104b67e527263893477e",
+        "notes": "4868351a23804aa887822824bcd044abba81eb0f68d18b5bc0d944a8e0d0f9a6",
+        "feasibility": "bd5ba989b185b0eeea1c1f23c20d56bef14407f4195d48da5a1fb7ca207235f2",
+        "weeks": [
+          {
+            "index": 0,
+            "start": "2026-09-21",
+            "phase": "Foundation",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "43f6fb96d3e5d6d1726a1220379cb438639aa7f27fa81d6ff8d743c98c98aed7"
+          },
+          {
+            "index": 1,
+            "start": "2026-09-28",
+            "phase": "Foundation",
+            "trainingKm": 70,
+            "longKm": 23,
+            "hash": "1b042df9c2efa5f19681b7f2cb5898d0d6ceca2986a50c798b8d543dfb837ac2"
+          },
+          {
+            "index": 2,
+            "start": "2026-10-05",
+            "phase": "Foundation",
+            "trainingKm": 72.9,
+            "longKm": 25,
+            "hash": "aaaf5a44af8f2ad81c07e891cb3202f60a6e737cdb04a627e727d5cf0b1720b1"
+          },
+          {
+            "index": 3,
+            "start": "2026-10-12",
+            "phase": "Recovery",
+            "trainingKm": 50.8,
+            "longKm": 20,
+            "hash": "7645c8828e88299667b4119572470fa1320866c2ca2d4ca96b38ca36c44d39d6"
+          },
+          {
+            "index": 4,
+            "start": "2026-10-19",
+            "phase": "Foundation",
+            "trainingKm": 76,
+            "longKm": 25,
+            "hash": "bb82930871f763a200e5fac22572ee73f5087860ed2af0754bb7e794720a3b76"
+          },
+          {
+            "index": 5,
+            "start": "2026-10-26",
+            "phase": "Foundation",
+            "trainingKm": 76,
+            "longKm": 27,
+            "hash": "cc59f08c445f58efc2bccbf922b48708b95cca5cdf363b4b3f126548177f40b2"
+          },
+          {
+            "index": 6,
+            "start": "2026-11-02",
+            "phase": "Build",
+            "trainingKm": 78.9,
+            "longKm": 27,
+            "hash": "82bb23085d53665eca58c47e4652b702d05f9617862a150d4116635f5271d6d8"
+          },
+          {
+            "index": 7,
+            "start": "2026-11-09",
+            "phase": "Recovery",
+            "trainingKm": 55.1,
+            "longKm": 21,
+            "hash": "d0040bcd7309ca24bc6167f33f807693a00d7668837e26e6c17da0f47e84664a"
+          },
+          {
+            "index": 8,
+            "start": "2026-11-16",
+            "phase": "Build",
+            "trainingKm": 82,
+            "longKm": 28,
+            "hash": "e200a7489e4b298513d1ba8259a8dd658f6dbc68e547e6370895d37cdf881345"
+          },
+          {
+            "index": 9,
+            "start": "2026-11-23",
+            "phase": "Build",
+            "trainingKm": 82,
+            "longKm": 29,
+            "hash": "f489d9f9eb4c34af819187539fb414f381cc1764a292a6a4431927e481bf60b5"
+          },
+          {
+            "index": 10,
+            "start": "2026-11-30",
+            "phase": "Build",
+            "trainingKm": 85,
+            "longKm": 31,
+            "hash": "b12583a66967005de5fd210d24c5d05a4bb879cb8886bee27039e8423d0fe81c"
+          },
+          {
+            "index": 11,
+            "start": "2026-12-07",
+            "phase": "Recovery",
+            "trainingKm": 59.1,
+            "longKm": 24,
+            "hash": "320468ebcb54aee0499d08a22905769ce92f8b16757683fe7861e6b0fb5df29e"
+          },
+          {
+            "index": 12,
+            "start": "2026-12-14",
+            "phase": "Race preparation",
+            "trainingKm": 85,
+            "longKm": 31,
+            "hash": "fc20dda1dcf00befbb41f0a033281f2f8c91f34a7d72030c389b8cf10c860c8b"
+          },
+          {
+            "index": 13,
+            "start": "2026-12-21",
+            "phase": "Race preparation",
+            "trainingKm": 85,
+            "longKm": 33,
+            "hash": "a2a36c2ceea28e7ebf61097e2d1b1ef554177451e97e65006ad6679fe81c8d0a"
+          },
+          {
+            "index": 14,
+            "start": "2026-12-28",
+            "phase": "Race preparation",
+            "trainingKm": 85,
+            "longKm": 35,
+            "hash": "05a2938bb560c94d78cd5e3b2635021c16659ce27b0c9498450039b77b2da7cd"
+          },
+          {
+            "index": 15,
+            "start": "2027-01-04",
+            "phase": "Taper",
+            "trainingKm": 62.7,
+            "longKm": 26,
+            "hash": "f68bcb5fb8b0879d4cbea19ca8e3436a50834b2854b19bd55667445f074ac15c"
+          },
+          {
+            "index": 16,
+            "start": "2027-01-11",
+            "phase": "Taper",
+            "trainingKm": 50.9,
+            "longKm": 21,
+            "hash": "521619f0a4f62b05532ace5dfec5353a327cbed750bd91b1596ac517659d29bf"
+          },
+          {
+            "index": 17,
+            "start": "2027-01-18",
+            "phase": "Race week",
+            "trainingKm": 33.8,
+            "longKm": 0,
+            "hash": "fa0492ebec51cf8fcfda1ab9f37b2540f3920c30a1c5bbff34e697e15b6e96f7"
+          }
+        ],
+        "complete": "86544e4b294fc48bf735090333350e2ed331a57ee38622237fe8b2af95b66bf5"
+      }
+    }
+  ]
+}

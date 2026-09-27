@@ -1,4 +1,9 @@
 import {
+  firstRaceProfileError,
+  isFirstRaceProfile,
+} from '../first-race-policy.ts';
+import { beginnerDays, isBeginnerProfile } from '../beginner-course.ts';
+import {
   EVENT_DISTANCE_POLICY,
   EXPOSURE_ANCHORS,
   HALF_PREPARATION_MINIMUM_RUNS,
@@ -13,6 +18,7 @@ import {
 import { advancedEligibility } from '../advanced-methods.ts';
 import { validateRecentRace } from '../fitness-pacing.ts';
 import { usesMarathonBook } from '../marathon-book.ts';
+import { isRoadRaceProfile } from '../road-training-policy.ts';
 import { customizationError } from '../runner-customization.ts';
 import {
   availableRunningDays,
@@ -24,7 +30,7 @@ import {
 } from '../training-structure.ts';
 import { isLongUltra, LONG_ULTRA_POLICY } from '../ultra-policy.ts';
 import { validateWorkoutTargets } from '../workout-targets.ts';
-import { dayDiff, validDate } from './calendar.ts';
+import { dayDiff, todayInZone, validDate } from './calendar.ts';
 import { PlanError } from './errors.ts';
 import { round } from './math.ts';
 import { MAX_EVENT_KM, TRAINING_POLICY } from './policy.ts';
@@ -75,8 +81,19 @@ export function extendedUltra(p: Pick<Profile, 'goal' | 'raceDistanceKm'>) {
 
 /** Keep the setup's guidance and the server's frequency boundary in agreement. */
 export function runningDayRange(
-  p: Pick<Profile, 'currentRuns' | 'goal' | 'raceDistanceKm'>,
+  p: Pick<Profile, 'currentRuns' | 'goal' | 'raceDistanceKm' | 'planLevel'>,
 ) {
+  if (
+    p.planLevel === 'beginner' &&
+    p.currentRuns > 0 &&
+    ['5k', '10k', 'half', 'marathon'].includes(p.goal)
+  ) {
+    const min = p.goal === 'marathon' ? 4 : 3;
+    return {
+      min,
+      max: Math.min(p.goal === 'half' ? 4 : min, p.currentRuns + 1),
+    };
+  }
   return {
     min:
       trainingFamily(p) === 'ultra'
@@ -121,16 +138,24 @@ export function preparationRequirements(
       : extended
         ? PROFILE_TRAINING_LIMITS.extendedPreparationDays
         : policy.recommendedDays,
-    minWeekly: ['custom', 'ultra'].includes(p.goal)
-      ? round(interpolateReadiness(raceDistance(p), 2), 1)
-      : extended
-        ? PROFILE_TRAINING_LIMITS.extendedMinimumWeeklyKm
-        : policy.minWeekly,
-    minLong: ['custom', 'ultra'].includes(p.goal)
-      ? round(interpolateReadiness(raceDistance(p), 3), 1)
-      : extended
-        ? PROFILE_TRAINING_LIMITS.extendedMinimumLongKm
-        : policy.minLong,
+    // A continuous-running novice can enter a half block at this baseline;
+    // the forecast may still require review if it cannot reach race exposure.
+    minWeekly:
+      p.goal === 'half'
+        ? 18
+        : ['custom', 'ultra'].includes(p.goal)
+          ? round(interpolateReadiness(raceDistance(p), 2), 1)
+          : extended
+            ? PROFILE_TRAINING_LIMITS.extendedMinimumWeeklyKm
+            : policy.minWeekly,
+    minLong:
+      p.goal === 'half'
+        ? 6
+        : ['custom', 'ultra'].includes(p.goal)
+          ? round(interpolateReadiness(raceDistance(p), 3), 1)
+          : extended
+            ? PROFILE_TRAINING_LIMITS.extendedMinimumLongKm
+            : policy.minLong,
     minRuns: ['custom', 'ultra'].includes(p.goal)
       ? raceDistance(p) > EVENT_DISTANCE_POLICY.defaultUltraKm
         ? PROFILE_TRAINING_LIMITS.ultraMinimumRuns
@@ -174,7 +199,7 @@ export function customExposureKm(distance: number) {
 
 export function validateProfile(
   input: unknown,
-  _asOf?: string,
+  asOf?: string,
   historicalEligibility = false,
 ): Profile {
   if (!input || typeof input !== 'object' || Array.isArray(input))
@@ -231,6 +256,18 @@ export function validateProfile(
     );
   if (['custom', 'ultra'].includes(p.goal))
     p.raceDistanceKm = round(p.raceDistanceKm!, 4);
+  if (
+    p.planLevel !== undefined &&
+    !['beginner', 'standard'].includes(p.planLevel)
+  )
+    throw new PlanError('Choose a beginner or standard plan.');
+  if (
+    p.planLevel === 'beginner' &&
+    !['5k', '10k', 'half', 'marathon'].includes(p.goal)
+  )
+    throw new PlanError(
+      'Beginner programmes currently support 5K, 10K, half marathon and marathon.',
+    );
   const family = trainingFamily(p);
   p.raceTerrain ??= 'road';
   p.intent ??= 'improve';
@@ -250,6 +287,13 @@ export function validateProfile(
   } catch {
     throw new PlanError('Choose a valid timezone, such as Europe/London.');
   }
+  if (
+    p.recentRace?.date &&
+    p.recentRace.date > (validDate(asOf) ? asOf : todayInZone(p.timezone))
+  )
+    throw new PlanError(
+      'Recent race: a completed result cannot be in the future.',
+    );
   const length = dayDiff(p.startDate, p.raceDate);
   const requirements = preparationRequirements(p);
   if (length < 0)
@@ -369,9 +413,16 @@ export function validateProfile(
     throw new PlanError(
       'Choose whether you want short equipment practice in darkness.',
     );
+  const beginner = isBeginnerProfile(p);
+  const firstRace = isFirstRaceProfile(p);
+  if (firstRace) {
+    const error = firstRaceProfileError(p);
+    if (error) throw new PlanError(error);
+    p.qualitySessions = 0;
+  }
   const crossDays = p.crossTraining?.map((s) => s.day) ?? [];
   if (
-    crossDays.includes(p.longDay) ||
+    (!beginner && crossDays.includes(p.longDay)) ||
     p.doubleDays?.some((d) => crossDays.includes(d))
   )
     throw new PlanError(
@@ -391,7 +442,7 @@ export function validateProfile(
     throw new PlanError(
       `You want ${runs} runs but have only ${available.length} available days. Add available days or reduce runs per week.`,
     );
-  if (!available.includes(p.longDay))
+  if (!beginner && !available.includes(p.longDay))
     throw new PlanError(
       'Your preferred long-run day must be one of your available days.',
     );
@@ -411,7 +462,55 @@ export function validateProfile(
     !['automatic', 'custom'].includes(p.qualityMode)
   )
     throw new PlanError('Choose automatic or custom workout structure.');
-  if (p.qualityMode === 'automatic') p.qualitySessions = classicQualityCount(p);
+  if (
+    isRoadRaceProfile(p) &&
+    p.qualityMode === 'custom' &&
+    ![0, 1, 2].includes(p.qualitySessions ?? 1)
+  )
+    throw new PlanError('Choose zero, one or two weekday quality workouts.');
+  if (beginner && p.qualityMode === 'custom' && (p.qualitySessions ?? 0) > 0)
+    throw new PlanError(
+      'Couch to 5K uses zero speed workouts. Choose zero quality sessions or automatic structure for this beginner course.',
+    );
+  if (
+    beginner &&
+    ((p.method && p.method !== 'balanced') || p.doubleDays?.length)
+  )
+    throw new PlanError(
+      'Couch to 5K uses single, conversational run/walk sessions. Choose balanced training without doubles.',
+    );
+  if (
+    beginner &&
+    (p.weekdayMinutes < 40 || (p.weeklyMinutesLimit ?? Infinity) < 40 * runs)
+  )
+    throw new PlanError(
+      'Allow 40 minutes per beginner session, including walking warm-up and cooldown, and enough weekly time for each selected run. Later lessons need the full 40 minutes.',
+    );
+  if (
+    beginner &&
+    [p.easyLimitKm, p.qualityLimitKm, p.longLimitKm, p.peakWeeklyKm].some(
+      (v) => v != null,
+    )
+  )
+    throw new PlanError(
+      'Couch to 5K is prescribed by time. Clear distance caps and use session or weekly time limits.',
+    );
+  if (
+    isRoadRaceProfile(p) &&
+    p.qualityMode === 'custom' &&
+    (p.qualitySessions ?? 1) > 0 &&
+    runs === 2
+  )
+    throw new PlanError(
+      'Two running days cannot fit a separate long run, a weekday quality workout and supporting easy running. Choose at least three running days or explicitly select zero weekday workouts.',
+    );
+  if (
+    p.qualityMode === 'automatic' ||
+    (isRoadRaceProfile(p) &&
+      p.qualityMode !== 'custom' &&
+      (!p.method || p.method === 'balanced'))
+  )
+    p.qualitySessions = classicQualityCount(p);
   if (isLongUltra(p)) {
     p.practiceInDark ??= true;
     if (
@@ -454,7 +553,22 @@ export function validateProfile(
       p.qualitySessions ?? PLAN_LOAD_LIMITS.maximumUltraQualitySessions,
     ) as 0 | 1;
   }
-  p.days = resolveRunningDays(p);
+  p.days = beginner
+    ? beginnerDays(
+        p,
+        available.filter((d) => !crossDays.includes(d)),
+        runs,
+      )
+    : resolveRunningDays(p);
+  if (beginner && p.days.length !== runs)
+    throw new PlanError(
+      'Choose two or three beginner running days with at least one rest day between, including Sunday to Monday, and 40 minutes available on each.',
+    );
+  if (beginner) {
+    p.qualitySessions = 0;
+    p.runMeasure = 'time';
+    p.workoutFormat = 'time';
+  }
   if (p.days.length !== runs)
     throw new PlanError(
       'Your selected runs and paired-session days cannot fit the available days. Review your schedule.',
@@ -492,11 +606,13 @@ export function validateProfile(
     );
   if (
     !historicalEligibility &&
+    !beginner &&
+    !firstRace &&
     p.goal !== 'base' &&
     (p.weeklyKm < requirements.minWeekly ||
       p.longestKm < requirements.minLong ||
       p.currentRuns < requirements.minRuns ||
-      p.experience === 'new')
+      (p.experience === 'new' && !isRoadRaceProfile(p)))
   )
     throw new PlanError(
       `This block needs a recent baseline of ${requirements.minWeekly} km per week, a ${requirements.minLong} km longest run and ${requirements.minRuns} running days. Build a base or choose a shorter distance first.`,
@@ -610,6 +726,15 @@ export function validateProfile(
     );
   const methodErrors = advancedEligibility(p);
   if (methodErrors.length) throw new PlanError(methodErrors[0]);
+  if (
+    isRoadRaceProfile(p) &&
+    p.qualityMode === 'custom' &&
+    (!p.method || p.method === 'balanced') &&
+    qualitySchedule(p).length !== p.qualitySessions
+  )
+    throw new PlanError(
+      `Your selected ${p.qualitySessions} weekday workouts do not fit the available running days and time limits with an easy or rest day between workouts and the long run. Review the days, session limits or explicitly choose fewer workouts.`,
+    );
   if (p.method === 'double-threshold') {
     p.qualitySessions = PLAN_LOAD_LIMITS.weekdayQualitySessions;
     const chosen = p.doubleDays![0];

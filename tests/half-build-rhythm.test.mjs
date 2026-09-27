@@ -73,7 +73,8 @@ test('selected running frequency and one-workout limit survive the new mix', () 
     const plan = build({
       currentRuns: runs,
       runsPerWeek: runs,
-      weeklyKm: runs === 3 ? 45 : 60,
+      weeklyKm: runs === 3 ? 28 : runs === 4 ? 45 : 60,
+      ...(runs === 3 ? { longestKm: 12 } : {}),
       weekdayMinutes: 120,
       longMinutes: 180,
     });
@@ -93,7 +94,7 @@ test('selected running frequency and one-workout limit survive the new mix', () 
   }
 });
 
-test('race rehearsal does not bypass introduction, history or an explicit training method', () => {
+test('race rehearsal respects history and specialist methods while introductory work keeps a complete small dose', () => {
   const plan = build();
   const tempo = plan.workouts
     .filter((w) => w.stimulus === 'threshold')
@@ -121,11 +122,12 @@ test('race rehearsal does not bypass introduction, history or an explicit traini
     }).template.stimulus,
     'threshold',
   );
-  assert.equal(
-    selectTemplate(input(), 'Build', { ...context, introduction: true })
-      .template.stimulus,
-    'economy',
-  );
+  const introductory = selectTemplate(input(), 'Build', {
+    ...context,
+    introduction: true,
+  });
+  assert.notEqual(introductory.template.stimulus, 'economy');
+  assert.equal(introductory.targetWorkMinutes, 6);
   assert.equal(
     selectTemplate(input({ method: 'threshold-singles' }), 'Build', context)
       .template.stimulus,
@@ -160,6 +162,7 @@ test('partial starts and every race weekday retain recovery, time ceilings and a
     const plan = makePlan(
       input({
         startDate,
+        weeklyKm: 40,
         raceDate: addDays('2027-01-11', offset),
         weekdayMinutes: 60,
         weeklyMinutesLimit: 270,
@@ -174,7 +177,7 @@ test('partial starts and every race weekday retain recovery, time ceilings and a
       if (w.kind === 'race') continue;
       if (w.kind !== 'long') assert.ok(w.minutes <= 60);
       if (plan.weeks[w.week].phase === 'Recovery') assert.ok(!main(w));
-      if (dayDiff(w.date, plan.profile.raceDate) <= 21)
+      if (dayDiff(w.date, plan.profile.raceDate) <= 14)
         assert.ok(
           ['Taper', 'Race week'].includes(
             trainingPhaseOn(plan.profile, plan.weeks[w.week].phase, w.date),
@@ -292,10 +295,18 @@ test('new race-effort steps retain the saved pace target through FIT and Interva
     Stream.fromByteArray(encodeWorkout(w, plan.profile)),
   ).read();
   assert.deepEqual(decoded.errors, []);
-  assert.ok(
-    decoded.messages.workoutStepMesgs.some((s) => s.durationTime === 360),
-  );
-  assert.match(intervalsWorkoutText(w, plan.profile), /360s/);
+  const mainDurations = w.steps
+    .filter((step) => step.kind === 'work')
+    .map((step) => step.seconds);
+  assert.ok(mainDurations.length > 0);
+  for (const seconds of mainDurations) {
+    assert.ok(
+      decoded.messages.workoutStepMesgs.some(
+        (step) => step.durationTime === seconds,
+      ),
+    );
+    assert.ok(intervalsWorkoutText(w, plan.profile).includes(`${seconds}s`));
+  }
   const refreshed = refreshWorkoutVariety(plan, start);
   assert.deepEqual(validatePlan(refreshed), []);
   assert.deepEqual(

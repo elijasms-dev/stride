@@ -1,0 +1,65 @@
+import { demoProfile, addDays } from '../lib/engine.ts';
+export const FIRST_RACE_CASES = [
+  {
+    goal: '5k',
+    weeklyKm: 8,
+    longestKm: 3,
+    runs: 3,
+    weeks: 8,
+    requiredLong: 4.8,
+    requiredWeek: 10,
+  },
+  {
+    goal: '10k',
+    weeklyKm: 15,
+    longestKm: 5,
+    runs: 3,
+    weeks: 8,
+    requiredLong: 8.8,
+    requiredWeek: 18,
+  },
+  {
+    goal: 'half',
+    weeklyKm: 20,
+    longestKm: 7,
+    runs: 3,
+    weeks: 14,
+    requiredLong: 16,
+    requiredWeek: 30,
+  },
+  {
+    goal: 'marathon',
+    weeklyKm: 28,
+    longestKm: 10,
+    runs: 4,
+    weeks: 20,
+    requiredLong: 28,
+    requiredWeek: 48,
+  },
+];
+export const firstRaceProfile = (c, patch = {}) => {
+  const start = patch.startDate ?? '2026-09-28';
+  return {
+    ...demoProfile(start),
+    planLevel: 'beginner',
+    goal: c.goal,
+    weeklyKm: c.weeklyKm,
+    longestKm: c.longestKm,
+    currentRuns: c.runs,
+    experience: 'new',
+    intent: 'finish',
+    method: 'balanced',
+    days: c.runs === 4 ? [0, 2, 4, 6] : [1, 3, 6],
+    availableDays: undefined,
+    runsPerWeek: undefined,
+    longDay: 6,
+    raceDate: addDays(start, c.weeks * 7 - 1),
+    weekdayMinutes: 120,
+    longMinutes: 300,
+    easyPace: 7,
+    qualityMode: 'automatic',
+    qualitySessions: 0,
+    volume: 'gradual',
+    ...patch,
+  };
+};

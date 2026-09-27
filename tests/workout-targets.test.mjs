@@ -32,7 +32,7 @@ const hr = {
   mode: 'heart-rate',
   heartRate: { easy: { low: 130, high: 150 }, tempo: { low: 160, high: 170 } },
 };
-function plan() {
+function plan(patch = {}) {
   const start = '2026-09-07';
   return makePlan({
     ...demoProfile(start),
@@ -47,6 +47,7 @@ function plan() {
     weekdayMinutes: 90,
     longMinutes: 200,
     raceDate: addDays(start, 139),
+    ...patch,
   });
 }
 void test('target validation rejects invalid modes, missing easy range, inverted or malformed ranges', () => {
@@ -76,7 +77,7 @@ void test('mile inputs round-trip to seconds/km and display explicit units', () 
   assert.equal(parsePace('5.0', 'km'), null);
 });
 void test('targets preserve schedule, duration, recorded/past runs and every protected receipt', () => {
-  const p = plan(),
+  const p = plan({ runMeasure: 'time' }),
     original = structuredClone(p),
     protectedId = p.workouts[4].id;
   p.workouts[2].status = 'completed';
@@ -150,6 +151,7 @@ void test('short HR efforts, walking, recoveries and hills retain effort; gentle
   assert.equal(w.steps[0].target, undefined);
   assert.deepEqual(w.steps[1].target, {
     mode: 'heart-rate',
+    source: 'manual',
     low: 160,
     high: 170,
   });
@@ -169,6 +171,7 @@ void test('short HR efforts, walking, recoveries and hills retain effort; gentle
           ...steps[1],
           intensity: 5,
           effort: 'Steady and comfortable · 5–6 / 10',
+          effortRole: 'steady',
         },
       ],
     },
@@ -219,7 +222,11 @@ void test('FIT encodes mixed effort, pace and absolute BPM and preserves duratio
   assert.throws(() => encodeWorkout(w), /FIT_TARGET/);
 });
 void test('specific names distinguish ultra and hills and follow repeated shortening and substitutions', () => {
-  const p = updateWorkoutTargets(plan(), config, '2026-09-07');
+  const p = updateWorkoutTargets(
+    plan({ runMeasure: 'time' }),
+    config,
+    '2026-09-07',
+  );
   const base = p.workouts.find(
     (w) => w.hard && w.steps.filter((s) => s.kind === 'work').length >= 3,
   );
@@ -265,7 +272,11 @@ void test('specific names distinguish ultra and hills and follow repeated shorte
   assert.ok(alt.steps.some((s) => s.target));
 });
 void test('race targets do not carry over to a different race distance', () => {
-  const p = updateWorkoutTargets(plan(), config, '2026-09-07');
+  const p = updateWorkoutTargets(
+    plan({ runMeasure: 'time' }),
+    config,
+    '2026-09-07',
+  );
   const w = p.workouts.find((w) => w.stimulus === 'race-rhythm');
   assert.ok(w.steps.some((s) => s.kind === 'work' && s.target));
   const changed = withWorkoutTargets(w, { ...p.profile, goal: 'half' });
@@ -298,6 +309,7 @@ void test('explicit race HR survives distance-ended race steps', () => {
   assert.ok(race.steps[0].metres);
   assert.deepEqual(race.steps[0].target, {
     mode: 'heart-rate',
+    source: 'manual',
     low: 155,
     high: 165,
   });

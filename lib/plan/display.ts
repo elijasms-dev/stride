@@ -21,14 +21,36 @@ export function eventDistanceDisplay(km: number, units: 'km' | 'mi') {
   }).format(units === 'mi' ? km / 1.609344 : km);
 }
 
+/** A saved estimate describes that prescription, including legacy history. */
+export function validStoredDistanceEstimate(
+  value: unknown,
+): value is NonNullable<Workout['distanceEstimate']> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const { lowerKm, upperKm, basis } = value as Record<string, unknown>;
+  return (
+    typeof basis === 'string' &&
+    basis.length <= 4000 &&
+    ((lowerKm === null && upperKm === null) ||
+      (typeof lowerKm === 'number' &&
+        typeof upperKm === 'number' &&
+        Number.isFinite(lowerKm) &&
+        Number.isFinite(upperKm) &&
+        lowerKm >= 0 &&
+        upperKm >= lowerKm))
+  );
+}
+
 export function workoutDistanceValue(
   w: Workout,
   p: Pick<Profile, 'units' | 'easyPace'>,
 ) {
+  if (w.beginnerLesson) return '—';
   if (w.kind === 'race') return eventDistanceDisplay(w.estimatedKm, p.units);
   const exact = prescribedDistanceKm(w);
   if (exact !== null) return String(kmDisplay(exact, p.units));
-  const estimate = distanceEstimate(w.steps, p);
+  const estimate = validStoredDistanceEstimate(w.distanceEstimate)
+    ? w.distanceEstimate
+    : distanceEstimate(w.steps, p);
   return estimate.lowerKm === null
     ? '—'
     : `${kmDisplay(estimate.lowerKm, p.units)}–${kmDisplay(estimate.upperKm!, p.units)}`;

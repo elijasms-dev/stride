@@ -1,10 +1,13 @@
 'use client';
+import { isBeginnerProfile } from '@/lib/beginner-course';
+import { BeginnerCourseFields } from './beginner-course-fields';
 import { RecentRaceFields } from './recent-race-fields';
 import { useId } from 'react';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { ChevronDown, SlidersHorizontal, Check } from 'lucide-react';
 import { isLongUltra } from '@/lib/ultra-policy';
 import { usesMarathonBook } from '@/lib/marathon-book';
+import { isRoadRaceProfile } from '@/lib/road-training-policy';
 import {
   ScheduleCustomizationFields,
   WorkoutCustomizationFields,
@@ -17,9 +20,9 @@ import { runningDayRange } from '@/lib/schedule-guidance';
 import {
   availableRunningDays,
   desiredRuns,
-  classicQualityCount,
   resolveRunningDays,
   requestedQualityCount,
+  usesStandardQualityRhythm,
 } from '@/lib/training-structure';
 import { dayNames, trainingFamily, type Profile } from '@/lib/engine';
 import { qualitySchedule } from '@/lib/training-structure';
@@ -50,7 +53,7 @@ function PlanChoice({
         onValueChange={(v) => onChange(String(v))}
         className="plan-choice-grid"
         style={{
-          gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))`,
+          gridTemplateColumns: `repeat(${options.length > 3 ? 2 : options.length}, minmax(0, 1fr))`,
         }}
       >
         {options.map((option) => (
@@ -75,7 +78,7 @@ function PlanChoice({
   );
 }
 
-function WorkoutFrequencyField({
+export function WorkoutFrequencyField({
   profile: p,
   onChange,
 }: {
@@ -84,18 +87,17 @@ function WorkoutFrequencyField({
 }) {
   const automatic =
     p.qualityMode === 'automatic' ||
-    p.qualitySessions == null ||
-    (usesMarathonBook(p) &&
-      p.qualityMode === undefined &&
-      p.qualitySessions === 2);
-  const easyOnly = p.goal === 'base' || desiredRuns(p) === 2;
-  const automaticCount =
-    p.intent === 'finish'
-      ? 0
-      : requestedQualityCount({
-          ...p,
-          qualityMode: 'automatic',
-        });
+    (p.qualityMode !== 'custom' &&
+      (p.qualitySessions == null ||
+        (isRoadRaceProfile(p) && (!p.method || p.method === 'balanced')) ||
+        usesStandardQualityRhythm(p) ||
+        (usesMarathonBook(p) && p.qualitySessions === 2)));
+  const easyOnly =
+    p.planLevel === 'beginner' || p.goal === 'base' || desiredRuns(p) === 2;
+  const automaticCount = requestedQualityCount({
+    ...p,
+    qualityMode: 'automatic',
+  });
   const twoReason = isLongUltra(p)
     ? 'For ultras beyond 50 miles, keep to one harder workout.'
     : desiredRuns(p) < 5 || p.currentRuns < 5
@@ -117,23 +119,21 @@ function WorkoutFrequencyField({
     <div className="plan-workout-choice">
       <PlanChoice
         label="Harder workouts per week"
-        value={
-          automatic
-            ? String(automaticCount)
-            : p.intent === 'finish'
-              ? '0'
-              : String(p.qualitySessions)
-        }
+        value={automatic ? 'automatic' : String(p.qualitySessions ?? 1)}
         onChange={(v) =>
           onChange({
             ...p,
             qualityMode: v === 'automatic' ? 'automatic' : 'custom',
             qualitySessions:
               v === 'automatic' ? undefined : (Number(v) as 0 | 1 | 2),
-            ...(Number(v) > 0 ? { intent: 'improve' as const } : {}),
           })
         }
         options={[
+          {
+            value: 'automatic',
+            title: 'Automatic',
+            detail: `${automaticCount} per week`,
+          },
           { value: '0', title: '0', detail: 'All easy' },
           { value: '1', title: '1', detail: 'Per week', disabled: easyOnly },
           {
@@ -147,7 +147,10 @@ function WorkoutFrequencyField({
       <p className="plan-control-hint">
         {easyOnly
           ? 'This plan keeps your runs easy.'
-          : 'Tempo, intervals or marathon-effort work. An easy long run is separate.'}
+          : 'Tempo, intervals or marathon-effort work. An easy long run is separate. Recovery and taper weeks can be lighter.'}
+        {automatic &&
+          !easyOnly &&
+          ' The count follows your current routine and goal.'}
       </p>
       {!easyOnly && twoReason && (
         <p className="plan-control-hint">{twoReason}</p>
@@ -200,6 +203,8 @@ export function PlanCustomizationFields({
   onReviewRoutine?: () => void;
   allowRunMeasure?: boolean;
 }) {
+  if (isBeginnerProfile(profile))
+    return <BeginnerCourseFields profile={profile} onChange={onChange} />;
   return (
     <div
       className="plan-customization"
@@ -218,6 +223,7 @@ export function PlanCustomizationFields({
         onChange={onChange}
         onReviewRoutine={onReviewRoutine}
       />
+      <SessionTimeFields profile={profile} onChange={onChange} />
       <div className="plan-distance-start">
         <div className="plan-distance-metrics">
           <div>
@@ -250,7 +256,7 @@ export function PlanCustomizationFields({
         {(profile.weekdayMinutes < 120 || profile.longMinutes < 300) && (
           <div className="plan-distance-limits">
             <p>
-              Your saved time limits can shorten these distances:{' '}
+              Your time limits must accommodate these starting distances:{' '}
               {profile.weekdayMinutes} min on weekdays, {profile.longMinutes}{' '}
               min for the long run.
             </p>
@@ -307,6 +313,59 @@ export function PlanCustomizationFields({
   );
 }
 
+export function SessionTimeFields({
+  profile: p,
+  onChange,
+}: {
+  profile: Profile;
+  onChange: (profile: Profile) => void;
+}) {
+  const update = <K extends keyof Profile>(key: K, value: Profile[K]) =>
+    onChange({ ...p, [key]: value });
+  const count = desiredRuns(p);
+  return (
+    <section className="form-section" aria-label="Time available for running">
+      <h3>How much time can you spare?</h3>
+      <p className="subtle">
+        Time you can usually spare. Suggestions allow for your recent routine
+        and longer outings later in race preparation. Confirm how much time you
+        can actually spare. A ceiling is not a session target.
+      </p>
+      <div className="form-grid">
+        <Field label="Weekday limit (minutes)">
+          <NumericInput
+            name="weekdayMinutes"
+            value={p.weekdayMinutes}
+            min={20}
+            max={120}
+            required
+            onValueChange={(v) => update('weekdayMinutes', v ?? NaN)}
+          />
+        </Field>
+        <Field label="Long-run limit (minutes)">
+          <NumericInput
+            name="longMinutes"
+            value={p.longMinutes}
+            min={30}
+            max={300}
+            required
+            onValueChange={(v) => update('longMinutes', v ?? NaN)}
+          />
+        </Field>
+      </div>
+      {count > 2 && p.longestKm * (p.easyPace ?? 7) > p.longMinutes + 1 && (
+        <p className="notice">
+          Your recent long run takes about{' '}
+          {Math.round(p.longestKm * (p.easyPace ?? 7))} minutes at{' '}
+          {p.easyPace ? 'your supplied easy pace' : 'the scheduling estimate'}.
+          This {p.longMinutes}-minute ceiling cannot fit that run. Review your
+          available time or your recent routine before saving.
+        </p>
+      )}
+    </section>
+  );
+}
+
 export function ScheduleFields({
   profile: p,
   onChange,
@@ -342,23 +401,9 @@ export function ScheduleFields({
         ...p,
         availableDays: available,
         runsPerWeek: count,
-        qualitySessions:
-          p.qualityMode === 'automatic'
-            ? classicQualityCount(p)
-            : p.qualitySessions,
       })
     : [];
-  const hardDays =
-    p.intent === 'finish' || p.goal === 'base'
-      ? []
-      : qualitySchedule({
-          ...p,
-          days: scheduled,
-          qualitySessions:
-            p.qualityMode === 'automatic'
-              ? classicQualityCount(p)
-              : p.qualitySessions,
-        });
+  const hardDays = qualitySchedule({ ...p, days: scheduled });
   return (
     <>
       {section === 'basic' && (
@@ -379,6 +424,10 @@ export function ScheduleFields({
                   key={n}
                   type="button"
                   aria-pressed={count === n}
+                  disabled={
+                    p.planLevel === 'beginner' &&
+                    (n < range.min || n > range.max)
+                  }
                   aria-label={`${n} running days per week`}
                   onClick={() =>
                     onChange({ ...p, runsPerWeek: n, availableDays: available })
@@ -513,10 +562,6 @@ export function ScheduleFields({
               profile={{
                 ...p,
                 days: scheduled,
-                qualitySessions:
-                  p.qualityMode === 'automatic'
-                    ? classicQualityCount(p)
-                    : p.qualitySessions,
               }}
               heading="Your weekly rhythm"
             />
@@ -545,44 +590,6 @@ export function ScheduleFields({
                 Use one run per day
               </button>
             </div>
-          )}
-          <p className="subtle">
-            Time you can usually spare. Suggestions allow for your recent
-            routine and longer outings later in race preparation. Confirm how
-            much time you can actually spare. A ceiling is not a session target.
-          </p>
-          <div className="form-grid">
-            <Field label="Weekday limit (minutes)">
-              <NumericInput
-                name="weekdayMinutes"
-                value={p.weekdayMinutes}
-                min={20}
-                max={120}
-                required
-                onValueChange={(v) => update('weekdayMinutes', v ?? NaN)}
-              />
-            </Field>
-            <Field label="Long-run limit (minutes)">
-              <NumericInput
-                name="longMinutes"
-                value={p.longMinutes}
-                min={30}
-                max={300}
-                required
-                onValueChange={(v) => update('longMinutes', v ?? NaN)}
-              />
-            </Field>
-          </div>
-          {count > 2 && p.longestKm * (p.easyPace ?? 7) > p.longMinutes + 1 && (
-            <p className="notice">
-              Your recent long run takes about{' '}
-              {Math.round(p.longestKm * (p.easyPace ?? 7))} minutes at{' '}
-              {p.easyPace
-                ? 'your supplied easy pace'
-                : 'the scheduling estimate'}
-              . This {p.longMinutes}-minute ceiling will shorten it. Increase
-              the limit if that is not intended.
-            </p>
           )}
           <ScheduleCustomizationFields profile={p} onChange={onChange} />
           <details className="reason-details advanced-preferences">

@@ -11,6 +11,7 @@ import { Choice, Field, FormError, Modal } from '../stride-ui';
 import { useExtraRunForm } from './use-extra-run-form';
 
 export function ExtraRunForm({
+  draftScope = '',
   plan,
   today,
   onClose,
@@ -21,6 +22,7 @@ export function ExtraRunForm({
   imported,
   existing,
 }: {
+  draftScope?: string;
   plan: Plan;
   today: string;
   onClose: () => void;
@@ -32,6 +34,7 @@ export function ExtraRunForm({
   existing?: import('@/lib/engine').ExtraRun;
 }) {
   const state = useExtraRunForm({
+    draftScope,
     plan,
     today,
     onClose,
@@ -87,6 +90,17 @@ export function ExtraRunForm({
       locked={busy}
     >
       <form onSubmit={state.saveRun}>
+        {state.draftStatus === 'unavailable' && (
+          <output>
+            Draft storage is unavailable. Keep this form open until your run is
+            saved.
+          </output>
+        )}
+        {state.draftStatus === 'restored' && (
+          <output>
+            Your unsaved run details were restored on this device.
+          </output>
+        )}
         <fieldset disabled={busy} className="form-section form-content">
           {imported && !existing && (
             <p className="notice">

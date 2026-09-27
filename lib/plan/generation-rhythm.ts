@@ -1,8 +1,10 @@
 import { schedulingEasyPace } from '../fitness-pacing.ts';
 import { qualityWorkMinutes } from '../prescription.ts';
 import { runningDayLimit } from '../runner-customization.ts';
+import { isRoadRaceProfile } from '../road-training-policy.ts';
 import {
   qualitySchedule,
+  requestedQualityCount,
   usesMarathonRhythm,
   usesStandardQualityRhythm,
 } from '../training-structure.ts';
@@ -11,10 +13,10 @@ import {
   scaleTemplate,
   WORKOUT_LIBRARY,
 } from '../workout-library.ts';
-import { withWorkoutTargets } from '../workout-targets.ts';
+import { withAllocatedWorkoutTargets as withWorkoutTargets } from '../workout-targets.ts';
 import { addDays, weekday } from './calendar.ts';
 import { PlanError } from './errors.ts';
-import { taperFactor } from './generation-calendar.ts';
+import { taperFactor, weekIncludesTaper } from './generation-calendar.ts';
 import { round } from './math.ts';
 import { PLAN_LOAD_LIMITS } from './policy-constants.ts';
 import { TRAINING_POLICY } from './policy.ts';
@@ -24,13 +26,18 @@ import type { Plan, Workout } from './types.ts';
 
 /** Only untouched complete ordinary weeks carry the generated rhythm contract.
  * Deliberate changes, observed history and return plans have their own allocation. */
-function eligibleWeeks(plan: Plan, from: string) {
+function eligibleWeeks(plan: Plan, from: string, customChoice = false) {
   if (
+    plan.firstRace ||
     plan.policyVersion !== TRAINING_POLICY.version ||
     plan.returnState ||
     (plan.baselineEvidence?.source === 'recorded-plan-history' &&
       plan.baselineEvidence.supportsProgression !== true) ||
-    !usesStandardQualityRhythm(plan.profile)
+    (customChoice
+      ? plan.profile.qualityMode !== 'custom' ||
+        plan.profile.goal === 'base' ||
+        !!(plan.profile.method && plan.profile.method !== 'balanced')
+      : !usesStandardQualityRhythm(plan.profile))
   )
     return [];
   return plan.weeks.flatMap((week) => {
@@ -39,6 +46,14 @@ function eligibleWeeks(plan: Plan, from: string) {
       week.start < plan.profile.startDate ||
       addDays(week.start, 6) > plan.profile.raceDate ||
       ['Recovery', 'Taper', 'Race week'].includes(week.phase) ||
+      // The generation contract intentionally keeps a returning/new runner's
+      // non-marathon foundation easy. Enforce their saved count once the
+      // ordinary workout phase begins, without changing declared mileage.
+      (customChoice &&
+        (plan.profile.qualitySessions ?? 1) > 0 &&
+        week.phase === 'Foundation' &&
+        plan.profile.experience !== 'established' &&
+        !usesMarathonRhythm(plan.profile)) ||
       taperFactor(plan.profile, addDays(week.start, 6)) < 1
     )
       return [];
@@ -69,6 +84,7 @@ const usefulQuality = (w: Workout) =>
 
 /** Validate the same eligible weeks that generation can repair, without mutation. */
 export function standardQualityRhythmErrors(plan: Plan): string[] {
+  if (isRoadRaceProfile(plan.profile)) return [];
   const errors: string[] = [];
   for (const { week, runs } of eligibleWeeks(
     plan,
@@ -82,6 +98,164 @@ export function standardQualityRhythmErrors(plan: Plan): string[] {
     )
       errors.push(
         `Week ${week.index + 1} needs one complete weekday quality workout and one long run. Review the workout time and weekly allocation together.`,
+      );
+  }
+  return errors;
+}
+
+/** An explicit ordinary-week count cannot disappear into an easy/strides recipe.
+ * Deliberate edits, recorded history, returns and specialist paired methods keep
+ * their existing exceptions; constraints are surfaced instead of relaxing choice. */
+export function explicitQualityFrequencyErrors(plan: Plan): string[] {
+  if (isRoadRaceProfile(plan.profile)) return [];
+  const expected = plan.profile.qualitySessions ?? 1;
+  return eligibleWeeks(
+    plan,
+    plan.constraintsFrom ?? plan.profile.startDate,
+    true,
+  ).flatMap(({ week, runs }) => {
+    const actual = runs.filter(
+      (w) => w.kind !== 'long' && w.hard && qualityWorkMinutes(w) > 0,
+    ).length;
+    return actual === expected
+      ? []
+      : [
+          `Week ${week.index + 1} cannot retain your selected ${expected} weekday workouts within the current allocation. Review the workout count, running days and session limits together.`,
+        ];
+  });
+}
+
+/** Count the executable work, not a cached quality total or a stale hard flag. */
+const roadWorkMinutes = (workout: Workout) =>
+  workout.steps.reduce(
+    (minutes, step) =>
+      minutes +
+      (step.kind === 'work' && step.intensity >= 4 && step.movement !== 'walk'
+        ? step.seconds / 60
+        : 0),
+    0,
+  );
+
+/** Named road plans retain the resolved choice throughout complete ordinary weeks.
+ * Missing sessions and walking substitutions are errors, not eligibility escapes. */
+export function roadQualityFrequencyErrors(
+  plan: Plan,
+  observedWorkouts: Workout[] = [],
+): string[] {
+  const p = plan.profile;
+  if (
+    !isRoadRaceProfile(p) ||
+    plan.policyVersion !== TRAINING_POLICY.version ||
+    plan.returnState ||
+    (p.method && p.method !== 'balanced') ||
+    (plan.baselineEvidence?.source === 'recorded-plan-history' &&
+      plan.baselineEvidence.supportsProgression !== true)
+  )
+    return [];
+  const from = plan.constraintsFrom ?? p.startDate;
+  const expected = requestedQualityCount(p);
+  const errors: string[] = [];
+  // A replan can reserve a recorded day before the caller merges its immutable
+  // journal prefix. Only actual completed records qualify as this context;
+  // forecast prescriptions and arbitrary missing days never do.
+  const observed = [...plan.workouts, ...observedWorkouts].filter(
+    (run) =>
+      run.status === 'completed' &&
+      run.feedback &&
+      Number.isFinite(run.feedback.actualMinutes) &&
+      run.feedback.actualMinutes > 0,
+  );
+  const recordedDates = observed.flatMap((run) => [
+    run.feedback!.actualDate ?? run.date,
+    run.date,
+  ]);
+  const demandingDates = observed
+    .filter(
+      (run) => run.hard || run.kind === 'long' || run.feedback!.effort >= 7,
+    )
+    .map((run) => run.feedback!.actualDate ?? run.date);
+  for (const run of plan.extraRuns ?? []) {
+    if (!Number.isFinite(run.minutes) || run.minutes <= 0) continue;
+    recordedDates.push(run.date);
+    if (
+      run.effort >= 7 ||
+      run.minutes >= Math.max(45, p.longestKm * schedulingEasyPace(p) * 0.9)
+    )
+      demandingDates.push(run.date);
+  }
+  for (const week of plan.weeks) {
+    const end = addDays(week.start, 6);
+    if (
+      week.start < from ||
+      week.start < p.startDate ||
+      end >= p.raceDate ||
+      ['Recovery', 'Taper', 'Race week'].includes(week.phase) ||
+      weekIncludesTaper(p, week.start) ||
+      recordedDates.some((date) => date >= week.start && date <= end) ||
+      demandingDates.some((date) => addDays(date, 1) === week.start)
+    )
+      continue;
+    const runs = plan.workouts.filter(
+      (workout) => workout.week === week.index && workout.kind !== 'race',
+    );
+    if (
+      runs.some(
+        (workout) =>
+          workout.status !== 'planned' ||
+          workout.returnRole ||
+          (workout.changed && workout.changeSource !== 'preferences'),
+      )
+    )
+      continue;
+    const expectedDates = Array.from({ length: 7 }, (_, day) =>
+      addDays(week.start, day),
+    ).filter((date) => p.days.includes(weekday(date)));
+    if (
+      runs.length !== expectedDates.length ||
+      expectedDates.some(
+        (date) => runs.filter((run) => run.date === date).length !== 1,
+      )
+    )
+      errors.push(
+        `Week ${week.index + 1} must retain all ${p.days.length} selected running days; a missing or duplicated run cannot satisfy the workout frequency.`,
+      );
+    const weekdayRuns = runs.filter((run) => run.kind !== 'long');
+    const useful = weekdayRuns.filter(
+      (run) =>
+        ['tempo', 'intervals', 'fartlek'].includes(run.kind) &&
+        run.hard &&
+        !['aerobic', 'economy'].includes(run.stimulus ?? '') &&
+        roadWorkMinutes(run) >= PLAN_LOAD_LIMITS.minimumTempoWorkMinutes - 1e-6,
+    );
+    const invalidQuality = weekdayRuns.some((run) => {
+      const dose = roadWorkMinutes(run);
+      const complete = useful.includes(run);
+      const relaxedStrides =
+        run.kind === 'easy' &&
+        !run.hard &&
+        run.stimulus === 'economy' &&
+        dose <= 3 + 1e-6 &&
+        run.steps
+          .filter((step) => step.kind === 'work' && step.intensity >= 4)
+          .every((step) => step.seconds <= 30);
+      return (
+        (run.hard && !complete) ||
+        (['tempo', 'intervals', 'fartlek'].includes(run.kind) && !complete) ||
+        (dose > 0 && !complete && !relaxedStrides)
+      );
+    });
+    if (useful.length !== expected || invalidQuality)
+      errors.push(
+        `Week ${week.index + 1} needs exactly ${expected} complete weekday workouts, each with at least ${PLAN_LOAD_LIMITS.minimumTempoWorkMinutes} minutes of running work. Easy running, walking, strides and stale workout labels do not satisfy this choice.`,
+      );
+    const longRuns = runs.filter((run) => run.kind === 'long');
+    if (
+      p.days.length > 2 &&
+      (longRuns.length !== 1 ||
+        longRuns.some((run) => run.hard || roadWorkMinutes(run) > 0))
+    )
+      errors.push(
+        `Week ${week.index + 1} needs one separate easy long run alongside the selected weekday workouts.`,
       );
   }
   return errors;
@@ -101,15 +275,25 @@ function fallbackTemplate(plan: Plan) {
 /** Restore the weekday stimulus using existing aerobic minutes. No long-run time,
  * completed work, explicit edits, or new weekly minutes fund the guarantee. */
 export function ensureGeneratedQualityRhythm(plan: Plan, from: string) {
+  // Named road plans fund their complete sessions during allocation. The legacy
+  // post-generation repair would replace their distance-specific prescriptions.
+  if (isRoadRaceProfile(plan.profile)) return;
   const p = plan.profile;
-  const qualityDay = qualitySchedule(p)[0];
+  const customTwo = p.qualityMode === 'custom' && p.qualitySessions === 2;
+  const qualityDays = qualitySchedule(p).slice(0, customTwo ? 2 : 1);
   const pace = Math.max(
     schedulingEasyPace(p),
     p.runMeasure === 'distance' && p.workoutTargets?.mode === 'pace'
       ? (p.workoutTargets.pace?.easy?.high ?? 0) / 60
       : 0,
   );
-  for (const { week, runs } of eligibleWeeks(plan, from)) {
+  for (const { week, runs, qualityDay } of eligibleWeeks(
+    plan,
+    from,
+    customTwo,
+  ).flatMap(({ week, runs }) =>
+    qualityDays.map((qualityDay) => ({ week, runs, qualityDay })),
+  )) {
     const long = runs.find((w) => w.kind === 'long');
     const tempo = runs.find((w) => weekday(w.date) === qualityDay);
     if (!long || !tempo)
@@ -128,7 +312,13 @@ export function ensureGeneratedQualityRhythm(plan: Plan, from: string) {
       );
     // A rebuilt routine can contain an old extra weekday stimulus. Its minutes
     // remain on that day as easy running before the selected slot is funded.
-    for (const other of runs.filter((w) => w !== tempo && w !== long && w.hard))
+    for (const other of runs.filter(
+      (w) =>
+        w !== tempo &&
+        w !== long &&
+        w.hard &&
+        !qualityDays.includes(weekday(w.date)),
+    ))
       Object.assign(
         other,
         resizeWorkout(other, p, week.phase, other.minutes, 0),
@@ -139,7 +329,13 @@ export function ensureGeneratedQualityRhythm(plan: Plan, from: string) {
       tempo.minutes,
     );
     let missing = targetMinutes - tempo.minutes;
-    const donors = runs.filter((w) => w !== tempo && w !== long && !w.hard);
+    const donors = runs.filter(
+      (w) =>
+        w !== tempo &&
+        w !== long &&
+        !w.hard &&
+        !qualityDays.includes(weekday(w.date)),
+    );
     if (
       donors.reduce(
         (n, w) =>
@@ -178,9 +374,15 @@ export function ensureGeneratedQualityRhythm(plan: Plan, from: string) {
         ? (template.workSeconds[0] * template.minimumReps) / 60
         : minimumWork,
     );
+    // A missing selected workout still owns its minimum complete dose. Do not
+    // spend that allowance on the first slot or on a faster long-run finish.
+    const reservedOtherWork = (w: Workout) =>
+      qualityDays.includes(weekday(w.date)) && w !== tempo
+        ? Math.max(fallbackWork, qualityWorkMinutes(w))
+        : qualityWorkMinutes(w);
     const otherWork = runs
       .filter((w) => w !== tempo && w !== long)
-      .reduce((n, w) => n + qualityWorkMinutes(w), 0);
+      .reduce((n, w) => n + reservedOtherWork(w), 0);
     if (qualityWorkMinutes(long) > ceiling - otherWork - fallbackWork)
       Object.assign(
         long,
@@ -197,7 +399,7 @@ export function ensureGeneratedQualityRhythm(plan: Plan, from: string) {
       ceiling -
         runs
           .filter((w) => w !== tempo)
-          .reduce((n, w) => n + qualityWorkMinutes(w), 0),
+          .reduce((n, w) => n + reservedOtherWork(w), 0),
     );
     if (usefulQuality(tempo) && qualityWorkMinutes(tempo) <= allowance + 0.01) {
       const addedSeconds = Math.round(

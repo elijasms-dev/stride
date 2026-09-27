@@ -9,6 +9,7 @@ import {
   eventDistanceDisplay,
   preparationRequirements,
   customExposureKm,
+  workoutDistanceLabel,
 } from '../lib/engine.ts';
 import { encodeWorkout } from '../lib/fit.ts';
 import { Decoder, Stream } from '@garmin/fitsdk';
@@ -209,6 +210,8 @@ void test('custom band crossings are explicit model changes with compatible long
 void test('recovery retains target snapshots and rejects malformed ranges', async () => {
   const { updateWorkoutTargets } = await import('../lib/workout-targets.ts');
   const f = file();
+  // This case tests target snapshot persistence, not a distance/time-cap review.
+  f.plan = makePlan({ ...profile, runMeasure: 'time' }, start);
   f.plan = updateWorkoutTargets(
     f.plan,
     { mode: 'pace', pace: { easy: { low: 330, high: 390 } } },
@@ -227,4 +230,98 @@ void test('recovery retains target snapshots and rejects malformed ranges', asyn
     high: 150,
   };
   assert.throws(() => validateRecovery(f), /target range/);
+});
+
+void test('legacy completed, skipped and past prescriptions retain their saved estimates and quality dose', () => {
+  for (const status of ['completed', 'skipped', 'planned']) {
+    const f = file();
+    const w = f.plan.workouts[0];
+    delete w.prescriptionVersion;
+    delete w.prescriptionPaceBasis;
+    w.status = status;
+    // A legacy distance interval used an old allocation for quality accounting.
+    // Its original estimate must not borrow today's easy pace during restoration.
+    w.kind = 'tempo';
+    w.stimulus = 'threshold';
+    w.hard = true;
+    w.minutes = 12;
+    w.qualityMinutes = 10;
+    w.estimatedKm = 1.3;
+    w.steps = [
+      {
+        label: '1 km tempo',
+        kind: 'work',
+        intensity: 6,
+        seconds: 600,
+        metres: 1000,
+        effort: 'Controlled',
+        target: { mode: 'pace', low: 300, high: 330 },
+      },
+      {
+        label: 'Easy recovery',
+        kind: 'recovery',
+        intensity: 2,
+        seconds: 120,
+        effort: 'Easy',
+      },
+    ];
+    w.distanceEstimate = {
+      lowerKm: 1.2,
+      upperKm: 1.5,
+      basis: 'Saved legacy estimate.',
+    };
+    if (status === 'completed') complete(w);
+    const before = structuredClone(w);
+    const restored = validateRecovery(f).plan.workouts.find(
+      (item) => item.id === w.id,
+    );
+    assert.deepEqual(restored, before);
+    assert.equal(
+      workoutDistanceLabel(restored, { units: 'km', easyPace: 12 }),
+      '1.2–1.5 km est.',
+    );
+  }
+});
+
+void test('legacy history without an estimate does not borrow a newer easy pace', () => {
+  const f = file();
+  const w = f.plan.workouts[0];
+  delete w.prescriptionVersion;
+  delete w.prescriptionPaceBasis;
+  delete w.distanceEstimate;
+  w.steps = [
+    {
+      label: 'Easy running',
+      seconds: w.minutes * 60,
+      kind: 'work',
+      intensity: 3,
+      effort: 'Easy',
+    },
+  ];
+  complete(w);
+  const restored = validateRecovery(f).plan.workouts.find(
+    (item) => item.id === w.id,
+  );
+  assert.equal(restored.distanceEstimate.lowerKm, null);
+  assert.equal(restored.distanceEstimate.upperKm, null);
+  assert.equal(
+    workoutDistanceLabel(restored, { units: 'km', easyPace: 3 }),
+    'Distance not estimated',
+  );
+});
+
+void test('recovery validates legacy saved estimate shapes before preserving them', () => {
+  for (const estimate of [
+    { lowerKm: 5, upperKm: 4, basis: 'Reversed' },
+    { lowerKm: null, upperKm: 5, basis: 'Mixed nulls' },
+    { lowerKm: 1, upperKm: Infinity, basis: 'Non-finite' },
+    { lowerKm: 1, upperKm: 2, basis: {} },
+  ]) {
+    const f = file();
+    const w = f.plan.workouts[0];
+    delete w.prescriptionVersion;
+    complete(w);
+    w.distanceEstimate = estimate;
+    assert.throws(() => validateRecovery(f), /saved distance estimate/);
+  }
 });

@@ -1,3 +1,4 @@
+import { beginRequestObservation } from '@/lib/request-observation';
 import { guardAccount } from '@/lib/accounts';
 import {
   ownerId,
@@ -14,6 +15,7 @@ import {
   requestLimit,
 } from '@/lib/server';
 export async function POST(request: Request) {
+  const observation = beginRequestObservation(request);
   try {
     const owner = ownerId(request);
     guardWrite(request);
@@ -86,11 +88,12 @@ export async function POST(request: Request) {
       );
     return json({ connected: true });
   } catch (e) {
-    return failure(e);
+    return failure(e, observation);
   }
 }
 
 export async function GET(request: Request) {
+  const observation = beginRequestObservation(request);
   try {
     const owner = ownerId(request);
     await requestLimit(owner, 'watch-check', 10);
@@ -134,6 +137,6 @@ export async function GET(request: Request) {
           : null,
     });
   } catch (error) {
-    return failure(error);
+    return failure(error, observation);
   }
 }

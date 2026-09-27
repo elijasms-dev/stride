@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   calculateTrainingPaces,
+  calculateTrainingPaceRanges,
   predictRaceTime,
   validateRecentRace,
 } from '../lib/fitness-pacing.ts';
@@ -189,16 +190,22 @@ test('manual easy pace funds the declared weekly distance and integer long runs'
   assertRhythm(plan);
   const longs = plan.workouts.filter((w) => w.kind === 'long');
   assert.equal(longs[0].estimatedKm, 25);
-  assert.equal(
-    plan.workouts
-      .filter((w) => w.week === 0 && w.kind !== 'race')
-      .reduce((sum, w) => sum + w.minutes, 0),
-    70 * 6.5,
+  // Faster quality segments consume less time than funding all70km at easy pace.
+  const opening = plan.workouts.filter(
+    (w) => w.week === 0 && w.kind !== 'race',
   );
+  assert.ok(opening.reduce((sum, w) => sum + w.minutes, 0) <= 70 * 6.5);
+  for (const w of opening)
+    assert.ok(
+      Math.abs(w.minutes * 60 - w.steps.reduce((n, s) => n + s.seconds, 0)) <
+        1e-6,
+    );
   assert.equal(plan.weeks[0].targetKm, 70);
   assert.equal(Math.max(...longs.map((w) => w.estimatedKm)), 32);
   for (const run of longs) {
-    assert.ok(run.minutes >= run.estimatedKm * 6.5);
+    for (const step of run.steps)
+      if (step.metres !== undefined && step.target?.mode === 'pace')
+        assert.ok((step.metres * step.target.high) / 1000 <= step.seconds + 1);
     assert.ok(run.minutes <= 210);
   }
   assertRhythm(refreshWorkoutVariety(plan, start));
@@ -264,8 +271,9 @@ test('benchmark targets use current fitness and preserve explicit effort/HR/manu
   const tempo = { kind: 'tempo', stimulus: 'threshold' };
   const target = workoutStepTarget(tempo, work, p);
   assert.ok(validStepTarget(target));
-  const exact = calculateTrainingPaces(p.recentRace).threshold;
-  assert.ok(target.low < exact && target.high > exact);
+  const expected = calculateTrainingPaceRanges(p.recentRace).threshold;
+  assert.deepEqual({ low: target.low, high: target.high }, expected);
+  assert.equal(target.source, 'benchmark');
   assert.equal(
     workoutStepTarget(tempo, work, {
       ...p,
@@ -282,7 +290,7 @@ test('benchmark targets use current fitness and preserve explicit effort/HR/manu
         pace: { easy: { low: 360, high: 390 }, tempo: manual },
       },
     }),
-    { ...manual, mode: 'pace' },
+    { ...manual, mode: 'pace', source: 'manual' },
   );
   assert.deepEqual(
     workoutStepTarget(tempo, work, {
@@ -295,7 +303,7 @@ test('benchmark targets use current fitness and preserve explicit effort/HR/manu
         },
       },
     }),
-    { mode: 'heart-rate', low: 150, high: 165 },
+    { mode: 'heart-rate', low: 150, high: 165, source: 'manual' },
   );
   const plan = build({ recentRace: p.recentRace });
   assert.ok(
@@ -414,10 +422,10 @@ test('reapplying unchanged fitness targets preserves mixed long-run distance and
   for (const recentRace of [
     { distanceKm: 1, timeMinutes: 15 },
     { distanceKm: 100, timeMinutes: 200 },
-  ])
-    assert.throws(() => validateProfile(profile({ recentRace })), {
-      name: 'PlanError',
-    });
+  ]) {
+    assert.doesNotThrow(() => validateProfile(profile({ recentRace })));
+    assert.equal(calculateTrainingPaceRanges(recentRace), null);
+  }
 });
 
 test('a fixed marathon ignores stale custom distance when predicting race targets', () => {
@@ -511,7 +519,7 @@ test('a constrained long-run day produces a monotone build within its final capa
   );
 });
 
-test('out-of-range short-event race predictions retain effort without breaking other targets', () => {
+test('benchmarks outside the supported fitness domain retain effort targets', () => {
   const p = profile({
     goal: 'custom',
     raceDistanceKm: 1,
@@ -523,10 +531,9 @@ test('out-of-range short-event race predictions retain effort without breaking o
     effort: 'Controlled',
     intensity: 6,
   };
-  assert.ok(
-    validStepTarget(
-      workoutStepTarget({ kind: 'tempo', stimulus: 'threshold' }, work, p),
-    ),
+  assert.equal(
+    workoutStepTarget({ kind: 'tempo', stimulus: 'threshold' }, work, p),
+    undefined,
   );
   assert.equal(
     workoutStepTarget({ kind: 'race', stimulus: 'race-rhythm' }, work, p),

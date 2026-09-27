@@ -1,8 +1,10 @@
+import { isFirstRaceProfile } from './first-race-policy.ts';
 import { schedulingEasyPace } from './fitness-pacing.ts';
 import { isLongUltra } from './ultra-policy.ts';
 import type { Profile } from './engine';
 import { runningDayLimit } from './runner-customization.ts';
 import { marathonSupportsMedium, usesMarathonBook } from './marathon-book.ts';
+import { isRoadRaceProfile, roadAbility } from './road-training-policy.ts';
 
 const separation = (a: number, b: number) =>
   Math.min(Math.abs(a - b), 7 - Math.abs(a - b));
@@ -12,13 +14,15 @@ export const desiredRuns = (p: Pick<Profile, 'days' | 'runsPerWeek'>) =>
 export const availableRunningDays = (
   p: Pick<Profile, 'days' | 'availableDays'>,
 ) => p.availableDays ?? p.days;
-export function classicQualityCount(
-  p: Pick<
-    Profile,
-    'days' | 'runsPerWeek' | 'goal' | 'raceDistanceKm' | 'method'
-  >,
-): 0 | 1 | 2 {
+export function classicQualityCount(p: Profile): 0 | 1 | 2 {
+  if (isFirstRaceProfile(p)) return 0;
   const count = desiredRuns(p);
+  if (isRoadRaceProfile(p) && (!p.method || p.method === 'balanced'))
+    return count === 2 ||
+      roadAbility(p) === 'developing' ||
+      (p.intent === 'finish' && (p.recentQualitySessions ?? 0) === 0)
+      ? 0
+      : 1;
   return isLongUltra(p)
     ? 1
     : p.goal === 'base' || count === 2
@@ -33,6 +37,11 @@ export function classicQualityCount(
 /** Standard single-session routines pair one weekday stimulus with endurance.
  * Explicit zero/two-workout choices and specialist methods retain their own policy. */
 export function usesStandardQualityRhythm(p: Profile): boolean {
+  if (isFirstRaceProfile(p)) return false;
+  if (isRoadRaceProfile(p))
+    return (
+      (!p.method || p.method === 'balanced') && requestedQualityCount(p) === 1
+    );
   return (
     p.goal !== 'base' &&
     desiredRuns(p) >= 3 &&
@@ -44,18 +53,27 @@ export function usesStandardQualityRhythm(p: Profile): boolean {
 }
 
 export function usesMarathonRhythm(
-  p: Pick<Profile, 'goal' | 'raceDistanceKm' | 'method'>,
+  p: Pick<Profile, 'goal' | 'raceDistanceKm' | 'method' | 'planLevel'>,
 ): boolean {
   const marathon =
     p.goal === 'marathon' ||
     (['custom', 'ultra'].includes(p.goal) &&
       (p.raceDistanceKm ?? 0) > 30 &&
       (p.raceDistanceKm ?? 0) <= 45);
-  return marathon && (!p.method || p.method === 'balanced');
+  return (
+    p.planLevel !== 'beginner' &&
+    marathon &&
+    (!p.method || p.method === 'balanced')
+  );
 }
 
 /** Number of weekday quality slots; the standard long run supplies the second session. */
 export function requestedQualityCount(p: Profile): 0 | 1 | 2 {
+  if (isFirstRaceProfile(p)) return 0;
+  if (isRoadRaceProfile(p)) {
+    if (p.qualityMode === 'custom') return p.qualitySessions ?? 1;
+    if (!p.method || p.method === 'balanced') return classicQualityCount(p);
+  }
   if (p.goal === 'base' || desiredRuns(p) === 2) return 0;
   if (p.qualityMode === 'custom') return p.qualitySessions ?? 1;
   if (usesStandardQualityRhythm(p)) return 1;

@@ -68,14 +68,23 @@ function verify(p) {
   assert.ok(reference, 'Use an actual pre-taper training week');
   const baseline = sum(runs.filter((w) => w.week === reference.index));
   assert.ok(baseline > 0);
-  for (const [bucket, factor] of [
-    [1, 0.4],
-    [2, usesMarathonBook(p.profile) ? 0.6 : 0.65],
-    ...(p.profile.goal === '10k' ||
-    (usesMarathonBook(p.profile) && marathonTaperDays(p.profile) === 14)
-      ? []
-      : [[3, usesMarathonBook(p.profile) ? 0.75 : 0.85]]),
-  ]) {
+  const buckets =
+    p.profile.goal === '10k'
+      ? [[1, 0.6]]
+      : p.profile.goal === 'half'
+        ? [
+            [1, 0.5],
+            [2, 0.8],
+          ]
+        : [
+            [1, 0.4],
+            [2, usesMarathonBook(p.profile) ? 0.6 : 0.65],
+            ...(p.profile.goal === '10k' ||
+            (usesMarathonBook(p.profile) && marathonTaperDays(p.profile) === 14)
+              ? []
+              : [[3, usesMarathonBook(p.profile) ? 0.75 : 0.85]]),
+          ];
+  for (const [bucket, factor] of buckets) {
     const window = runs.filter((w) => {
       const d = dayDiff(w.date, p.profile.raceDate);
       return usesMarathonBook(p.profile)

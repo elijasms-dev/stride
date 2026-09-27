@@ -45,7 +45,7 @@ for (const n of [3, 5, 6, 7])
   void test(`${n} requested days uses the classic Saturday-long rhythm and quality placements`, () => {
     const p = makePlan(profile(n), start);
     assert.deepEqual(p.profile.days, shapes[n]);
-    assert.deepEqual(qualitySchedule(p.profile), [1]);
+    assert.deepEqual(qualitySchedule(p.profile), n === 3 ? [] : [1]);
     assert.deepEqual(validatePlan(p), []);
     for (const week of p.weeks.filter((w) => w.phase !== 'Race week')) {
       const runs = active(p, week.index);

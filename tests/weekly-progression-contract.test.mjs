@@ -1,3 +1,4 @@
+import { roadOpeningFailures } from './road-overhaul-helpers.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -69,7 +70,7 @@ for (const [goal, weeklyKm, longestKm, span, patch] of [
 ]) {
   assert.equal(typeof goal, 'string');
   if (typeof goal !== 'string') throw new Error('Expected a goal name');
-  void test(`${goal}: maintaining weekly volume preserves the exact opening baseline across ordinary weeks`, () => {
+  void test(`${goal}: maintaining weekly volume preserves the disclosed opening allocation across ordinary weeks`, () => {
     const plan = makePlan(
       {
         ...demoProfile(start),
@@ -97,8 +98,12 @@ for (const [goal, weeklyKm, longestKm, span, patch] of [
       .filter((run) => run.hard || run.kind === 'long')
       .map((run) => structuredClone(run));
     reconcileOrdinaryWeeklyProgression(plan);
+    assert.equal(plan.profile.weeklyKm, weeklyKm);
+    assert.equal(plan.profile.longestKm, longestKm);
+    assert.deepEqual(roadOpeningFailures(plan), []);
+    const openingKm = total(plan, plan.weeks[0].index);
     for (const week of ordinary(plan))
-      assert.ok(Math.abs(total(plan, week.index) - weeklyKm) <= 0.00101);
+      assert.ok(Math.abs(total(plan, week.index) - openingKm) <= 0.00101);
     assert.deepEqual(
       plan.workouts.filter((run) => run.hard || run.kind === 'long'),
       protectedRuns,
@@ -253,7 +258,9 @@ void test('weekly funding preserves run/walk jogging bouts and adjusts walking r
   reconcileOrdinaryWeeklyProgression(plan);
   assert.ok(Math.abs(total(plan, 1) - 50) <= 0.00101);
   assert.deepEqual(runWalk.steps[0], jogging);
-  assert.equal(runWalk.steps[1].seconds, 360);
+  // Funding now shares the extra 72 seconds across both easy outings.
+  assert.equal(runWalk.steps[1].seconds, 324);
+  assert.ok(Math.abs(next[2].minutes - opening[2].minutes - 0.6) < 1e-9);
 });
 
 void test('an unfundable opening baseline raises a controlled error naming the affected week', () => {

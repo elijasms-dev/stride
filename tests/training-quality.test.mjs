@@ -11,6 +11,7 @@ import {
   taperFactor,
 } from '../lib/engine.ts';
 import { summaryEffort } from '../lib/prescription.ts';
+import { scaleTemplate, WORKOUT_LIBRARY } from '../lib/workout-library.ts';
 const demo = demoProfile('2026-09-07');
 const marathon = {
   ...demo,
@@ -31,7 +32,7 @@ const training = (p, w) =>
     (s) => s.week === w && s.kind !== 'race' && s.status !== 'skipped',
   );
 
-void test('10K block repeats introductory aerobic support then progresses event-specific work', () => {
+void test('10K block varies introductory shapes within a stable allowance then progresses event-specific work', () => {
   const p = generate(demo),
     runs = p.workouts.filter((w) => w.hard && w.kind !== 'race');
   const support = runs.filter(
@@ -40,8 +41,21 @@ void test('10K block repeats introductory aerobic support then progresses event-
       w.stimulus === 'threshold',
   );
   assert.ok(support.length >= 2);
-  assert.equal(support[0].templateId, support[1].templateId);
-  assert.ok(support[1].qualityMinutes >= support[0].qualityMinutes);
+  assert.equal(support[0].targetWorkMinutes, support[1].targetWorkMinutes);
+  for (const workout of support.slice(0, 2)) {
+    assert.ok(workout.qualityMinutes >= workout.targetWorkMinutes * 0.75);
+    assert.ok(workout.qualityMinutes <= workout.targetWorkMinutes + 1 / 60);
+    assert.ok(workout.steps.some((step) => step.kind === 'warmup'));
+    assert.ok(workout.steps.some((step) => step.kind === 'cooldown'));
+    assert.ok(
+      workout.steps
+        .filter((step) => step.kind === 'work')
+        .every(
+          (step) =>
+            step.effortRole === 'threshold' || step.effortRole === 'steady',
+        ),
+    );
+  }
   const specific = runs.filter(
     (w) =>
       p.weeks[w.week].phase === 'Race preparation' &&
@@ -131,9 +145,13 @@ void test('actual allocated training controls long-run share and taper, with rac
             dayDiff(w.date, p.profile.raceDate) <= days,
         )
         .reduce((n, w) => n + w.minutes, 0);
-    assert.ok(finalWindow(input.goal === 'marathon' ? 6 : 7) <= ref * 0.4 + 1);
     assert.ok(
-      finalWindow(input.goal === 'marathon' ? 13 : 14) <= ref * 1.05 + 2,
+      finalWindow(input.goal === 'marathon' ? 6 : 7) <=
+        ref * (input.goal === 'marathon' ? 0.4 : 0.6) + 1,
+    );
+    assert.ok(
+      finalWindow(input.goal === 'marathon' ? 13 : 14) <=
+        ref * (input.goal === 'marathon' ? 1.05 : 1.6) + 2,
     );
     assert.equal(
       p.weeks.at(-1).raceKm,
@@ -181,10 +199,34 @@ void test('rest remains possible when removing easy volume would raise quality f
   );
 });
 void test('strides are described as mostly easy and unknown distance is not made precise', () => {
-  const p = generate({ ...demo, intent: 'finish' }),
-    strides = p.workouts.find((w) => w.stimulus === 'economy');
-  assert.ok(strides);
+  const recipe = WORKOUT_LIBRARY.find((t) => t.id === 'economy-relaxed');
+  const dose = scaleTemplate(recipe, 30, false, 'Build', 2, 2, demo);
+  assert.ok(dose);
+  const strides = {
+    ...dose,
+    kind: recipe.kind,
+    stimulus: recipe.stimulus,
+    hard: false,
+  };
   assert.equal(summaryEffort(strides), '2–3');
+  const finish = generate({
+    ...demo,
+    intent: 'finish',
+    qualityMode: 'custom',
+    qualitySessions: 1,
+  });
+  assert.ok(
+    finish.workouts.some(
+      (w) => w.hard && w.kind !== 'race' && w.stimulus !== 'economy',
+    ),
+  );
+  assert.ok(
+    finish.workouts
+      .filter((w) => w.hard && w.kind !== 'race')
+      .every((w) =>
+        w.steps.filter((s) => s.kind === 'work').every((s) => s.intensity <= 5),
+      ),
+  );
   const unknown = generate({ ...demo, easyPace: null, runMeasure: 'time' });
   assert.ok(
     unknown.workouts

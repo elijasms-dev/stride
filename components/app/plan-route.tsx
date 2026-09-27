@@ -24,6 +24,7 @@ export function PlanRoute() {
         onWorkout={showWorkout}
         onDay={showDay}
         onAdjust={() => openModal('adjustments')}
+        onPreferences={() => openModal(isDemo ? 'onboarding' : 'preferences')}
         onVariety={() => openModal('variety-review')}
         selected={week.index}
         onSelect={selectWeek}

@@ -1,0 +1,26 @@
+{
+  "sourceSha256": "d3381ddd9c65b9d675b4ca9103ef49ba87d2ba6a99d6a5a03f8ab1c0cc5ec059",
+  "testSuite": {
+    "passed": 2877,
+    "failed": 0
+  },
+  "firstRaceMatrix": {
+    "generatedAt": "2026-09-24T14:49:02.277Z",
+    "libSha256": "d3381ddd9c65b9d675b4ca9103ef49ba87d2ba6a99d6a5a03f8ab1c0cc5ec059",
+    "cases": 1266,
+    "adequate": 1202,
+    "foundation": 24,
+    "preparationGap": 16,
+    "expectedRejections": 24,
+    "failures": 0
+  },
+  "typecheck": "passed",
+  "lintApp": "passed",
+  "productionBuild": "passed",
+  "approvedMarathonFixtures": {
+    "passed": 21,
+    "changed": 0
+  },
+  "pushed": false,
+  "paceFollowUp": "docs/reviews/2026-09-24-pacing-follow-up.md"
+}

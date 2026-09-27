@@ -145,7 +145,11 @@ export default function TrainingReview({
         <>
           {walkChanges.length > 0 && (
             <section className="notice" aria-label="Run-walk stage change">
-              <strong>Longer running intervals, with walking breaks</strong>
+              <strong>
+                {plan.beginner
+                  ? 'Your next Couch to 5K stage'
+                  : 'Longer running intervals, with walking breaks'}
+              </strong>
               <p>
                 Longest running interval:{' '}
                 {duration(longestStep(previousWalks, 'run'))}

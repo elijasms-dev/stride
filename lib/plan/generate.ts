@@ -1,7 +1,21 @@
+import { isFirstRaceProfile } from '../first-race-policy.ts';
+import { makeFirstRacePlan } from './first-race.ts';
+import { isBeginnerProfile } from '../beginner-course.ts';
+import { makeBeginnerPlan } from './beginner.ts';
 /** Plan generate responsibilities; extracted without changing policy or behavior. */
 import { applyAdvancedMethod } from '../advanced-methods.ts';
+import { roadPreparationConstraint } from '../road-feasibility.ts';
+import {
+  isRoadRaceProfile,
+  roadTrainingPolicy,
+  roadTaperDays,
+} from '../road-training-policy.ts';
 import { marathonBookNote } from '../marathon-book.ts';
-import { distanceEstimate, qualityWorkMinutes } from '../prescription.ts';
+import {
+  distanceEstimate,
+  qualityWorkMinutes,
+  resolvePrescription,
+} from '../prescription.ts';
 import { runMeasureNote } from '../run-distance.ts';
 import { applyPreferredStartTimes } from '../runner-customization.ts';
 import {
@@ -15,12 +29,16 @@ import {
 } from '../ultra-policy.ts';
 import { scaleTemplate, WORKOUT_LIBRARY } from '../workout-library.ts';
 import { withSpecificWorkoutName } from '../workout-names.ts';
-import { withWorkoutTargets } from '../workout-targets.ts';
+import {
+  resolveEffortRole,
+  workoutStepTarget,
+  withAllocatedWorkoutTargets as withWorkoutTargets,
+} from '../workout-targets.ts';
 import {
   applyActualTrainingEnvelope,
   rebalanceFutureQuality,
 } from './allocate.ts';
-import { addDays, dateLabel, dayDiff } from './calendar.ts';
+import { addDays, dateLabel, dayDiff, monday } from './calendar.ts';
 import { PlanError } from './errors.ts';
 import {
   taperFactor,
@@ -38,6 +56,7 @@ import {
   resolveGenerationPolicy,
 } from './generation-policy.ts';
 import {
+  fundWeek,
   reconcileOpeningBaseline,
   reconcileOrdinaryWeeklyProgression,
 } from './generation-baseline.ts';
@@ -57,9 +76,10 @@ import {
   validateProfile,
 } from './profile.ts';
 import { refreshWeekTotals } from './totals.ts';
-import { type Plan } from './types.ts';
+import { type Plan, type Profile } from './types.ts';
 import { validatePlan } from './validate.ts';
 import { refreshWorkoutVariety } from './variety.ts';
+import { SESSION_BALANCE_VERSION } from './session-balance.ts';
 
 // Numerical allocation must settle before a plan is accepted. This is a bounded
 // computation guard, not a training progression or load allowance.
@@ -71,7 +91,53 @@ export function makePlan(
   findAlternative = true,
   replan?: ReplanContext,
 ): Plan {
-  const context = resolveGenerationPolicy(validateProfile(input, asOf), replan);
+  const profile = validateProfile(input, asOf);
+  if (isBeginnerProfile(profile)) return makeBeginnerPlan(profile);
+  if (isFirstRaceProfile(profile)) {
+    const plan = makeFirstRacePlan(profile, asOf, replan);
+    const errors = validatePlan(plan, replan?.retainedPrefix);
+    if (errors.length) throw new PlanError(errors[0]);
+    return plan;
+  }
+  // A base block's finish date is a calendar boundary, not an event taper.
+  // Generate its complete final week first, then retain only in-range sessions.
+  // Validation still applies to the user's original date span (up to 52 weeks).
+  const finish = profile.raceDate;
+  const generationFinish =
+    profile.goal === 'base' ? addDays(monday(finish), 6) : finish;
+  const plan = makeValidatedPlan(
+    generationFinish === finish
+      ? profile
+      : { ...profile, raceDate: generationFinish },
+    asOf,
+    findAlternative,
+    replan,
+  );
+  if (generationFinish === finish) return plan;
+  plan.profile.raceDate = finish;
+  plan.workouts = plan.workouts.filter((workout) => workout.date <= finish);
+  const shortNote = `Short block · ${dayDiff(profile.startDate, finish) + 1} calendar days. Training starts from your current routine and stays within these dates.`;
+  plan.notes = plan.notes.filter((note) => !note.startsWith('Short block ·'));
+  if (
+    dayDiff(profile.startDate, finish) <
+    preparationRequirements(profile).recommendedDays
+  )
+    plan.notes.unshift(shortNote);
+  refreshWeekTotals(plan);
+  const errors = validatePlan(plan, replan?.retainedPrefix);
+  if (errors.length) throw new PlanError(errors[0]);
+  return plan;
+}
+
+/** Generation receives an already validated profile, including internal calendar
+ * padding for a base block. Padded dates never leave the public makePlan boundary. */
+function makeValidatedPlan(
+  profile: Profile,
+  asOf?: string,
+  findAlternative = true,
+  replan?: ReplanContext,
+): Plan {
+  const context = resolveGenerationPolicy(profile, replan);
   const {
     p,
     bookMarathon,
@@ -215,13 +281,26 @@ export function makePlan(
     id: `plan-${start}-${p.goal}`,
     engineVersion: ENGINE_VERSION,
     policyVersion: TRAINING_POLICY.version,
+    ...((isRoadRaceProfile(p) || p.goal === 'marathon') &&
+    !isNovice &&
+    (!p.method || p.method === 'balanced')
+      ? { sessionBalanceVersion: SESSION_BALANCE_VERSION }
+      : {}),
     profile: p,
     weeks,
     workouts,
     notes: [
       runMeasureNote(p.runMeasure),
       ...(bookMarathon ? [marathonBookNote(p)] : []),
-      ...(p.goal === '5k' && policy.longCeilingKm > familyPolicy.longCeilingKm
+      ...(isRoadRaceProfile(p)
+        ? [
+            `${p.goal === 'half' ? 'Half-marathon' : p.goal.toUpperCase()} preparation uses the ${roadTrainingPolicy(p).ability} running-capacity band. The first long run starts from your declared routine. Supporting easy runs stay shorter; any opening weekly-distance adjustment is explained separately. Later long runs progress in whole kilometres or hold, within your available time and weekly allocation.`,
+            `Your ${requestedQuality} weekday ${requestedQuality === 1 ? 'workout is' : 'workouts are'} separate from the easy long run. Recovery weeks reduce the workload; the final ${roadTaperDays(p)} days taper toward race day. Workout doses follow your background and planned exposures, not spare time in your schedule.`,
+          ]
+        : []),
+      ...(!isRoadRaceProfile(p) &&
+      p.goal === '5k' &&
+      policy.longCeilingKm > familyPolicy.longCeilingKm
         ? [
             '5K endurance keeps room for your familiar longer easy run. It does not extend beyond your recent long-run baseline or a 90-minute planning allowance. Your weekly balance, time limits, recovery weeks and taper can make it shorter.',
           ]
@@ -262,6 +341,19 @@ export function makePlan(
     ],
     createdAt: p.startDate,
     baselineEvidence: replan?.baseline,
+    ...(replan &&
+    (isRoadRaceProfile(p) || p.goal === 'marathon') &&
+    !isNovice &&
+    (!p.method || p.method === 'balanced')
+      ? {
+          // Returning caution is applied once to each forecast, not compounded
+          // each time the same forecast is reviewed with unchanged evidence.
+          allocationBaseline: {
+            weeklyKm: base / context.initialFactor,
+            weeklyMinutes: (base * pace) / context.initialFactor,
+          },
+        }
+      : {}),
     ...(replan?.returnState ? { returnState: replan.returnState } : {}),
     feasibility: {
       status: 'forecast',
@@ -269,6 +361,58 @@ export function makePlan(
       asOf: replan?.from ?? p.startDate,
     },
   };
+  if (isRoadRaceProfile(p)) {
+    for (const week of plan.weeks) {
+      const runs = plan.workouts.filter(
+        (w) => w.week === week.index && w.kind !== 'race',
+      );
+      const allocatedKm = runs.reduce((sum, w) => sum + w.estimatedKm, 0);
+      let updated = false;
+      for (const workout of runs) {
+        if (
+          !workout.hard ||
+          workout.kind === 'long' ||
+          workout.status !== 'planned' ||
+          workout.changed
+        )
+          continue;
+        const targetedSteps = workout.steps.map((step) => {
+          const target = workoutStepTarget(workout, step, p);
+          return {
+            ...step,
+            effortRole: resolveEffortRole(workout, step, p),
+            ...(target ? { target } : {}),
+          };
+        });
+        // Capacity must count known faster work before enforcing easy-padding
+        // ceilings. Unknown effort portions retain the broad conservative bound.
+        if (
+          targetedSteps.some(
+            (step) => step.kind === 'work' && step.target?.mode === 'pace',
+          )
+        ) {
+          const estimate = distanceEstimate(targetedSteps, p);
+          if (estimate.lowerKm !== null) {
+            workout.steps = targetedSteps;
+            workout.estimatedKm = estimate.lowerKm;
+            workout.distanceEstimate = estimate;
+            updated = true;
+          }
+        }
+      }
+      // A corrected main-set estimate does not add weekly mileage. Rebalance
+      // only relaxed running around the intact quality sets and fixed long run.
+      if (updated)
+        fundWeek(
+          plan,
+          runs,
+          allocatedKm,
+          'The planned weekly distance cannot fit the prescribed pace ranges and session limits. Review the pace and available time together.',
+          undefined,
+          false,
+        );
+    }
+  }
   reconcileOpeningBaseline(plan, allowDeclaredOpening);
   applyActualTrainingEnvelope(plan, undefined, replan?.retainedPrefix);
   rebalanceFutureQuality(plan, replan?.from ?? p.startDate);
@@ -292,15 +436,16 @@ export function makePlan(
   if (
     p.goal !== 'base' &&
     exposure + 0.01 < requiredExposure &&
-    (replan || shortBlock)
+    (replan || shortBlock || isRoadRaceProfile(p))
   ) {
     plan.feasibility = {
       status: 'review-required',
       asOf: replan?.from ?? p.startDate,
       reasons: [
-        shortBlock
+        (shortBlock
           ? `This short block reaches ${round(exposure)} ${exposureUnit} for its longest training session. It does not include the full event build-up; preparation before the start date is outside this plan.`
-          : `The remaining block reaches ${round(exposure)} ${exposureUnit} for its longest training session, below this event policy's ${round(requiredExposure)} ${exposureUnit} preparation exposure. Review the event or date; the old forecast is not evidence of readiness.`,
+          : `The remaining block reaches ${round(exposure)} ${exposureUnit} for its longest training session, below this event policy's ${round(requiredExposure)} ${exposureUnit} preparation exposure. Review the event and preparation; the old forecast is not evidence of readiness.`) +
+          roadPreparationConstraint(p, requiredExposure),
       ],
     };
   }
@@ -308,7 +453,8 @@ export function makePlan(
     p.goal !== 'base' &&
     exposure + 0.01 < requiredExposure &&
     !replan &&
-    !shortBlock
+    !shortBlock &&
+    !isRoadRaceProfile(p)
   ) {
     const maximumFromBaseline =
       Math.min(
@@ -406,7 +552,7 @@ export function makePlan(
   normalizeGeneratedLongRuns(varied, replan?.from ?? p.startDate);
   reconcileOpeningBaseline(varied, allowDeclaredOpening);
   reconcileOrdinaryWeeklyProgression(varied, allowDeclaredOpening);
-  const errors = validatePlan(varied);
+  const errors = validatePlan(varied, replan?.retainedPrefix);
   if (errors.length) throw new PlanError(errors[0]);
   varied.workouts = varied.workouts.map((w) =>
     withWorkoutTargets(withSpecificWorkoutName(w), varied.profile),
@@ -427,6 +573,11 @@ export function makePlan(
     normalizeGeneratedLongRuns(varied, replan?.from ?? p.startDate);
     reconcileOpeningBaseline(varied, allowDeclaredOpening);
     reconcileOrdinaryWeeklyProgression(varied, allowDeclaredOpening);
+    varied.workouts = varied.workouts.map((w) =>
+      w.steps.some((s) => s.target?.mode === 'pace')
+        ? withWorkoutTargets(w, varied.profile)
+        : resolvePrescription(w, varied.profile, true),
+    );
     if (allocationSnapshot() === before) {
       allocationSettled = true;
       break;
@@ -437,7 +588,7 @@ export function makePlan(
       'The weekly progression and session limits cannot settle into a consistent plan. Review the starting load and available training time together.',
     );
   refreshWeekTotals(varied);
-  const finalErrors = validatePlan(varied);
+  const finalErrors = validatePlan(varied, replan?.retainedPrefix);
   if (finalErrors.length) throw new PlanError(finalErrors[0]);
   return varied;
 }

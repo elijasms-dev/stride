@@ -156,3 +156,67 @@ void test('a failed logical action releases its guard and allows a real retry', 
   assert.equal(await singleFlight(slot, work), 'saved');
   assert.equal(attempts, 2);
 });
+
+void test('reads, previews and feedback remain nonblocking; only replacement commits block', async () => {
+  const { actionProgressBlocking } = await import(source);
+  for (const action of [
+    'preview',
+    'complete',
+    'freeRun',
+    'correctLog',
+    'preferencesPreview',
+    'workoutPreview',
+  ]) {
+    assert.equal(
+      actionProgressBlocking('/api/plan', {
+        method: 'POST',
+        body: JSON.stringify({ action }),
+      }),
+      false,
+    );
+  }
+  assert.equal(actionProgressBlocking('/api/activities'), false);
+  assert.equal(
+    actionProgressBlocking('/api/recovery', {
+      method: 'POST',
+      body: '{"action":"preview"}',
+    }),
+    false,
+  );
+  assert.equal(
+    actionProgressBlocking('/api/plan', {
+      method: 'POST',
+      body: '{"action":"activate"}',
+    }),
+    true,
+  );
+  assert.equal(
+    actionProgressBlocking('/api/recovery', {
+      method: 'POST',
+      body: '{"action":"commit"}',
+    }),
+    true,
+  );
+  const gate = deferred();
+  const task = withActionProgress('Checking runs…', () => gate.promise);
+  assert.equal(getActionProgress().blocking, false);
+  gate.resolve();
+  await task;
+});
+
+void test('nested read cannot remove an atomic replacement lock', async () => {
+  const commit = deferred(),
+    read = deferred();
+  const a = withActionProgress('Replacing journal…', () => commit.promise, {
+    blocking: true,
+  });
+  const b = withActionProgress('Reading…', () => read.promise);
+  assert.equal(getActionProgress().label, 'Replacing journal…');
+  assert.equal(getActionProgress().blocking, true);
+  commit.resolve();
+  await a;
+  assert.equal(getActionProgress().label, 'Reading…');
+  assert.equal(getActionProgress().blocking, false);
+  read.resolve();
+  await b;
+});

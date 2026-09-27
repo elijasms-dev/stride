@@ -3,8 +3,10 @@
 import { NotificationBar, type AppNotification } from '../notification-bar';
 /* oxlint-disable react/react-compiler -- This app hydrates device preferences after SSR; it does not use the React Compiler. */
 import { TRAINING_POLICY } from '@/lib/engine';
+import { needsSessionBalanceReview } from '@/lib/plan/session-balance';
 import { ArrowUpRight, CloudOff, RotateCcw } from 'lucide-react';
 import { useAppContext } from './app-context';
+import { PendingSaves } from './device-journal-settings';
 
 export function AppNotices() {
   const {
@@ -23,6 +25,7 @@ export function AppNotices() {
     returnCheck,
     walkCheck,
     unconfirmedRunWalk,
+    deviceError,
   } = useAppContext();
   return (
     <>
@@ -53,7 +56,9 @@ export function AppNotices() {
                 } satisfies AppNotification,
               ]
             : []),
-          ...(!isDemo && plan.policyVersion !== TRAINING_POLICY.version
+          ...(!isDemo &&
+          (plan.policyVersion !== TRAINING_POLICY.version ||
+            needsSessionBalanceReview(plan))
             ? [
                 {
                   id: 'training-update',
@@ -91,9 +96,15 @@ export function AppNotices() {
       {offline && (
         <output className="notice error connection-notice">
           <CloudOff size={18} /> You are offline. Your current view is
-          available; reconnect to save changes.
+          available. Run logs can be saved on this device and synced later.
         </output>
       )}
+      {deviceError && (
+        <p className="notice error" role="alert">
+          {deviceError}
+        </p>
+      )}
+      <PendingSaves />
       {loadError && (
         <div className="notice error connection-notice" role="alert">
           <span>{loadError}</span>
@@ -160,7 +171,9 @@ export function AppNotices() {
               </strong>
               <p>
                 {walkCheck.ready
-                  ? 'Review longer running intervals while holding weekly volume.'
+                  ? plan.beginner
+                    ? 'Review the next beginner stage after comfortable, confirmed lessons. Repeat whenever needed.'
+                    : 'Review longer running intervals while holding weekly volume.'
                   : walkCheck.heldForFatigue
                     ? walkCheck.reason
                     : 'A comfortable outing has no running-interval confirmation. If you remember, review that log. Otherwise, keep this stage and log your next scheduled runs.'}

@@ -1,3 +1,7 @@
+import { reserveBeginnerRecovery } from './beginner-course.ts';
+import { rebuildBeginner } from './plan/beginner.ts';
+import { validateProfile } from './plan/profile.ts';
+import { monday } from './plan/calendar.ts';
 import { schedulingEasyPace } from './fitness-pacing.ts';
 import {
   FIFTY_MILES_KM,
@@ -13,7 +17,10 @@ import { rebalanceFutureQuality } from './plan/allocate.ts';
 import { validatePlan } from './plan/validate.ts';
 import { PlanError } from './plan/errors.ts';
 import { type Goal, type Plan, type Profile } from './plan/types.ts';
-import { currentTrainingBaseline } from './training-history.ts';
+import {
+  currentTrainingBaseline,
+  trainingRecords,
+} from './training-history.ts';
 export type EventPatch = Pick<
   Profile,
   | 'goal'
@@ -33,6 +40,40 @@ export function changeEvent(plan: Plan, patch: EventPatch, asOf: string): Plan {
     throw new PlanError(
       'Complete the current return review before starting another block. You can extend rest or defer the race in Adjust training.',
     );
+  if (plan.beginner && ['5k', '10k', 'half', 'marathon'].includes(patch.goal)) {
+    if (patch.raceDate < asOf || patch.raceDate < plan.profile.raceDate)
+      throw new PlanError(
+        'Choose a beginner-course finish date on or after today and the current finish date.',
+      );
+    const profile = validateProfile(
+      {
+        ...plan.profile,
+        goal: patch.goal as Goal,
+        planLevel: 'beginner',
+        raceDate: patch.raceDate,
+        raceName: patch.raceName,
+      },
+      asOf,
+    );
+    const next = structuredClone(plan);
+    const start = monday(profile.startDate);
+    next.weeks = Array.from(
+      { length: Math.floor(dayDiff(start, profile.raceDate) / 7) + 1 },
+      (_, index) =>
+        next.weeks[index] ?? {
+          index,
+          start: addDays(start, index * 7),
+          phase: 'Foundation',
+          targetKm: 0,
+          longKm: 0,
+          focus: 'Continue the reviewed beginner stage.',
+        },
+    );
+    next.notes.push(
+      'The beginner course finish date was extended. Your saved stage and completed lessons remain; distance is still unprescribed.',
+    );
+    return rebuildBeginner(next, profile, asOf);
+  }
   const baseline = currentTrainingBaseline(plan, asOf);
   const recentRace = plan.workouts
     .filter(
@@ -74,6 +115,9 @@ export function changeEvent(plan: Plan, patch: EventPatch, asOf: string): Plan {
   const profile: Profile = {
     ...plan.profile,
     goal: patch.goal as Goal,
+    planLevel: ['5k', '10k', 'half', 'marathon'].includes(patch.goal)
+      ? plan.profile.planLevel
+      : undefined,
     raceName: patch.raceName,
     raceDate: patch.raceDate,
     raceDistanceKm: patch.raceDistanceKm,
@@ -190,6 +234,17 @@ export function avoidRecordedOverlap(
     throw new PlanError(
       'Complete the current return review before starting another block. Rest can be extended in Adjust training.',
     );
+  if (candidate.beginner) {
+    const next = structuredClone(candidate);
+    reserveBeginnerRecovery(next, asOf, [
+      ...trainingRecords(previous).map((r) => r.date),
+      ...(standaloneRuns ?? []).map((r) => r.date),
+    ]);
+    refreshWeekTotals(next);
+    const errors = validatePlan(next);
+    if (errors.length) throw new PlanError(errors[0]);
+    return next;
+  }
   const dates = new Set([
     ...previous.workouts
       .filter((w) => w.status === 'completed')
@@ -251,7 +306,8 @@ export function avoidRecordedOverlap(
   }
   refreshWeekTotals(candidate);
   rebalanceFutureQuality(candidate, candidate.profile.startDate);
-  if (isLongUltra(candidate.profile)) refreshFeasibility(candidate, asOf);
+  if (candidate.firstRace || isLongUltra(candidate.profile))
+    refreshFeasibility(candidate, asOf);
   return candidate;
 }
 

@@ -1,5 +1,10 @@
 'use client';
-import { useSyncExternalStore, type ComponentProps } from 'react';
+import {
+  useEffect,
+  useState,
+  useSyncExternalStore,
+  type ComponentProps,
+} from 'react';
 import {
   getActionProgress,
   getServerActionProgress,
@@ -34,18 +39,34 @@ export function BusyStatus({ label }: { label: string }) {
 
 export function ActionProgressScreen() {
   const progress = useActionProgress();
+  const [visibleId, setVisibleId] = useState<number | null>(null);
+  const progressId = progress?.id;
+  useEffect(() => {
+    if (progressId === undefined) return;
+    const timer = setTimeout(() => setVisibleId(progressId), 200);
+    return () => clearTimeout(timer);
+  }, [progressId]);
+  if (!progress || visibleId !== progress.id) return null;
+  if (!progress.blocking)
+    return (
+      <output
+        className="action-progress-toast"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        <span className="action-spinner small" aria-hidden="true" />
+        <span>{progress.label}</span>
+      </output>
+    );
   return (
-    <Dialog open={!!progress} onOpenChange={() => {}}>
+    <Dialog open onOpenChange={() => {}}>
       <DialogContent showCloseButton={false} className="action-progress-modal">
         <span className="action-spinner" aria-hidden="true" />
         <div>
-          <DialogTitle>{progress?.label ?? 'Working…'}</DialogTitle>
+          <DialogTitle>{progress.label}</DialogTitle>
           <DialogDescription>
             Your entries stay in place while this finishes.
           </DialogDescription>
-          <output className="sr-only" aria-live="polite" aria-atomic="true">
-            {progress?.label}
-          </output>
         </div>
       </DialogContent>
     </Dialog>

@@ -115,8 +115,22 @@ export function currentTrainingBaseline(plan: Plan, asOf: string) {
           1,
           plan.profile.days.length / Math.max(1, plan.profile.currentRuns),
         );
+  // A balanced forecast can deliberately leave part of its budget unused.
+  // Reusing its shorter outings as a new baseline would compound that reduction
+  // on every review. Carry the pre-clipping budget separately from evidence.
+  const allocated =
+    plan.policyVersion === TRAINING_POLICY.version &&
+    plan.sessionBalanceVersion === 'distinct-long-v1'
+      ? plan.allocationBaseline
+      : undefined;
   const reviewedOpening =
-    plan.policyVersion === TRAINING_POLICY.version && plan.baselineEvidence
+    plan.policyVersion === TRAINING_POLICY.version &&
+    plan.baselineEvidence &&
+    !allocated &&
+    !(
+      plan.sessionBalanceVersion === 'distinct-long-v1' &&
+      asOf <= plan.profile.startDate
+    )
       ? plan.weeks.find(
           (week) =>
             week.start >= plan.baselineEvidence!.asOf &&
@@ -138,7 +152,7 @@ export function currentTrainingBaseline(plan: Plan, asOf: string) {
       5,
     reviewedRuns.length
       ? reviewedRuns.reduce((sum, w) => sum + w.estimatedKm, 0)
-      : Infinity,
+      : (allocated?.weeklyKm ?? Infinity),
   );
   const declaredMinutes = Math.min(
     plan.baselineEvidence?.weeklyMinutes ??
@@ -150,7 +164,7 @@ export function currentTrainingBaseline(plan: Plan, asOf: string) {
       ),
     reviewedRuns.length
       ? reviewedRuns.reduce((sum, w) => sum + w.minutes, 0)
-      : Infinity,
+      : (allocated?.weeklyMinutes ?? Infinity),
   );
   const observedMinutes =
     (records.reduce((n, r) => n + r.minutes, 0) * 7) / elapsed;
@@ -251,8 +265,14 @@ export function currentTrainingBaseline(plan: Plan, asOf: string) {
     coverage: Math.round(coverage * 100),
     known: resolved.length,
     due: due.length,
-    weeklyKm: round(Math.max(1, weeklyKm), 3),
-    weeklyMinutes: round(Math.max(7, weeklyMinutes)),
+    weeklyKm:
+      allocated && !enough
+        ? Math.max(1, weeklyKm)
+        : round(Math.max(1, weeklyKm), 3),
+    weeklyMinutes:
+      allocated && !enough
+        ? Math.max(7, weeklyMinutes)
+        : round(Math.max(7, weeklyMinutes)),
     longestKm: round(Math.max(1, longestKm), 3),
     source: enough
       ? ('recorded-plan-history' as const)

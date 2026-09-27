@@ -1,5 +1,6 @@
 'use client';
 import { CustomizationSummary } from '../runner-customization-fields';
+import { comparePlanPreferences } from '@/lib/plan-preferences-summary';
 
 import { dateLabel, type Plan } from '@/lib/engine';
 import {
@@ -108,6 +109,14 @@ export function PreferencePreview({
             <span>Week of {dateLabel(overview.weekStart)}</span>
           )}
         </div>
+        <PrescriptionComparison
+          label="Saved preferences before and after"
+          rows={comparePlanPreferences(plan.profile, preview.profile)}
+        />
+        <p className="plan-control-hint">
+          Unchanged values remain your saved choices. Weekly prescriptions can
+          still be lighter for recovery, taper or a reviewed return.
+        </p>
         <PrescriptionComparison
           label="Training totals comparison"
           rows={overview.rows}

@@ -1,6 +1,8 @@
+import { beginRequestObservation } from '@/lib/request-observation';
 import { ownerId, json, failure, database } from '@/lib/server';
 import { readAccount } from '@/lib/accounts';
 export async function GET(request: Request) {
+  const observation = beginRequestObservation(request);
   try {
     const a = await readAccount(ownerId(request));
     const db = database();
@@ -39,6 +41,6 @@ export async function GET(request: Request) {
       },
     });
   } catch (e) {
-    return failure(e);
+    return failure(e, observation);
   }
 }

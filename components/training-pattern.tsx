@@ -1,7 +1,7 @@
+import { isBeginnerProfile } from '@/lib/beginner-course';
 import { dayNames, type Profile } from '@/lib/engine';
 import { usesMarathonBook } from '@/lib/marathon-book';
 import {
-  classicQualityCount,
   desiredRuns,
   qualitySchedule,
   aerobicSupportDay,
@@ -16,16 +16,7 @@ export function TrainingPattern({
   heading?: string;
 }) {
   const count = desiredRuns(profile);
-  const quality =
-    profile.goal === 'base' || profile.intent === 'finish'
-      ? []
-      : qualitySchedule({
-          ...profile,
-          qualitySessions:
-            profile.qualityMode === 'automatic'
-              ? classicQualityCount(profile)
-              : profile.qualitySessions,
-        });
+  const quality = qualitySchedule(profile);
   const doubles = ['easy-doubles', 'double-threshold'].includes(
     profile.method ?? '',
   )
@@ -51,13 +42,15 @@ export function TrainingPattern({
             ? cross
               ? 'Cross-train'
               : 'Rest'
-            : count > 2 && index === profile.longDay
-              ? 'Long'
-              : quality.includes(index)
-                ? 'Workout'
-                : index === medium
-                  ? 'Endurance'
-                  : 'Easy';
+            : isBeginnerProfile(profile)
+              ? 'Run/walk'
+              : count > 2 && index === profile.longDay
+                ? 'Long'
+                : quality.includes(index)
+                  ? 'Workout'
+                  : index === medium
+                    ? 'Endurance'
+                    : 'Easy';
           return (
             <li key={day} data-role={role.toLowerCase()}>
               <span>{day.slice(0, 3)}</span>
@@ -69,9 +62,11 @@ export function TrainingPattern({
         })}
       </ol>
       <p>
-        {usesMarathonBook(profile)
-          ? `${medium === undefined ? 'Endurance follows your selected running days.' : 'Midweek endurance fits your baseline and time limits.'} ${quality.length && profile.intent !== 'finish' && profile.difficulty !== 'gentle' ? 'Marathon-effort long runs count as one of your workouts. ' : ''}Recovery and taper weeks are lighter.`
-          : 'Recovery, taper and race weeks can be lighter. Your available days are options, not extra runs.'}
+        {isBeginnerProfile(profile)
+          ? 'Timed beginner lessons, no speed workouts. Keep a rest day between runs and review each stage after comfortable completion.'
+          : usesMarathonBook(profile)
+            ? `${medium === undefined ? 'Endurance follows your selected running days.' : 'Midweek endurance fits your baseline and time limits.'} ${quality.length && profile.intent !== 'finish' && profile.difficulty !== 'gentle' ? 'Marathon-effort long runs count as one of your workouts. ' : ''}Recovery and taper weeks are lighter.`
+            : 'Recovery, taper and race weeks can be lighter. Your available days are options, not extra runs.'}
       </p>
     </section>
   );

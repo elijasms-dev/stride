@@ -1,3 +1,4 @@
+import { beginnerReview } from '../beginner-course.ts';
 import {
   PLAN_LOAD_LIMITS,
   RETURN_TRAINING_POLICY,
@@ -203,6 +204,8 @@ export function returnReview(plan: Plan, asOf: string) {
 }
 
 export function noviceReview(plan: Plan, asOf: string) {
+  if (plan.beginner) return beginnerReview(plan, asOf);
+  if (plan.firstRace) return null;
   if (
     plan.profile.experience !== 'new' ||
     (plan.profile.runWalkStage ?? 0) >=

@@ -42,19 +42,26 @@ const input = (patch = {}) => ({
 const make = (patch = {}) => makePlan(input(patch), start);
 const training = (plan) => plan.workouts.filter((w) => w.kind !== 'race');
 
-test('the full training week 22–27 days before a Sunday half keeps its race-specific work', () => {
+test('the full training week 15–20 days before a Sunday half keeps its race-specific work', () => {
   const plan = make();
-  const week = plan.weeks.find((w) => w.start === '2026-11-02');
+  const week = plan.weeks.find((w) => w.start === '2026-11-09');
   assert.equal(week.phase, 'Race preparation');
-  assert.match(week.focus, /Taper begins on 8 Nov/);
+  assert.match(week.focus, /Taper begins on 15 Nov/);
   const runs = training(plan).filter((w) => w.week === week.index);
   assert.equal(runs.length, 5);
-  assert.equal(
-    runs.reduce((n, w) => n + w.minutes, 0),
-    300,
+  assert.ok(
+    Math.abs(runs.reduce((n, w) => n + w.estimatedKm, 0) - 50) <= 0.001,
   );
-  assert.equal(runs.find((w) => w.date === '2026-11-03').qualityMinutes, 24);
-  assert.equal(runs.find((w) => w.date === '2026-11-05').qualityMinutes, 20);
+  const quality = runs.filter((w) => w.hard);
+  assert.equal(quality.length, 2);
+  assert.ok(
+    quality.every(
+      (w) =>
+        w.steps
+          .filter((step) => step.kind === 'work' && step.intensity >= 4)
+          .reduce((sum, step) => sum + step.seconds / 60, 0) >= 6,
+    ),
+  );
   assert.ok(runs.every((w) => taperFactor(plan.profile, w.date) === 1));
   assert.ok(runs.every((w) => !/Taper ·/.test(w.reason)));
   assert.deepEqual(validatePlan(plan), []);
@@ -67,6 +74,7 @@ for (let raceDay = 0; raceDay < 7; raceDay++)
         raceDate: addDays('2026-11-23', raceDay),
         runsPerWeek,
         currentRuns: runsPerWeek,
+        ...(runsPerWeek === 3 ? { weeklyKm: 30, longestKm: 12 } : {}),
         qualitySessions: runsPerWeek >= 5 ? 2 : 1,
       });
       assert.deepEqual(validatePlan(plan), []);
@@ -77,13 +85,13 @@ for (let raceDay = 0; raceDay < 7; raceDay++)
           plan.weeks[w.week].phase,
           w.date,
         );
-        if (gap > 21) assert.ok(!['Taper', 'Race week'].includes(phase));
+        if (gap > 14) assert.ok(!['Taper', 'Race week'].includes(phase));
         else assert.ok(['Taper', 'Race week'].includes(phase));
         if (gap <= 2) assert.equal(w.hard, false);
       }
       for (const week of plan.weeks) {
         if (week.phase === 'Taper')
-          assert.ok(dayDiff(week.start, plan.profile.raceDate) <= 21);
+          assert.ok(dayDiff(week.start, plan.profile.raceDate) <= 14);
         const dates = new Set(
           plan.workouts.filter((w) => w.week === week.index).map((w) => w.date),
         );
@@ -92,22 +100,32 @@ for (let raceDay = 0; raceDay < 7; raceDay++)
     }
   });
 
-test('the existing three-week distance reduction remains intact, including custom half-family events', () => {
+test('named half uses two taper weeks while custom half-family events retain three', () => {
   for (const patch of [
     {},
     { goal: 'custom', raceDistanceKm: 20 },
     { goal: 'custom', raceDistanceKm: 30 },
   ]) {
     const plan = make(patch);
-    for (const [days, factor] of [
-      [22, 1],
-      [21, 0.85],
-      [15, 0.85],
-      [14, 0.65],
-      [8, 0.65],
-      [7, 0.4],
-      [1, 0.4],
-    ])
+    for (const [days, factor] of plan.profile.goal === 'half'
+      ? [
+          [22, 1],
+          [21, 1],
+          [15, 1],
+          [14, 0.8],
+          [8, 0.8],
+          [7, 0.5],
+          [1, 0.5],
+        ]
+      : [
+          [22, 1],
+          [21, 0.85],
+          [15, 0.85],
+          [14, 0.65],
+          [8, 0.65],
+          [7, 0.4],
+          [1, 0.4],
+        ])
       assert.equal(
         taperFactor(plan.profile, addDays(plan.profile.raceDate, -days)),
         factor,
@@ -122,7 +140,7 @@ test('the existing three-week distance reduction remains intact, including custo
 
 test('short blocks enter taper by date without compressing training or imposing a minimum length', () => {
   for (let offset = 0; offset < 7; offset++)
-    for (const span of [0, 1, 6, 20, 21, 22, 27]) {
+    for (const span of [0, 1, 6, 13, 14, 15, 20, 21, 22, 27]) {
       const startDate = addDays(start, offset);
       const profile = input({ startDate, raceDate: addDays(startDate, span) });
       const plan = makePlan(profile, startDate);
@@ -138,7 +156,7 @@ test('short blocks enter taper by date without compressing training or imposing 
           plan.weeks[w.week].phase,
           w.date,
         );
-        if (dayDiff(w.date, profile.raceDate) <= 21)
+        if (dayDiff(w.date, profile.raceDate) <= 14)
           assert.ok(['Taper', 'Race week'].includes(phase));
         else assert.equal(phase, 'Race preparation');
       }
@@ -151,7 +169,11 @@ test('explicit edits of a legacy boundary week do not retain its premature taper
     trainingPhaseOn(profile, 'Taper', '2026-11-03'),
     'Race preparation',
   );
-  assert.equal(trainingPhaseOn(profile, 'Taper', '2026-11-08'), 'Taper');
+  assert.equal(
+    trainingPhaseOn(profile, 'Taper', '2026-11-08'),
+    'Race preparation',
+  );
+  assert.equal(trainingPhaseOn(profile, 'Taper', '2026-11-15'), 'Taper');
   assert.equal(
     trainingPhaseOn(
       { ...profile, startDate: '2026-11-02' },
@@ -166,7 +188,7 @@ test('refresh preserves actual taper prescriptions and their last familiar pre-t
   const plan = make({ raceDate: '2026-11-25' });
   const before = structuredClone(plan);
   const tapered = training(plan).filter(
-    (w) => dayDiff(w.date, plan.profile.raceDate) <= 21,
+    (w) => dayDiff(w.date, plan.profile.raceDate) <= 14,
   );
   assert.ok(
     tapered.some(
@@ -184,7 +206,7 @@ test('refresh preserves actual taper prescriptions and their last familiar pre-t
         (s) =>
           s.templateId &&
           s.templateId === w.templateId &&
-          dayDiff(s.date, plan.profile.raceDate) > 21,
+          dayDiff(s.date, plan.profile.raceDate) > 14,
       )
       .at(-1);
     if (anchor)
@@ -201,7 +223,8 @@ test('optional supporting sessions reduce from the actual taper day, including a
     crossTraining: [{ day: 6, activity: 'cycling', minutes: 40 }],
   });
   assert.equal(supportingSession(plan, '2026-10-25').minutes, 40);
-  assert.equal(supportingSession(plan, '2026-11-08').minutes, 20);
+  assert.equal(supportingSession(plan, '2026-11-08').minutes, 40);
+  assert.equal(supportingSession(plan, '2026-11-15').minutes, 20);
 });
 
 for (const method of ['easy-doubles', 'double-threshold'])
@@ -227,7 +250,7 @@ for (const method of ['easy-doubles', 'double-threshold'])
     assert.ok(plan.workouts.some((w) => w.pairId));
     assert.ok(
       training(plan)
-        .filter((w) => dayDiff(w.date, plan.profile.raceDate) <= 21)
+        .filter((w) => dayDiff(w.date, plan.profile.raceDate) <= 14)
         .every((w) => !w.pairId),
     );
     assert.deepEqual(validatePlan(plan), []);

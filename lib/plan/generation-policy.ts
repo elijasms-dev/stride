@@ -6,6 +6,12 @@ import {
   SECONDS_PER_MINUTE,
 } from './generation-constants.ts';
 import { schedulingEasyPace } from '../fitness-pacing.ts';
+import {
+  isRoadRaceProfile,
+  roadTrainingPolicy,
+  roadPeakLongKm,
+  roadTaperDays,
+} from '../road-training-policy.ts';
 
 import { fiveKEnduranceCeiling } from '../five-k-endurance.ts';
 
@@ -56,6 +62,7 @@ export function resolveGenerationPolicy(
   replan?: ReplanContext,
 ) {
   const p = { ...profile, runMeasure: profile.runMeasure ?? 'distance' };
+  const road = isRoadRaceProfile(p) ? roadTrainingPolicy(p) : undefined;
   const bookMarathon = usesMarathonBook(p);
   const recoveryFactor = marathonRecoveryFactor(p);
   const shortBlock =
@@ -71,7 +78,14 @@ export function resolveGenerationPolicy(
           ...TRAINING_POLICY.family.marathon,
           longCeilingKm: marathonReference(p).longCeilingKm,
         }
-      : TRAINING_POLICY.family[trainingFamily(p)];
+      : road
+        ? {
+            ...TRAINING_POLICY.family[trainingFamily(p)],
+            longCeilingKm: roadPeakLongKm(p),
+            weeklyStepKm: road.weeklyStep,
+            maxForecast: road.forecastFactor,
+          }
+        : TRAINING_POLICY.family[trainingFamily(p)];
   const start = monday(p.startDate),
     count = Math.floor(dayDiff(start, p.raceDate) / DAYS_PER_WEEK) + 1;
   const recordedQuality = replan
@@ -109,7 +123,8 @@ export function resolveGenerationPolicy(
       ? Math.max(0, Math.floor(dayDiff(start, replan.from) / DAYS_PER_WEEK))
       : 0;
   const isNovice =
-    p.experience === 'new' || p.weeklyKm < GENERATION_POLICY.noviceWeeklyKm;
+    !road &&
+    (p.experience === 'new' || p.weeklyKm < GENERATION_POLICY.noviceWeeklyKm);
   const initialFactor =
     replan && p.experience === 'returning'
       ? TRAINING_POLICY.returningRunnerFactor
@@ -131,18 +146,20 @@ export function resolveGenerationPolicy(
       : p.currentRuns;
   const policy = {
     ...familyPolicy,
-    longCeilingKm: fiveKEnduranceCeiling(p, familyPolicy.longCeilingKm, {
-      longestKm: reviewedLongKm ?? p.longestKm,
-      longestMinutes:
-        replan?.baseline.longestMinutes ??
-        (reviewedLongKm ?? p.longestKm) * pace,
-      // Allocation frequency can include a newly requested day. It is not
-      // evidence that the runner already had that routine before this block.
-      currentRuns: Math.min(
-        p.currentRuns,
-        replan?.referenceRuns ?? p.currentRuns,
-      ),
-    }),
+    longCeilingKm: road
+      ? familyPolicy.longCeilingKm
+      : fiveKEnduranceCeiling(p, familyPolicy.longCeilingKm, {
+          longestKm: reviewedLongKm ?? p.longestKm,
+          longestMinutes:
+            replan?.baseline.longestMinutes ??
+            (reviewedLongKm ?? p.longestKm) * pace,
+          // Allocation frequency can include a newly requested day. It is not
+          // evidence that the runner already had that routine before this block.
+          currentRuns: Math.min(
+            p.currentRuns,
+            replan?.referenceRuns ?? p.currentRuns,
+          ),
+        }),
   };
   const frequencyFactor = replan
     ? Math.min(1, p.days.length / Math.max(1, referenceRuns))
@@ -180,11 +197,9 @@ export function resolveGenerationPolicy(
         ? ABSOLUTE_WEEKLY_KM.higherRoad
         : ABSOLUTE_WEEKLY_KM.other;
   const weeksUntilRace = count;
-  const taperWeeks = mandatoryTaperWeeks(
-    trainingFamily(p),
-    weeksUntilRace,
-    p.goal,
-  );
+  const taperWeeks = road
+    ? roadTaperDays(p) / 7
+    : mandatoryTaperWeeks(trainingFamily(p), weeksUntilRace, p.goal);
   // Keeping the block's progression clock never overrides recorded distance or
   // duration. These two observations independently constrain familiar endurance.
   const declaredLong =
@@ -194,9 +209,11 @@ export function resolveGenerationPolicy(
       ? Math.min(TRAINING_POLICY.family.marathon.longCeilingKm, declaredLong)
       : anchoredLongRunKm(declaredLong, policy.minLong);
   const peakLong = Math.min(
-    p.volume === 'maintain'
-      ? startLong
-      : peakLongRunKm(trainingFamily(p), startLong, p.intent),
+    road
+      ? roadPeakLongKm(p, startLong, longPace)
+      : p.volume === 'maintain'
+        ? startLong
+        : peakLongRunKm(trainingFamily(p), startLong, p.intent),
     // Keep the opening run anchored to history, but allow later whole sessions
     // to progress toward the existing long-ultra time ceiling.
     isLongUltra(p) ? LONG_ULTRA_POLICY.longMinutes / pace : Infinity,
@@ -237,8 +254,9 @@ export function resolveGenerationPolicy(
     throw new PlanError(
       'Your available days cannot fit a medium-long run away from the long run and quality session.',
     );
-  const preparationWeeks =
-    family === 'ultra'
+  const preparationWeeks = road
+    ? road.preparationWeeks
+    : family === 'ultra'
       ? isLongUltra(p)
         ? PREPARATION_WEEKS.longUltra
         : PREPARATION_WEEKS.ultra
@@ -255,6 +273,7 @@ export function resolveGenerationPolicy(
       : progressionStart;
   return {
     p,
+    road,
     bookMarathon,
     recoveryFactor,
     shortBlock,

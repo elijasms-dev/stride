@@ -1,0 +1,45 @@
+{
+  "generatedAt": "2026-09-24T10:41:08.291Z",
+  "libSourceSha256": "4d8937eb86f3289186b2745c472335eaf5d15615ddc5904eaca9717e1ba888c9",
+  "sweeps": [
+    {
+      "name": "Independent road abilities",
+      "cases": 81,
+      "accepted": 63,
+      "rejected": 18,
+      "failed": 0,
+      "weeks": 798
+    },
+    {
+      "name": "Endurance baselines",
+      "cases": 504,
+      "accepted": 252,
+      "rejected": 252,
+      "failed": 0,
+      "weeks": 4016
+    },
+    {
+      "name": "Calendar and custom distances",
+      "cases": 828,
+      "accepted": 755,
+      "rejected": 73,
+      "failed": 0,
+      "weeks": 13353
+    },
+    {
+      "name": "Adversarial boundaries",
+      "cases": 232,
+      "accepted": 139,
+      "rejected": 93,
+      "failed": 0,
+      "weeks": 2062
+    }
+  ],
+  "totals": {
+    "cases": 1645,
+    "accepted": 1209,
+    "rejected": 436,
+    "failed": 0,
+    "weeks": 20229
+  }
+}

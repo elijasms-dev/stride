@@ -4,6 +4,7 @@ import {
   integer,
   primaryKey,
   index,
+  uniqueIndex,
 } from 'drizzle-orm/sqlite-core';
 export const athleteState = sqliteTable('athlete_state', {
   owner: text('owner').primaryKey(),
@@ -117,4 +118,102 @@ export const standaloneRuns = sqliteTable(
     updatedAt: text('updated_at').notNull(),
   },
   (t) => [primaryKey({ columns: [t.owner, t.id] })],
+);
+
+// Compact durable receipts, scoped to an account lifetime. No journal snapshots
+// or user notes: replay returns the current journal and this acknowledgement.
+export const journalMutations = sqliteTable(
+  'journal_mutations',
+  {
+    owner: text('owner').notNull(),
+    epoch: integer('epoch').notNull(),
+    id: text('id').notNull(),
+    requestHash: text('request_hash').notNull(),
+    createdAt: text('created_at').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.owner, t.epoch, t.id] })],
+);
+
+export const deliveryJobs = sqliteTable(
+  'delivery_jobs',
+  {
+    owner: text('owner').notNull(),
+    epoch: integer('epoch').notNull(),
+    id: text('id').notNull(),
+    workoutId: text('workout_id').notNull(),
+    version: integer('version').notNull(),
+    action: text('action').notNull(),
+    providerAthleteId: text('provider_athlete_id').notNull(),
+    connectionGeneration: text('connection_generation').notNull(),
+    prescriptionHash: text('prescription_hash'),
+    status: text('status').notNull(),
+    attempts: integer('attempts').notNull().default(0),
+    availableAt: text('available_at').notNull(),
+    leaseToken: text('lease_token'),
+    leaseUntil: text('lease_until'),
+    result: text('result'),
+    createdAt: text('created_at').notNull(),
+    updatedAt: text('updated_at').notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.owner, t.epoch, t.id] }),
+    uniqueIndex('idx_delivery_job_intent').on(
+      t.owner,
+      t.epoch,
+      t.connectionGeneration,
+      t.workoutId,
+      t.version,
+      t.action,
+    ),
+    index('idx_delivery_job_due').on(t.owner, t.epoch, t.status, t.availableAt),
+  ],
+);
+
+// Sandbox only. Provider payloads and card details are deliberately not stored.
+export const billingEvents = sqliteTable(
+  'billing_events',
+  {
+    id: text('id').primaryKey(),
+    subscriptionId: text('subscription_id').notNull(),
+    type: text('type').notNull(),
+    eventCreated: integer('event_created').notNull(),
+    payloadHash: text('payload_hash').notNull(),
+    status: text('status').notNull().default('pending'),
+    attempts: integer('attempts').notNull().default(0),
+    nextAttemptAt: integer('next_attempt_at').notNull().default(0),
+    lastError: text('last_error'),
+    receivedAt: integer('received_at').notNull(),
+    processedAt: integer('processed_at'),
+  },
+  (t) => [
+    index('idx_billing_event_queue').on(
+      t.status,
+      t.nextAttemptAt,
+      t.subscriptionId,
+    ),
+  ],
+);
+export const billingSubscriptions = sqliteTable(
+  'billing_subscriptions',
+  {
+    id: text('id').primaryKey(),
+    accountId: text('account_id'),
+    accountEpoch: integer('account_epoch'),
+    customerId: text('customer_id'),
+    status: text('status').notNull().default('unknown'),
+    periodEnd: integer('period_end').notNull().default(0),
+    lastEntitledPeriodEnd: integer('last_entitled_period_end')
+      .notNull()
+      .default(0),
+    graceUntil: integer('grace_until').notNull().default(0),
+    cancelAtPeriodEnd: integer('cancel_at_period_end').notNull().default(0),
+    verifiedAt: integer('verified_at').notNull().default(0),
+    lastEventAt: integer('last_event_at').notNull().default(0),
+    revision: integer('revision').notNull().default(0),
+    leaseToken: text('lease_token'),
+    leaseUntil: integer('lease_until').notNull().default(0),
+  },
+  (t) => [
+    index('idx_billing_subscription_account').on(t.accountId, t.accountEpoch),
+  ],
 );

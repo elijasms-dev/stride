@@ -14,6 +14,7 @@ import { workoutTone } from '@/lib/day-sessions';
 import { specificWorkoutName } from '@/lib/workout-names';
 import { runDuration } from '@/lib/journal-view';
 import { WeekRhythm } from '../week-rhythm';
+import { WeeklyReview } from './weekly-review';
 import { InlineWorkout, WorkoutPrescription } from './inline-workout';
 import type { Props } from './explorer-types';
 
@@ -236,6 +237,12 @@ export function PlanWeekSchedule({
           </span>
         )}
       </div>
+      <WeeklyReview
+        plan={plan}
+        weekIndex={weekIndex}
+        today={today}
+        onWorkout={onWorkout}
+      />
       <details className="pe-week-context">
         <summary>
           About this week <ChevronDown size={15} aria-hidden="true" />

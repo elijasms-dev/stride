@@ -1071,6 +1071,7 @@ void test('D08: attaching a verified recording preserves journal effort and note
     id: f.w.id,
     feedback: feedback({
       activityId: undefined,
+      actualKm: 9,
       effort: 6,
       note: 'Keep this original reflection',
     }),
@@ -1165,7 +1166,7 @@ void test('D10: correctLog cannot introduce an unverified recording into a manua
     action: 'complete',
     version: 3,
     id: f.w.id,
-    feedback: feedback({ activityId: undefined }),
+    feedback: feedback({ activityId: undefined, actualKm: 9 }),
   });
   assert.equal(first.status, 200, routeSummary(first));
   const result = await planAction({
@@ -1263,7 +1264,7 @@ void test('D13: attaching a recording to a journal entry from another local date
     action: 'complete',
     version: 3,
     id: f.w.id,
-    feedback: feedback({ activityId: undefined }),
+    feedback: feedback({ activityId: undefined, actualKm: 9 }),
   });
   assert.equal(first.status, 200, routeSummary(first));
   const result = await planAction({
@@ -1341,4 +1342,80 @@ void test('send eligibility matches the seven-day window while preserving future
     workoutSendWindow('2026-09-08', '2026-09-09', true).allowed,
     false,
   );
+});
+
+function beginnerFixtureProfile(startDate) {
+  const day = (new Date(startDate + 'T12:00:00Z').getUTCDay() + 6) % 7;
+  const days = [day, (day + 2) % 7, (day + 4) % 7].sort((a, b) => a - b);
+  return {
+    ...demoProfile(startDate),
+    goal: '5k',
+    experience: 'new',
+    startDate,
+    raceDate: addDays(startDate, 62),
+    timezone: 'UTC',
+    weeklyKm: 0,
+    longestKm: 0,
+    currentRuns: 0,
+    days,
+    availableDays: days,
+    runsPerWeek: 3,
+    longDay: days[2],
+    weekdayMinutes: 40,
+    easyPace: null,
+    qualityMode: 'automatic',
+  };
+}
+void test('C25K: truthful changed-date completion persists and reserves recovery through the actual plan route', async (t) => {
+  const f = await fixture({ disconnected: true });
+  t.after(() => f.sqlite.close());
+  f.state.plan = makePlan(beginnerFixtureProfile(addDays(today, -1)), today);
+  saveFixtureState(f, 3);
+  const w = f.state.plan.workouts[0];
+  const result = await planAction({
+    action: 'complete',
+    version: 3,
+    id: w.id,
+    feedback: feedback({
+      actualMinutes: w.minutes,
+      actualKm: null,
+      activityId: undefined,
+      source: undefined,
+      execution: 'as-planned',
+      effort: 3,
+    }),
+  });
+  assert.equal(result.status, 200, routeSummary(result));
+  const saved = savedJournal(f).plan;
+  assert.equal(
+    saved.workouts.find((x) => x.id === w.id).feedback.actualDate,
+    today,
+  );
+  assert.equal(
+    saved.workouts.find((x) => x.date === addDays(today, 1)).status,
+    'skipped',
+  );
+  assert.equal(saved.beginner.stage, 0);
+});
+void test('C25K: an extra run persists without creating adjacent beginner running through the actual plan route', async (t) => {
+  const f = await fixture({ disconnected: true });
+  t.after(() => f.sqlite.close());
+  f.state.plan = makePlan(beginnerFixtureProfile(addDays(today, 1)), today);
+  saveFixtureState(f, 3);
+  const result = await planAction({
+    action: 'freeRun',
+    version: 3,
+    run: extraRun({
+      minutes: 15,
+      km: null,
+      activityId: undefined,
+      source: undefined,
+      effort: 3,
+    }),
+  });
+  assert.equal(result.status, 200, routeSummary(result));
+  const saved = savedJournal(f).plan;
+  assert.equal(saved.extraRuns.at(-1).date, today);
+  assert.equal(saved.workouts[0].status, 'skipped');
+  assert.equal(saved.beginner.stage, 0);
 });

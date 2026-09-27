@@ -201,7 +201,11 @@ test('explicit two-workout choices require a familiar background while automatic
     requestedQualityCount(
       input({ goal: 'half', runsPerWeek: 2, qualitySessions: 2 }),
     ),
-    0,
+    2,
+  );
+  assert.throws(
+    () => build({ goal: 'half', runsPerWeek: 2, qualitySessions: 2 }),
+    /workout|quality|running day/i,
   );
 });
 

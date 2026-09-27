@@ -21,6 +21,7 @@ export function calculateWeekLoad(
 ) {
   const {
     p,
+    road,
     bookMarathon,
     start,
     count,
@@ -105,6 +106,7 @@ export function calculateWeekLoad(
     wholeKilometres: true,
     recoveryEveryWeeks: p.recoveryWeeks,
     recoveryOffset: longProgressionStart,
+    maximumStepKm: road?.longStepKm,
   });
   // Maintenance may hold the progression clock at zero for many weeks. Only
   // the actual opening week keeps its fraction when the next integer fits.
@@ -151,9 +153,11 @@ export function calculateWeekLoad(
           : Math.min(
               policy.weeklyStepKm,
               load *
-                (family === 'ultra'
-                  ? GENERATION_POLICY.ultraWeeklyGrowthFraction
-                  : GENERATION_POLICY.roadWeeklyGrowthFraction),
+                (road
+                  ? road.growthFraction
+                  : family === 'ultra'
+                    ? GENERATION_POLICY.ultraWeeklyGrowthFraction
+                    : GENERATION_POLICY.roadWeeklyGrowthFraction),
             )),
       absoluteCeiling,
       base * policy.maxForecast,

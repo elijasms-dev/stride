@@ -130,10 +130,20 @@ void test('two sets retain equal complete repetition counts and additive inter-s
 void test('shortening sets twice preserves both sets, renames counts and avoids beginner fallback', () => {
   const p = profile(),
     original = session('split-repeats-metres', 30, p);
-  const a = resizeWorkout(original, p, 'Build', 40, 11);
-  const b = resizeWorkout(a, p, 'Build', 32, 11);
+  // Each 400 m rep takes at most 108 s at its prescribed 270 s/km.
+  // Eight work minutes fit four reps, while six would take 10.8 minutes.
+  const a = resizeWorkout(original, p, 'Build', 40, 8);
+  const b = resizeWorkout(a, p, 'Build', 32, 8);
   assert.equal(work(a).length, 4);
   assert.equal(work(b).length, 4);
+  assert.ok(work(a).length < work(original).length);
+  for (const resized of [a, b]) {
+    assert.equal(qualityWorkMinutes(resized), 7.2);
+    for (const step of work(resized)) {
+      assert.ok(step.seconds >= (step.metres * step.target.low) / 1000);
+      assert.ok(step.seconds <= (step.metres * step.target.high) / 1000);
+    }
+  }
   assert.equal(mainSetSummary(b), '2 × (2 × 400 m)');
   assert.ok(
     b.steps
@@ -240,22 +250,21 @@ void test('tempo distance steps support supplied HR, short intervals and walking
   assert.throws(() => intervalsWorkoutText(tempo), /Direct BPM/);
   assert.ok(encodeWorkout(tempo).length > 0);
 });
-void test('slower easy target converts alternating distance pairs together into truthful timed steps', () => {
+void test('slower easy targets retain alternating distance pairs and update their duration', () => {
   const w = session('on-off-metres');
   const p = profile();
   p.workoutTargets.pace.easy = { low: 500, high: 540 };
   const next = withWorkoutTargets(w, p);
-  assert.ok(next.steps.every((s) => !s.metres));
-  assert.equal(next.title, 'Tempo on / off');
-  assert.doesNotMatch(mainSetSummary(next), /km/);
-  assert.equal(
-    next.steps.filter((s) => s.label === 'Easy off block').length,
-    work(next).length,
-  );
+  assert.equal(next.title, w.title);
+  assert.match(mainSetSummary(next), /km/);
   assert.deepEqual(
-    next.steps.map((s) => s.seconds),
-    w.steps.map((s) => s.seconds),
+    next.steps.map((s) => s.metres),
+    w.steps.map((s) => s.metres),
   );
+  assert.ok(next.minutes > w.minutes);
+  for (let i = 0; i < w.steps.length; i++)
+    if (w.steps[i].metres === undefined)
+      assert.equal(next.steps[i].seconds, w.steps[i].seconds);
 });
 for (const mode of ['effort', 'pace', 'heart-rate'])
   for (const days of [4, 5, 6])

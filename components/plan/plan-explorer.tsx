@@ -17,6 +17,7 @@ import { dateLabel, goalLabel } from '@/lib/engine';
 import { nearestPlanWeek } from '@/lib/plan-explorer';
 import { downloadTrainingPlan, printTrainingPlan } from '@/lib/plan-print';
 import { PlanFit } from '../plan-fit';
+import { PlanPreferencesSummary } from './plan-preferences-summary';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,6 +35,7 @@ export function FullPlan({
   onWorkout,
   onDay,
   onAdjust,
+  onPreferences,
   onNew,
   onVariety,
   selected,
@@ -101,63 +103,55 @@ export function FullPlan({
         <div className="plan-heading-actions">
           <button
             type="button"
-            className="secondary-button pe-print"
-            onClick={() => printTrainingPlan(plan)}
-          >
-            <Printer size={17} aria-hidden="true" />
-            Print plan
-          </button>
-          <button
-            type="button"
             className="secondary-button"
             onClick={isDemo ? onNew : onAdjust}
           >
             <SlidersHorizontal size={17} aria-hidden="true" />
             {isDemo ? 'Build my plan' : 'Adjust plan'}
           </button>
-          {!isDemo && (
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <button
-                    type="button"
-                    className="icon-button plan-options"
-                    aria-label="More plan options"
-                  />
-                }
-              >
-                <Ellipsis size={20} aria-hidden="true" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="plan-options-menu">
-                <DropdownMenuItem onClick={() => downloadTrainingPlan(plan)}>
-                  <Download size={16} aria-hidden="true" />
-                  Download readable plan
-                </DropdownMenuItem>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <button
+                  type="button"
+                  className="icon-button plan-options"
+                  aria-label="More plan options"
+                />
+              }
+            >
+              <Ellipsis size={20} aria-hidden="true" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="plan-options-menu">
+              <DropdownMenuItem onClick={() => printTrainingPlan(plan)}>
+                <Printer size={16} aria-hidden="true" />
+                Print plan
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => downloadTrainingPlan(plan)}>
+                <Download size={16} aria-hidden="true" />
+                Download readable plan
+              </DropdownMenuItem>
+              {!isDemo && (
                 <DropdownMenuItem onClick={onVariety}>
                   <RefreshCw size={16} aria-hidden="true" />
                   Refresh workouts
                 </DropdownMenuItem>
+              )}
+              {!isDemo && (
                 <DropdownMenuItem onClick={onNew}>
                   <RotateCcw size={16} aria-hidden="true" />
                   Restart plan
                 </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
-
-      <ProgressionChart
-        plan={plan}
-        selected={selectedWeek.index}
-        onSelect={chooseWeek}
-      />
 
       <nav
         className="pe-toolbar"
         aria-label="Training schedule views and weeks"
       >
-        <div className="pe-view-switch" role="group" aria-label="Schedule view">
+        <fieldset className="pe-view-switch" aria-label="Schedule view">
           <button
             type="button"
             aria-pressed={view === 'week'}
@@ -175,7 +169,7 @@ export function FullPlan({
           >
             Full plan
           </button>
-        </div>
+        </fieldset>
         <div className="pe-week-navigation">
           <button
             type="button"
@@ -252,6 +246,21 @@ export function FullPlan({
           </section>
         ))}
       </div>
+      <details className="pe-plan-context">
+        <summary>
+          Your routine and progression{' '}
+          <ChevronDown size={18} aria-hidden="true" />
+        </summary>
+        <PlanPreferencesSummary
+          profile={plan.profile}
+          onEdit={isDemo ? onNew : onPreferences}
+        />
+        <ProgressionChart
+          plan={plan}
+          selected={selectedWeek.index}
+          onSelect={chooseWeek}
+        />
+      </details>
       <div className="plan-note pe-plan-notes">
         <PlanFit plan={plan} asOf={today} />
         {isDemo ? (

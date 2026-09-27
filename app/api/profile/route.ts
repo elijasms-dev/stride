@@ -1,3 +1,4 @@
+import { beginRequestObservation } from '@/lib/request-observation';
 import { readAccount } from '@/lib/accounts';
 import { guardAccount } from '@/lib/accounts';
 import {
@@ -10,6 +11,7 @@ import {
   HttpError,
 } from '@/lib/server';
 export async function GET(request: Request) {
+  const observation = beginRequestObservation(request);
   try {
     const owner = ownerId(request);
     const profile = await database()
@@ -27,10 +29,11 @@ export async function GET(request: Request) {
       email: request.headers.get('oai-authenticated-user-email'),
     });
   } catch (e) {
-    return failure(e);
+    return failure(e, observation);
   }
 }
 export async function POST(request: Request) {
+  const observation = beginRequestObservation(request);
   try {
     const owner = ownerId(request);
     guardWrite(request);
@@ -101,6 +104,6 @@ export async function POST(request: Request) {
       );
     return json({ ok: true });
   } catch (e) {
-    return failure(e);
+    return failure(e, observation);
   }
 }

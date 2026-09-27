@@ -186,6 +186,7 @@ export async function syncWorkout(
   confirm = false,
   requestedEpoch?: number,
   checkOnly = false,
+  expectedConnection?: { athleteId: string; generation: string },
 ) {
   const state = await readState(owner);
   if (!state.plan || version !== state.version)
@@ -200,6 +201,15 @@ export async function syncWorkout(
     db = database(),
     workout = state.plan.workouts.find((w) => w.id === id),
     athlete = connection.athleteId;
+  if (
+    expectedConnection &&
+    (connection.athleteId !== expectedConnection.athleteId ||
+      connection.generation !== expectedConnection.generation)
+  )
+    throw new HttpError(
+      409,
+      'The connected account changed. Review the workout before sending again.',
+    );
   const scope = `/athlete/${encodeURIComponent(athlete)}`;
   const previous = await db
     .prepare(

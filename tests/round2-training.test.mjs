@@ -186,7 +186,8 @@ void test('same total activity time credits intended quality separately from eas
     assert.equal(r.historyPreserved, true);
   }
   assert.ok(
-    planned.nextDose.workMinutes > unknown.nextDose.workMinutes,
+    planned.nextDose.workMinutes >= unknown.nextDose.workMinutes &&
+      planned.nextDose.template !== unknown.nextDose.template,
     JSON.stringify(comparisons),
   );
   for (const r of comparisons.filter((r) => r.execution !== 'as-planned'))
@@ -268,9 +269,9 @@ void test('internal run-walk advance updates executable intervals even when volu
 
 void test('event tapers retain familiar work, reduce its dose, and exclude the exact race from training totals', () => {
   const cases = [
-    ['5k', 83, 2, 5],
-    ['10k', 83, 2, 10],
-    ['half', 195, 3, 21.0975],
+    ['5k', 83, 1, 5],
+    ['10k', 83, 1, 10],
+    ['half', 195, 2, 21.0975],
     ['marathon', 139, 3, 42.195],
     ['ultra', 195, 3, 50],
     ['ultra', 195, 3, 80],
@@ -312,7 +313,32 @@ void test('event tapers retain familiar work, reduce its dose, and exclude the e
       (w) => w.week >= taper[0].index && w.kind !== 'race' && w.templateId,
     )) {
       const familiar = before
-        .filter((prior) => prior.templateId === w.templateId)
+        .filter(
+          (prior) =>
+            prior.templateId === w.templateId ||
+            (['5k', '10k', 'half'].includes(goal) &&
+              prior.stimulus === w.stimulus &&
+              Math.max(
+                ...prior.steps
+                  .filter((s) => s.kind === 'work')
+                  .map((s) => s.seconds),
+              ) >=
+                Math.max(
+                  ...w.steps
+                    .filter((s) => s.kind === 'work')
+                    .map((s) => s.seconds),
+                ) &&
+              Math.max(
+                ...prior.steps
+                  .filter((s) => s.kind === 'work')
+                  .map((s) => s.intensity),
+              ) >=
+                Math.max(
+                  ...w.steps
+                    .filter((s) => s.kind === 'work')
+                    .map((s) => s.intensity),
+                )),
+        )
         .at(-1);
       assert.ok(
         familiar,

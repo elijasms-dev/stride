@@ -26,6 +26,17 @@ registerHooks({
     return next(specifier, context);
   },
   load(url, context, next) {
+    // Vite accepts application JSON imports without Node's import attributes.
+    if (
+      url.startsWith(root.href) &&
+      url.endsWith('.json') &&
+      !url.includes('/node_modules/')
+    )
+      return {
+        format: 'module',
+        source: `export default JSON.parse(${JSON.stringify(readFileSync(fileURLToPath(url), 'utf8'))});`,
+        shortCircuit: true,
+      };
     if (
       url.startsWith(root.href) &&
       /\.tsx?$/.test(url) &&

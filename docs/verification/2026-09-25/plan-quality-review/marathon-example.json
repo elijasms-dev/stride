@@ -1,0 +1,5276 @@
+{
+  "input": {
+    "name": "",
+    "goal": "marathon",
+    "raceName": "Autumn 10K",
+    "startDate": "2026-09-28",
+    "raceDate": "2027-01-31",
+    "weeklyKm": 60,
+    "longestKm": 20,
+    "currentRuns": 5,
+    "days": [
+      0,
+      1,
+      2,
+      4,
+      6
+    ],
+    "longDay": 6,
+    "weekdayMinutes": 120,
+    "longMinutes": 300,
+    "experience": "established",
+    "difficulty": "balanced",
+    "volume": "gradual",
+    "timezone": "Europe/London",
+    "units": "km",
+    "easyPace": 6,
+    "runsPerWeek": 5,
+    "availableDays": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "intent": "improve",
+    "qualityMode": "custom",
+    "qualitySessions": 2,
+    "recentQualitySessions": 2,
+    "recentQualityMinutes": 40,
+    "workoutFormat": "time",
+    "workoutVariety": "varied",
+    "runMeasure": "time",
+    "workoutTargets": {
+      "mode": "effort"
+    }
+  },
+  "weeks": [
+    {
+      "week": 1,
+      "phase": "Foundation",
+      "km": 60,
+      "minutes": 360,
+      "workouts": [
+        {
+          "date": "2026-09-29",
+          "kind": "easy",
+          "title": "4 × 20 sec strides",
+          "templateId": "marathon-book-strides",
+          "minutes": 61,
+          "estimatedKm": 10.167,
+          "stimulus": "economy",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Easy run before strides",
+              "seconds": 2380,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "20 sec stride · 1 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 2 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 3 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 4 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-09-30",
+          "kind": "tempo",
+          "title": "20 min tempo",
+          "templateId": "marathon-book-lt-20",
+          "minutes": 68,
+          "estimatedKm": 11.333,
+          "stimulus": "threshold",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 900,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1380,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "20 min tempo",
+              "seconds": 1200,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10 · no sprint finish",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 600,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-10-01",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 44,
+          "estimatedKm": 7.333,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2640,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-10-02",
+          "kind": "fartlek",
+          "title": "4 × 3 min intervals",
+          "templateId": "marathon-book-controlled-fartlek-timed",
+          "minutes": 67,
+          "estimatedKm": 11.167,
+          "stimulus": "aerobic-power",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1860,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "3 min interval · 1 of 4",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 2 of 4",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 3 of 4",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 4 of 4",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-10-04",
+          "kind": "long",
+          "title": "Easy long run",
+          "minutes": 120,
+          "estimatedKm": 20,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy long run",
+              "seconds": 7200,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "phase": "Foundation",
+      "km": 60,
+      "minutes": 360,
+      "workouts": [
+        {
+          "date": "2026-10-06",
+          "kind": "easy",
+          "title": "4 × 20 sec strides",
+          "templateId": "marathon-book-strides",
+          "minutes": 61,
+          "estimatedKm": 10.167,
+          "stimulus": "economy",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Easy run before strides",
+              "seconds": 2380,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "20 sec stride · 1 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 2 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 3 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 4 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-10-07",
+          "kind": "tempo",
+          "title": "5 × 5 min tempo",
+          "templateId": "marathon-book-cruise-five-timed",
+          "minutes": 68,
+          "estimatedKm": 11.333,
+          "stimulus": "threshold",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1440,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "5 min tempo · 1 of 5",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 60,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "5 min tempo · 2 of 5",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 60,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "5 min tempo · 3 of 5",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 60,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "5 min tempo · 4 of 5",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 60,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "5 min tempo · 5 of 5",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-10-08",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 44,
+          "estimatedKm": 7.333,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2640,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-10-09",
+          "kind": "intervals",
+          "title": "Pyramid intervals",
+          "templateId": "marathon-book-pyramid-timed",
+          "minutes": 67,
+          "estimatedKm": 11.167,
+          "stimulus": "aerobic-power",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1920,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "2 min interval · 1 of 5",
+              "seconds": 120,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 2 of 5",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "4 min interval · 3 of 5",
+              "seconds": 240,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 4 of 5",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "2 min interval · 5 of 5",
+              "seconds": 120,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-10-11",
+          "kind": "long",
+          "title": "Easy long run",
+          "minutes": 120,
+          "estimatedKm": 20,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy long run",
+              "seconds": 7200,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "phase": "Foundation",
+      "km": 63,
+      "minutes": 378,
+      "workouts": [
+        {
+          "date": "2026-10-13",
+          "kind": "easy",
+          "title": "4 × 20 sec strides",
+          "templateId": "marathon-book-strides",
+          "minutes": 63,
+          "estimatedKm": 10.5,
+          "stimulus": "economy",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Easy run before strides",
+              "seconds": 2500,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "20 sec stride · 1 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 2 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 3 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 4 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-10-14",
+          "kind": "tempo",
+          "title": "3 × 8 min tempo",
+          "templateId": "marathon-book-cruise-eight-timed",
+          "minutes": 69,
+          "estimatedKm": 11.5,
+          "stimulus": "threshold",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1620,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "8 min tempo · 1 of 3",
+              "seconds": 480,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "8 min tempo · 2 of 3",
+              "seconds": 480,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "8 min tempo · 3 of 3",
+              "seconds": 480,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-10-15",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 45,
+          "estimatedKm": 7.5,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2700,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-10-16",
+          "kind": "tempo",
+          "title": "4 × 6 min marathon effort",
+          "templateId": "marathon-book-marathon-short-blocks-timed",
+          "minutes": 69,
+          "estimatedKm": 11.5,
+          "stimulus": "race-rhythm",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1440,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "6 min race rhythm · 1 of 4",
+              "seconds": 360,
+              "effort": "Controlled marathon effort · 4–5 / 10 · patient and sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 120,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "6 min race rhythm · 2 of 4",
+              "seconds": 360,
+              "effort": "Controlled marathon effort · 4–5 / 10 · patient and sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 120,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "6 min race rhythm · 3 of 4",
+              "seconds": 360,
+              "effort": "Controlled marathon effort · 4–5 / 10 · patient and sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 120,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "6 min race rhythm · 4 of 4",
+              "seconds": 360,
+              "effort": "Controlled marathon effort · 4–5 / 10 · patient and sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-10-18",
+          "kind": "long",
+          "title": "Long run · 30 min marathon effort",
+          "templateId": "marathon-book-mp-40",
+          "minutes": 132,
+          "estimatedKm": 22,
+          "stimulus": "race-rhythm",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 900,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Easy endurance running",
+              "seconds": 4920,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "30 min race rhythm",
+              "seconds": 1800,
+              "effort": "Controlled marathon effort · 4–5 / 10 · ease back if it stops feeling sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "phase": "Recovery",
+      "km": 44,
+      "minutes": 264,
+      "workouts": [
+        {
+          "date": "2026-10-20",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 41,
+          "estimatedKm": 6.833,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2460,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-10-21",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 46,
+          "estimatedKm": 7.667,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2760,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-10-22",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 30,
+          "estimatedKm": 5,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 1800,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-10-23",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 45,
+          "estimatedKm": 7.5,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2700,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-10-25",
+          "kind": "long",
+          "title": "Easy long run",
+          "minutes": 102,
+          "estimatedKm": 17,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy long run",
+              "seconds": 6120,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "week": 5,
+      "phase": "Foundation",
+      "km": 66,
+      "minutes": 396,
+      "workouts": [
+        {
+          "date": "2026-10-27",
+          "kind": "easy",
+          "title": "4 × 20 sec strides",
+          "templateId": "marathon-book-strides",
+          "minutes": 64,
+          "estimatedKm": 10.667,
+          "stimulus": "economy",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Easy run before strides",
+              "seconds": 2560,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "20 sec stride · 1 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 2 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 3 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 4 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-10-28",
+          "kind": "tempo",
+          "title": "25 min tempo",
+          "templateId": "marathon-book-lt-25",
+          "minutes": 71,
+          "estimatedKm": 11.833,
+          "stimulus": "threshold",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 900,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1260,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "25 min tempo",
+              "seconds": 1500,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10 · no sprint finish",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 600,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-10-29",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 46,
+          "estimatedKm": 7.667,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2760,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-10-30",
+          "kind": "fartlek",
+          "title": "5 × 3 min intervals",
+          "templateId": "marathon-book-controlled-fartlek-timed",
+          "minutes": 71,
+          "estimatedKm": 11.833,
+          "stimulus": "aerobic-power",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1740,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "3 min interval · 1 of 5",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 2 of 5",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 3 of 5",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 4 of 5",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 5 of 5",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-11-01",
+          "kind": "long",
+          "title": "Easy long run",
+          "minutes": 144,
+          "estimatedKm": 24,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy long run",
+              "seconds": 8640,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "week": 6,
+      "phase": "Foundation",
+      "km": 66,
+      "minutes": 396,
+      "workouts": [
+        {
+          "date": "2026-11-03",
+          "kind": "easy",
+          "title": "4 × 20 sec strides",
+          "templateId": "marathon-book-strides",
+          "minutes": 64,
+          "estimatedKm": 10.667,
+          "stimulus": "economy",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Easy run before strides",
+              "seconds": 2560,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "20 sec stride · 1 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 2 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 3 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 4 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-11-04",
+          "kind": "tempo",
+          "title": "5 × 5 min tempo",
+          "templateId": "marathon-book-cruise-five-timed",
+          "minutes": 71,
+          "estimatedKm": 11.833,
+          "stimulus": "threshold",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1620,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "5 min tempo · 1 of 5",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 60,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "5 min tempo · 2 of 5",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 60,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "5 min tempo · 3 of 5",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 60,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "5 min tempo · 4 of 5",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 60,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "5 min tempo · 5 of 5",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-11-05",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 46,
+          "estimatedKm": 7.667,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2760,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-11-06",
+          "kind": "intervals",
+          "title": "2 × (5 × 90 sec) intervals",
+          "templateId": "marathon-book-split-repeats-timed",
+          "minutes": 71,
+          "estimatedKm": 11.833,
+          "stimulus": "aerobic-power",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1860,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "90 sec interval · 1 of 10",
+              "seconds": 90,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 60,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "90 sec interval · 2 of 10",
+              "seconds": 90,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 60,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "90 sec interval · 3 of 10",
+              "seconds": 90,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 60,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "90 sec interval · 4 of 10",
+              "seconds": 90,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 60,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "90 sec interval · 5 of 10",
+              "seconds": 90,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 60,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Extra recovery between sets",
+              "seconds": 60,
+              "effort": "Additional walking reset after the regular recovery",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "walk",
+              "effortRole": "effort"
+            },
+            {
+              "label": "90 sec interval · 6 of 10",
+              "seconds": 90,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 60,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "90 sec interval · 7 of 10",
+              "seconds": 90,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 60,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "90 sec interval · 8 of 10",
+              "seconds": 90,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 60,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "90 sec interval · 9 of 10",
+              "seconds": 90,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 60,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "90 sec interval · 10 of 10",
+              "seconds": 90,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-11-08",
+          "kind": "long",
+          "title": "Easy long run",
+          "minutes": 144,
+          "estimatedKm": 24,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy long run",
+              "seconds": 8640,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "week": 7,
+      "phase": "Build",
+      "km": 69,
+      "minutes": 414,
+      "workouts": [
+        {
+          "date": "2026-11-10",
+          "kind": "easy",
+          "title": "4 × 20 sec strides",
+          "templateId": "marathon-book-strides",
+          "minutes": 66,
+          "estimatedKm": 11,
+          "stimulus": "economy",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Easy run before strides",
+              "seconds": 2680,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "20 sec stride · 1 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 2 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 3 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 4 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-11-11",
+          "kind": "tempo",
+          "title": "3 × 10 min tempo",
+          "templateId": "marathon-book-tempo-blocks-timed",
+          "minutes": 73,
+          "estimatedKm": 12.167,
+          "stimulus": "threshold",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1440,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "10 min tempo · 1 of 3",
+              "seconds": 600,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 120,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "10 min tempo · 2 of 3",
+              "seconds": 600,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 120,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "10 min tempo · 3 of 3",
+              "seconds": 600,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-11-12",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 47,
+          "estimatedKm": 7.833,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2820,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-11-13",
+          "kind": "tempo",
+          "title": "5 × 6 min marathon effort",
+          "templateId": "marathon-book-marathon-short-blocks-timed",
+          "minutes": 72,
+          "estimatedKm": 12,
+          "stimulus": "race-rhythm",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1140,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "6 min race rhythm · 1 of 5",
+              "seconds": 360,
+              "effort": "Controlled marathon effort · 4–5 / 10 · patient and sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 120,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "6 min race rhythm · 2 of 5",
+              "seconds": 360,
+              "effort": "Controlled marathon effort · 4–5 / 10 · patient and sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 120,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "6 min race rhythm · 3 of 5",
+              "seconds": 360,
+              "effort": "Controlled marathon effort · 4–5 / 10 · patient and sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 120,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "6 min race rhythm · 4 of 5",
+              "seconds": 360,
+              "effort": "Controlled marathon effort · 4–5 / 10 · patient and sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 120,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "6 min race rhythm · 5 of 5",
+              "seconds": 360,
+              "effort": "Controlled marathon effort · 4–5 / 10 · patient and sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-11-15",
+          "kind": "long",
+          "title": "Long run · 25 min marathon effort",
+          "templateId": "marathon-book-mp-55",
+          "minutes": 156,
+          "estimatedKm": 26,
+          "stimulus": "race-rhythm",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 900,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Easy endurance running",
+              "seconds": 6660,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "25 min race rhythm",
+              "seconds": 1500,
+              "effort": "Controlled marathon effort · 4–5 / 10 · ease back if it stops feeling sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "week": 8,
+      "phase": "Recovery",
+      "km": 48.2,
+      "minutes": 289,
+      "workouts": [
+        {
+          "date": "2026-11-17",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 43,
+          "estimatedKm": 7.167,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2580,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-11-18",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 48,
+          "estimatedKm": 8,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2880,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-11-19",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 31,
+          "estimatedKm": 5.167,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 1860,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-11-20",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 47,
+          "estimatedKm": 7.833,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2820,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-11-22",
+          "kind": "long",
+          "title": "Easy long run",
+          "minutes": 120,
+          "estimatedKm": 20,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy long run",
+              "seconds": 7200,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "week": 9,
+      "phase": "Build",
+      "km": 72,
+      "minutes": 432,
+      "workouts": [
+        {
+          "date": "2026-11-24",
+          "kind": "easy",
+          "title": "4 × 20 sec strides",
+          "templateId": "marathon-book-strides",
+          "minutes": 68,
+          "estimatedKm": 11.333,
+          "stimulus": "economy",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Easy run before strides",
+              "seconds": 2800,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "20 sec stride · 1 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 2 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 3 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 4 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-11-25",
+          "kind": "tempo",
+          "title": "35 min tempo",
+          "templateId": "marathon-book-lt-35",
+          "minutes": 74,
+          "estimatedKm": 12.333,
+          "stimulus": "threshold",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 900,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 840,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "35 min tempo",
+              "seconds": 2100,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10 · no sprint finish",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 600,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-11-26",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 48,
+          "estimatedKm": 8,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2880,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-11-27",
+          "kind": "intervals",
+          "title": "3 min into 1 min",
+          "templateId": "marathon-book-long-into-short-timed",
+          "minutes": 74,
+          "estimatedKm": 12.333,
+          "stimulus": "aerobic-power",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1950,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "3 min interval · 1 of 8",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 2 of 8",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 3 of 8",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 4 of 8",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "1 min interval · 5 of 8",
+              "seconds": 60,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "1 min interval · 6 of 8",
+              "seconds": 60,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "1 min interval · 7 of 8",
+              "seconds": 60,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "1 min interval · 8 of 8",
+              "seconds": 60,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-11-29",
+          "kind": "long",
+          "title": "Easy long run",
+          "minutes": 168,
+          "estimatedKm": 28,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy long run",
+              "seconds": 10080,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "week": 10,
+      "phase": "Build",
+      "km": 72,
+      "minutes": 432,
+      "workouts": [
+        {
+          "date": "2026-12-01",
+          "kind": "easy",
+          "title": "4 × 20 sec strides",
+          "templateId": "marathon-book-strides",
+          "minutes": 64,
+          "estimatedKm": 10.667,
+          "stimulus": "economy",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Easy run before strides",
+              "seconds": 2560,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "20 sec stride · 1 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 2 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 3 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 4 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-02",
+          "kind": "tempo",
+          "title": "Tempo on / off",
+          "templateId": "marathon-book-on-off-timed",
+          "minutes": 71,
+          "estimatedKm": 11.833,
+          "stimulus": "threshold",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 840,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "5 min tempo · 1 of 6",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy off block",
+              "seconds": 120,
+              "effort": "Fully conversational · 2–3 / 10 · let the effort come right down",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "5 min tempo · 2 of 6",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy off block",
+              "seconds": 120,
+              "effort": "Fully conversational · 2–3 / 10 · let the effort come right down",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "5 min tempo · 3 of 6",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy off block",
+              "seconds": 120,
+              "effort": "Fully conversational · 2–3 / 10 · let the effort come right down",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "5 min tempo · 4 of 6",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy off block",
+              "seconds": 120,
+              "effort": "Fully conversational · 2–3 / 10 · let the effort come right down",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "5 min tempo · 5 of 6",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy off block",
+              "seconds": 120,
+              "effort": "Fully conversational · 2–3 / 10 · let the effort come right down",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "5 min tempo · 6 of 6",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy off block",
+              "seconds": 120,
+              "effort": "Fully conversational · 2–3 / 10 · let the effort come right down",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-03",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 46,
+          "estimatedKm": 7.667,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2760,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-04",
+          "kind": "fartlek",
+          "title": "6 × 3 min intervals",
+          "templateId": "marathon-book-controlled-fartlek-timed",
+          "minutes": 71,
+          "estimatedKm": 11.833,
+          "stimulus": "aerobic-power",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1380,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "3 min interval · 1 of 6",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 2 of 6",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 3 of 6",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 4 of 6",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 5 of 6",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 6 of 6",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-06",
+          "kind": "long",
+          "title": "Long run · 45 min marathon effort",
+          "templateId": "marathon-book-mp-70",
+          "minutes": 180,
+          "estimatedKm": 30,
+          "stimulus": "race-rhythm",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 900,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Easy endurance running",
+              "seconds": 6900,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "45 min race rhythm",
+              "seconds": 2700,
+              "effort": "Controlled marathon effort · 4–5 / 10 · ease back if it stops feeling sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "week": 11,
+      "phase": "Build",
+      "km": 75,
+      "minutes": 450,
+      "workouts": [
+        {
+          "date": "2026-12-08",
+          "kind": "easy",
+          "title": "4 × 20 sec strides",
+          "templateId": "marathon-book-strides",
+          "minutes": 69,
+          "estimatedKm": 11.5,
+          "stimulus": "economy",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Easy run before strides",
+              "seconds": 2860,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "20 sec stride · 1 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 2 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 3 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 4 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-09",
+          "kind": "tempo",
+          "title": "Cut-down tempo",
+          "templateId": "marathon-book-tempo-cut-down-timed",
+          "minutes": 76,
+          "estimatedKm": 12.667,
+          "stimulus": "threshold",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1980,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "10 min tempo · 1 of 3",
+              "seconds": 600,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 120,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "8 min tempo · 2 of 3",
+              "seconds": 480,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 120,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "6 min tempo · 3 of 3",
+              "seconds": 360,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-10",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 49,
+          "estimatedKm": 8.167,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2940,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-11",
+          "kind": "tempo",
+          "title": "6 × 6 min marathon effort",
+          "templateId": "marathon-book-marathon-short-blocks-timed",
+          "minutes": 76,
+          "estimatedKm": 12.667,
+          "stimulus": "race-rhythm",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 900,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "6 min race rhythm · 1 of 6",
+              "seconds": 360,
+              "effort": "Controlled marathon effort · 4–5 / 10 · patient and sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 120,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "6 min race rhythm · 2 of 6",
+              "seconds": 360,
+              "effort": "Controlled marathon effort · 4–5 / 10 · patient and sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 120,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "6 min race rhythm · 3 of 6",
+              "seconds": 360,
+              "effort": "Controlled marathon effort · 4–5 / 10 · patient and sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 120,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "6 min race rhythm · 4 of 6",
+              "seconds": 360,
+              "effort": "Controlled marathon effort · 4–5 / 10 · patient and sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 120,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "6 min race rhythm · 5 of 6",
+              "seconds": 360,
+              "effort": "Controlled marathon effort · 4–5 / 10 · patient and sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 120,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "6 min race rhythm · 6 of 6",
+              "seconds": 360,
+              "effort": "Controlled marathon effort · 4–5 / 10 · patient and sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-13",
+          "kind": "long",
+          "title": "Easy long run",
+          "minutes": 180,
+          "estimatedKm": 30,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy long run",
+              "seconds": 10800,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "week": 12,
+      "phase": "Recovery",
+      "km": 52.5,
+      "minutes": 315,
+      "workouts": [
+        {
+          "date": "2026-12-15",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 45,
+          "estimatedKm": 7.5,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2700,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-16",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 50,
+          "estimatedKm": 8.333,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 3000,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-17",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 33,
+          "estimatedKm": 5.5,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 1980,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-18",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 49,
+          "estimatedKm": 8.167,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2940,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-20",
+          "kind": "long",
+          "title": "Easy long run",
+          "minutes": 138,
+          "estimatedKm": 23,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy long run",
+              "seconds": 8280,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "week": 13,
+      "phase": "Race preparation",
+      "km": 75,
+      "minutes": 450,
+      "workouts": [
+        {
+          "date": "2026-12-22",
+          "kind": "easy",
+          "title": "4 × 20 sec strides",
+          "templateId": "marathon-book-strides",
+          "minutes": 66,
+          "estimatedKm": 11.001,
+          "stimulus": "economy",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Easy run before strides",
+              "seconds": 2680,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "20 sec stride · 1 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 2 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 3 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 4 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-23",
+          "kind": "tempo",
+          "title": "25 min tempo",
+          "templateId": "marathon-book-lt-25",
+          "minutes": 73,
+          "estimatedKm": 12.167,
+          "stimulus": "threshold",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 900,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1380,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "25 min tempo",
+              "seconds": 1500,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10 · no sprint finish",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 600,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-24",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 47,
+          "estimatedKm": 7.833,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2820,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-25",
+          "kind": "intervals",
+          "title": "Pyramid intervals",
+          "templateId": "marathon-book-pyramid-timed",
+          "minutes": 72,
+          "estimatedKm": 12,
+          "stimulus": "aerobic-power",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 2220,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "2 min interval · 1 of 5",
+              "seconds": 120,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 2 of 5",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "4 min interval · 3 of 5",
+              "seconds": 240,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 4 of 5",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "2 min interval · 5 of 5",
+              "seconds": 120,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-27",
+          "kind": "long",
+          "title": "Long run · 55 min marathon effort",
+          "templateId": "marathon-book-mp-85",
+          "minutes": 192,
+          "estimatedKm": 32,
+          "stimulus": "race-rhythm",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 900,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Easy endurance running",
+              "seconds": 7020,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "55 min race rhythm",
+              "seconds": 3300,
+              "effort": "Controlled marathon effort · 4–5 / 10 · ease back if it stops feeling sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "week": 14,
+      "phase": "Race preparation",
+      "km": 75,
+      "minutes": 450,
+      "workouts": [
+        {
+          "date": "2026-12-29",
+          "kind": "easy",
+          "title": "4 × 20 sec strides",
+          "templateId": "marathon-book-strides",
+          "minutes": 64,
+          "estimatedKm": 10.668,
+          "stimulus": "economy",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Easy run before strides",
+              "seconds": 2560,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "20 sec stride · 1 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 2 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 3 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 4 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-30",
+          "kind": "tempo",
+          "title": "6 × 5 min tempo",
+          "templateId": "marathon-book-tempo-repeats-timed",
+          "minutes": 71,
+          "estimatedKm": 11.833,
+          "stimulus": "threshold",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1110,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "5 min tempo · 1 of 6",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "5 min tempo · 2 of 6",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "5 min tempo · 3 of 6",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "5 min tempo · 4 of 6",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "5 min tempo · 5 of 6",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "5 min tempo · 6 of 6",
+              "seconds": 300,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2026-12-31",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 46,
+          "estimatedKm": 7.667,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2760,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2027-01-01",
+          "kind": "fartlek",
+          "title": "6 × 3 min intervals",
+          "templateId": "marathon-book-controlled-fartlek-timed",
+          "minutes": 71,
+          "estimatedKm": 11.833,
+          "stimulus": "aerobic-power",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1380,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "3 min interval · 1 of 6",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 2 of 6",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 3 of 6",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 4 of 6",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 5 of 6",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 6 of 6",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2027-01-03",
+          "kind": "long",
+          "title": "Easy long run",
+          "minutes": 198,
+          "estimatedKm": 33,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy long run",
+              "seconds": 11880,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "week": 15,
+      "phase": "Race preparation",
+      "km": 75,
+      "minutes": 450,
+      "workouts": [
+        {
+          "date": "2027-01-05",
+          "kind": "easy",
+          "title": "4 × 20 sec strides",
+          "templateId": "marathon-book-strides",
+          "minutes": 64,
+          "estimatedKm": 10.668,
+          "stimulus": "economy",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Easy run before strides",
+              "seconds": 2560,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "20 sec stride · 1 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 2 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 3 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 100,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "20 sec stride · 4 of 4",
+              "seconds": 20,
+              "effort": "Relaxed acceleration · quick feet · never strain or sprint",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2027-01-06",
+          "kind": "tempo",
+          "title": "4 × 8 min tempo",
+          "templateId": "marathon-book-cruise-eight-timed",
+          "minutes": 71,
+          "estimatedKm": 11.833,
+          "stimulus": "threshold",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1170,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "8 min tempo · 1 of 4",
+              "seconds": 480,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "8 min tempo · 2 of 4",
+              "seconds": 480,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "8 min tempo · 3 of 4",
+              "seconds": 480,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 90,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "8 min tempo · 4 of 4",
+              "seconds": 480,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2027-01-07",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 46,
+          "estimatedKm": 7.667,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2760,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2027-01-08",
+          "kind": "tempo",
+          "title": "Cut-down marathon effort",
+          "templateId": "marathon-book-marathon-descending-timed",
+          "minutes": 71,
+          "estimatedKm": 11.833,
+          "stimulus": "race-rhythm",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1680,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "10 min race rhythm · 1 of 3",
+              "seconds": 600,
+              "effort": "Controlled marathon effort · 4–5 / 10 · patient and sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 120,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "8 min race rhythm · 2 of 3",
+              "seconds": 480,
+              "effort": "Controlled marathon effort · 4–5 / 10 · patient and sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 120,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "6 min race rhythm · 3 of 3",
+              "seconds": 360,
+              "effort": "Controlled marathon effort · 4–5 / 10 · patient and sustainable",
+              "intensity": 5,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "race"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2027-01-10",
+          "kind": "long",
+          "title": "Easy long run",
+          "minutes": 198,
+          "estimatedKm": 33,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy long run",
+              "seconds": 11880,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "week": 16,
+      "phase": "Taper",
+      "km": 56.2,
+      "minutes": 337,
+      "workouts": [
+        {
+          "date": "2027-01-12",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 48,
+          "estimatedKm": 8,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2880,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2027-01-13",
+          "kind": "fartlek",
+          "title": "3 × 3 min intervals",
+          "templateId": "marathon-book-controlled-fartlek-timed",
+          "minutes": 53,
+          "estimatedKm": 8.833,
+          "stimulus": "aerobic-power",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1380,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "3 min interval · 1 of 3",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 2 of 3",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 3 of 3",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2027-01-14",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 34,
+          "estimatedKm": 5.667,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2040,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2027-01-15",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 52,
+          "estimatedKm": 8.667,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 3120,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2027-01-17",
+          "kind": "long",
+          "title": "Easy long run",
+          "minutes": 150,
+          "estimatedKm": 25,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy long run",
+              "seconds": 9000,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "week": 17,
+      "phase": "Taper",
+      "km": 45,
+      "minutes": 270,
+      "workouts": [
+        {
+          "date": "2027-01-19",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 38,
+          "estimatedKm": 6.333,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2280,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2027-01-20",
+          "kind": "fartlek",
+          "title": "3 × 3 min intervals",
+          "templateId": "marathon-book-controlled-fartlek-timed",
+          "minutes": 42,
+          "estimatedKm": 7,
+          "stimulus": "aerobic-power",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 720,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "3 min interval · 1 of 3",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 2 of 3",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Easy recovery",
+              "seconds": 180,
+              "effort": "Easy jog; let breathing settle",
+              "intensity": 2,
+              "kind": "recovery",
+              "movement": "run",
+              "effortRole": "effort"
+            },
+            {
+              "label": "3 min interval · 3 of 3",
+              "seconds": 180,
+              "effort": "Current 5K effort · quick and controlled · 7 / 10 · never sprint",
+              "intensity": 7,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "interval"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2027-01-21",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 28,
+          "estimatedKm": 4.667,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 1680,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2027-01-22",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 42,
+          "estimatedKm": 7,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2520,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2027-01-24",
+          "kind": "long",
+          "title": "Easy long run",
+          "minutes": 120,
+          "estimatedKm": 20,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy long run",
+              "seconds": 7200,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "week": 18,
+      "phase": "Race week",
+      "km": 30,
+      "minutes": 180,
+      "workouts": [
+        {
+          "date": "2027-01-26",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 47,
+          "estimatedKm": 7.833,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 2820,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2027-01-27",
+          "kind": "tempo",
+          "title": "9 min tempo",
+          "templateId": "marathon-book-lt-9",
+          "minutes": 52,
+          "estimatedKm": 8.667,
+          "stimulus": "threshold",
+          "steps": [
+            {
+              "label": "Warm up",
+              "seconds": 600,
+              "effort": "Start gently · full sentences · 2–3 / 10",
+              "intensity": 2,
+              "kind": "warmup",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "Aerobic running before the main set",
+              "seconds": 1680,
+              "effort": "Comfortable aerobic running · 2–3 / 10",
+              "intensity": 3,
+              "kind": "aerobic",
+              "movement": "run",
+              "effortRole": "easy"
+            },
+            {
+              "label": "9 min tempo",
+              "seconds": 540,
+              "effort": "Current one-hour race effort · comfortably hard · 6 / 10 · no sprint finish",
+              "intensity": 6,
+              "kind": "work",
+              "movement": "run",
+              "effortRole": "threshold"
+            },
+            {
+              "label": "Cool down",
+              "seconds": 300,
+              "effort": "Easy running · finish relaxed",
+              "intensity": 2,
+              "kind": "cooldown",
+              "movement": "run",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2027-01-28",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 30,
+          "estimatedKm": 5,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 1800,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2027-01-29",
+          "kind": "easy",
+          "title": "Recovery run",
+          "minutes": 51,
+          "estimatedKm": 8.5,
+          "stimulus": "aerobic",
+          "steps": [
+            {
+              "label": "Easy run",
+              "seconds": 3060,
+              "effort": "Conversational · 2–3 / 10",
+              "intensity": 3,
+              "kind": "work",
+              "effortRole": "easy"
+            }
+          ]
+        },
+        {
+          "date": "2027-01-31",
+          "kind": "race",
+          "title": "Autumn 10K",
+          "minutes": 253,
+          "estimatedKm": 42.195,
+          "steps": [
+            {
+              "label": "Race",
+              "seconds": 15180,
+              "effort": "Start controlled, finish by feel",
+              "intensity": 7,
+              "kind": "work",
+              "metres": 42195,
+              "effortRole": "race"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

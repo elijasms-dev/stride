@@ -1,3 +1,4 @@
+import { firstRaceFeasibility } from './plan/first-race.ts';
 import { schedulingEasyPace } from './fitness-pacing.ts';
 import {
   type Plan,
@@ -5,7 +6,12 @@ import {
   type Step,
   type Workout,
 } from './plan/types.ts';
-import { distanceEstimate, qualityWorkMinutes } from './prescription.ts';
+import {
+  distanceEstimate,
+  executableDistanceRange,
+  qualityWorkMinutes,
+  resolvePrescription,
+} from './prescription.ts';
 import { withSpecificWorkoutName } from './workout-names.ts';
 import { clockMinutes, runningDayLimit } from './runner-customization.ts';
 import { addDays, dayDiff, weekday } from './plan/calendar.ts';
@@ -52,6 +58,18 @@ function distanceTitle(w: Workout, profile: Profile, km: number) {
   return `${value} ${profile.units} · ${baseTitle(w.title)}`;
 }
 
+export function withPrescribedDistanceTitle(
+  w: Workout,
+  profile: Profile,
+): Workout {
+  const km = prescribedDistanceKm(w);
+  return km !== null &&
+    ['easy', 'long'].includes(w.kind) &&
+    profile.runMeasure === 'distance'
+    ? { ...w, title: distanceTitle(w, profile, km) }
+    : w;
+}
+
 /** Distance ends the running steps; seconds retain the existing planning allowance.
  * Round down within each step and the existing distance/time allocation, never add load. */
 export function withRunDistance(
@@ -59,7 +77,11 @@ export function withRunDistance(
   profile: Profile,
   options: { preserveFundedDistance?: boolean } = {},
 ): Workout {
-  if (profile.runMeasure !== 'distance' || !eligibleRun(workout))
+  if (
+    workout.beginnerLesson ||
+    profile.runMeasure !== 'distance' ||
+    !eligibleRun(workout)
+  )
     return workout;
   // Generation owns long-run progression and event ceilings. Conversion keeps
   // any funded target, including a fractional starting run, to metre precision.
@@ -71,11 +93,12 @@ export function withRunDistance(
   const stepQuantum = exactDistance ? 1 : 100;
   const pace = workout.steps.map((s) =>
     Math.ceil(
-      Math.max(
-        schedulingEasyPace(profile) * 60,
-        s.planningPaceSecondsPerKm ?? 0,
-        s.target?.mode === 'pace' ? s.target.high : 0,
-      ) - 1e-9,
+      (s.target?.mode === 'pace'
+        ? s.target.high
+        : Math.max(
+            schedulingEasyPace(profile) * 60,
+            s.planningPaceSecondsPerKm ?? 0,
+          )) - 1e-9,
     ),
   );
   // A saved distance run already funded within the one-second export tolerance
@@ -108,6 +131,12 @@ export function withRunDistance(
             : Math.ceil((s.seconds * 1000) / pace[i] - 1e-6),
           Math.floor(((s.seconds + 1) * 1000) / pace[i] + 1e-6),
           Math.floor((s.metres ?? Infinity) + 1e-6),
+          options.preserveFundedDistance &&
+            s.kind === 'work' &&
+            s.intensity >= 4 &&
+            s.target?.mode === 'pace'
+            ? Math.floor((s.seconds * 1000) / pace[i] + 1e-6)
+            : Infinity,
         )
       : Math.floor(
           (Math.min((s.seconds * 1000) / pace[i], s.metres ?? Infinity) +
@@ -140,16 +169,38 @@ export function withRunDistance(
   const target = Math.floor(capacity / stepQuantum) * stepQuantum;
   if (target < capacities.length * stepQuantum) return workout;
   const totalSeconds = workout.steps.reduce((sum, s) => sum + s.seconds, 0);
-  const metres = capacities.map((cap, i) =>
-    Math.min(
-      cap,
-      Math.max(
-        stepQuantum,
-        Math.floor(
-          (target * workout.steps[i].seconds) / totalSeconds / stepQuantum,
-        ) * stepQuantum,
+  // Changing display measure must not shrink a paced faster block to make
+  // proportional room for easy running. Fund its existing timed dose first.
+  const fixedWork = workout.steps.map((step, i) =>
+    options.preserveFundedDistance &&
+    step.kind === 'work' &&
+    step.intensity >= 4 &&
+    step.target?.mode === 'pace'
+      ? Math.min(
+          capacities[i],
+          Math.floor((step.seconds * 1000) / pace[i] + 1e-6),
+        )
+      : null,
+  );
+  if (
+    fixedWork.reduce(
+      (sum: number, metres) => sum + (metres ?? stepQuantum),
+      0,
+    ) > target
+  )
+    return workout;
+  const metres = capacities.map(
+    (cap, i) =>
+      fixedWork[i] ??
+      Math.min(
+        cap,
+        Math.max(
+          stepQuantum,
+          Math.floor(
+            (target * workout.steps[i].seconds) / totalSeconds / stepQuantum,
+          ) * stepQuantum,
+        ),
       ),
-    ),
   );
   let remaining = target - metres.reduce((sum, m) => sum + m, 0);
   // Remove rounding overshoot from the largest blocks; distribute spare distance only
@@ -158,7 +209,12 @@ export function withRunDistance(
     const candidates = metres
       .map((m, i) => ({
         i,
-        room: remaining > 0 ? capacities[i] - m : m - stepQuantum,
+        room:
+          fixedWork[i] !== null
+            ? 0
+            : remaining > 0
+              ? capacities[i] - m
+              : m - stepQuantum,
       }))
       .filter((c) => c.room >= stepQuantum)
       .sort((a, b) => b.room - a.room);
@@ -199,7 +255,7 @@ export function withRunDistance(
 }
 
 const MEASUREMENT_CAPACITY_ERROR =
-  'The existing distances cannot fit the current pace targets and running-time limits. Review the pace or available time before changing measurement mode.';
+  'The existing distances cannot fit the current pace targets and running-time limits. Review the pace or available time before applying this change.';
 
 /** A measurement change preserves the funded metres. If a slower explicit pace
  * needs more planning time, only relaxed running can receive that allowance;
@@ -213,16 +269,28 @@ function migrateFundedDistance(workout: Workout, profile: Profile): Workout {
   if (prescribedDistanceKm(converted) === targetMetres / 1000) return converted;
   const pace = workout.steps.map((step) =>
     Math.ceil(
-      Math.max(
-        schedulingEasyPace(profile) * 60,
-        step.planningPaceSecondsPerKm ?? 0,
-        step.target?.mode === 'pace' ? step.target.high : 0,
-      ) - 1e-9,
+      (step.target?.mode === 'pace'
+        ? step.target.high
+        : Math.max(
+            schedulingEasyPace(profile) * 60,
+            step.planningPaceSecondsPerKm ?? 0,
+          )) - 1e-9,
     ),
   );
   const capacityMetres = workout.steps.reduce(
     (sum, step, i) =>
-      sum + Math.floor(((step.seconds + 1) * 1000) / pace[i] + 1e-6),
+      sum +
+      Math.floor(
+        ((step.seconds +
+          (step.kind === 'work' &&
+          step.intensity >= 4 &&
+          step.target?.mode === 'pace'
+            ? 0
+            : 1)) *
+          1000) /
+          pace[i] +
+          1e-6,
+      ),
     0,
   );
   const relaxed = workout.steps
@@ -258,7 +326,7 @@ function migrateFundedDistance(workout: Workout, profile: Profile): Workout {
 
 /** Check only newly added planning time. Older saved violations and truthful
  * historical overruns are not retroactively rewritten by a measurement edit. */
-function checkMigrationTimeLimits(before: Plan, after: Plan) {
+export function checkPrescriptionTimeLimits(before: Plan, after: Plan) {
   const increased = after.workouts.filter((workout) => {
     const prior = before.workouts.find((w) => w.id === workout.id);
     return prior && workout.minutes > prior.minutes + 1e-6;
@@ -343,8 +411,31 @@ export function updateRunMeasure(
   protectedIds: readonly string[] = [],
 ): Plan {
   const next = structuredClone(plan);
-  next.profile.runMeasure = measure;
+  next.profile.runMeasure = next.beginner ? 'time' : measure;
+  if (next.beginner) return next;
   const protectedSet = new Set(protectedIds);
+  const refresh = (workout: Workout) => {
+    // The runner is changing the endpoint measure, not buying or removing load.
+    // Retain funded kilometres and fixed timed seconds while refreshing all
+    // metadata from the resulting prescription. Allow only export rounding.
+    const resolved = resolvePrescription(workout, next.profile, true);
+    // A future switch back to time must retain the runner's timed prescription,
+    // including a second of distance-conversion rounding already funded here.
+    resolved.steps = resolved.steps.map((step, index) => ({
+      ...step,
+      seconds: Math.max(step.seconds, workout.steps[index].seconds),
+    }));
+    resolved.minutes =
+      resolved.steps.reduce((sum, step) => sum + step.seconds, 0) / 60;
+    const range = executableDistanceRange(resolved.steps);
+    if (
+      range &&
+      (resolved.estimatedKm < range.lowerKm - 0.02 ||
+        resolved.estimatedKm > range.upperKm + 0.02)
+    )
+      throw new PlanError(MEASUREMENT_CAPACITY_ERROR);
+    return resolved;
+  };
   next.workouts = next.workouts.map((w) => {
     if (
       w.status !== 'planned' ||
@@ -355,7 +446,8 @@ export function updateRunMeasure(
       !eligibleRun(w)
     )
       return w;
-    if (measure === 'distance') return migrateFundedDistance(w, next.profile);
+    if (measure === 'distance')
+      return refresh(migrateFundedDistance(w, next.profile));
     if (prescribedDistanceKm(w) === null) return w;
     const steps = w.steps.map(
       ({ metres: _distance, planningPaceSecondsPerKm: _pace, ...s }) => ({
@@ -366,22 +458,26 @@ export function updateRunMeasure(
             : s.label,
       }),
     );
-    return withSpecificWorkoutName({
-      ...w,
-      steps,
-      title: baseTitle(w.title),
-      estimatedKm: w.estimatedKm,
-      distanceEstimate: distanceEstimate(steps, next.profile),
-    });
+    return refresh(
+      withSpecificWorkoutName({
+        ...w,
+        steps,
+        title: baseTitle(w.title),
+        estimatedKm: w.estimatedKm,
+        distanceEstimate: distanceEstimate(steps, next.profile),
+      }),
+    );
   });
-  checkMigrationTimeLimits(plan, next);
+  checkPrescriptionTimeLimits(plan, next);
   const noteIndex = next.notes.findIndex(
     (note) =>
       note.startsWith('Training duration and effort are prescribed.') ||
       note.startsWith('Easy and long runs use distance targets'),
   );
   if (noteIndex >= 0) next.notes[noteIndex] = runMeasureNote(measure);
-  return refreshDistanceTotals(next);
+  refreshDistanceTotals(next);
+  if (next.firstRace) next.feasibility = firstRaceFeasibility(next, from);
+  return next;
 }
 
 /** Pace-target edits can reduce a distance prescription without changing its time allowance. */
@@ -393,15 +489,10 @@ export function refreshDistanceTotals(plan: Plan): Plan {
     );
     week.targetKm =
       Math.round(sessions.reduce((n, w) => n + w.estimatedKm, 0) * 10) / 10;
-    week.longKm =
-      Math.round(
-        Math.max(
-          0,
-          ...sessions
-            .filter((w) => w.kind === 'long')
-            .map((w) => w.estimatedKm),
-        ) * 10,
-      ) / 10;
+    week.longKm = Math.max(
+      0,
+      ...sessions.filter((w) => w.kind === 'long').map((w) => w.estimatedKm),
+    );
     week.trainingMinutes = sessions.reduce((sum, w) => sum + w.minutes, 0);
     week.qualityMinutes = sessions.reduce(
       (sum, w) => sum + qualityWorkMinutes(w),

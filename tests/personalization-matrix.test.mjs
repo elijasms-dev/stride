@@ -1,3 +1,4 @@
+import { roadOpeningFailures } from './road-overhaul-helpers.mjs';
 // Independent source-executing acceptance matrix. Synthetic profiles only.
 // Portable: place in work/ beside stride/, or copy unchanged to stride/tests/.
 import test from 'node:test';
@@ -70,7 +71,7 @@ const matrix = [
     'established three-day 5K',
     {
       goal: '5k',
-      weeklyKm: 30,
+      weeklyKm: 24,
       longestKm: 8,
       currentRuns: 3,
       days: [1, 3, 6],
@@ -80,7 +81,7 @@ const matrix = [
   [
     'established four-day 10K',
     {
-      weeklyKm: 45,
+      weeklyKm: 40,
       longestKm: 12,
       currentRuns: 4,
       days: [0, 2, 4, 6],
@@ -288,14 +289,34 @@ for (const [name, patch] of matrix)
   });
 
 void test('weekly baseline changes the executable first full week, not just profile metadata', () => {
-  const a = generate({ weeklyKm: 45, longestKm: 12, qualitySessions: 0 }),
-    b = generate({ weeklyKm: 60, longestKm: 12, qualitySessions: 0 });
+  const a = generate({
+      weeklyKm: 45,
+      longestKm: 12,
+      qualityMode: 'custom',
+      qualitySessions: 0,
+    }),
+    b = generate({
+      weeklyKm: 60,
+      longestKm: 12,
+      qualityMode: 'custom',
+      qualitySessions: 0,
+    });
   assert.ok(total(week(b, 0)) > total(week(a, 0)));
   assert.ok(total(week(b, 0)) <= 60 * base.easyPace + 1);
 });
 void test('recent longest run changes initial long capacity independently of weekly volume', () => {
-  const a = generate({ longestKm: 8, qualitySessions: 0 }),
-    b = generate({ longestKm: 16, qualitySessions: 0 });
+  const a = generate({
+      weeklyKm: 40,
+      longestKm: 8,
+      qualityMode: 'custom',
+      qualitySessions: 0,
+    }),
+    b = generate({
+      weeklyKm: 40,
+      longestKm: 16,
+      qualityMode: 'custom',
+      qualitySessions: 0,
+    });
   const longest = (p) =>
     Math.max(
       ...week(p, 0)
@@ -309,13 +330,22 @@ void test('a fresh four-day schedule retains declared mileage and current runnin
   const a = generate({
       currentRuns: 5,
       days: [0, 2, 4, 6],
+      qualityMode: 'custom',
       qualitySessions: 0,
     }),
-    b = generate({ currentRuns: 5, days: [0, 1, 3, 4, 6], qualitySessions: 0 });
+    b = generate({
+      currentRuns: 5,
+      days: [0, 1, 3, 4, 6],
+      qualityMode: 'custom',
+      qualitySessions: 0,
+    });
   assert.equal(week(a, 0).length, 4);
   assert.equal(week(b, 0).length, 5);
-  assert.equal(a.weeks[0].targetKm, base.weeklyKm);
-  assert.equal(b.weeks[0].targetKm, base.weeklyKm);
+  assert.deepEqual(roadOpeningFailures(a), []);
+  assert.deepEqual(roadOpeningFailures(b), []);
+  assert.ok(a.weeks[0].targetKm <= b.weeks[0].targetKm);
+  assert.equal(a.profile.weeklyKm, base.weeklyKm);
+  assert.equal(b.profile.weeklyKm, base.weeklyKm);
   assert.equal(a.profile.currentRuns, 5);
   assert.equal(b.profile.currentRuns, 5);
 });

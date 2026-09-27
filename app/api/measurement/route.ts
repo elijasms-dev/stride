@@ -1,3 +1,4 @@
+import { beginRequestObservation } from '@/lib/request-observation';
 import {
   ownerId,
   guardWrite,
@@ -10,6 +11,7 @@ import {
 import { guardAccount } from '@/lib/accounts';
 import { measure } from '@/lib/measurement';
 export async function POST(request: Request) {
+  const observation = beginRequestObservation(request);
   try {
     const owner = ownerId(request);
     guardWrite(request);
@@ -21,6 +23,6 @@ export async function POST(request: Request) {
     await measure(owner, account.epoch, 'field-invalid');
     return json({ ok: true });
   } catch (e) {
-    return failure(e);
+    return failure(e, observation);
   }
 }

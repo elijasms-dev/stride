@@ -14,6 +14,7 @@ import {
   updateRunMeasure,
 } from '../lib/run-distance.ts';
 import {
+  withAllocatedWorkoutTargets,
   withWorkoutTargets,
   updateWorkoutTargets,
 } from '../lib/workout-targets.ts';
@@ -117,9 +118,23 @@ void test('new plans default to distance without changing running dates or presc
   assert.equal(automatic.profile.runMeasure, 'distance');
   assert.deepEqual(validatePlan(automatic), []);
   assert.deepEqual(
-    automatic.workouts.map((w) => [w.date, w.kind, w.minutes, w.hard]),
-    timed.workouts.map((w) => [w.date, w.kind, w.minutes, w.hard]),
+    automatic.workouts.map((w) => [w.date, w.kind, w.hard]),
+    timed.workouts.map((w) => [w.date, w.kind, w.hard]),
   );
+  automatic.workouts.forEach((w, i) => {
+    // Whole metres and whole seconds redistribute at most one rounded minute;
+    // changing display measure must never change the actual quality main set.
+    assert.ok(Math.abs(w.minutes - timed.workouts[i].minutes) <= 1);
+    const mainSet = (run) =>
+      run.steps
+        .filter((s) => s.kind === 'work' && s.intensity >= 4)
+        .map(({ seconds, intensity, effort }) => ({
+          seconds,
+          intensity,
+          effort,
+        }));
+    assert.deepEqual(mainSet(w), mainSet(timed.workouts[i]));
+  });
   assert.ok(
     automatic.workouts.some(
       (w) => w.kind === 'long' && prescribedDistanceKm(w) !== null,
@@ -133,7 +148,7 @@ void test('new plans default to distance without changing running dates or presc
 });
 void test('a distance target needs no invented numerical pace alert', () => {
   const p = { ...profile, easyPace: null, workoutTargets: { mode: 'effort' } };
-  const run = withWorkoutTargets(longRun(20), p);
+  const run = withAllocatedWorkoutTargets(longRun(20), p);
   assert.ok(prescribedDistanceKm(run) > 0);
   assert.ok(run.steps.every((s) => !s.target));
   const plan = makePlan(p, start);
@@ -177,35 +192,24 @@ void test('run-walk, returns, recoveries, hills and double threshold retain thei
     assert.deepEqual(withRunDistance(before, profile), before);
   }
 });
-void test('slower pace targets shrink distance, preserve time and refresh weekly totals', () => {
+void test('slower targets cannot silently shrink saved distances to hide a session-time conflict', () => {
   const before = makePlan(profile, start);
-  const after = updateWorkoutTargets(
-    before,
-    { mode: 'pace', pace: { easy: { low: 570, high: 600 } } },
-    start,
-  );
-  assert.deepEqual(validatePlan(after), []);
-  for (const week of after.weeks) {
-    const sum = after.workouts
-      .filter(
-        (w) =>
-          w.week === week.index && w.kind !== 'race' && w.status !== 'skipped',
-      )
-      .reduce((n, w) => n + w.estimatedKm, 0);
-    assert.equal(week.targetKm, Math.round(sum * 10) / 10);
-  }
-  for (const w of after.workouts.filter(
-    (w) => prescribedDistanceKm(w) !== null && w.kind !== 'race',
-  )) {
-    const old = before.workouts.find((s) => s.id === w.id);
-    assert.equal(w.minutes, old.minutes);
-    assert.ok(w.estimatedKm <= old.estimatedKm);
-    assert.ok(
-      w.steps.every(
-        (s) => (s.metres * s.planningPaceSecondsPerKm) / 1000 <= s.seconds,
+  const snapshot = structuredClone(before);
+  assert.throws(
+    () =>
+      updateWorkoutTargets(
+        before,
+        { mode: 'pace', pace: { easy: { low: 570, high: 600 } } },
+        start,
       ),
-    );
-  }
+    { name: 'PlanError', message: /distances cannot fit.*time limits/ },
+  );
+  assert.deepEqual(
+    before,
+    snapshot,
+    'A rejected pace change must preserve the existing plan',
+  );
+  assert.deepEqual(validatePlan(before), []);
 });
 void test('short easy runs assign the same HR alerts on repeated target updates', () => {
   const p = {

@@ -1,0 +1,402 @@
+{
+  "generatedAt": "2026-09-25T10:05:22.346Z",
+  "sourceBefore": "0420f9d381ec57db1f9daad38bf46d31afa0fe22aaf1b0964d52eb0c7be8b4ea",
+  "sourceAfter": "0420f9d381ec57db1f9daad38bf46d31afa0fe22aaf1b0964d52eb0c7be8b4ea",
+  "sourceStable": true,
+  "historical": false,
+  "summary": {
+    "cases": 1,
+    "passed": 1,
+    "failed": 0,
+    "errors": 0,
+    "expectedRejections": 0,
+    "weeks": 13,
+    "issueCounts": {},
+    "generationMs": {
+      "median": 36.118,
+      "p95": 36.118,
+      "maximum": 36.118
+    }
+  },
+  "results": [
+    {
+      "id": "5k-q1-midweek",
+      "group": "calendar",
+      "input": {
+        "name": "",
+        "goal": "5k",
+        "raceName": "5K race day",
+        "startDate": "2026-09-30",
+        "raceDate": "2026-12-22",
+        "weeklyKm": 30,
+        "longestKm": 8,
+        "currentRuns": 4,
+        "days": [
+          0,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": null,
+        "runsPerWeek": 4,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "recentRace": {
+          "distanceKm": 5,
+          "timeMinutes": 25,
+          "date": "2026-09-20",
+          "source": "race",
+          "course": "road"
+        },
+        "qualityMode": "custom",
+        "qualitySessions": 1,
+        "recentQualitySessions": 1,
+        "recentQualityMinutes": 20,
+        "runMeasure": "distance"
+      },
+      "generationMs": 36.118,
+      "status": "passed",
+      "structural": [],
+      "opening": {
+        "declaredWeeklyKm": 30,
+        "actualWeeklyKm": 21.6,
+        "weeklyDifferenceKm": -8.4,
+        "declaredLongKm": 8,
+        "actualLongKm": 8
+      },
+      "peaks": {
+        "weeklyKm": 30.45,
+        "longKm": 10
+      },
+      "maximumEligibleEasyLongRatio": 0.8,
+      "adjacentIdenticalExposures": 0,
+      "maxIdenticalExposureStreak": 1,
+      "maxIdenticalWeekStreak": 1,
+      "uniqueOrdinaryQualitySignatures": 6,
+      "qualityFamilies": [
+        "threshold",
+        "race-rhythm"
+      ],
+      "issues": [],
+      "warnings": [],
+      "weeks": [
+        {
+          "week": 1,
+          "start": "2026-09-28",
+          "phase": "Foundation",
+          "scope": "ordinary",
+          "trainingKm": 21.6,
+          "minutes": 154.167,
+          "longKm": 8,
+          "longMinutes": 57.867,
+          "easyMaxKm": 6.4,
+          "easyMaxMinutes": 46.3,
+          "easyLongRatio": 0.8,
+          "easyLongTimeRatio": 0.800115,
+          "hierarchyEligible": false,
+          "qualityCount": 1,
+          "quality": [
+            {
+              "date": "2026-09-30",
+              "title": "7 × 2 min tempo",
+              "stimulus": "threshold",
+              "signature": "[[\"aerobic\",[\"time\",900],3,\"easy\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"]]",
+              "steps": "15min aerobic/easy + 2min work/threshold + 1min recovery/effort + 2min work/threshold + 1min recovery/effort + 2min work/threshold + 1min recovery/effort + 2min work/threshold + 1min recovery/effort + 2min work/threshold + 1min recovery/effort + 2min work/threshold + 1min recovery/effort + 2min work/threshold"
+            }
+          ]
+        },
+        {
+          "week": 2,
+          "start": "2026-10-05",
+          "phase": "Maintenance",
+          "scope": "ordinary",
+          "trainingKm": 26.5,
+          "minutes": 190.383,
+          "longKm": 8,
+          "longMinutes": 57.867,
+          "easyMaxKm": 6.177,
+          "easyMaxMinutes": 44.683,
+          "easyLongRatio": 0.772125,
+          "easyLongTimeRatio": 0.772177,
+          "hierarchyEligible": true,
+          "qualityCount": 1,
+          "quality": [
+            {
+              "date": "2026-10-07",
+              "title": "9 × 90 sec tempo",
+              "stimulus": "threshold",
+              "signature": "[[\"aerobic\",[\"time\",900],3,\"easy\",\"run\"],[\"work\",[\"time\",90],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",90],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",90],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",90],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",90],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",90],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",90],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",90],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",90],6,\"threshold\",\"run\"]]",
+              "steps": "15min aerobic/easy + 1.5min work/threshold + 1min recovery/effort + 1.5min work/threshold + 1min recovery/effort + 1.5min work/threshold + 1min recovery/effort + 1.5min work/threshold + 1min recovery/effort + 1.5min work/threshold + 1min recovery/effort + 1.5min work/threshold + 1min recovery/effort + 1.5min work/threshold + 1min recovery/effort + 1.5min work/threshold + 1min recovery/effort + 1.5min work/threshold"
+            }
+          ]
+        },
+        {
+          "week": 3,
+          "start": "2026-10-12",
+          "phase": "Maintenance",
+          "scope": "ordinary",
+          "trainingKm": 26.5,
+          "minutes": 189.783,
+          "longKm": 8,
+          "longMinutes": 57.867,
+          "easyMaxKm": 6.4,
+          "easyMaxMinutes": 46.3,
+          "easyLongRatio": 0.8,
+          "easyLongTimeRatio": 0.800115,
+          "hierarchyEligible": true,
+          "qualityCount": 1,
+          "quality": [
+            {
+              "date": "2026-10-14",
+              "title": "7 × 90 sec 5K effort",
+              "stimulus": "race-rhythm",
+              "signature": "[[\"aerobic\",[\"time\",900],3,\"easy\",\"run\"],[\"work\",[\"time\",90],7,\"race\",\"run\"],[\"recovery\",[\"time\",75],2,\"effort\",\"run\"],[\"work\",[\"time\",90],7,\"race\",\"run\"],[\"recovery\",[\"time\",75],2,\"effort\",\"run\"],[\"work\",[\"time\",90],7,\"race\",\"run\"],[\"recovery\",[\"time\",75],2,\"effort\",\"run\"],[\"work\",[\"time\",90],7,\"race\",\"run\"],[\"recovery\",[\"time\",75],2,\"effort\",\"run\"],[\"work\",[\"time\",90],7,\"race\",\"run\"],[\"recovery\",[\"time\",75],2,\"effort\",\"run\"],[\"work\",[\"time\",90],7,\"race\",\"run\"],[\"recovery\",[\"time\",75],2,\"effort\",\"run\"],[\"work\",[\"time\",90],7,\"race\",\"run\"]]",
+              "steps": "15min aerobic/easy + 1.5min work/race + 1.25min recovery/effort + 1.5min work/race + 1.25min recovery/effort + 1.5min work/race + 1.25min recovery/effort + 1.5min work/race + 1.25min recovery/effort + 1.5min work/race + 1.25min recovery/effort + 1.5min work/race + 1.25min recovery/effort + 1.5min work/race"
+            }
+          ]
+        },
+        {
+          "week": 4,
+          "start": "2026-10-19",
+          "phase": "Recovery",
+          "scope": "recovery",
+          "trainingKm": 16.25,
+          "minutes": 117.55,
+          "longKm": 5,
+          "longMinutes": 36.167,
+          "easyMaxKm": 4,
+          "easyMaxMinutes": 28.933,
+          "easyLongRatio": 0.8,
+          "easyLongTimeRatio": 0.8,
+          "hierarchyEligible": true,
+          "qualityCount": 0,
+          "quality": []
+        },
+        {
+          "week": 5,
+          "start": "2026-10-26",
+          "phase": "Build",
+          "scope": "ordinary",
+          "trainingKm": 26.8,
+          "minutes": 191.783,
+          "longKm": 8,
+          "longMinutes": 57.867,
+          "easyMaxKm": 6.4,
+          "easyMaxMinutes": 46.3,
+          "easyLongRatio": 0.8,
+          "easyLongTimeRatio": 0.800115,
+          "hierarchyEligible": true,
+          "qualityCount": 1,
+          "quality": [
+            {
+              "date": "2026-10-28",
+              "title": "7 × 2 min tempo",
+              "stimulus": "threshold",
+              "signature": "[[\"aerobic\",[\"time\",900],3,\"easy\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"]]",
+              "steps": "15min aerobic/easy + 2min work/threshold + 1min recovery/effort + 2min work/threshold + 1min recovery/effort + 2min work/threshold + 1min recovery/effort + 2min work/threshold + 1min recovery/effort + 2min work/threshold + 1min recovery/effort + 2min work/threshold + 1min recovery/effort + 2min work/threshold"
+            }
+          ]
+        },
+        {
+          "week": 6,
+          "start": "2026-11-02",
+          "phase": "Build",
+          "scope": "ordinary",
+          "trainingKm": 28.3,
+          "minutes": 203.4,
+          "longKm": 9,
+          "longMinutes": 65.1,
+          "easyMaxKm": 6.615,
+          "easyMaxMinutes": 47.85,
+          "easyLongRatio": 0.735,
+          "easyLongTimeRatio": 0.735023,
+          "hierarchyEligible": true,
+          "qualityCount": 1,
+          "quality": [
+            {
+              "date": "2026-11-04",
+              "title": "9 × 90 sec tempo",
+              "stimulus": "threshold",
+              "signature": "[[\"aerobic\",[\"time\",900],3,\"easy\",\"run\"],[\"work\",[\"time\",90],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",90],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",90],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",90],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",90],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",90],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",90],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",90],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",90],6,\"threshold\",\"run\"]]",
+              "steps": "15min aerobic/easy + 1.5min work/threshold + 1min recovery/effort + 1.5min work/threshold + 1min recovery/effort + 1.5min work/threshold + 1min recovery/effort + 1.5min work/threshold + 1min recovery/effort + 1.5min work/threshold + 1min recovery/effort + 1.5min work/threshold + 1min recovery/effort + 1.5min work/threshold + 1min recovery/effort + 1.5min work/threshold + 1min recovery/effort + 1.5min work/threshold"
+            }
+          ]
+        },
+        {
+          "week": 7,
+          "start": "2026-11-09",
+          "phase": "Build",
+          "scope": "ordinary",
+          "trainingKm": 28.95,
+          "minutes": 207.5,
+          "longKm": 9,
+          "longMinutes": 65.1,
+          "easyMaxKm": 7.2,
+          "easyMaxMinutes": 52.083,
+          "easyLongRatio": 0.8,
+          "easyLongTimeRatio": 0.800051,
+          "hierarchyEligible": true,
+          "qualityCount": 1,
+          "quality": [
+            {
+              "date": "2026-11-11",
+              "title": "7 × 90 sec 5K effort",
+              "stimulus": "race-rhythm",
+              "signature": "[[\"aerobic\",[\"time\",900],3,\"easy\",\"run\"],[\"work\",[\"time\",90],7,\"race\",\"run\"],[\"recovery\",[\"time\",75],2,\"effort\",\"run\"],[\"work\",[\"time\",90],7,\"race\",\"run\"],[\"recovery\",[\"time\",75],2,\"effort\",\"run\"],[\"work\",[\"time\",90],7,\"race\",\"run\"],[\"recovery\",[\"time\",75],2,\"effort\",\"run\"],[\"work\",[\"time\",90],7,\"race\",\"run\"],[\"recovery\",[\"time\",75],2,\"effort\",\"run\"],[\"work\",[\"time\",90],7,\"race\",\"run\"],[\"recovery\",[\"time\",75],2,\"effort\",\"run\"],[\"work\",[\"time\",90],7,\"race\",\"run\"],[\"recovery\",[\"time\",75],2,\"effort\",\"run\"],[\"work\",[\"time\",90],7,\"race\",\"run\"]]",
+              "steps": "15min aerobic/easy + 1.5min work/race + 1.25min recovery/effort + 1.5min work/race + 1.25min recovery/effort + 1.5min work/race + 1.25min recovery/effort + 1.5min work/race + 1.25min recovery/effort + 1.5min work/race + 1.25min recovery/effort + 1.5min work/race + 1.25min recovery/effort + 1.5min work/race"
+            }
+          ]
+        },
+        {
+          "week": 8,
+          "start": "2026-11-16",
+          "phase": "Recovery",
+          "scope": "recovery",
+          "trainingKm": 19.5,
+          "minutes": 141.05,
+          "longKm": 6,
+          "longMinutes": 43.4,
+          "easyMaxKm": 4.8,
+          "easyMaxMinutes": 34.717,
+          "easyLongRatio": 0.8,
+          "easyLongTimeRatio": 0.799923,
+          "hierarchyEligible": true,
+          "qualityCount": 0,
+          "quality": []
+        },
+        {
+          "week": 9,
+          "start": "2026-11-23",
+          "phase": "Build",
+          "scope": "ordinary",
+          "trainingKm": 28.95,
+          "minutes": 206.317,
+          "longKm": 9,
+          "longMinutes": 65.1,
+          "easyMaxKm": 7.033,
+          "easyMaxMinutes": 50.867,
+          "easyLongRatio": 0.781444,
+          "easyLongTimeRatio": 0.781362,
+          "hierarchyEligible": true,
+          "qualityCount": 1,
+          "quality": [
+            {
+              "date": "2026-11-25",
+              "title": "5 × 3 min tempo",
+              "stimulus": "threshold",
+              "signature": "[[\"aerobic\",[\"time\",900],3,\"easy\",\"run\"],[\"work\",[\"time\",180],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",180],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",180],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",180],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",180],6,\"threshold\",\"run\"]]",
+              "steps": "15min aerobic/easy + 3min work/threshold + 1min recovery/effort + 3min work/threshold + 1min recovery/effort + 3min work/threshold + 1min recovery/effort + 3min work/threshold + 1min recovery/effort + 3min work/threshold"
+            }
+          ]
+        },
+        {
+          "week": 10,
+          "start": "2026-11-30",
+          "phase": "Race preparation",
+          "scope": "ordinary",
+          "trainingKm": 28.95,
+          "minutes": 208.667,
+          "longKm": 9,
+          "longMinutes": 65.1,
+          "easyMaxKm": 7.2,
+          "easyMaxMinutes": 52.083,
+          "easyLongRatio": 0.8,
+          "easyLongTimeRatio": 0.800051,
+          "hierarchyEligible": true,
+          "qualityCount": 1,
+          "quality": [
+            {
+              "date": "2026-12-02",
+              "title": "10 × 200 m 5K effort",
+              "stimulus": "race-rhythm",
+              "signature": "[[\"aerobic\",[\"time\",900],3,\"easy\",\"run\"],[\"work\",[\"distance\",200],7,\"race\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"distance\",200],7,\"race\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"distance\",200],7,\"race\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"distance\",200],7,\"race\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"distance\",200],7,\"race\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"distance\",200],7,\"race\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"distance\",200],7,\"race\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"distance\",200],7,\"race\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"distance\",200],7,\"race\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"distance\",200],7,\"race\",\"run\"]]",
+              "steps": "15min aerobic/easy + 200m work/race + 1min recovery/effort + 200m work/race + 1min recovery/effort + 200m work/race + 1min recovery/effort + 200m work/race + 1min recovery/effort + 200m work/race + 1min recovery/effort + 200m work/race + 1min recovery/effort + 200m work/race + 1min recovery/effort + 200m work/race + 1min recovery/effort + 200m work/race + 1min recovery/effort + 200m work/race"
+            }
+          ]
+        },
+        {
+          "week": 11,
+          "start": "2026-12-07",
+          "phase": "Race preparation",
+          "scope": "ordinary",
+          "trainingKm": 30.45,
+          "minutes": 217.567,
+          "longKm": 10,
+          "longMinutes": 72.333,
+          "easyMaxKm": 7.025,
+          "easyMaxMinutes": 50.817,
+          "easyLongRatio": 0.7025,
+          "easyLongTimeRatio": 0.702535,
+          "hierarchyEligible": true,
+          "qualityCount": 1,
+          "quality": [
+            {
+              "date": "2026-12-09",
+              "title": "8 × 2 min tempo",
+              "stimulus": "threshold",
+              "signature": "[[\"aerobic\",[\"time\",900],3,\"easy\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"]]",
+              "steps": "15min aerobic/easy + 2min work/threshold + 1min recovery/effort + 2min work/threshold + 1min recovery/effort + 2min work/threshold + 1min recovery/effort + 2min work/threshold + 1min recovery/effort + 2min work/threshold + 1min recovery/effort + 2min work/threshold + 1min recovery/effort + 2min work/threshold + 1min recovery/effort + 2min work/threshold"
+            }
+          ]
+        },
+        {
+          "week": 12,
+          "start": "2026-12-14",
+          "phase": "Race preparation",
+          "scope": "taper",
+          "trainingKm": 15.295,
+          "minutes": 109.55,
+          "longKm": null,
+          "longMinutes": null,
+          "easyMaxKm": 4.1,
+          "easyMaxMinutes": 29.667,
+          "easyLongRatio": null,
+          "easyLongTimeRatio": null,
+          "hierarchyEligible": false,
+          "qualityCount": 1,
+          "quality": [
+            {
+              "date": "2026-12-16",
+              "title": "5 × 2 min tempo",
+              "stimulus": "threshold",
+              "signature": "[[\"aerobic\",[\"time\",120],3,\"easy\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"],[\"recovery\",[\"time\",60],2,\"effort\",\"run\"],[\"work\",[\"time\",120],6,\"threshold\",\"run\"]]",
+              "steps": "2min aerobic/easy + 2min work/threshold + 1min recovery/effort + 2min work/threshold + 1min recovery/effort + 2min work/threshold + 1min recovery/effort + 2min work/threshold + 1min recovery/effort + 2min work/threshold"
+            }
+          ]
+        },
+        {
+          "week": 13,
+          "start": "2026-12-21",
+          "phase": "Race week",
+          "scope": "race-week",
+          "trainingKm": 0,
+          "minutes": 0,
+          "longKm": null,
+          "longMinutes": null,
+          "easyMaxKm": 0,
+          "easyMaxMinutes": 0,
+          "easyLongRatio": null,
+          "easyLongTimeRatio": null,
+          "hierarchyEligible": false,
+          "qualityCount": 0,
+          "quality": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,13 @@
+import { firstRaceFeasibility } from './first-race.ts';
+import { reserveBeginnerRecovery } from '../beginner-course.ts';
 import { ENVELOPE_TAPER_POLICY, PLAN_LOAD_LIMITS } from './policy-constants.ts';
 /** Plan allocate responsibilities; extracted without changing policy or behavior. */
 import { schedulingEasyPace } from '../fitness-pacing.ts';
+import {
+  isRoadRaceProfile,
+  roadTaperDays,
+  roadTaperFraction,
+} from '../road-training-policy.ts';
 import {
   marathonRecoveryFactor,
   marathonTaperDays,
@@ -15,11 +22,12 @@ import {
 } from '../training-structure.ts';
 import { isLongUltra } from '../ultra-policy.ts';
 import { resizeWorkout } from '../workout-library.ts';
-import { withWorkoutTargets } from '../workout-targets.ts';
+import { withAllocatedWorkoutTargets as withWorkoutTargets } from '../workout-targets.ts';
 import { addDays, dateLabel, dayDiff, dayNames, weekday } from './calendar.ts';
 import { PlanError } from './errors.ts';
 import {
   marathonRaceWeekRunCount,
+  weekIncludesTaper,
   taperFactor,
   trainingPhaseOn,
 } from './generation-calendar.ts';
@@ -27,12 +35,14 @@ import { TRAINING_POLICY } from './policy.ts';
 import { trainingFamily } from './profile.ts';
 import { refreshWeekTotals } from './totals.ts';
 import { type Plan, type Workout } from './types.ts';
+import { usesDistinctLongBalance } from './session-balance.ts';
 
 export function applyActualTrainingEnvelope(
   plan: Plan,
   asOf?: string,
   allocationPrefix: Workout[] = [],
 ) {
+  if (plan.beginner) return refreshWeekTotals(plan);
   const p = plan.profile;
   const update = (w: Workout, minutes: number, minimumMinutes = 0) => {
     if (asOf && (w.date < asOf || w.status !== 'planned')) return;
@@ -142,6 +152,9 @@ export function applyActualTrainingEnvelope(
       p.weeklyMinutesLimit ?? Infinity,
       'Your weekly running-time ceiling',
     );
+  // The first-race generator owns its progression and taper. Explicit time
+  // budgets above still apply after edits or recorded activity.
+  if (plan.firstRace) return refreshWeekTotals(plan);
   const constrainLongShares = () => {
     // The long run is constrained by allocated running, not mileage that caps removed.
     for (const week of plan.weeks) {
@@ -151,6 +164,15 @@ export function applyActualTrainingEnvelope(
       );
       const long = runs.find((w) => w.kind === 'long');
       if (long) {
+        // A base block may finish partway through a calendar week. Its omitted
+        // later outings are outside the block, not lost support-run capacity.
+        // The generator and explicit limits already bound this retained outing.
+        if (p.goal === 'base' && addDays(week.start, 6) > p.raceDate) continue;
+        // Entry partway through a week omits earlier support runs. Applying a
+        // full-week share to the remaining two outings fights the shorter-easy
+        // role and repeatedly shrinks both on every reconciliation pass.
+        // Generation already bounds this long by the partial week's budget.
+        if (usesDistinctLongBalance(plan) && week.start < p.startDate) continue;
         const others = [
           ...runs.filter((w) => w !== long),
           ...allocationPrefix.filter(
@@ -166,7 +188,7 @@ export function applyActualTrainingEnvelope(
           !['Recovery', 'Taper', 'Race week'].includes(week.phase) &&
           week.start >= p.startDate &&
           addDays(week.start, 6) <= p.raceDate &&
-          taperFactor(p, addDays(week.start, 6)) >= 1 &&
+          !weekIncludesTaper(p, week.start) &&
           new Set(runs.map((w) => w.date)).size === p.days.length;
         const familiarKm = plan.baselineEvidence
           ? Math.min(
@@ -421,11 +443,13 @@ export function applyActualTrainingEnvelope(
         .reduce((n, w) => n + w.minutes, 0) ||
       plan.baselineEvidence?.weeklyMinutes ||
       startingWeeklyMinutes;
-    const taperWeeks = usesMarathonBook(p)
-      ? marathonTaperDays(p) / 7
-      : ['half', 'marathon', 'ultra'].includes(trainingFamily(p))
-        ? ENVELOPE_TAPER_POLICY.enduranceWeeks
-        : ENVELOPE_TAPER_POLICY.shortEventWeeks;
+    const taperWeeks = isRoadRaceProfile(p)
+      ? roadTaperDays(p) / 7
+      : usesMarathonBook(p)
+        ? marathonTaperDays(p) / 7
+        : ['half', 'marathon', 'ultra'].includes(trainingFamily(p))
+          ? ENVELOPE_TAPER_POLICY.enduranceWeeks
+          : ENVELOPE_TAPER_POLICY.shortEventWeeks;
     for (let bucket = 1; bucket <= taperWeeks; bucket++) {
       const boundaryOffset = usesMarathonBook(p) ? 1 : 0;
       const from = addDays(p.raceDate, -bucket * 7 + boundaryOffset);
@@ -442,17 +466,19 @@ export function applyActualTrainingEnvelope(
       );
       const target =
         baseline *
-        (usesMarathonBook(p)
-          ? bucket === 1
-            ? ENVELOPE_TAPER_POLICY.finalWeekFraction
-            : bucket === 2
-              ? ENVELOPE_TAPER_POLICY.bookSecondWeekFraction
-              : ENVELOPE_TAPER_POLICY.bookThirdWeekFraction
-          : bucket === 1
-            ? ENVELOPE_TAPER_POLICY.finalWeekFraction
-            : bucket === 2
-              ? ENVELOPE_TAPER_POLICY.standardSecondWeekFraction
-              : ENVELOPE_TAPER_POLICY.standardThirdWeekFraction) *
+        (isRoadRaceProfile(p)
+          ? roadTaperFraction(p, bucket * 7)
+          : usesMarathonBook(p)
+            ? bucket === 1
+              ? ENVELOPE_TAPER_POLICY.finalWeekFraction
+              : bucket === 2
+                ? ENVELOPE_TAPER_POLICY.bookSecondWeekFraction
+                : ENVELOPE_TAPER_POLICY.bookThirdWeekFraction
+            : bucket === 1
+              ? ENVELOPE_TAPER_POLICY.finalWeekFraction
+              : bucket === 2
+                ? ENVELOPE_TAPER_POLICY.standardSecondWeekFraction
+                : ENVELOPE_TAPER_POLICY.standardThirdWeekFraction) *
         Math.min(
           1,
           new Set(runs.map((w) => w.date)).size /
@@ -480,6 +506,16 @@ export function applyActualTrainingEnvelope(
 }
 
 export function rebalanceFutureQuality(plan: Plan, asOf: string): Plan {
+  if (plan.firstRace) {
+    plan.constraintsFrom = asOf;
+    refreshWeekTotals(plan);
+    plan.feasibility = firstRaceFeasibility(plan, asOf);
+    return plan;
+  }
+  if (plan.beginner) {
+    reserveBeginnerRecovery(plan, asOf);
+    return refreshWeekTotals(plan);
+  }
   plan.constraintsFrom = asOf;
   for (let pass = 0; pass < PLAN_LOAD_LIMITS.qualityRebalancePasses; pass++)
     for (const week of plan.weeks) {

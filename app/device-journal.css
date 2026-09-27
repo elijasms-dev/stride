@@ -1,0 +1,41 @@
+.device-journal {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 20px;
+}
+.device-journal h2 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+.device-journal p {
+  line-height: 1.6;
+}
+.device-journal details {
+  width: 100%;
+  min-width: 0;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+.device-journal summary {
+  min-height: 44px;
+  cursor: pointer;
+  padding: 10px 0;
+}
+.device-journal pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.85rem;
+}
+.device-journal button {
+  min-height: 44px;
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+@media print {
+  .device-journal {
+    display: none;
+  }
+}

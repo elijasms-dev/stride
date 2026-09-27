@@ -7,6 +7,8 @@ import {
   orderedCalendarSessions,
 } from '@/lib/day-sessions';
 import { trainingDay } from '@/lib/form-values';
+import { millisecondsUntilTrainingDay } from '@/lib/training-day-clock';
+import { withCurrentFeasibility } from '@/lib/plan/feasibility';
 import {
   DEFAULT_HOME_PREFERENCES,
   HOME_PREFERENCES_KEY,
@@ -75,7 +77,10 @@ export function useAppNavigation({
   const [clockDay, setClockDay] = useState(() => trainingDay('UTC'));
   const initialDate = useMemo(() => new Date().toISOString().slice(0, 10), []),
     example = useMemo(() => demoPlan(initialDate), [initialDate]);
-  const plan = data.plan ?? example,
+  const plan = useMemo(
+      () => withCurrentFeasibility(data.plan ?? example, clockDay),
+      [data.plan, example, clockDay],
+    ),
     isDemo = !data.plan,
     trainingTimezone = isDemo
       ? account.profile?.timezone || deviceZone
@@ -125,14 +130,19 @@ export function useAppNavigation({
     mainScrollRef.current?.scrollTo({ top: 0, behavior: 'instant' });
   };
   useEffect(() => {
-    setDeviceZone(Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC');
-    const tick = () => setClockDay(trainingDay(trainingTimezone));
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const tick = () => {
+      clearTimeout(timer);
+      if (document.visibilityState !== 'visible') return;
+      setDeviceZone(Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC');
+      setClockDay(trainingDay(trainingTimezone));
+      timer = setTimeout(tick, millisecondsUntilTrainingDay(trainingTimezone));
+    };
     tick();
-    const timer = setInterval(tick, 15000);
     window.addEventListener('focus', tick);
     document.addEventListener('visibilitychange', tick);
     return () => {
-      clearInterval(timer);
+      clearTimeout(timer);
       window.removeEventListener('focus', tick);
       document.removeEventListener('visibilitychange', tick);
     };

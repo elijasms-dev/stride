@@ -1,3 +1,4 @@
+import { beginRequestObservation } from '@/lib/request-observation';
 import {
   ownerId,
   guardWrite,
@@ -7,6 +8,7 @@ import {
   failure,
   readState,
   HttpError,
+  pruneRevisionsStatement,
 } from '@/lib/server';
 import {
   assertAccountIdentity,
@@ -41,6 +43,7 @@ type Operation = {
   status: string;
 };
 export async function POST(request: Request) {
+  const observation = beginRequestObservation(request);
   try {
     const owner = ownerId(request);
     guardWrite(request);
@@ -140,7 +143,7 @@ export async function POST(request: Request) {
           kind === 'reopen'
             ? 'This opens an empty Stride journal. It does not restore deleted running; use a recovery copy if you want your records back.'
             : kind === 'delete'
-              ? 'This deletes the local training journal, profile, connection key and revision history. A minimal account tombstone remains to block stale requests.'
+              ? 'This deletes the local training journal, profile, connection key, revision history and associated sandbox billing records. A minimal account tombstone remains to block stale requests.'
               : 'Restoring replaces the current journal and profile. Current revisions remain available for audit, but automatic undo cannot cross a recovery operation. Revision snapshots from the uploaded file are not imported; keep the original export for that audit history. Provider connections and delivery confirmations are cleared. External calendar workouts are not removed; review those copies before reconnecting.',
       });
     }
@@ -200,6 +203,8 @@ export async function POST(request: Request) {
       'connections',
       'deliveries',
       'standalone_runs',
+      'journal_mutations',
+      'delivery_jobs',
       'request_limits',
     ])
       statements.push(
@@ -209,6 +214,39 @@ export async function POST(request: Request) {
           )
           .bind(owner, token),
       );
+    if (kind === 'delete') {
+      // Sandbox records have no financial retention requirement. Purge every
+      // prior lifetime associated with this account, only inside its winning
+      // deletion transaction. Delete inbox references before their bindings.
+      const fence =
+        "EXISTS(SELECT 1 FROM accounts a WHERE a.owner=? AND a.account_id=? AND a.epoch=? AND a.operation_id=? AND a.status='closed')";
+      statements.push(
+        db
+          .prepare(
+            `DELETE FROM billing_events WHERE subscription_id IN (SELECT id FROM billing_subscriptions WHERE account_id=? AND account_epoch<=?) AND ${fence}`,
+          )
+          .bind(
+            account.account_id,
+            account.epoch,
+            owner,
+            account.account_id,
+            epoch,
+            token,
+          ),
+        db
+          .prepare(
+            `DELETE FROM billing_subscriptions WHERE account_id=? AND account_epoch<=? AND ${fence}`,
+          )
+          .bind(
+            account.account_id,
+            account.epoch,
+            owner,
+            account.account_id,
+            epoch,
+            token,
+          ),
+      );
+    }
     if (kind === 'delete')
       statements.push(
         db
@@ -230,6 +268,7 @@ export async function POST(request: Request) {
             owner,
             token,
           ),
+        pruneRevisionsStatement(owner, token),
       );
       for (const r of file?.standaloneRuns ?? [])
         statements.push(
@@ -311,6 +350,6 @@ export async function POST(request: Request) {
             : 'Empty journal opened',
     });
   } catch (e) {
-    return failure(e);
+    return failure(e, observation);
   }
 }

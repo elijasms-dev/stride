@@ -8,6 +8,7 @@ import {
   WORKOUT_TEMPLATES,
 } from '../lib/trainingEngine.ts';
 import type { Goal, UserTrainingInput } from '../lib/types.ts';
+import { deriveFitness } from '../lib/fitness-pacing.ts';
 
 const marathonFourWeek: UserTrainingInput = {
   currentLongRun: 18,
@@ -16,6 +17,57 @@ const marathonFourWeek: UserTrainingInput = {
   daysPerWeek: 5,
   goal: 'marathon',
 };
+
+void describe('Supported fitness targets', () => {
+  void test('valid out-of-domain benchmarks keep plan structure but emit no actionable extrapolated pace', () => {
+    for (const recentRace of [
+      { distanceKm: 5, timeMinutes: 50 },
+      { distanceKm: 5, timeMinutes: 11 },
+      { distanceKm: 50, timeMinutes: 300 },
+    ]) {
+      const plan = generateTrainingPlan({ ...marathonFourWeek, recentRace });
+      assert.ok(plan.notes.some((note) => note.includes('effort guidance')));
+      assert.ok(plan.weeks.length > 0);
+      for (const week of plan.weeks)
+        for (const day of week.dailySplits) {
+          assert.equal(day.paceSecondsPerKm, undefined);
+          assert.ok(day.km > 0);
+          for (const step of day.scaled?.steps ?? [])
+            assert.equal(step.paceSecondsPerKm, undefined);
+        }
+    }
+  });
+
+  void test('supported novice and established performances retain the shared model paces', () => {
+    for (const recentRace of [
+      { distanceKm: 5, timeMinutes: 40 },
+      { distanceKm: 10, timeMinutes: 50 },
+    ]) {
+      const fitness = deriveFitness(recentRace);
+      assert.ok(fitness.paces);
+      const plan = generateTrainingPlan({ ...marathonFourWeek, recentRace });
+      for (const week of plan.weeks) {
+        const easy = week.dailySplits.find((day) => day.type === 'recovery');
+        assert.equal(easy?.paceSecondsPerKm, fitness.paces.easy);
+        for (const day of week.dailySplits)
+          assert.ok(Number.isFinite(day.paceSecondsPerKm));
+      }
+    }
+  });
+
+  void test('malformed benchmark values still produce the controlled input error', () => {
+    assert.throws(
+      () =>
+        generateTrainingPlan({
+          ...marathonFourWeek,
+          recentRace: { distanceKm: 0, timeMinutes: 50 },
+        }),
+      (error: unknown) =>
+        error instanceof TrainingEngineError &&
+        error.code === 'INVALID_BENCHMARK',
+    );
+  });
+});
 
 void describe('Short Marathon Test', () => {
   void test('4-week marathon preserves its starting baseline, uses integer steps and tapers', () => {

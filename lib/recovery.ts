@@ -2,6 +2,8 @@ import { validStepTarget } from './workout-targets.ts';
 import { MAX_RECORDED_MINUTES } from './ultra-policy.ts';
 import { validWorkoutEnjoyment } from './workout-enjoyment.ts';
 import { validateRun } from './run-input.ts';
+import { activityTime } from './activity-time.ts';
+import { impossibleRunningSummary } from './activity-plausibility.ts';
 import { type ExtraRun } from './plan/types.ts';
 import { distanceEstimate, qualityWorkMinutes } from './prescription.ts';
 import {
@@ -14,6 +16,7 @@ import {
 import { validateProfile } from './plan/profile.ts';
 import { validatePlan } from './plan/validate.ts';
 import { refreshWeekTotals } from './plan/totals.ts';
+import { validStoredDistanceEstimate } from './plan/display.ts';
 import { type Plan } from './plan/types.ts';
 import { PlanError } from './plan/errors.ts';
 export type RecoveryProfile = {
@@ -84,6 +87,16 @@ function feedback(raw: unknown, today: string) {
   number(raw.actualMinutes, 1, MAX_RECORDED_MINUTES, 'recorded time');
   if (raw.actualKm !== null)
     number(raw.actualKm, 0.001, 250, 'recorded distance');
+  if (
+    impossibleRunningSummary(
+      Number(raw.actualMinutes),
+      raw.actualKm === null ? null : Number(raw.actualKm),
+    )
+  )
+    fail(
+      'a recorded distance and duration imply an impossible running speed. Correct the source record before restoring.',
+    );
+  activityTime(raw);
   number(raw.effort, 1, 10, 'effort');
   if (
     !Number.isInteger(raw.effort) ||
@@ -220,7 +233,7 @@ export function validateRecovery(input: unknown): RecoveryFile {
   try {
     p.profile = validateProfile(
       p.profile,
-      p.profile.startDate,
+      undefined,
       /^stride-0\.[123]\./.test(p.engineVersion),
     );
   } catch (e) {
@@ -230,8 +243,28 @@ export function validateRecovery(input: unknown): RecoveryFile {
   text(p.id, 200, 'plan identity', false);
   text(p.engineVersion, 80, 'engine version');
   text(p.policyVersion, 100, 'policy version');
+  if (
+    p.sessionBalanceVersion !== undefined &&
+    p.sessionBalanceVersion !== 'distinct-long-v1'
+  )
+    fail('unknown easy/long-run balance policy.');
+  if (p.openingWeekKm !== undefined) {
+    number(p.openingWeekKm, 0, 200, 'opening weekly allocation');
+    if (
+      p.sessionBalanceVersion !== 'distinct-long-v1' ||
+      p.openingWeekKm > p.profile.weeklyKm
+    )
+      fail('invalid opening weekly allocation.');
+  }
+  if (p.allocationBaseline !== undefined) {
+    object(p.allocationBaseline, 'Reviewed allocation');
+    number(p.allocationBaseline.weeklyKm, 0, 200, 'allocation distance');
+    number(p.allocationBaseline.weeklyMinutes, 0, 3000, 'allocation duration');
+    if (p.sessionBalanceVersion !== 'distinct-long-v1' || !p.baselineEvidence)
+      fail('reviewed allocation requires its generation baseline.');
+  }
   text(p.createdAt, 40, 'creation date');
-  if (!/^stride-0\.(?:[1-9]|10)\.\d+$/.test(p.engineVersion))
+  if (!/^stride-0\.(?:[1-9]|10|11)\.\d+$/.test(p.engineVersion))
     fail('this training engine version needs a newer recovery reader.');
   if (
     !Array.isArray(p.weeks) ||
@@ -303,7 +336,6 @@ export function validateRecovery(input: unknown): RecoveryFile {
     if (
       w.pairId !== undefined ||
       w.session !== undefined ||
-      w.startTime !== undefined ||
       w.pairType !== undefined
     ) {
       text(w.pairId, 200, 'paired day identity', false);
@@ -315,6 +347,12 @@ export function validateRecovery(input: unknown): RecoveryFile {
       )
         fail('check paired session identity and time.');
     }
+    if (
+      w.startTime !== undefined &&
+      (typeof w.startTime !== 'string' ||
+        !/^([01]\d|2[0-3]):[0-5]\d$/.test(w.startTime))
+    )
+      fail('check the session start time.');
     if (w.returnCeilingMinutes !== undefined)
       number(w.returnCeilingMinutes, 1, 1500, 'stored return ceiling');
     if (w.returnStage !== undefined || w.returnStageStarted !== undefined) {
@@ -396,8 +434,36 @@ export function validateRecovery(input: unknown): RecoveryFile {
     if (w.feedback?.activityId)
       unique(w.feedback.activityId, activityIds, 'external activity');
     if (w.skipReason !== undefined) text(w.skipReason, 200, 'skip reason');
-    w.distanceEstimate = distanceEstimate(w.steps, p.profile);
-    w.qualityMinutes = qualityWorkMinutes(w);
+    if (
+      w.prescriptionVersion !== undefined &&
+      w.prescriptionVersion !== 'pace-resolved-v1'
+    )
+      fail('unknown prescription accounting version.');
+    if (w.prescriptionPaceBasis !== undefined)
+      number(w.prescriptionPaceBasis, 2, 20, 'saved easy-pace basis');
+    if (
+      w.distanceRevision !== undefined &&
+      w.distanceRevision !== 'pace-edited-time'
+    )
+      fail('unknown timed distance revision.');
+    if (
+      w.distanceEstimate !== undefined &&
+      !validStoredDistanceEstimate(w.distanceEstimate)
+    )
+      fail('invalid saved distance estimate.');
+    const legacyHistory =
+      !w.prescriptionVersion && (w.status !== 'planned' || w.date < today);
+    if (w.beginnerLesson || !legacyHistory || w.distanceEstimate === undefined)
+      w.distanceEstimate = distanceEstimate(
+        w.steps,
+        w.beginnerLesson
+          ? { easyPace: null }
+          : w.prescriptionVersion || legacyHistory
+            ? { easyPace: w.prescriptionPaceBasis ?? null }
+            : p.profile,
+      );
+    if (!legacyHistory || w.qualityMinutes === undefined)
+      w.qualityMinutes = qualityWorkMinutes(w);
   }
   if (p.extraRuns !== undefined) {
     if (!Array.isArray(p.extraRuns) || p.extraRuns.length > 4000)
@@ -409,6 +475,7 @@ export function validateRecovery(input: unknown): RecoveryFile {
       date(r.date, 'extra run date');
       feedback(
         {
+          ...activityTime(r),
           actualDate: r.date,
           actualMinutes: r.minutes,
           actualKm: r.km,

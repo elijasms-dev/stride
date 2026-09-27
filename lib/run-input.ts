@@ -2,7 +2,13 @@ import { MAX_RECORDED_MINUTES } from './ultra-policy.ts';
 import { validDate } from './plan/calendar.ts';
 import { PlanError } from './plan/errors.ts';
 import { type ExtraRun } from './plan/types.ts';
-export function validateRun(raw: unknown, today: string): ExtraRun {
+import { activityTime } from './activity-time.ts';
+import { impossibleRunningSummary } from './activity-plausibility.ts';
+export function validateRun(
+  raw: unknown,
+  today: string,
+  verifyProviderLater = false,
+): ExtraRun {
   const r = raw as ExtraRun;
   if (
     !r ||
@@ -26,7 +32,15 @@ export function validateRun(raw: unknown, today: string): ExtraRun {
     throw new PlanError(
       'Check the run date, time, distance, effort and feeling. Leave an unknown distance blank.',
     );
+  if (
+    (!verifyProviderLater || !r.activityId) &&
+    impossibleRunningSummary(r.minutes, r.km)
+  )
+    throw new PlanError(
+      'This distance and duration imply an impossible running speed. Check the units and duration; the run has not been saved.',
+    );
   return {
+    ...activityTime(r),
     id: typeof r.id === 'string' ? r.id : '',
     date: r.date,
     minutes: r.minutes,

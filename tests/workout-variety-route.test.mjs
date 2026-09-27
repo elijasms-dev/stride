@@ -702,3 +702,44 @@ void test('actual plan-save response preserves pinned client identity', async (t
   assert.equal(result.accountEpoch, account.epoch);
   assert.equal(client.isInvalid(), false);
 });
+
+void test('target reset restores benchmark mode through review/apply and an unchanged repeat is a journal no-op', async (t) => {
+  const { sqlite, plan, today } = await seed(t);
+  plan.profile.recentRace = { distanceKm: 5, timeMinutes: 25, date: '2026-08-01', source: 'race', course: 'road' };
+  plan.profile.workoutTargets = { mode: 'effort' };
+  await saveState(owner, 1, plan, 'Synthetic explicit effort override', 0);
+  const protectedRun = plan.workouts.find((w) => w.date >= today && w.status === 'planned');
+  receipt(sqlite, protectedRun.id);
+  const beforeReview = snapshot(sqlite);
+  const review = await request({ action: 'targetsPreview', version: 2, targets: null });
+  assert.equal(review.status, 200, JSON.stringify(review.data));
+  assert.equal(snapshot(sqlite), beforeReview);
+  assert.equal(Object.hasOwn(review.data.plan.profile, 'workoutTargets'), false);
+  assert.ok(review.data.plan.workouts.some((w) => w.steps.some((s) => s.target?.mode === 'pace')));
+  assert.deepEqual(review.data.plan.workouts.find((w) => w.id === protectedRun.id), protectedRun);
+  const saved = await request({ action: 'targets', version: review.data.version, effectiveDate: review.data.effectiveDate, fingerprint: review.data.fingerprint, targets: null });
+  assert.equal(saved.status, 200, JSON.stringify(saved.data));
+  assert.equal(saved.data.version, 3);
+  assert.equal(Object.hasOwn(saved.data.plan.profile, 'workoutTargets'), false);
+  const beforeNoop = snapshot(sqlite);
+  const repeated = await request({ action: 'targetsPreview', version: 3, targets: null });
+  assert.equal(repeated.status, 200);
+  const noChange = await request({ action: 'targets', version: 3, effectiveDate: repeated.data.effectiveDate, fingerprint: repeated.data.fingerprint, targets: null });
+  assert.equal(noChange.status, 200);
+  assert.equal(noChange.data.version, 3);
+  assert.equal(snapshot(sqlite), beforeNoop, 'No revision or state rewrite for an unchanged automatic save');
+});
+
+void test('target route rejects reversed training zones without changing journal state', async (t) => {
+  const { sqlite } = await seed(t);
+  const before = snapshot(sqlite);
+  for (const targets of [
+    { mode: 'pace', pace: { easy: { low: 180, high: 190 }, interval: { low: 600, high: 620 } } },
+    { mode: 'heart-rate', heartRate: { easy: { low: 200, high: 220 }, interval: { low: 80, high: 90 } } },
+  ]) {
+    const response = await request({ action: 'targetsPreview', version: 1, targets });
+    assert.equal(response.status, 422);
+    assert.match(response.data.error, /should not be entirely/);
+    assert.equal(snapshot(sqlite), before);
+  }
+});

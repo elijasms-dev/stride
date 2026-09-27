@@ -92,6 +92,66 @@ function structured(
 }
 
 export const MARATHON_WORKOUTS: WorkoutTemplate[] = [
+  // Stride doses, informed by Daniels' alternating continuous/cruise work and
+  // B.A.A. marathon-pace blocks. These are scaled alternatives, not copied plans.
+  ...structured(
+    'cruise-five',
+    'threshold',
+    [300],
+    [1000],
+    2,
+    6,
+    'Accumulate controlled threshold running in repeatable bouts. Jog for one minute between efforts, holding the same pace from first to last.',
+    { recoverySeconds: 60 },
+  ),
+  ...structured(
+    'cruise-eight',
+    'threshold',
+    [480],
+    [1600],
+    2,
+    4,
+    'Use longer threshold bouts to practise an even sustained effort. Keep the short jog recoveries easy and finish with the same control as you started.',
+    { recoverySeconds: 90 },
+  ),
+  ...structured(
+    'short-cruise-ladder',
+    'threshold',
+    [300, 240, 180],
+    [1000, 800, 600],
+    3,
+    3,
+    'Run three progressively shorter controlled bouts at one effort. Jog for one minute between them; shorter repetitions do not mean a faster finish.',
+    { recoverySeconds: 60 },
+  ),
+  ...structured(
+    'controlled-fartlek',
+    'aerobic-power',
+    [180],
+    [600],
+    3,
+    6,
+    'Alternate controlled quicker efforts with a full three-minute easy jog. Use the full recovery to keep every effort repeatable.',
+    { kind: 'fartlek', recoverySeconds: 180 },
+  ),
+  ...structured(
+    'marathon-short-blocks',
+    'race-rhythm',
+    [360],
+    [1500],
+    2,
+    6,
+    'Practise patient marathon effort in shorter blocks with two-minute easy jogs. Keep every block at the same sustainable effort.',
+  ),
+  ...structured(
+    'marathon-descending',
+    'race-rhythm',
+    [600, 480, 360],
+    [2400, 2000, 1600],
+    3,
+    3,
+    'Rehearse marathon effort in three descending blocks. The pace stays steady while the bouts shorten; take an easy two-minute jog between them.',
+  ),
   ...structured(
     'tempo-blocks',
     'threshold',

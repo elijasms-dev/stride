@@ -15,10 +15,15 @@ export function refreshWeekTotals(plan: Plan) {
       .reduce((n, s) => n + s.estimatedKm, 0);
     w.trainingMinutes = training.reduce((n, s) => n + s.minutes, 0);
     w.qualityMinutes = training.reduce((n, s) => n + qualityWorkMinutes(s), 0);
+    if (plan.beginner)
+      w.focus =
+        'Timed beginner lessons at the reviewed stage; allow a rest day between runs and repeat until comfortable.';
     w.rationale = [
       w.focus,
       `${training.length} sessions, ${Math.round(w.trainingMinutes)} ${plan.profile.runMeasure === 'distance' ? 'planning' : 'prescribed'} minutes; quality-work allocation ${Math.round(w.qualityMinutes)} minutes.`,
-      'Long and demanding work are separated by easy or rest days; there is no catch-up mileage.',
+      plan.beginner
+        ? 'Distances are unprescribed; totals show outing time, including walking. No speed workouts or catch-up sessions.'
+        : 'Long and demanding work are separated by easy or rest days; there is no catch-up mileage.',
       ...(w.phase === 'Taper' || w.phase === 'Race week'
         ? [
             'Training totals exclude the race. Familiar work is reduced while recovery increases.',

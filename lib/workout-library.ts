@@ -1,11 +1,22 @@
+import { PlanError } from './plan/errors.ts';
 import { usesMarathonRhythm } from './training-structure.ts';
 import { schedulingEasyPace } from './fitness-pacing.ts';
 import { STRUCTURED_FORMATS } from './workout-formats.ts';
 import { MARATHON_WORKOUTS } from './marathon-workouts.ts';
 import { usesMarathonBook, marathonTaperFraction } from './marathon-book.ts';
 import { stepLength, withSpecificWorkoutName } from './workout-names.ts';
-import { withWorkoutTargets, workoutStepTarget } from './workout-targets.ts';
+import {
+  withAllocatedWorkoutTargets as withWorkoutTargets,
+  workoutStepTarget,
+} from './workout-targets.ts';
 import { marathonRecipe, marathonSecondQuality } from './marathon-model.ts';
+import { ROAD_WORKOUTS, selectRoadWorkout } from './road-workouts.ts';
+import {
+  isRoadRaceProfile,
+  roadAbility,
+  roadAerobicAllowanceMinutes,
+  roadQualitySessionCap,
+} from './road-training-policy.ts';
 import {
   runWalkSteps,
   distanceEstimate,
@@ -790,6 +801,7 @@ addRecipe('marathon-steady', {
 });
 WORKOUT_LIBRARY.push(...STRUCTURED_FORMATS);
 WORKOUT_LIBRARY.push(...MARATHON_WORKOUTS);
+WORKOUT_LIBRARY.push(...ROAD_WORKOUTS);
 for (const t of WORKOUT_LIBRARY)
   if (t.workSeconds.length > 1) t.completeSet = true;
 
@@ -822,7 +834,7 @@ function resolveDistanceTemplate(
   if (!slowPace) return null;
   const planningPaceSecondsPerKm =
     savedPace ??
-    (t.id.startsWith('marathon-book-')
+    (t.id.startsWith('marathon-book-') || t.id.startsWith('road-')
       ? slowPace
       : Math.max(slowPace, schedulingEasyPace(p) * 60));
   const floatPace = t.floatMetres
@@ -869,9 +881,13 @@ export const stimulusLabel: Record<Stimulus, string> = {
   'race-rhythm': 'Race-specific rhythm',
 };
 export type SelectionContext = {
+  /** Keep named road-event policies separate from custom goals normalized for recipes. */
+  originalGoal?: Profile['goal'];
   excludeTemplateIds?: ReadonlySet<string>;
   previous: Workout[];
   availableMinutes: number;
+  /** Existing weekly work allocation for this slot; never raised for variety. */
+  workAllowanceMinutes?: number;
   slot: number;
   /** Slots the weekly schedule can actually fit, independent of availability. */
   qualitySlots?: number;
@@ -986,11 +1002,22 @@ function structuredFormat(
               w.steps.filter((s) => s.kind === 'work').map((s) => s.seconds),
             ),
         );
+        const workTarget = workoutStepTarget(
+          {
+            kind: candidate.kind,
+            stimulus: candidate.stimulus,
+            templateId: candidate.id,
+          },
+          {
+            kind: 'work',
+            intensity: candidate.intensity,
+            seconds: Math.max(...candidate.workSeconds),
+          },
+          p,
+        );
         const actualLongest =
-          candidate.workMetres && p.workoutTargets?.pace?.tempo
-            ? (Math.max(...candidate.workMetres) *
-                p.workoutTargets.pace.tempo.high) /
-              1000
+          candidate.workMetres && workTarget?.mode === 'pace'
+            ? (Math.max(...candidate.workMetres) * workTarget.high) / 1000
             : Math.max(...candidate.workSeconds);
         if (
           actualLongest > previousLongest * 1.3 ||
@@ -1021,6 +1048,12 @@ function marathonStructuredChoice(
   families: string[],
   budget: number,
 ): WorkoutTemplate | null {
+  const namedMarathon =
+    context.originalGoal == null || context.originalGoal === 'marathon';
+  const allowance = namedMarathon
+    ? Math.min(budget, context.workAllowanceMinutes ?? Infinity)
+    : budget;
+  const candidates: { template: WorkoutTemplate; steps: Step[] }[] = [];
   for (const family of families) {
     for (const unit of p.workoutFormat === 'time'
       ? ['timed']
@@ -1036,15 +1069,38 @@ function marathonStructuredChoice(
         context.availableMinutes,
         false,
         phase,
-        budget,
-        budget,
+        allowance,
+        allowance,
         p,
       );
-      // A whole main set must fit; never slice a pyramid or discard its finish.
-      if (dose && dose.qualityMinutes >= budget * 0.65) return candidate;
+      // Whole ladders and sets must fit the actual slot, not only an aspirational
+      // progression dose. Repetition is retained when it is the only viable set.
+      if (dose && dose.qualityMinutes >= allowance * 0.65) {
+        if (!namedMarathon) return candidate;
+        candidates.push({ template: candidate, steps: dose.steps });
+      }
     }
   }
-  return null;
+  if (p.workoutVariety === 'familiar') return candidates[0]?.template ?? null;
+  return (
+    (
+      candidates.find(({ template, steps }) => {
+        const previous = context.previous
+          .filter(
+            (w) =>
+              w.kind !== 'long' &&
+              w.kind !== 'race' &&
+              w.status !== 'skipped' &&
+              w.stimulus === template.stimulus,
+          )
+          .at(-1);
+        return (
+          !context.excludeTemplateIds?.has(template.id) &&
+          (!previous || !sameMainSet(steps, previous.steps))
+        );
+      }) ?? candidates[0]
+    )?.template ?? null
+  );
 }
 
 function selectMarathonBookTemplate(
@@ -1052,6 +1108,8 @@ function selectMarathonBookTemplate(
   phase: Phase,
   context: SelectionContext,
 ): TemplateDecision {
+  const namedMarathon =
+    context.originalGoal == null || context.originalGoal === 'marathon';
   const prior = context.previous.filter(
     (w) => w.status !== 'skipped' && w.kind !== 'race',
   );
@@ -1115,6 +1173,7 @@ function selectMarathonBookTemplate(
         (w) => w.stimulus === 'aerobic-power',
       ).length;
       const rotation = [
+        ...(namedMarathon ? ['controlled-fartlek'] : []),
         'six-hundred',
         'pyramid',
         'split-repeats',
@@ -1135,7 +1194,13 @@ function selectMarathonBookTemplate(
         phase,
         context,
         marathonEffort
-          ? ['marathon-blocks']
+          ? namedMarathon
+            ? [
+                'marathon-short-blocks',
+                'marathon-descending',
+                'marathon-blocks',
+              ]
+            : ['marathon-blocks']
           : [preferred, ...rotation.filter((f) => f !== preferred)],
         target,
       );
@@ -1256,6 +1321,7 @@ function selectMarathonBookTemplate(
     ? Math.min(9, latest * 0.5)
     : Math.min(
         Math.max(6, context.availableMinutes - 25),
+        namedMarathon ? (context.workAllowanceMinutes ?? Infinity) : Infinity,
         phase === 'Foundation' ? 25 : 40,
         Math.max(
           Math.min(25, familiar),
@@ -1272,8 +1338,15 @@ function selectMarathonBookTemplate(
   const template = WORKOUT_LIBRARY.find(
     (t) => t.id === `marathon-book-lt-${dose}`,
   )!;
-  if (!taper && dose >= 20 && p.workoutVariety !== 'familiar') {
+  if (
+    !taper &&
+    dose >= (namedMarathon ? 9 : 20) &&
+    p.workoutVariety !== 'familiar'
+  ) {
     const rotation = [
+      ...(namedMarathon
+        ? ['cruise-five', 'short-cruise-ladder', 'cruise-eight']
+        : []),
       'tempo-blocks',
       'on-off',
       'tempo-cut-down',
@@ -1317,6 +1390,48 @@ export function selectTemplate(
   context: SelectionContext,
 ): TemplateDecision {
   if (
+    isRoadRaceProfile(p) &&
+    (context.originalGoal === undefined ||
+      ['5k', '10k', 'half'].includes(context.originalGoal)) &&
+    (!p.method || p.method === 'balanced')
+  ) {
+    return selectRoadWorkout(p, phase, context, {
+      economy: WORKOUT_LIBRARY.find((t) => t.id === 'economy-relaxed')!,
+      resolve: (template, existingSteps) =>
+        resolveDistanceTemplate(
+          template,
+          p,
+          p.difficulty === 'gentle',
+          existingSteps,
+        ),
+      savedTemplate: (id) => WORKOUT_LIBRARY.find((t) => t.id === id),
+      fits: (template, budget) =>
+        scaleTemplate(
+          template,
+          context.availableMinutes,
+          p.difficulty === 'gentle',
+          phase,
+          budget,
+          budget,
+          p,
+        ),
+    });
+  }
+  if (
+    usesMarathonRhythm(p) &&
+    (context.originalGoal == null
+      ? p.goal === 'marathon'
+      : context.originalGoal === 'marathon') &&
+    p.qualityMode === 'custom' &&
+    p.qualitySessions === 2 &&
+    !['Recovery', 'Taper', 'Race week'].includes(phase)
+  )
+    return selectMarathonBookTemplate(
+      { ...p, goal: 'marathon', intent: 'improve' },
+      phase,
+      { ...context, introduction: false },
+    );
+  if (
     usesMarathonRhythm(p) &&
     !['Recovery', 'Taper', 'Race week'].includes(phase)
   ) {
@@ -1349,6 +1464,8 @@ export function selectTemplate(
   }
   if (usesMarathonBook(p) && context.marathonModel !== false)
     return selectMarathonBookTemplate(p, phase, context);
+  const explicitTwoWorkouts =
+    p.qualityMode === 'custom' && p.qualitySessions === 2;
   const secondEconomy =
     p.goal === 'marathon' &&
     context.slot > 0 &&
@@ -1404,12 +1521,12 @@ export function selectTemplate(
     id = 'economy-relaxed';
   else if (p.goal === 'ultra')
     id =
-      context.slot > 0 && phase === 'Maintenance'
+      context.slot > 0 && phase === 'Maintenance' && !explicitTwoWorkouts
         ? 'economy-relaxed'
         : 'ultra-steady';
   else if (phase === 'Maintenance')
     id =
-      context.slot > 0 || p.difficulty === 'gentle'
+      (context.slot > 0 || p.difficulty === 'gentle') && !explicitTwoWorkouts
         ? 'economy-relaxed'
         : 'threshold-cruise';
   else if (phase === 'Foundation')
@@ -1638,6 +1755,20 @@ export function scaleTemplate(
     targetWorkMinutes < 0
   )
     return null;
+  if (
+    t.id.startsWith('road-') &&
+    profile &&
+    isRoadRaceProfile(profile) &&
+    (roadAbility(profile) === 'developing' ||
+      profile.intent === 'finish' ||
+      gentle)
+  ) {
+    t = {
+      ...t,
+      intensity: Math.min(5, t.intensity),
+      cue: 'Steady and comfortable · 5 / 10 · controlled breathing, with reserve',
+    };
+  }
   const resolved = resolveDistanceTemplate(t, profile, gentle, existingSteps);
   if (!resolved) return null;
   t = resolved;
@@ -1646,7 +1777,17 @@ export function scaleTemplate(
     t.workSeconds.some((n) => !Number.isFinite(n) || n <= 0)
   )
     return null;
-  const ceiling = Math.floor(minutes * 60),
+  const boundedRoad =
+    profile !== undefined &&
+    isRoadRaceProfile(profile) &&
+    (!profile.method || profile.method === 'balanced') &&
+    t.kind !== 'long';
+  const ceiling = Math.floor(
+      Math.min(
+        minutes,
+        boundedRoad ? roadQualitySessionCap(profile) : Infinity,
+      ) * 60,
+    ),
     warm = t.warmupSeconds ?? 600,
     cool = t.cooldownSeconds ?? 300;
   const taper = ['Taper', 'Race week'].includes(phase);
@@ -1655,7 +1796,10 @@ export function scaleTemplate(
       // A saved work allowance already includes difficulty adjustment. Repeated
       // edits must not reduce it again; fresh weekly allocations still do.
       qualityCapMinutes *
-        (options.capBasis !== 'prescribed' && gentle && t.stimulus !== 'economy'
+        (options.capBasis !== 'prescribed' &&
+        gentle &&
+        t.stimulus !== 'economy' &&
+        !t.id.startsWith('road-')
           ? 0.8
           : 1),
       targetWorkMinutes,
@@ -1713,17 +1857,13 @@ export function scaleTemplate(
     usesMarathonBook(profile) &&
     ['marathon-book-steady-intro', 'threshold-cruise'].includes(t.id);
   const retainAllocatedAerobic =
-    profile !== undefined &&
-    (usesMarathonBook(profile) ||
-      (!taper &&
-        !gentle &&
-        profile.experience === 'established' &&
-        ['5k', '10k', 'half'].includes(profile.goal)));
+    profile !== undefined && usesMarathonBook(profile);
 
   // A strides day ends with brief accelerations. Other workout families retain
   // their existing bounded aerobic lead-in.
-  const aerobic =
-    t.kind === 'long' || retainGentleMarathonAerobic || retainAllocatedAerobic
+  const aerobic = boundedRoad
+    ? Math.min(spare, roadAerobicAllowanceMinutes(profile) * 60)
+    : t.kind === 'long' || retainGentleMarathonAerobic || retainAllocatedAerobic
       ? spare - splitEasy * (sequence.length - 1)
       : Math.min(
           spare,
@@ -1862,10 +2002,30 @@ export function resizeWorkout(
   ceilingMinutes: number,
   workCap = w.qualityMinutes ?? Infinity,
 ): Workout {
+  if (w.beginnerLesson) {
+    if (ceilingMinutes < w.minutes)
+      throw new PlanError(
+        'Keep the complete beginner lesson, including walking warm-up and cooldown. Move it, skip it, or log a shorter attempt as partial.',
+      );
+    return structuredClone(w);
+  }
   let template = WORKOUT_LIBRARY.find((t) => t.id === w.templateId);
   const savedWork = w.steps.filter(
     (s) => s.kind === 'work' && s.intensity >= 4,
   );
+  // Finish/developing road sessions store a controlled version of the recipe.
+  // Resizing must preserve that actual effort, even when difficulty is balanced.
+  if (
+    template?.id.startsWith('road-') &&
+    savedWork.length &&
+    savedWork.every((s) => s.intensity <= 5)
+  ) {
+    template = {
+      ...template,
+      intensity: Math.max(...savedWork.map((s) => s.intensity)),
+      cue: savedWork[0].effort,
+    };
+  }
   if (
     template &&
     w.varietyVersion &&
@@ -1921,7 +2081,7 @@ export function resizeWorkout(
     ),
   );
   const runWalk =
-    p.experience === 'new' ||
+    (!isRoadRaceProfile(p) && p.experience === 'new' && p.planLevel !== 'beginner') ||
     w.steps.some(
       (s) =>
         s.movement === 'walk' &&
@@ -2060,18 +2220,26 @@ export function variedWorkoutPrescription(
         ? 'threshold:marathon'
         : (workout.stimulus ?? '');
   const sourceRotation = VARIETY_ROTATIONS[family];
-  if (!sourceRotation) return workout;
+  const roadRecipe =
+    isRoadRaceProfile(profile) && workout.templateId?.startsWith('road-');
+  const rotationSource = roadRecipe
+    ? ROAD_WORKOUTS.filter(
+        (t) =>
+          t.stimulus === workout.stimulus && t.goals.includes(profile.goal),
+      ).map((t) => t.id)
+    : sourceRotation;
+  if (!rotationSource) return workout;
   const measured = (id: string) =>
     !!WORKOUT_LIBRARY.find((t) => t.id === id)?.workMetres;
   const rotation =
     profile.workoutFormat === 'time'
-      ? sourceRotation.filter((id) => !measured(id))
+      ? rotationSource.filter((id) => !measured(id))
       : profile.workoutFormat === 'distance'
         ? [
-            ...sourceRotation.filter(measured),
-            ...sourceRotation.filter((id) => !measured(id)),
+            ...rotationSource.filter(measured),
+            ...rotationSource.filter((id) => !measured(id)),
           ]
-        : sourceRotation;
+        : rotationSource;
   if (!rotation.length) return workout;
   const originalQuality = qualityWorkMinutes(workout);
   const originalWork = workout.steps.filter((step) => step.kind === 'work');
@@ -2150,6 +2318,14 @@ export function variedWorkoutPrescription(
       continue;
     const spare = Math.round(workout.minutes * 60 - dose.minutes * 60);
     if (spare < 0) continue;
+    if (
+      roadRecipe &&
+      dose.steps
+        .filter((s) => s.kind === 'aerobic')
+        .reduce((sum, s) => sum + s.seconds, spare) >
+        roadAerobicAllowanceMinutes(profile) * 60
+    )
+      continue;
     // Keep the runner's booked time. Only easy running can replace unused work/recovery time.
     if (spare > 0) {
       const aerobic = dose.steps.find((step) => step.kind === 'aerobic');
@@ -2198,6 +2374,13 @@ export function variedWorkoutPrescription(
       profile,
     );
   }
+  if (roadRecipe)
+    return {
+      ...workout,
+      varietyVersion: WORKOUT_VARIETY_VERSION,
+      varietySourceTemplateId:
+        workout.varietySourceTemplateId ?? workout.templateId,
+    };
   const shaped = shapedWorkout(workout, profile, exposure);
   return previousWorkout && sameMainSet(shaped.steps, previousWorkout.steps)
     ? workout

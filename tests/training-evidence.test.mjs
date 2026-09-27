@@ -230,10 +230,14 @@ void test('actual quality performed today cannot increase the next replan dose d
   const a = dose(quality(replan(unknown))[0]),
     b = dose(quality(replan(reported))[0]);
   assert.deepEqual(b, a);
-  assert.equal(a.minutes, 8);
+  assert.deepEqual(
+    quality(replan(reported)).map(dose),
+    quality(replan(unknown)).map(dose),
+  );
+  assert.equal(a.minutes, 6);
 });
 
-void test('a prior-day successful recording scheduled today contributes to real replan quality', () => {
+void test('a prior-day successful recording remains quality evidence independently of its prescribed date', () => {
   const asOf = '2026-11-04',
     p = fixture(asOf),
     w = p.workouts.find((w) => w.date === asOf);
@@ -247,8 +251,14 @@ void test('a prior-day successful recording scheduled today contributes to real 
     b,
     'The same actual successful run must not depend on its prescribed date',
   );
-  assert.equal(a.template, 'threshold-cruise');
-  assert.equal(a.minutes, 12);
+  assert.ok(
+    qualityTrainingEvidence(p.workouts, asOf).some(
+      (row) => row.workout.id === w.id && row.eligible,
+    ),
+  );
+  assert.equal(a.template, 'road-threshold-120s');
+  // One successful exposure does not bypass the new recipe's consolidation.
+  assert.equal(a.minutes, 6);
 });
 
 void test('new-event history cannot bypass execution gates merely because a record was prescribed today', () => {
@@ -313,9 +323,51 @@ void test('a duplicate provider identity cannot manufacture a second successful 
     currentTrainingBaseline(duplicate, defaultAsOf),
   );
   const control = dose(quality(replan(single))[0]);
-  assert.equal(control.template, 'threshold-cruise');
-  assert.equal(control.minutes, 12);
+  assert.equal(control.template, 'road-threshold-120s');
+  assert.equal(control.minutes, 6);
   assert.deepEqual(dose(quality(replan(duplicate))[0]), control);
+  assert.deepEqual(
+    quality(replan(duplicate)).map(dose),
+    quality(replan(single)).map(dose),
+  );
+});
+
+void test('two distinct successful recent exposures advance road threshold doses; stale actual dates cannot', () => {
+  const recent = fixture();
+  for (const date of ['2026-10-14', '2026-10-21'])
+    success(recent.workouts.find((run) => run.date === date));
+  const stale = structuredClone(recent);
+  for (const date of ['2026-10-14', '2026-10-21'])
+    stale.workouts.find((run) => run.date === date).feedback.actualDate =
+      addDays(date, -42);
+  const unknown = structuredClone(recent);
+  for (const date of ['2026-10-14', '2026-10-21'])
+    unknown.workouts.find((run) => run.date === date).feedback.execution =
+      'unknown';
+
+  const firstThreshold = (plan) =>
+    quality(replan(plan)).find((run) => run.stimulus === 'threshold');
+  const successfulDose = dose(firstThreshold(recent));
+  const staleDose = dose(firstThreshold(stale));
+  const unknownDose = dose(firstThreshold(unknown));
+  assert.ok(
+    successfulDose.minutes > staleDose.minutes && successfulDose.minutes <= 9,
+    'two actual eligible exposures fund more than the six-minute introduction, within the existing nine-minute allowance',
+  );
+  assert.ok(
+    successfulDose.target > staleDose.target && successfulDose.target <= 9,
+  );
+  assert.ok(successfulDose.minutes <= successfulDose.target + 1 / 60);
+  assert.equal(
+    staleDose.minutes,
+    6,
+    'old actual dates cannot supply current preparation',
+  );
+  assert.deepEqual(
+    staleDose,
+    unknownDose,
+    'unknown execution also starts from the six-minute introduction',
+  );
 });
 
 void test('quality preparation-window membership uses the actual date rather than the prescribed week', () => {
@@ -328,18 +380,19 @@ void test('quality preparation-window membership uses the actual date rather tha
     dose(quality(replan(stale))[0]),
     dose(quality(replan(unknown))[0]),
   );
-  assert.equal(qualityWorkMinutes(quality(replan(stale))[0]), 8);
+  assert.equal(qualityWorkMinutes(quality(replan(stale))[0]), 6);
 });
 
 void test('future forecast exposures still progress separately from unknown recorded execution', () => {
   const p = fixture(),
     q = replan(p);
   const future = quality(q)
-    .filter((w) => w.templateId === 'race-rhythm-10')
-    .slice(0, 2);
-  assert.equal(future.length, 2);
+    .filter((w) => w.stimulus === 'race-rhythm')
+    .slice(0, 3);
+  assert.equal(future.length, 3);
   assert.ok(future.every((w) => w.status === 'planned' && !w.feedback));
-  assert.ok(qualityWorkMinutes(future[1]) > qualityWorkMinutes(future[0]));
+  assert.equal(qualityWorkMinutes(future[1]), qualityWorkMinutes(future[0]));
+  assert.ok(qualityWorkMinutes(future[2]) > qualityWorkMinutes(future[1]));
   assert.ok(
     p.workouts
       .filter((w) => w.feedback)

@@ -146,21 +146,21 @@ test('taper fractions follow race-relative day boundaries for short road and hal
       goal === 'half'
         ? [
             [22, 1],
-            [21, 0.85],
-            [15, 0.85],
-            [14, 0.65],
-            [8, 0.65],
-            [7, 0.4],
-            [0, 0.4],
+            [21, 1],
+            [15, 1],
+            [14, 0.8],
+            [8, 0.8],
+            [7, 0.5],
+            [0, 0.5],
           ]
         : [
             [22, 1],
             [21, 1],
             [15, 1],
-            [14, 0.65],
-            [8, 0.65],
-            [7, 0.4],
-            [0, 0.4],
+            [14, 1],
+            [8, 1],
+            [7, 0.6],
+            [0, 0.6],
           ];
     for (const [daysBeforeRace, fraction] of expected)
       assert.equal(

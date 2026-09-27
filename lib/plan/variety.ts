@@ -14,7 +14,7 @@ import {
   withSpecificWorkoutName,
   withSteadyRaceInstructions,
 } from '../workout-names.ts';
-import { withWorkoutTargets } from '../workout-targets.ts';
+import { withAllocatedWorkoutTargets as withWorkoutTargets } from '../workout-targets.ts';
 import { rebalanceFutureQuality } from './allocate.ts';
 import { PlanError } from './errors.ts';
 import {
@@ -33,6 +33,7 @@ export function refreshWorkoutVariety(
   protectedWorkoutIds: readonly string[] = [],
 ): Plan {
   const next = structuredClone(plan);
+  if (next.beginner || next.firstRace) return next;
   const profile = { ...next.profile, goal: trainingFamily(next.profile) };
   if (!/^\d{4}-\d{2}-\d{2}$/.test(fromDate)) return next;
   if (

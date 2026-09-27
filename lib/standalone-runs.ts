@@ -4,7 +4,11 @@ import {
   readState,
   importReceiptStatement,
   type ProviderIdentity,
+  type JournalMutation,
+  replayMutation,
+  mutationReceiptStatement,
 } from './server';
+import { activityTime } from './activity-time';
 import { verifiedActivity } from './provider-activities';
 import { todayInZone } from './engine';
 import { validateRun } from './run-input';
@@ -13,13 +17,16 @@ export async function saveStandaloneRun(
   owner: string,
   raw: unknown,
   account: Account,
+  mutation?: JournalMutation,
 ) {
+  const replay = await replayMutation(owner, account.epoch, mutation);
+  if (replay) return replay;
   const db = database();
   const profile = await db
     .prepare('SELECT timezone FROM profiles WHERE owner=?')
     .bind(owner)
     .first<{ timezone: string }>();
-  const r = validateRun(raw, todayInZone(profile?.timezone || 'UTC'));
+  const r = validateRun(raw, todayInZone(profile?.timezone || 'UTC'), true);
   r.id = r.activityId ? 'intervals:' + r.activityId : crypto.randomUUID();
   r.recordedAt = new Date().toISOString();
   r.source = 'Manual';
@@ -31,6 +38,7 @@ export async function saveStandaloneRun(
     r.km =
       actual.distance && actual.distance > 0 ? actual.distance / 1000 : null;
     r.source = actual.source;
+    Object.assign(r, activityTime(actual));
   }
   validateRun(r, todayInZone(profile?.timezone || 'UTC'));
   const current = await readState(owner);
@@ -43,8 +51,33 @@ export async function saveStandaloneRun(
     current.standaloneRuns?.some(
       (x) => x.id === r.id || (r.activityId && x.activityId === r.activityId),
     )
-  )
+  ) {
+    if (mutation) {
+      const token = crypto.randomUUID();
+      await db.batch([
+        db
+          .prepare(
+            "UPDATE accounts SET operation_id=? WHERE owner=? AND epoch=? AND revision=? AND status='active' AND NOT EXISTS(SELECT 1 FROM journal_mutations m WHERE m.owner=accounts.owner AND m.epoch=accounts.epoch AND m.id=?)",
+          )
+          .bind(token, owner, account.epoch, account.revision, mutation.id),
+        mutationReceiptStatement(
+          owner,
+          account.epoch,
+          mutation,
+          r.recordedAt,
+          'account',
+          token,
+        ),
+      ]);
+      const replay = await replayMutation(owner, account.epoch, mutation);
+      if (replay) return replay;
+      throw new HttpError(
+        409,
+        'Your journal changed. Reload before retrying this recording.',
+      );
+    }
     return current;
+  }
   if ((current.standaloneRuns?.length ?? 0) >= 4000)
     throw new HttpError(
       413,
@@ -63,7 +96,7 @@ export async function saveStandaloneRun(
   const result = await db.batch([
     db
       .prepare(
-        "UPDATE accounts SET revision=revision+1,operation_id=? WHERE owner=? AND epoch=? AND revision=? AND status='active' AND NOT EXISTS(SELECT 1 FROM athlete_state s WHERE s.owner=accounts.owner AND s.data<>'null') AND (? IS NULL OR EXISTS(SELECT 1 FROM connections c WHERE c.owner=accounts.owner AND c.provider_athlete_id=? AND c.generation=?))",
+        "UPDATE accounts SET revision=revision+1,operation_id=? WHERE owner=? AND epoch=? AND revision=? AND status='active' AND NOT EXISTS(SELECT 1 FROM athlete_state s WHERE s.owner=accounts.owner AND s.data<>'null') AND (? IS NULL OR EXISTS(SELECT 1 FROM connections c WHERE c.owner=accounts.owner AND c.provider_athlete_id=? AND c.generation=?)) AND NOT EXISTS(SELECT 1 FROM journal_mutations m WHERE m.owner=accounts.owner AND m.epoch=accounts.epoch AND m.id=?)",
       )
       .bind(
         token,
@@ -73,6 +106,7 @@ export async function saveStandaloneRun(
         identity?.generation ?? null,
         identity?.athleteId ?? null,
         identity?.generation ?? null,
+        mutation?.id ?? null,
       ),
     db
       .prepare(
@@ -91,13 +125,31 @@ export async function saveStandaloneRun(
           ),
         ]
       : []),
+    ...(mutation
+      ? [
+          mutationReceiptStatement(
+            owner,
+            account.epoch,
+            mutation,
+            r.recordedAt,
+            'account',
+            token,
+          ),
+        ]
+      : []),
   ]);
-  if (result[0].meta.changes !== 1)
+  if (result[0].meta.changes !== 1) {
+    const replay = await replayMutation(owner, account.epoch, mutation);
+    if (replay) return replay;
     throw new HttpError(
       409,
       'Your journal changed. Reload and check the saved runs before retrying.',
     );
-  return readState(owner);
+  }
+  return {
+    ...(await readState(owner)),
+    ...(mutation ? { acknowledgedMutationId: mutation.id } : {}),
+  };
 }
 
 export async function correctStandaloneRun(
@@ -106,7 +158,10 @@ export async function correctStandaloneRun(
   raw: unknown,
   reason: unknown,
   account: Account,
+  mutation?: JournalMutation,
 ) {
+  const replay = await replayMutation(owner, account.epoch, mutation);
+  if (replay) return replay;
   const db = database(),
     state = await readState(owner);
   if (state.plan)
@@ -134,6 +189,7 @@ export async function correctStandaloneRun(
     token = crypto.randomUUID();
   const next = {
     ...r,
+    ...activityTime(original),
     id,
     source: original.source,
     recordedAt: at,
@@ -165,19 +221,43 @@ export async function correctStandaloneRun(
   const result = await db.batch([
     db
       .prepare(
-        "UPDATE accounts SET revision=revision+1,operation_id=? WHERE owner=? AND epoch=? AND revision=? AND status='active'",
+        "UPDATE accounts SET revision=revision+1,operation_id=? WHERE owner=? AND epoch=? AND revision=? AND status='active' AND NOT EXISTS(SELECT 1 FROM journal_mutations m WHERE m.owner=accounts.owner AND m.epoch=accounts.epoch AND m.id=?)",
       )
-      .bind(token, owner, account.epoch, account.revision),
+      .bind(
+        token,
+        owner,
+        account.epoch,
+        account.revision,
+        mutation?.id ?? null,
+      ),
     db
       .prepare(
         'UPDATE standalone_runs SET data=?,updated_at=? WHERE owner=? AND id=? AND EXISTS(SELECT 1 FROM accounts a WHERE a.owner=standalone_runs.owner AND a.operation_id=?)',
       )
       .bind(JSON.stringify(next), at, owner, id, token),
+    ...(mutation
+      ? [
+          mutationReceiptStatement(
+            owner,
+            account.epoch,
+            mutation,
+            at,
+            'account',
+            token,
+          ),
+        ]
+      : []),
   ]);
-  if (result[0].meta.changes !== 1 || result[1].meta.changes !== 1)
+  if (result[0].meta.changes !== 1 || result[1].meta.changes !== 1) {
+    const replay = await replayMutation(owner, account.epoch, mutation);
+    if (replay) return replay;
     throw new HttpError(
       409,
       'Your journal changed. Reload before correcting it.',
     );
-  return readState(owner);
+  }
+  return {
+    ...(await readState(owner)),
+    ...(mutation ? { acknowledgedMutationId: mutation.id } : {}),
+  };
 }

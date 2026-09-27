@@ -1,0 +1,27 @@
+# Endurance, custom-distance and base sweep
+
+The repaired sweep generated **4,680 plans covering 101,772 weeks**, with no independent contract failures. Another **404 inputs matched a specific, predeclared rejection category**. An arbitrary `PlanError` is a failed case, never a pass. These are software and product-policy checks; they do not establish individual race readiness.
+
+| Family | Generated and checked | Expected rejection |
+| --- | ---: | ---: |
+| Marathon | 486 | 6 |
+| Base | 378 | 108 |
+| Custom event | 2,880 | 145 |
+| Ultra | 936 | 145 |
+| Total | 4,680 | 404 |
+
+The deterministic matrix crosses 0/1/2 harder workouts, time/distance prescriptions, effort/benchmark/manual pace modes, 3–6 running days, 4–32 weeks, 15–105 starting weekly kilometres, 5–32 km familiar long runs and 4:30–8:00 declared easy pace. Benchmarks range from 38 to 65 minutes for 10 km. Manual ranges are separate per training role. Custom distances include both sides of 7.5, 15, 30, 45, 60 and 80.4672 km policy boundaries, plus 1 km, standard race distances, 100 km and 100 miles. Available session time is generous in the acceptance matrix; separate invalid cases exercise rejection.
+
+Each generated plan is checked independently for unchanged starting weekly distance and long run; selected running/quality frequency in ordinary weeks; marked recovery/taper exceptions; monotonic ordinary weekly and long-run progression; two-kilometre long-run increments; forecast ceilings; step-duration sums; distance/pace endpoint compatibility; target provenance; no numerical cues in effort mode or walking/recovery steps; saved executable-distance metadata; quality minutes calculated from executable work; weekly quality fraction; per-session caps; event identity; and week totals. `validatePlan` and a JSON round trip run afterward. The checker intentionally does not treat internal validation as independent evidence. It makes no claim that time and distance modes must have identical workout durations.
+
+**Actual defect: two selected marathon workouts could disappear despite available capacity.** The initial run found 16 rejected profiles, all with 4:30 declared easy pace. A 45 km/week, 16 km long-run, five-day profile had two 50-minute slots in week 3 but selected recipes whose complete main sets exceeded their individual work allowances; both slots became easy. A 70 km/week, 23 km long-run, five-day profile lost its weekday pyramid when proportional quality reduction made the complete set unfit, while retaining a 20-minute second workout and 35-minute marathon-effort long-run segment. A 90/28 six-day profile showed the same issue.
+
+`lib/plan/generation-rhythm.ts` now applies the existing funded-workout repair to both explicitly selected slots. Other selected slots cannot become easy-time donors or be removed as extras. Their complete minimum doses are reserved before assigning optional faster long-run work. A lost main set receives a complete smaller controlled workout within the existing weekly allocation; long-run distance, weekly forecast and session limits remain enforced. The ordinary single-workout path retains its existing behavior. Eighteen new regressions reproduce the three representative baselines in both measurement modes and all three pace modes.
+
+**Base findings were checker classification issues, not a new training-policy defect.** The UI disables harder-workout choices for base plans, and accepted legacy inputs normalize to zero. The initial checker incorrectly flagged 216 such accepted normalization probes. Another 108 low-volume/frequency base inputs requested two workouts and correctly hit the existing two-workout eligibility rule before normalization. Both behaviors are recorded explicitly in the current checker. No base-workout policy was changed.
+
+The remaining expected rejects are 288 attempts to prescribe two harder workouts beyond 50 miles (the product supports at most one) and eight focused invalid/unsupported inputs: insufficient physical session capacity, a long run larger than the week, two workouts without history, a zero-time benchmark, a future benchmark, an inverted manual range, insufficient established long-ultra history and an event beyond 100 miles. The capacity probe uses valid field bounds: a 23 km familiar long run at a manual 6:30/km slower endpoint cannot fit a 30-minute limit.
+
+Evidence: `endurance-initial.json` preserves the uncorrected matrix and original classifications; `endurance-repair-full.json` records the first clean complete rerun; `endurance-final.json` records the final 5,084-case pass on stable source hash `4ad75397d37495b505943ac105a7cbaa3369af7963899b68e821e8383683da0d`; focused diagnostic files remain alongside them. Historical verification folders were untouched. Final reports include source hashes before/after the run and fail if code changes while the sweep executes.
+
+Run `node --experimental-strip-types scripts/stress-endurance-distances.mjs --tag <unique-name>`; add `--case <case-id>` to reproduce one input. Existing tags cannot be overwritten. Focused regression command: `node --experimental-strip-types --test tests/endurance-quality-stress.test.mjs tests/standard-quality-rhythm.test.mjs tests/explicit-workout-contract.test.mjs tests/marathon-dynamic-workouts.test.mjs tests/marathon-book.test.mjs tests/custom-event-context.test.mjs` — **143/143 passed**. `tsc --noEmit` also passed.

@@ -7,6 +7,12 @@ import {
 } from '@/lib/action-progress';
 /* oxlint-disable react/react-compiler -- This app hydrates device preferences after SSR; it does not use the React Compiler. */
 import { type Plan, type State } from '@/lib/engine';
+import { ApiRequestError, isRetryableRequest } from '@/lib/client-api';
+import {
+  offlineJournal,
+  queueableActions,
+  type PendingSave,
+} from '@/lib/offline-journal';
 import type { Dispatch, SetStateAction } from 'react';
 import { api } from '../stride-ui';
 import type { useAppDialogs } from './use-app-dialogs';
@@ -80,31 +86,130 @@ export function usePlanActions(
               setToast(
                 delivery.status === 'confirmed'
                   ? 'Your watch confirmation is saved.'
-                  : delivery.status === 'review'
+                  : delivery.status === 'queued'
                     ? delivery.message ||
-                      'Workout delivery needs attention. Open its details.'
-                    : delivery.status === 'stale'
-                      ? 'Your plan changed during delivery. Send the latest workout again.'
-                      : delivery.status === 'preserved'
-                        ? 'The historical or completed calendar entry was preserved.'
-                        : delivery.status === 'removed'
-                          ? 'Workout removed from Intervals.icu.'
-                          : delivery.status === 'completed'
-                            ? 'This workout is already completed. Nothing was sent.'
-                            : delivery.status === 'accepted'
-                              ? 'Workout ready in Intervals.icu. Next, sync Garmin Connect.'
-                              : 'Delivery is not confirmed. Check the workout status before retrying.',
+                      'Delivery is saved for retry. Resume it in Connections when connected.'
+                    : delivery.status === 'review'
+                      ? delivery.message ||
+                        'Workout delivery needs attention. Open its details.'
+                      : delivery.status === 'stale'
+                        ? 'Your plan changed during delivery. Send the latest workout again.'
+                        : delivery.status === 'preserved'
+                          ? 'The historical or completed calendar entry was preserved.'
+                          : delivery.status === 'removed'
+                            ? 'Workout removed from Intervals.icu.'
+                            : delivery.status === 'completed'
+                              ? 'This workout is already completed. Nothing was sent.'
+                              : delivery.status === 'accepted'
+                                ? 'Workout ready in Intervals.icu. Next, sync Garmin Connect.'
+                                : 'Delivery is not confirmed. Check the workout status before retrying.',
               );
               return;
             }
-            const result = await api<State>('/api/plan', {
-              method: 'POST',
-              body: JSON.stringify({
+            const queueable = queueableActions.has(action);
+            const id = crypto.randomUUID();
+            let command: PendingSave = {
+              id,
+              createdAt: new Date().toISOString(),
+              status: 'pending',
+              body: {
+                ...payload,
                 action,
                 version: data.version,
-                ...payload,
-              }),
-            });
+                mutationId: id,
+              },
+            };
+            let durable = false;
+            if (queueable) {
+              try {
+                const local = await offlineJournal.read();
+                const pending =
+                  local?.scope === server.draftScope ? local.pending : [];
+                // Reopening a form after a lost response must reuse its exact intent.
+                const content = (body: PendingSave['body']) =>
+                  JSON.stringify({
+                    ...body,
+                    mutationId: undefined,
+                    version: undefined,
+                  });
+                command =
+                  pending?.find(
+                    (item) => content(item.body) === content(command.body),
+                  ) ?? command;
+                await offlineJournal.enqueue(server.draftScope, command);
+                durable = true;
+                await server.reloadDevice();
+              } catch (error) {
+                server.setDeviceError((error as Error).message);
+                if (!navigator.onLine) throw error;
+              }
+            }
+            if (
+              queueable &&
+              durable &&
+              (!navigator.onLine || command.status === 'review')
+            ) {
+              setToast(
+                command.status === 'review'
+                  ? 'This saved entry needs review in Pending saves.'
+                  : 'Saved on this device. It will sync when you reconnect.',
+              );
+              return;
+            }
+            let result: State;
+            try {
+              result = await api<State & { acknowledgedMutationId?: string }>(
+                '/api/plan',
+                {
+                  method: 'POST',
+                  body: JSON.stringify(
+                    queueable
+                      ? command.body
+                      : { ...payload, action, version: data.version },
+                  ),
+                },
+              );
+              if (durable) {
+                if (
+                  (result as State & { acknowledgedMutationId?: string })
+                    .acknowledgedMutationId !== command.id
+                )
+                  throw new Error(
+                    'The server did not acknowledge this entry. Review Pending saves before retrying.',
+                  );
+                await offlineJournal.acknowledge(
+                  server.draftScope,
+                  command.id,
+                  result.version,
+                );
+                await server.reloadDevice();
+              }
+            } catch (error) {
+              if (!durable) throw error;
+              if (
+                error instanceof ApiRequestError &&
+                error.status < 500 &&
+                error.status !== 409
+              ) {
+                // Definitively rejected input remains in the open form for correction.
+                await offlineJournal.acknowledge(server.draftScope, command.id);
+                await server.reloadDevice();
+                throw error;
+              }
+              if (!isRetryableRequest(error))
+                await offlineJournal.review(
+                  server.draftScope,
+                  command.id,
+                  (error as Error).message,
+                );
+              await server.reloadDevice();
+              setToast(
+                isRetryableRequest(error)
+                  ? 'Saved on this device; waiting to confirm with the server.'
+                  : 'Your entry is saved on this device and needs review in Pending saves.',
+              );
+              return;
+            }
             setData((d) => ({ ...d, ...result }));
             let syncNote = '';
             if (

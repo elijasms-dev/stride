@@ -27,6 +27,7 @@ import {
 import { type AccountData } from '../profile';
 import { api } from '../stride-ui';
 import { empty, type AppData } from './types';
+import { useDeviceJournal } from './use-device-journal';
 
 export function useTrainingPlan() {
   const sessionInvalid = useSyncExternalStore(
@@ -80,6 +81,14 @@ export function useTrainingPlan() {
     ),
   );
   const refresh = useCallback(() => journalLoader.refresh(), [journalLoader]);
+  const deviceJournal = useDeviceJournal(
+    draftScope,
+    data,
+    sessionInvalid,
+    refresh,
+    actionFlight,
+    setBusy,
+  );
   async function loadImportActivities(older: boolean) {
     const expectedScope = importScopeRef.current;
     if (!expectedScope)
@@ -162,6 +171,7 @@ export function useTrainingPlan() {
     };
   }, [refresh, journalLoader]);
   return {
+    ...deviceJournal,
     sessionInvalid,
     draftScope,
     importCache,

@@ -1,0 +1,187 @@
+{
+  "version": "marathon-variety-and-balance-v1",
+  "capturedAt": "2026-09-25",
+  "note": "Only named-marathon generated plans and public plan edits are versioned. Prior fixtures and rejection results are retained. Full current metadata is hashed alongside separately asserted input, executable plan, frequency and protected history contracts.",
+  "cases": [
+    {
+      "name": "marathon, 6 weeks, effort",
+      "previousFixture": "plan-policy-v32.json",
+      "previousExpected": {
+        "sha256": "25f84013b1c8396aa616b309ced852f365783186df73eb66dc9d6fd9bc1f4b80"
+      },
+      "expected": {
+        "sha256": "79e7d083a75c673420682f90980f75b598b3fafddd8e9203fc3f4d06b2aa13bc"
+      }
+    },
+    {
+      "name": "marathon, 6 weeks, benchmark",
+      "previousFixture": "plan-policy-pace-v1.json",
+      "previousExpected": {
+        "sha256": "2e348c1bd5a93427298988c9fc7a5743d50a379c9b824c319ed92bf4375cef8b"
+      },
+      "expected": {
+        "sha256": "f13ce4986d99765ab900349e4b7147dbd9c6ea4b4ee84480dc2276899337caeb"
+      }
+    },
+    {
+      "name": "marathon, 6 weeks, manual",
+      "previousFixture": "plan-policy-pace-v1.json",
+      "previousExpected": {
+        "sha256": "858a234e78cd78cc113bf5456c19b5718bc0c6c68549439379e062a2fa8a9c2f"
+      },
+      "expected": {
+        "sha256": "8c43da5915ed94881c5fc2acb6d5718ab17417379e0185078aaebe0aa3082bf8"
+      }
+    },
+    {
+      "name": "marathon, 18 weeks, effort",
+      "previousFixture": "plan-policy-v32.json",
+      "previousExpected": {
+        "sha256": "7205957d1e360484fb5013456b7a19ce8f3ec6397e53c85709ef20e1117cec2d"
+      },
+      "expected": {
+        "sha256": "24cf56eba43e9963d01b054e2201f1440887603e035fbfcaedeb3a8224b24f5c"
+      }
+    },
+    {
+      "name": "marathon, 18 weeks, benchmark",
+      "previousFixture": "plan-policy-pace-v1.json",
+      "previousExpected": {
+        "sha256": "ce3d1bad32187cd955feb023e14bb697d8d61a641d1f406260eaf7ee0aebba9d"
+      },
+      "expected": {
+        "sha256": "96e991c3c774570c7c4ee17c1523b042f469706bc240350e2b5c82c503b090b9"
+      }
+    },
+    {
+      "name": "marathon, 18 weeks, manual",
+      "previousFixture": "plan-policy-pace-v1.json",
+      "previousExpected": {
+        "sha256": "6f117ac7cce3f6b8b2a6d9628a6d556689f58f99d0364e2b0fa26af2e2440753"
+      },
+      "expected": {
+        "sha256": "08be9090094e5c33414c6bbeb45e4098d66b5ba574742805cf2b599733bec12d"
+      }
+    },
+    {
+      "name": "marathon, 26 weeks, effort",
+      "previousFixture": "plan-policy-v32.json",
+      "previousExpected": {
+        "sha256": "a4340de3ab39368a94f1544887d1c846cc9b77cc8ba2f275b4813464a53f82d2"
+      },
+      "expected": {
+        "sha256": "b1cd445c68689a9177c072e9096973758ab7d7bef75c414c252b051ff3498b10"
+      }
+    },
+    {
+      "name": "marathon, 26 weeks, benchmark",
+      "previousFixture": "plan-policy-pace-v1.json",
+      "previousExpected": {
+        "sha256": "20e969d5f079ac042ee948585e596fb85c407a24dce72d65699a368124e976a5"
+      },
+      "expected": {
+        "sha256": "bda5475a177716cf0b1406665c6a2eb630fb9573790e83ff35419e5abc5a7927"
+      }
+    },
+    {
+      "name": "marathon, 26 weeks, manual",
+      "previousFixture": "plan-policy-pace-v1.json",
+      "previousExpected": {
+        "sha256": "ab4143b0524a9fd6d9be496e8d4478a9624c29eddda4c67221ed7dd213bdbd13"
+      },
+      "expected": {
+        "sha256": "9ecb83a88aa5fc7b23f4d31ca9e2739cd436c17c7d9dc7a674c6581866ab95c3"
+      }
+    },
+    {
+      "name": "constraints {\"difficulty\":\"gentle\"}",
+      "previousFixture": "plan-policy-v32.json",
+      "previousExpected": {
+        "sha256": "396386c24a0228b1af2f1dae7d389289fa9a1f45fd6f013a5c000ccab08f4b28"
+      },
+      "expected": {
+        "sha256": "4bbb3fb0844c8a1eb95ae98968651272a6e83f807546abf6208acb5045eb8af8"
+      }
+    },
+    {
+      "name": "constraints {\"dayPreferences\":[{\"day\":2,\"maxMinutes\":30}]}",
+      "previousFixture": "plan-policy-v32.json",
+      "previousExpected": {
+        "sha256": "3048fda3dd01d8f37f68c61818f1c42426915974507d3cf71b82925531297e6c"
+      },
+      "expected": {
+        "sha256": "b8351a5bd029f87f1ff9f7c40e6b66cb543c51f56819280789bc233c1d846583"
+      }
+    },
+    {
+      "name": "constraints {\"runsPerWeek\":4,\"currentRuns\":5}",
+      "previousFixture": "plan-policy-v32.json",
+      "previousExpected": {
+        "sha256": "89a211138e96eebc57971e66d6424509960a52f906c4808971eeb0bf0e4981ea"
+      },
+      "expected": {
+        "sha256": "f58575f614013610818a9428fdedda1779da49e4a6b6e3124a44cc7554aa19a7"
+      }
+    },
+    {
+      "name": "constraints {\"easyPace\":null}",
+      "previousFixture": "plan-policy-v32.json",
+      "previousExpected": {
+        "sha256": "f2f3408a5672a0eee0b163fc2900cd2406270ea8a89b1fc3a2516dd6983c70a6"
+      },
+      "expected": {
+        "sha256": "52b6a4d939651c10bc06def8ff1ff790d71a01d882482cda3f4b7caa19849856"
+      }
+    },
+    {
+      "name": "public operation refresh",
+      "previousFixture": "plan-policy-v32.json",
+      "previousExpected": {
+        "sha256": "feab1894b545f50db37d1b99f87838758dfa5cbf45a9392d27f41b46d72d5dfc"
+      },
+      "expected": {
+        "sha256": "2e3bc931d2dbdfab35a6c0b7e1b7018cf94b65ac48f6076dd93a6f216afeb86c"
+      }
+    },
+    {
+      "name": "public operation revise",
+      "previousFixture": "plan-policy-v32.json",
+      "previousExpected": {
+        "sha256": "b8b72b6e4b71a47c4fd9cf35fbb20815654f4e1b5f0f9f349787a61509e17a1b"
+      },
+      "expected": {
+        "sha256": "0497c6c79a139b55c844c28568adee9fb5f88215d0971e6a1a259529c333c574"
+      }
+    },
+    {
+      "name": "public operation easy",
+      "previousFixture": "plan-policy-v32.json",
+      "previousExpected": {
+        "sha256": "d7fc657161d5b4f9571553744ec75a4facdedb6c1f9d825a6888541bf26ce1ce"
+      },
+      "expected": {
+        "sha256": "c433b0e20bd3bf2d3bf8299647be3840fad640e4c85aaaf880db7d72b28fe051"
+      }
+    },
+    {
+      "name": "public operation rest",
+      "previousFixture": "plan-policy-v32.json",
+      "previousExpected": {
+        "sha256": "760579a35eff66108fae7b52d798aa478a0d3285e35b111d40ae9a5a988ab75c"
+      },
+      "expected": {
+        "sha256": "ea0fe8966c35e033562388b78a9c1288b80181132704c77fe9be393b5dc847e3"
+      }
+    },
+    {
+      "name": "public operation shorten",
+      "previousFixture": "plan-policy-v32.json",
+      "previousExpected": {
+        "sha256": "d44247da18cac987c6ce5c9520f25ede8a4ccaf7f41dfbce5b756d8a3857e9e3"
+      },
+      "expected": {
+        "sha256": "3932983a968c89aa34ebecc6e825f4c883322f6187a4cb51818ac9962da6ae43"
+      }
+    }
+  ]
+}

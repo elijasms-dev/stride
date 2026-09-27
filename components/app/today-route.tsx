@@ -124,27 +124,29 @@ export function TodayRoute() {
               ))}
             </fieldset>
           )}
-          {workout ? (
-            <TodayWorkoutCard
-              key={workout.id}
-              workout={workout}
-              profile={plan.profile}
-              showEstimates={homePreferences.showEstimates}
-              onOpen={showWorkout}
-            />
-          ) : (
-            <button
-              type="button"
-              className="daily-rest-card"
-              key={currentDate}
-              aria-label={`${dayTitle}, open daily guide`}
-              onClick={() => showDay(currentDate)}
-            >
-              <Moon size={24} aria-hidden="true" />
-              <span>{dayTitle}</span>
-              <ChevronRight size={20} aria-hidden="true" />
-            </button>
-          )}
+          <div id="selected-day-workout" tabIndex={-1}>
+            {workout ? (
+              <TodayWorkoutCard
+                key={workout.id}
+                workout={workout}
+                profile={plan.profile}
+                showEstimates={homePreferences.showEstimates}
+                onOpen={showWorkout}
+              />
+            ) : (
+              <button
+                type="button"
+                className="daily-rest-card"
+                key={currentDate}
+                aria-label={`${dayTitle}, open daily guide`}
+                onClick={() => showDay(currentDate)}
+              >
+                <Moon size={24} aria-hidden="true" />
+                <span>{dayTitle}</span>
+                <ChevronRight size={20} aria-hidden="true" />
+              </button>
+            )}
+          </div>
           <UpcomingSessions
             count={homePreferences.upcomingCount}
             showEstimates={homePreferences.showEstimates}

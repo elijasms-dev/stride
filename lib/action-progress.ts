@@ -1,4 +1,4 @@
-export type ActionProgress = { id: number; label: string };
+export type ActionProgress = { id: number; label: string; blocking: boolean };
 const listeners = new Set<() => void>();
 const pending = new Map<number, ActionProgress>();
 let serial = 0;
@@ -12,7 +12,9 @@ export const subscribeToActionProgress = (listener: () => void) => {
 export const getActionProgress = () => snapshot;
 export const getServerActionProgress = () => null;
 function publish() {
-  snapshot = [...pending.values()].at(-1) ?? null;
+  const actions = [...pending.values()];
+  snapshot =
+    actions.findLast((action) => action.blocking) ?? actions.at(-1) ?? null;
   for (const listener of listeners) listener();
 }
 
@@ -74,6 +76,24 @@ export function actionProgressLabel(path: string, init?: RequestInit) {
   return null;
 }
 
+/** Only journal replacement/recovery needs a screen-wide progress lock. */
+export function actionProgressBlocking(path: string, init?: RequestInit) {
+  if (!init?.method || ['GET', 'HEAD'].includes(init.method.toUpperCase()))
+    return false;
+  const route = path.split('?')[0];
+  let action: unknown;
+  try {
+    action =
+      typeof init.body === 'string' ? JSON.parse(init.body).action : undefined;
+  } catch {
+    return false;
+  }
+  return (
+    (route === '/api/plan' && action === 'activate') ||
+    (route === '/api/recovery' && action === 'commit')
+  );
+}
+
 /** Allow the status to render for a frame before synchronous work begins. */
 export function afterActionPaint(): Promise<void> {
   if (typeof document === 'undefined' || document.visibilityState !== 'visible')
@@ -102,10 +122,11 @@ export function afterActionPaint(): Promise<void> {
 export async function withActionProgress<T>(
   label: string | null,
   work: () => Promise<T>,
+  options: { blocking?: boolean } = {},
 ): Promise<T> {
   if (!label) return work();
   const id = ++serial;
-  pending.set(id, { id, label });
+  pending.set(id, { id, label, blocking: options.blocking === true });
   publish();
   try {
     await afterActionPaint();

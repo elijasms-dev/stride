@@ -1,4 +1,8 @@
 import {
+  firstRaceTaperFactor,
+  isFirstRaceProfile,
+} from '../first-race-policy.ts';
+import {
   GENERATION_POLICY,
   PREPARATION_WEEKS,
   TAPER_POLICY,
@@ -15,20 +19,31 @@ import {
   marathonBlockPhase,
 } from '../marathon-book.ts';
 import { isLongUltra } from '../ultra-policy.ts';
+import {
+  isRoadRaceProfile,
+  roadTaperFraction,
+  roadTrainingPolicy,
+} from '../road-training-policy.ts';
 
 /** Race-relative taper: calendar week boundaries must not delay race recovery. */
 export function taperFactor(
   p: Pick<Profile, 'goal' | 'raceDistanceKm' | 'raceDate'> &
-    Partial<Pick<Profile, 'startDate' | 'method'>>,
+    Partial<Pick<Profile, 'startDate' | 'method' | 'planLevel'>>,
   date: string,
 ) {
   if (p.goal === 'base') return 1;
+  if (
+    p.planLevel === 'beginner' &&
+    ['5k', '10k', 'half', 'marathon'].includes(p.goal)
+  )
+    return firstRaceTaperFactor(p, date);
   if (usesMarathonBook(p) && p.startDate)
     return marathonTaperFraction(
       { startDate: p.startDate, raceDate: p.raceDate },
       date,
     );
   const days = dayDiff(date, p.raceDate);
+  if (isRoadRaceProfile(p)) return roadTaperFraction(p, days);
   if (days <= DAYS_PER_WEEK) return TAPER_POLICY.finalWeekFraction;
   if (days <= TAPER_POLICY.secondWeekDays)
     return TAPER_POLICY.secondWeekFraction;
@@ -39,13 +54,28 @@ export function taperFactor(
     return TAPER_POLICY.thirdWeekFraction;
   return 1;
 }
+
+/** A Sunday boundary cannot reduce a Monday–Saturday week with no Sunday run. */
+export function weekIncludesTaper(p: Profile, weekStart: string) {
+  return !usesMarathonBook(p)
+    ? p.days
+        .map((day) => addDays(weekStart, day))
+        .some(
+          (date) =>
+            date >= p.startDate &&
+            date < p.raceDate &&
+            taperFactor(p, date) < 1,
+        )
+    : taperFactor(p, addDays(weekStart, FINAL_WEEKDAY_OFFSET)) < 1;
+}
 /** Race-specific entry is a position before the event, not time since signup.
  * Fitness and quality-history gates remain independent of this phase window.
  */
 export function racePreparationDays(p: Profile) {
   const family = trainingFamily(p);
-  const referenceWeeks =
-    family === 'ultra'
+  const referenceWeeks = isRoadRaceProfile(p)
+    ? roadTrainingPolicy(p).preparationWeeks
+    : family === 'ultra'
       ? isLongUltra(p)
         ? PREPARATION_WEEKS.longUltra
         : PREPARATION_WEEKS.ultra
@@ -56,7 +86,11 @@ export function racePreparationDays(p: Profile) {
           : PREPARATION_WEEKS.shortRoad;
   return (
     Math.max(
-      GENERATION_POLICY.minimumRacePreparationWeeks,
+      isRoadRaceProfile(p)
+        ? p.goal === 'half'
+          ? 4
+          : 3
+        : GENERATION_POLICY.minimumRacePreparationWeeks,
       Math.ceil(referenceWeeks * GENERATION_POLICY.racePreparationFraction),
     ) * DAYS_PER_WEEK
   );
@@ -66,6 +100,12 @@ export function trainingPhaseOn(
   weekPhase: Phase,
   date: string,
 ): Phase {
+  if (isFirstRaceProfile(p)) {
+    if (date === p.raceDate || dayDiff(date, p.raceDate) < 7)
+      return 'Race week';
+    if (firstRaceTaperFactor(p, date) < 1) return 'Taper';
+    return weekPhase === 'Taper' ? 'Build' : weekPhase;
+  }
   if (usesMarathonBook(p))
     return weekPhase === 'Recovery' ? 'Recovery' : marathonBlockPhase(p, date);
   if (usesDailyTaperPhase(p) && weekPhase !== 'Race week') {

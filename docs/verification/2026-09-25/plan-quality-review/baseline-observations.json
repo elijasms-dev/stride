@@ -1,0 +1,20 @@
+{
+  "description": "Partial observations captured by the independent reviewer before the original 12 full example plans were accidentally overwritten during regeneration. This is not a reconstructed copy of the original plans and does not support exact before/after hashes.",
+  "originalPath": "docs/verification/2026-09-25/all-distance-stress/example-plans.json",
+  "method": "For every saved week containing a long run, divide the largest non-hard workout with kind=easy by that week's long-run estimated km. Includes recovery and mixed-taper weeks; counts are observations, not automatically defects. Separately named medium-long roles were not distinguished in this first read.",
+  "roadWeeksAbove80Percent": 79,
+  "examples": [
+    {"id":"5k-q0","maximumRatio":0.9888888888888889,"weeksAbove80Percent":10,"openingEasyMaxKm":7.334,"openingLongKm":8},
+    {"id":"5k-q1","maximumRatio":1.48,"weeksAbove80Percent":10,"openingEasyMaxKm":7.474,"openingLongKm":8},
+    {"id":"5k-q2","maximumRatio":1.088888888888889,"weeksAbove80Percent":10,"openingEasyMaxKm":10.45,"openingLongKm":13},
+    {"id":"10k-q0","maximumRatio":1.125,"weeksAbove80Percent":8},
+    {"id":"10k-q1","maximumRatio":1.157142857142857,"weeksAbove80Percent":10,"openingEasyMaxKm":8.857,"openingLongKm":11},
+    {"id":"10k-q2","maximumRatio":1,"weeksAbove80Percent":9},
+    {"id":"half-q0","maximumRatio":0.9933333333333334,"weeksAbove80Percent":3},
+    {"id":"half-q1","maximumRatio":0.9976,"weeksAbove80Percent":11},
+    {"id":"half-q2","maximumRatio":0.9352777777777779,"weeksAbove80Percent":8},
+    {"id":"marathon-q0","maximumRatio":0.7086956521739131,"weeksAbove80Percent":0},
+    {"id":"marathon-q1","maximumRatio":0.7086956521739131,"weeksAbove80Percent":0},
+    {"id":"marathon-q2","maximumRatio":0.5888260869565217,"weeksAbove80Percent":0}
+  ]
+}

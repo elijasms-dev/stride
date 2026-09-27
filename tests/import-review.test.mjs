@@ -6,9 +6,8 @@ import { existsSync } from 'node:fs';
 const lib = existsSync(new URL('../lib/import-review.ts', import.meta.url))
   ? new URL('../lib/', import.meta.url)
   : new URL('./stride/lib/', import.meta.url);
-const { importReviewScope, mergeImportPage } = await import(
-  new URL('import-review.ts', lib)
-);
+const { importReviewScope, mergeImportPage, linkedActivityReview } =
+  await import(new URL('import-review.ts', lib));
 
 const connection = {
   provider_athlete_id: 'athlete-10',
@@ -251,4 +250,115 @@ void test('merging a page preserves frozen input records, arrays, cache and prov
     ['recent', 'unknown-distance', 'earlier'],
   );
   assert.deepEqual({ current, page, provider }, before);
+});
+
+function linkedPlan(values = {}) {
+  return {
+    workouts: [],
+    extraRuns: [
+      {
+        id: 'saved-run',
+        date: '2026-09-07',
+        minutes: 2535 / 60,
+        km: 6.1234,
+        effort: 4,
+        feeling: 'good',
+        note: 'Keep my reflection',
+        activityId: 'linked',
+        ...values,
+      },
+    ],
+  };
+}
+
+test('a precise matching recording remains linked without a false mismatch from unit conversion', () => {
+  const review = linkedActivityReview(activity('linked'), linkedPlan());
+  assert.ok(review);
+  assert.deepEqual(review.differences, []);
+  assert.equal(review.extraRun.id, 'saved-run');
+  assert.equal(
+    linkedActivityReview(activity('different-id'), linkedPlan()),
+    null,
+  );
+});
+
+for (const [field, patch] of [
+  ['distance', { distance: 7000 }],
+  ['duration', { movingTime: 2700 }],
+  ['date', { date: '2026-09-08' }],
+])
+  test(`fresh ${field} differences remain linked and never overwrite the saved observations`, () => {
+    const plan = freezeTree(linkedPlan());
+    const before = structuredClone(plan);
+    const review = linkedActivityReview(
+      freezeTree({ ...activity('linked'), ...patch }),
+      plan,
+    );
+    assert.deepEqual(review.differences, [field]);
+    assert.equal(review.extraRun.id, 'saved-run');
+    assert.deepEqual(plan, before);
+  });
+
+test('manual corrections produce a comparison without pretending to establish which source changed', () => {
+  const plan = freezeTree(
+    linkedPlan({ minutes: 50, km: 7, note: 'I corrected a short recording' }),
+  );
+  const review = linkedActivityReview(activity('linked'), plan);
+  assert.deepEqual(review.differences, ['distance', 'duration']);
+  assert.equal(review.saved.minutes, 50);
+  assert.equal(review.extraRun.note, 'I corrected a short recording');
+  assert.equal('providerChanged' in review, false);
+});
+
+test('completed plan logs use their actual date and offer the existing workout identity for review', () => {
+  const workout = {
+    id: 'planned-slot',
+    date: '2026-09-06',
+    status: 'completed',
+    feedback: {
+      activityId: 'linked',
+      actualDate: '2026-09-07',
+      actualMinutes: 2535 / 60,
+      actualKm: 6.1234,
+      note: 'Keep completed log',
+    },
+  };
+  const plan = freezeTree({ workouts: [workout] });
+  const review = linkedActivityReview(activity('linked'), plan);
+  assert.deepEqual(review.differences, []);
+  assert.equal(review.workout, workout);
+  assert.equal(review.extraRun, undefined);
+});
+
+test('unknown and zero provider distance follow saved-run normalization; new distance is a difference', () => {
+  const plan = linkedPlan({ km: null });
+  for (const distance of [null, 0])
+    assert.deepEqual(
+      linkedActivityReview({ ...activity('linked'), distance }, plan)
+        .differences,
+      [],
+    );
+  assert.deepEqual(linkedActivityReview(activity('linked'), plan).differences, [
+    'distance',
+  ]);
+  assert.deepEqual(
+    linkedActivityReview(
+      { ...activity('linked'), distance: 6123.9, movingTime: 2535.5 },
+      linkedPlan(),
+    ).differences,
+    [],
+  );
+});
+
+test('an empty or partial provider page cannot delete journal entries or imply source deletion', () => {
+  const plan = freezeTree(linkedPlan());
+  const before = structuredClone(plan);
+  const refreshed = merge(cache({ activities: [activity('linked')] }), {
+    activities: [],
+    nextCursor: null,
+  });
+  assert.deepEqual(refreshed.activities, []);
+  assert.deepEqual(plan, before);
+  assert.equal(linkedActivityReview(activity('another-id'), plan), null);
+  assert.equal(plan.extraRuns.length, 1);
 });

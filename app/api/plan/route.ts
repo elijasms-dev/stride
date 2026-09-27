@@ -1,3 +1,4 @@
+import { beginRequestObservation } from '@/lib/request-observation';
 import {
   validateWorkoutTargets,
   updateWorkoutTargets,
@@ -10,6 +11,8 @@ import {
 } from '@/lib/workout-enjoyment';
 import { measure } from '@/lib/measurement';
 import { validateRun } from '@/lib/run-input';
+import { activityTime } from '@/lib/activity-time';
+import { impossibleRunningSummary } from '@/lib/activity-plausibility';
 import { saveStandaloneRun, correctStandaloneRun } from '@/lib/standalone-runs';
 import {
   changeEvent,
@@ -50,13 +53,19 @@ import {
   database,
   HttpError,
   type ProviderIdentity,
+  journalMutation,
+  replayMutation,
 } from '@/lib/server';
 export async function POST(request: Request) {
+  const observation = beginRequestObservation(request);
   try {
     const owner = ownerId(request);
     guardWrite(request);
     const accountContext = await guardAccount(request, owner);
     const b = await body(request);
+    const mutation = await journalMutation(b);
+    const replay = await replayMutation(owner, accountContext.epoch, mutation);
+    if (replay) return json(replay);
     if (b.action === 'preview') {
       const previous = await readState(owner);
       try {
@@ -82,10 +91,13 @@ export async function POST(request: Request) {
           b.run,
           b.correctionReason,
           accountContext,
+          mutation,
         ),
       );
     if (b.action === 'freeRun' && !current.plan)
-      return json(await saveStandaloneRun(owner, b.run, accountContext));
+      return json(
+        await saveStandaloneRun(owner, b.run, accountContext, mutation),
+      );
     if (b.action === 'activate' && b.requestId !== undefined) {
       if (
         typeof b.requestId !== 'string' ||
@@ -104,11 +116,18 @@ export async function POST(request: Request) {
         return json(current);
       }
     }
-    if (b.version !== current.version)
+    if (b.version !== current.version) {
+      const replay = await replayMutation(
+        owner,
+        accountContext.epoch,
+        mutation,
+      );
+      if (replay) return json(replay);
       throw new HttpError(
         409,
         'Your plan changed in another window. Refresh before making this change.',
       );
+    }
     if (b.action === 'runMeasurePreview' || b.action === 'runMeasure') {
       if (!current.plan) throw new PlanError('Build a plan first.');
       if (b.measure !== 'distance' && b.measure !== 'time')
@@ -173,7 +192,7 @@ export async function POST(request: Request) {
       if (!current.plan) throw new PlanError('Build a plan first.');
       let config;
       try {
-        config = validateWorkoutTargets(b.targets);
+        config = b.targets === null ? null : validateWorkoutTargets(b.targets);
       } catch (e) {
         throw new PlanError((e as Error).message);
       }
@@ -457,13 +476,14 @@ export async function POST(request: Request) {
         if ((r.activityId ?? null) !== (original.activityId ?? null))
           throw new PlanError('Keep the original provider recording link.');
         Object.assign(original, r, {
+          ...activityTime(original),
           id: original.id,
           source: original.source,
           recordedAt: new Date().toISOString(),
         });
         label = 'Corrected an extra run: ' + b.correctionReason.trim();
       } else if (b.action === 'freeRun' || b.action === 'attachRecording') {
-        const r = b.run as Record<string, unknown>;
+        const r = validateRun(b.run, today, true);
         if (
           !r ||
           !validDate(r.date) ||
@@ -512,6 +532,7 @@ export async function POST(request: Request) {
               ? actual.distance / 1000
               : null;
           r.source = actual.source;
+          Object.assign(r, activityTime(actual));
           validateRun(r, today);
         }
         if (b.action === 'attachRecording') {
@@ -533,6 +554,7 @@ export async function POST(request: Request) {
               );
             existing.feedback = {
               ...existing.feedback,
+              ...activityTime(r),
               actualDate: r.date,
               actualMinutes: Number(r.minutes),
               actualKm: r.km as number | null,
@@ -548,6 +570,7 @@ export async function POST(request: Request) {
                 'Choose a recording from the same date as this run.',
               );
             Object.assign(extra, {
+              ...activityTime(r),
               minutes: Number(r.minutes),
               km: r.km,
               activityId: r.activityId,
@@ -569,11 +592,13 @@ export async function POST(request: Request) {
               accountContext.epoch,
               undefined,
               importIdentity,
+              mutation,
             ),
           );
         }
         plan.extraRuns ??= [];
         plan.extraRuns.push({
+          ...activityTime(r),
           id: crypto.randomUUID(),
           date: r.date,
           minutes: Number(r.minutes),
@@ -639,6 +664,14 @@ export async function POST(request: Request) {
           throw new PlanError(
             'Check your actual duration, distance, and effort before saving.',
           );
+        if (
+          (!f.activityId || b.action === 'correctLog') &&
+          impossibleRunningSummary(f.actualMinutes, f.actualKm)
+        )
+          throw new PlanError(
+            'This distance and duration imply an impossible running speed. Check the units and duration; the run has not been saved.',
+          );
+        Object.assign(f, activityTime(f));
         if (f.activityId && b.action !== 'correctLog') {
           const actual = await verifiedActivity(
             owner,
@@ -652,6 +685,7 @@ export async function POST(request: Request) {
               ? actual.distance / 1000
               : null;
           f.source = actual.source;
+          Object.assign(f, activityTime(actual));
           validateRun(
             {
               date: f.actualDate ?? workout.date,
@@ -709,8 +743,10 @@ export async function POST(request: Request) {
           throw new PlanError(
             'Keep the original recording link when correcting its log.',
           );
-        if (b.action === 'correctLog')
+        if (b.action === 'correctLog') {
           f.source = workout.feedback?.source ?? 'Manual';
+          Object.assign(f, activityTime(workout.feedback ?? {}));
+        }
         f.enjoyment = mergeWorkoutEnjoyment(
           f.enjoyment,
           workout.feedback?.enjoyment,
@@ -817,6 +853,7 @@ export async function POST(request: Request) {
       accountContext.epoch,
       b.action === 'activate' ? accountContext.revision : undefined,
       importIdentity,
+      mutation,
     );
     if (b.action === 'activate')
       await measure(owner, accountContext.epoch, 'activation-accepted');
@@ -827,8 +864,6 @@ export async function POST(request: Request) {
       await measure(owner, accountContext.epoch, 'first-workout-completed');
     return json(saved);
   } catch (e) {
-    console.error("=== PLAN ERROR ===", e);
-    return failure(e);
+    return failure(e, observation);
   }
 }
-

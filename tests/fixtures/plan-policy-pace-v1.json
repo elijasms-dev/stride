@@ -1,0 +1,134 @@
+{
+  "modelVersion": "stride-daniels-1",
+  "prescriptionVersion": "pace-resolved-v1",
+  "date": "2026-09-14",
+  "reason": "Intentional numeric training-pace, manual easy scheduling and executable distance-duration changes. The original v32 fixture is unchanged; history and frequency hashes are from the pre-pace implementation.",
+  "cases": [
+    {
+      "name": "base, 6 weeks, benchmark",
+      "historyAndFrequencySha256": "fef2b4de602e3d0908aebb2eb4822d7f58830bee57bdf61f92abed405456784a",
+      "expected": {
+        "sha256": "aa1fc8b3cc37b1ad37f7b7899585fafaee318d8d84e9303268482d4aa8077abe"
+      }
+    },
+    {
+      "name": "base, 6 weeks, manual",
+      "historyAndFrequencySha256": "fef2b4de602e3d0908aebb2eb4822d7f58830bee57bdf61f92abed405456784a",
+      "expected": {
+        "sha256": "cfa3df00e0ee96d0b99b8cc1f3e15447ec98b635e704ce9426487dd4c8f36c5f"
+      }
+    },
+    {
+      "name": "base, 18 weeks, benchmark",
+      "historyAndFrequencySha256": "969b12c6433d1277a10e58ec595df2b95a7723dedfa3e54ac762d4ed4333d887",
+      "expected": {
+        "sha256": "731dfc40827a969e096a7c9a9ff5cf288f969adddd698743f355f277b545e6d6"
+      }
+    },
+    {
+      "name": "base, 18 weeks, manual",
+      "historyAndFrequencySha256": "969b12c6433d1277a10e58ec595df2b95a7723dedfa3e54ac762d4ed4333d887",
+      "expected": {
+        "sha256": "838c4b41142c40a1e0391ccc82d435d043e893c814e017994f925a35db264a7c"
+      }
+    },
+    {
+      "name": "base, 26 weeks, benchmark",
+      "historyAndFrequencySha256": "4741f6e8bbc9997b8dbca6005581acd5e836b203d7c5d63eba935c081d1c9789",
+      "expected": {
+        "sha256": "82876cfaa19474171e867b41d13ec7be50cf77544f88b19478907269ca18aa78"
+      }
+    },
+    {
+      "name": "base, 26 weeks, manual",
+      "historyAndFrequencySha256": "4741f6e8bbc9997b8dbca6005581acd5e836b203d7c5d63eba935c081d1c9789",
+      "expected": {
+        "sha256": "b0525fc1c64d28268ab92efedf689d65382f6ecce2b4f8b140430ebb6d211a1d"
+      }
+    },
+    {
+      "name": "marathon, 6 weeks, benchmark",
+      "historyAndFrequencySha256": "dcd1ba58e9512b77761a5cabe77778b580233cbe5a3ac6e18475c2a06c3ece63",
+      "expected": {
+        "sha256": "2e348c1bd5a93427298988c9fc7a5743d50a379c9b824c319ed92bf4375cef8b"
+      }
+    },
+    {
+      "name": "marathon, 6 weeks, manual",
+      "historyAndFrequencySha256": "dcd1ba58e9512b77761a5cabe77778b580233cbe5a3ac6e18475c2a06c3ece63",
+      "expected": {
+        "sha256": "858a234e78cd78cc113bf5456c19b5718bc0c6c68549439379e062a2fa8a9c2f"
+      }
+    },
+    {
+      "name": "marathon, 18 weeks, benchmark",
+      "historyAndFrequencySha256": "fd3596e77a2d8cb4f78ec35f5c65346474b040014c5b7fd69226ca2ec7a15d68",
+      "expected": {
+        "sha256": "ce3d1bad32187cd955feb023e14bb697d8d61a641d1f406260eaf7ee0aebba9d"
+      }
+    },
+    {
+      "name": "marathon, 18 weeks, manual",
+      "historyAndFrequencySha256": "fd3596e77a2d8cb4f78ec35f5c65346474b040014c5b7fd69226ca2ec7a15d68",
+      "expected": {
+        "sha256": "6f117ac7cce3f6b8b2a6d9628a6d556689f58f99d0364e2b0fa26af2e2440753"
+      }
+    },
+    {
+      "name": "marathon, 26 weeks, benchmark",
+      "historyAndFrequencySha256": "a992c79677bd2f0df9b576f2bd49fab11e9ec71d2e89f80b01eccc1168838ab1",
+      "expected": {
+        "sha256": "20e969d5f079ac042ee948585e596fb85c407a24dce72d65699a368124e976a5"
+      }
+    },
+    {
+      "name": "marathon, 26 weeks, manual",
+      "historyAndFrequencySha256": "a992c79677bd2f0df9b576f2bd49fab11e9ec71d2e89f80b01eccc1168838ab1",
+      "expected": {
+        "sha256": "ab4143b0524a9fd6d9be496e8d4478a9624c29eddda4c67221ed7dd213bdbd13"
+      }
+    },
+    {
+      "name": "custom, 6 weeks, benchmark",
+      "historyAndFrequencySha256": "00d83daf94fc1213b759590681501267450dfd69075cb7438038fdcdeba7e98d",
+      "expected": {
+        "sha256": "85653562ef444626c2aaa31b92433ed92df3860094745a392afd5971c6e4c4fe"
+      }
+    },
+    {
+      "name": "custom, 6 weeks, manual",
+      "historyAndFrequencySha256": "00d83daf94fc1213b759590681501267450dfd69075cb7438038fdcdeba7e98d",
+      "expected": {
+        "sha256": "1f7dab0eecbe477540e05fc3509182586b8a47e509bd6384e56eff808040c90b"
+      }
+    },
+    {
+      "name": "custom, 18 weeks, benchmark",
+      "historyAndFrequencySha256": "43aed14db55316266fe933ae86e6f83b29cdd406181ae04d880357be1950e661",
+      "expected": {
+        "sha256": "3a4c41faf2aac9fb2a753486572a29d16a4215ecf8b8ff69fa8b84d7ed4db78e"
+      }
+    },
+    {
+      "name": "custom, 18 weeks, manual",
+      "historyAndFrequencySha256": "43aed14db55316266fe933ae86e6f83b29cdd406181ae04d880357be1950e661",
+      "expected": {
+        "sha256": "5babd855738f1c2ea764ef2e046477e415cb4b45f708440fc91ebb20e8b1d29e"
+      }
+    },
+    {
+      "name": "custom, 26 weeks, benchmark",
+      "historyAndFrequencySha256": "4b953368089a79036eec30cdb7198f54a7e190e75d77fdcff38125d9ccfd1a5a",
+      "expected": {
+        "sha256": "6733904a6ac205d93194d943cb5d8edb43fae4e2c181fdf09d43d759e13dbb58"
+      }
+    },
+    {
+      "name": "custom, 26 weeks, manual",
+      "historyAndFrequencySha256": "4b953368089a79036eec30cdb7198f54a7e190e75d77fdcff38125d9ccfd1a5a",
+      "expected": {
+        "sha256": "bde81a187a07a7deb5674584dd3870d56d4bfadaeb705060a6db841cce9fc666"
+      }
+    }
+  ]
+}

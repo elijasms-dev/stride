@@ -107,20 +107,20 @@ for (let weekday = 0; weekday < 7; weekday++) {
 }
 
 test('native/custom short-road taper lengths and longer event models retain their current factors', () => {
-  for (const { event, length } of [
-    { event: { goal: '5k' }, length: 14 },
-    { event: { goal: '10k' }, length: 14 },
+  for (const { event, length, factors = [0.65, 0.4] } of [
+    { event: { goal: '5k' }, length: 7, factors: [1, 0.6] },
+    { event: { goal: '10k' }, length: 7, factors: [1, 0.6] },
     { event: { goal: 'custom', raceDistanceKm: 15 }, length: 14 },
     { event: { goal: 'custom', raceDistanceKm: 16.09344 }, length: 21 },
-    { event: { goal: 'half' }, length: 21 },
+    { event: { goal: 'half' }, length: 14, factors: [0.8, 0.5] },
     { event: { goal: 'custom', raceDistanceKm: 35 }, length: 21 },
     { event: { goal: 'ultra', raceDistanceKm: 50 }, length: 21 },
   ]) {
     const p = input(event);
     assert.equal(taperFactor(p, addDays(p.raceDate, -length - 1)), 1);
     assert.ok(taperFactor(p, addDays(p.raceDate, -length)) < 1);
-    assert.equal(taperFactor(p, addDays(p.raceDate, -14)), 0.65);
-    assert.equal(taperFactor(p, addDays(p.raceDate, -7)), 0.4);
+    assert.equal(taperFactor(p, addDays(p.raceDate, -14)), factors[0]);
+    assert.equal(taperFactor(p, addDays(p.raceDate, -7)), factors[1]);
   }
 });
 
@@ -300,7 +300,7 @@ test('a boundary-week double splits its existing daily budget without adding tra
         w.steps.reduce((n, s) => n + s.seconds, 0) === w.minutes * 60,
     ),
   );
-  const during = raw.map((w) => ({ ...w, date: '2027-01-12' }));
+  const during = raw.map((w) => ({ ...w, date: '2027-01-19' }));
   const single = applyAdvancedMethod(
     during,
     p,

@@ -1,3 +1,4 @@
+import { roadOpeningFailures } from './road-overhaul-helpers.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -89,7 +90,7 @@ for (const [goal, weeklyKm, longestKm, span, schedule] of [
     },
   ],
 ]) {
-  void test(`${JSON.stringify(goal)}: the ordinary opening week uses the entered weekly and long-run distances`, () => {
+  void test(`${JSON.stringify(goal)}: the ordinary opening preserves history and long-run distance with any role adjustment disclosed`, () => {
     const input = profile({
       goal,
       weeklyKm,
@@ -106,7 +107,7 @@ for (const [goal, weeklyKm, longestKm, span, schedule] of [
     );
     assert.equal(plan.profile.weeklyKm, weeklyKm);
     assert.equal(plan.profile.longestKm, longestKm);
-    assert.equal(plan.weeks[0].targetKm, weeklyKm);
+    assert.deepEqual(roadOpeningFailures(plan, input), []);
     assert.equal(long(plan, 0)?.estimatedKm, longestKm);
     assert.equal(prescribedDistanceKm(long(plan, 0)), longestKm);
     assert.ok(plan.weeks[0].trainingMinutes <= weeklyKm * input.easyPace);

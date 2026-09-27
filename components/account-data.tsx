@@ -125,9 +125,12 @@ export default function AccountData({
             <details className="reason-details">
               <summary>Revision history</summary>
               <p>
-                Older plan snapshots download in pages of up to 20, with a size
-                limit for large journals. The recovery copy contains your
-                current running journal; these separate pages are for audit.
+                The latest 50 plan snapshots are retained for undo and review.
+                Older snapshots are removed after a successful save; recorded
+                runs remain in your current journal and recovery copy. Snapshots
+                download in pages of up to 20, with a size limit for large
+                journals. The recovery copy contains your current running
+                journal; these separate pages are for audit.
               </p>
               <BusyButton
                 busy={busy}

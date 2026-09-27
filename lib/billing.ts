@@ -1,4 +1,4 @@
-/** Server-side sandbox adapter. No live billing or public webhook route is enabled. */
+/** Server-side sandbox adapter. Live keys and events remain disabled. */
 import Stripe from 'stripe';
 export type BillingConfig = {
   secretKey: string;
@@ -19,6 +19,7 @@ export type SubscriptionSnapshot = {
   periodEnd: number;
   cancelAtPeriodEnd: boolean;
   livemode: boolean;
+  trialEnd?: number | null;
 };
 export type BillingRecord = {
   subscriptionId: string;
@@ -69,6 +70,7 @@ export function createSandboxBilling(
       new Stripe(config.secretKey, {
         httpClient: Stripe.createFetchHttpClient(),
         maxNetworkRetries: 0,
+        timeout: 10000,
       });
   function binding(value: BillingBinding) {
     if (
@@ -78,6 +80,39 @@ export function createSandboxBilling(
       !/^cus_[A-Za-z0-9]+$/.test(value.customerId)
     )
       throw new Error('A server-owned account/customer binding is required.');
+  }
+  function subscriptionSnapshot(
+    sub: Stripe.Subscription,
+    account: BillingBinding,
+  ): SubscriptionSnapshot {
+    const customer =
+      typeof sub.customer === 'string' ? sub.customer : sub.customer.id;
+    if (
+      sub.livemode ||
+      sub.id !== account.subscriptionId ||
+      customer !== account.customerId ||
+      sub.metadata.stride_account !== account.accountId ||
+      sub.metadata.stride_epoch !== String(account.epoch)
+    )
+      throw new Error(
+        'This subscription does not belong to the active sandbox account.',
+      );
+    const items = sub.items.data.filter(
+      (item) => item.price.id === config.priceId,
+    );
+    if (items.length !== 1)
+      throw new Error(
+        'This subscription does not include exactly one configured Stride Price.',
+      );
+    return {
+      id: sub.id,
+      customerId: customer,
+      status: sub.status,
+      periodEnd: items[0].current_period_end,
+      cancelAtPeriodEnd: sub.cancel_at_period_end,
+      livemode: sub.livemode,
+      trialEnd: sub.trial_end ?? null,
+    };
   }
   return {
     async createCustomer(accountId: string, epoch: number) {
@@ -131,33 +166,38 @@ export function createSandboxBilling(
       binding(account);
       if (!account.subscriptionId)
         throw new Error('No server-recorded subscription exists.');
-      const sub = await stripe.subscriptions.retrieve(account.subscriptionId);
-      const customer =
-        typeof sub.customer === 'string' ? sub.customer : sub.customer.id;
+      return subscriptionSnapshot(
+        await stripe.subscriptions.retrieve(account.subscriptionId),
+        account,
+      );
+    },
+    /** Establish ownership from fresh provider state, never from user redirect parameters
+     * or a delayed webhook's embedded entitlement status. */
+    async discoverSubscription(subscriptionId: string) {
+      if (!/^sub_[A-Za-z0-9]+$/.test(subscriptionId))
+        throw new Error('Invalid sandbox subscription.');
+      const sub = await stripe.subscriptions.retrieve(subscriptionId);
+      const account: BillingBinding = {
+        accountId: sub.metadata.stride_account,
+        epoch: Number(sub.metadata.stride_epoch),
+        customerId:
+          typeof sub.customer === 'string' ? sub.customer : sub.customer.id,
+        subscriptionId: sub.id,
+      };
+      if (!/^\d+$/.test(sub.metadata.stride_epoch ?? ''))
+        throw new Error('No sandbox account epoch.');
+      binding(account);
+      const customer = await stripe.customers.retrieve(account.customerId);
       if (
-        sub.livemode ||
-        customer !== account.customerId ||
-        sub.metadata.stride_account !== account.accountId ||
-        sub.metadata.stride_epoch !== String(account.epoch)
+        customer.deleted ||
+        customer.livemode ||
+        customer.metadata.stride_account !== account.accountId ||
+        customer.metadata.stride_epoch !== String(account.epoch)
       )
         throw new Error(
-          'This subscription does not belong to the active sandbox account.',
+          'Customer ownership does not match the sandbox account.',
         );
-      const items = sub.items.data.filter(
-        (item) => item.price.id === config.priceId,
-      );
-      if (items.length !== 1)
-        throw new Error(
-          'This subscription does not include exactly one configured Stride Price.',
-        );
-      return {
-        id: sub.id,
-        customerId: customer,
-        status: sub.status,
-        periodEnd: items[0].current_period_end,
-        cancelAtPeriodEnd: sub.cancel_at_period_end,
-        livemode: sub.livemode,
-      };
+      return { account, snapshot: subscriptionSnapshot(sub, account) };
     },
     async verifyWebhook(rawBody: string, signature: string) {
       if (!config.webhookSecret)
@@ -176,7 +216,7 @@ export function createSandboxBilling(
     },
   };
 }
-/** Call only inside serialized per-subscription processing with a durable event inbox and CAS. Event creation time is not delivery order; refresh Stripe after acquiring the lease. No live consumer exists yet. */
+/** Call only inside serialized per-subscription processing with a durable event inbox and CAS. Event creation time is not delivery order; refresh Stripe after acquiring the lease. The durable sandbox inbox implements that contract; no live consumer is enabled. */
 export function applyBillingSnapshot(
   current: BillingRecord | null,
   account: BillingBinding,

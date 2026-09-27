@@ -1,3 +1,4 @@
+import { roadOpeningFailures } from './road-overhaul-helpers.mjs';
 import { assertMarathonWeek } from './marathon-contract.mjs';
 // Source-executing regression candidate. Synthetic runners only; no API, account,
 // browser, or provider writes. Portable unchanged from work/ to stride/tests/.
@@ -137,12 +138,14 @@ void test('three-day 10K opening has a purposeful quality session and no easy ou
   const p = make({
     goal: '10k',
     raceDate: addDays(start, 83),
-    weeklyKm: 30,
+    weeklyKm: 26,
     longestKm: 10,
     currentRuns: 3,
     runsPerWeek: 3,
     recentQualitySessions: 1,
     recentQualityMinutes: 20,
+    qualityMode: 'custom',
+    qualitySessions: 1,
     weekdayMinutes: 65,
     longMinutes: 100,
     easyPace: 6,
@@ -162,9 +165,12 @@ void test('three-day 10K opening has a purposeful quality session and no easy ou
       .filter((w) => !w.hard && w.kind !== 'long')
       .every((w) => w.minutes <= long.minutes),
   );
+  assert.deepEqual(roadOpeningFailures(p), []);
+  assert.ok(sum(opening) <= 156 + 1 / 60);
   assert.ok(
-    sum(opening) >= 170,
-    'Purposeful preparation preserves a useful familiar opening workload',
+    opening
+      .filter((w) => w.kind === 'easy')
+      .every((w) => w.estimatedKm <= 8.001),
   );
 });
 
@@ -480,7 +486,7 @@ void test('seven available days preserve requested two-through-seven running fre
     const p = make({
       goal: '10k',
       raceDate: addDays(start, 83),
-      weeklyKm: n === 2 ? 30 : 45,
+      weeklyKm: n === 2 ? 24 : n === 3 ? 36 : n === 4 ? 40 : 45,
       longestKm: 12,
       currentRuns: n,
       runsPerWeek: n,
@@ -493,8 +499,10 @@ void test('seven available days preserve requested two-through-seven running fre
     executable(p);
     assert.equal(p.profile.availableDays.length, 7);
     assert.equal(p.profile.days.length, n);
-    const expected = n === 2 ? 0 : 1;
-    for (const week of development(p)) {
+    const expected = n <= 3 ? 0 : 1;
+    for (const week of development(p).filter(
+      (week) => taperFactor(p.profile, addDays(week.start, 6)) === 1,
+    )) {
       assert.equal(runs(p, week.index).length, n);
       assert.equal(runs(p, week.index).filter((w) => w.hard).length, expected);
       assert.equal(

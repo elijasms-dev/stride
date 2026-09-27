@@ -1,0 +1,290 @@
+{
+  "beforeLargest": {
+    "file": "_next/static/chunks/stride-app-CrVT93He.js",
+    "bytes": 774495,
+    "gzipBytes": 237952
+  },
+  "afterLargest": {
+    "file": "_next/static/chunks/stride-ui-DW7tvWVw.js",
+    "bytes": 388713,
+    "gzipBytes": 123431
+  },
+  "afterChunks": [
+    {
+      "file": "_next/static/chunks/stride-ui-DW7tvWVw.js",
+      "bytes": 388713,
+      "gzipBytes": 123431
+    },
+    {
+      "file": "_next/static/chunks/framework-D_rUT4EX.js",
+      "bytes": 190152,
+      "gzipBytes": 58938
+    },
+    {
+      "file": "_next/static/chunks/index-LDGz_h3U.js",
+      "bytes": 188489,
+      "gzipBytes": 53228
+    },
+    {
+      "file": "_next/static/chunks/stride-app-CsAVOd1P.js",
+      "bytes": 164230,
+      "gzipBytes": 49060
+    },
+    {
+      "file": "_next/static/chunks/workout-detail-DJjJyJR9.js",
+      "bytes": 46080,
+      "gzipBytes": 16333
+    },
+    {
+      "file": "_next/static/chunks/training-controls-TkjSpN_F.js",
+      "bytes": 41187,
+      "gzipBytes": 12915
+    },
+    {
+      "file": "_next/static/chunks/dropdown-menu-DfuwVURf.js",
+      "bytes": 35544,
+      "gzipBytes": 11888
+    },
+    {
+      "file": "_next/static/chunks/connections-H41jR_Rv.js",
+      "bytes": 25317,
+      "gzipBytes": 8041
+    },
+    {
+      "file": "_next/static/chunks/race-picker-CzMVJYPS.js",
+      "bytes": 23698,
+      "gzipBytes": 6880
+    },
+    {
+      "file": "_next/static/chunks/tabs-D6L3sk0_.js",
+      "bytes": 21002,
+      "gzipBytes": 8318
+    },
+    {
+      "file": "_next/static/chunks/hybrid-client-route-owner-CwsRFaIX.js",
+      "bytes": 19519,
+      "gzipBytes": 6220
+    },
+    {
+      "file": "_next/static/chunks/onboarding-U1PMhuCh.js",
+      "bytes": 18966,
+      "gzipBytes": 6947
+    },
+    {
+      "file": "_next/static/chunks/link-xAjqld0S.js",
+      "bytes": 13735,
+      "gzipBytes": 5175
+    },
+    {
+      "file": "_next/static/chunks/app-elements-H_Dr48wG.js",
+      "bytes": 12828,
+      "gzipBytes": 4191
+    },
+    {
+      "file": "_next/static/chunks/week-rhythm-C3OkBCux.js",
+      "bytes": 7905,
+      "gzipBytes": 3246
+    },
+    {
+      "file": "_next/static/chunks/login-v5ho2w6P.js",
+      "bytes": 7582,
+      "gzipBytes": 3255
+    },
+    {
+      "file": "_next/static/chunks/account-data-CnEORC-g.js",
+      "bytes": 6866,
+      "gzipBytes": 2567
+    },
+    {
+      "file": "_next/static/chunks/event-change-Ba_wPWAx.js",
+      "bytes": 6836,
+      "gzipBytes": 2817
+    },
+    {
+      "file": "_next/static/chunks/workout-target-settings-CZbrcJeu.js",
+      "bytes": 6393,
+      "gzipBytes": 2696
+    },
+    {
+      "file": "_next/static/chunks/app-rsc-cache-busting-CQblSdon.js",
+      "bytes": 4962,
+      "gzipBytes": 2049
+    },
+    {
+      "file": "_next/static/chunks/navigation-errors-D5LMQqDL.js",
+      "bytes": 4040,
+      "gzipBytes": 1618
+    },
+    {
+      "file": "_next/static/chunks/training-review-DaFwkCm3.js",
+      "bytes": 3966,
+      "gzipBytes": 1750
+    },
+    {
+      "file": "_next/static/chunks/plan-adjustments-DCFEIzHt.js",
+      "bytes": 3964,
+      "gzipBytes": 1750
+    },
+    {
+      "file": "_next/static/chunks/CompositeRoot-DDePRk4r.js",
+      "bytes": 3866,
+      "gzipBytes": 1755
+    },
+    {
+      "file": "_next/static/chunks/plan-guidance-_8BjeMtT.js",
+      "bytes": 3856,
+      "gzipBytes": 1691
+    },
+    {
+      "file": "_next/static/chunks/run-measure-settings-D1Tecgz4.js",
+      "bytes": 3419,
+      "gzipBytes": 1580
+    },
+    {
+      "file": "_next/static/chunks/headers-C_MtfdF4.js",
+      "bytes": 3286,
+      "gzipBytes": 1283
+    },
+    {
+      "file": "_next/static/chunks/garmin-handoff-DqWKP1kr.js",
+      "bytes": 2765,
+      "gzipBytes": 1339
+    },
+    {
+      "file": "_next/static/chunks/daily-guide-BkWd5Fsn.js",
+      "bytes": 2519,
+      "gzipBytes": 1085
+    },
+    {
+      "file": "_next/static/chunks/CompositeItem-BHoo73dV.js",
+      "bytes": 1997,
+      "gzipBytes": 962
+    },
+    {
+      "file": "_next/static/chunks/day-detail-Cg5gsx24.js",
+      "bytes": 1743,
+      "gzipBytes": 798
+    },
+    {
+      "file": "_next/static/chunks/check-D_YQJCfa.js",
+      "bytes": 1493,
+      "gzipBytes": 856
+    },
+    {
+      "file": "_next/static/chunks/app-route-prefetch-policy-DyHipSZK.js",
+      "bytes": 1104,
+      "gzipBytes": 561
+    },
+    {
+      "file": "_next/static/chunks/action-progress-C-Hzuubh.js",
+      "bytes": 1029,
+      "gzipBytes": 555
+    },
+    {
+      "file": "_next/static/chunks/query-QnVafXuX.js",
+      "bytes": 984,
+      "gzipBytes": 485
+    },
+    {
+      "file": "_next/static/chunks/streamed-icons-DmzwONPk.js",
+      "bytes": 772,
+      "gzipBytes": 490
+    },
+    {
+      "file": "_next/static/chunks/rolldown-runtime-C60lm6uB.js",
+      "bytes": 694,
+      "gzipBytes": 423
+    },
+    {
+      "file": "_next/static/chunks/app-rsc-render-mode-CvTCGruk.js",
+      "bytes": 668,
+      "gzipBytes": 348
+    },
+    {
+      "file": "_next/static/chunks/watch-C-JiFg5e.js",
+      "bytes": 621,
+      "gzipBytes": 353
+    },
+    {
+      "file": "_next/static/chunks/layout-segment-context-Da_rTk3p.js",
+      "bytes": 534,
+      "gzipBytes": 368
+    },
+    {
+      "file": "_next/static/chunks/run-feedback-validation-Dabc_P9T.js",
+      "bytes": 491,
+      "gzipBytes": 345
+    },
+    {
+      "file": "_next/static/chunks/calendar-days-B6hVGEul.js",
+      "bytes": 481,
+      "gzipBytes": 258
+    },
+    {
+      "file": "_next/static/chunks/sliders-horizontal-C4hrUXK4.js",
+      "bytes": 413,
+      "gzipBytes": 234
+    },
+    {
+      "file": "_next/static/chunks/protocol-headers-B9-bVeat.js",
+      "bytes": 327,
+      "gzipBytes": 179
+    },
+    {
+      "file": "_next/static/chunks/shield-check-BzYrCZQW.js",
+      "bytes": 309,
+      "gzipBytes": 241
+    },
+    {
+      "file": "_next/static/chunks/hash-Cp347hhd.js",
+      "bytes": 256,
+      "gzipBytes": 181
+    },
+    {
+      "file": "_next/static/chunks/arrow-up-right-BkoTVVtQ.js",
+      "bytes": 156,
+      "gzipBytes": 150
+    },
+    {
+      "file": "_next/static/chunks/arrow-left-DHrqM0m2.js",
+      "bytes": 154,
+      "gzipBytes": 154
+    },
+    {
+      "file": "_next/static/chunks/chevron-right-CPtRdED9.js",
+      "bytes": 119,
+      "gzipBytes": 130
+    },
+    {
+      "file": "_next/static/chunks/deployment-id-DFhHa9wO.js",
+      "bytes": 97,
+      "gzipBytes": 103
+    },
+    {
+      "file": "_next/static/chunks/profile-EjT8E7lo.js",
+      "bytes": 87,
+      "gzipBytes": 97
+    },
+    {
+      "file": "_next/static/chunks/record-uXSNv6cl.js",
+      "bytes": 79,
+      "gzipBytes": 93
+    },
+    {
+      "file": "_next/static/chunks/plan-preferences-Cob1d6da.js",
+      "bytes": 74,
+      "gzipBytes": 89
+    },
+    {
+      "file": "_next/static/chunks/training-view-DZoU1m3R.js",
+      "bytes": 71,
+      "gzipBytes": 86
+    },
+    {
+      "file": "_next/static/chunks/extra-run-form-BCOodDzS.js",
+      "bytes": 71,
+      "gzipBytes": 86
+    }
+  ],
+  "note": "Production build chunk sizes; shared chunks also load with the app. This is not initial-transfer or field-performance measurement."
+}

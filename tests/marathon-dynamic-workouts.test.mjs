@@ -261,7 +261,11 @@ for (const mode of ['effort', 'pace', 'heart-rate'])
         const step = run.steps.find(
           (s) => s.kind === 'work' && s.seconds >= 120,
         );
-        assert.deepEqual(step.target, { mode, ...ranges[band] });
+        assert.deepEqual(step.target, {
+          mode,
+          ...ranges[band],
+          source: 'manual',
+        });
         const decoded = new Decoder(
           Stream.fromByteArray(encodeWorkout(run, p.profile)),
         ).read();

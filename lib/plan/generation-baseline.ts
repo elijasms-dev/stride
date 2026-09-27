@@ -1,12 +1,17 @@
 import { schedulingEasyPace } from '../fitness-pacing.ts';
+import {
+  isRoadRaceProfile,
+  roadWorkoutMinutesCap,
+  roadTrainingPolicy,
+} from '../road-training-policy.ts';
 import { usesMarathonBook } from '../marathon-book.ts';
-import { distanceEstimate } from '../prescription.ts';
+import { distanceEstimate, executableDistanceRange } from '../prescription.ts';
 import { runningDayLimit } from '../runner-customization.ts';
 import { withSpecificWorkoutName } from '../workout-names.ts';
 import { longUltraOpeningBaselineMessage } from '../ultra-policy.ts';
 import { addDays, dayDiff, weekday } from './calendar.ts';
 import { PlanError } from './errors.ts';
-import { taperFactor } from './generation-calendar.ts';
+import { taperFactor, weekIncludesTaper } from './generation-calendar.ts';
 import {
   GENERATION_POLICY,
   SECONDS_PER_MINUTE,
@@ -16,6 +21,11 @@ import { ENVELOPE_TAPER_POLICY } from './policy-constants.ts';
 import { trainingFamily } from './profile.ts';
 import { refreshWeekTotals } from './totals.ts';
 import type { Plan, Workout } from './types.ts';
+import {
+  balanceReferenceLong,
+  easyLongRoleCapKm,
+  usesDistinctLongBalance,
+} from './session-balance.ts';
 
 const METRES_PER_KM = 1000;
 const DISTANCE_TOLERANCE_KM = 1 / METRES_PER_KM;
@@ -43,7 +53,7 @@ export function hasOpeningBaseline(plan: Plan, allowDeclared = false) {
     week.start === plan.profile.startDate &&
     addDays(week.start, 6) <= plan.profile.raceDate &&
     !['Recovery', 'Taper', 'Race week'].includes(week.phase) &&
-    taperFactor(plan.profile, addDays(week.start, 6)) >= 1 &&
+    !weekIncludesTaper(plan.profile, week.start) &&
     plan.profile.weeklyKm > 0 &&
     plan.workouts
       .filter((w) => w.week === week.index)
@@ -141,13 +151,41 @@ function fundingCandidates(runs: Workout[]) {
   ];
 }
 
-function fundingCapKm(plan: Plan, run: Workout) {
+function fundingCapKm(
+  plan: Plan,
+  run: Workout,
+  runs: Workout[],
+  balance = true,
+) {
+  const long =
+    runs.find((w) => w.kind === 'long') ??
+    (balance && usesDistinctLongBalance(plan)
+      ? balanceReferenceLong(plan, run.week)
+      : undefined);
+  const roleCap =
+    (isRoadRaceProfile(plan.profile) ||
+      (balance && usesDistinctLongBalance(plan))) &&
+    !run.hard
+      ? long && balance && usesDistinctLongBalance(plan)
+        ? easyLongRoleCapKm(plan.profile, run.date, long, run.role)
+        : (long?.estimatedKm ?? Infinity)
+      : Infinity;
   return run.hard && run.kind !== 'long'
     ? (plan.profile.qualityLimitKm ?? Infinity)
-    : (plan.profile.easyLimitKm ?? Infinity);
+    : Math.min(plan.profile.easyLimitKm ?? Infinity, roleCap);
+}
+
+function fundingPace(run: Workout, fallback: number) {
+  // A declared scheduling estimate may be slower than the benchmark's actual
+  // easy band. Once a continuous easy prescription has that band, fund its
+  // duration using the executable endpoint, not an incompatible estimate.
+  const target =
+    run.steps.length === 1 && !run.hard ? run.steps[0].target : undefined;
+  return target && target.mode === 'pace' ? target.high : fallback;
 }
 
 function fundedSeconds(run: Workout, metres: number, pace: number) {
+  pace = fundingPace(run, pace);
   return run.hard && run.kind !== 'long'
     ? Math.round(run.minutes * SECONDS_PER_MINUTE) +
         Math.round(
@@ -159,6 +197,7 @@ function fundedSeconds(run: Workout, metres: number, pace: number) {
 }
 
 function fundedMetres(run: Workout, seconds: number, pace: number) {
+  pace = fundingPace(run, pace);
   return run.hard
     ? Math.round(run.estimatedKm * METRES_PER_KM) +
         metresWithinSeconds(
@@ -170,7 +209,7 @@ function fundedMetres(run: Workout, seconds: number, pace: number) {
 
 /** Maximum easy-running funding with complete faster blocks and existing long
  * targets fixed. Temporary second budgets do not mutate the plan or workouts. */
-function maximumFundedWeekKm(plan: Plan, runs: Workout[]) {
+function maximumFundedWeekKm(plan: Plan, runs: Workout[], balance = true) {
   const p = plan.profile;
   const familiar = familiarDayLimits(plan);
   const pace = Math.max(
@@ -186,7 +225,10 @@ function maximumFundedWeekKm(plan: Plan, runs: Workout[]) {
       run,
       run.hard
         ? Math.round(run.estimatedKm * METRES_PER_KM)
-        : Math.ceil((minimumAdjustableSeconds(run) / pace) * METRES_PER_KM),
+        : Math.ceil(
+            (minimumAdjustableSeconds(run) / fundingPace(run, pace)) *
+              METRES_PER_KM,
+          ),
     ]),
   );
   const seconds = (run: Workout) =>
@@ -196,6 +238,7 @@ function maximumFundedWeekKm(plan: Plan, runs: Workout[]) {
   const available = (run: Workout) =>
     Math.min(
       p.weekdayMinutes * SECONDS_PER_MINUTE,
+      roadWorkoutMinutesCap(p, run) * SECONDS_PER_MINUTE,
       Math.min(
         runningDayLimit(p, weekday(run.date)) * SECONDS_PER_MINUTE,
         familiarDaySeconds(plan, run, familiar),
@@ -212,7 +255,7 @@ function maximumFundedWeekKm(plan: Plan, runs: Workout[]) {
     if (seconds(run) > available(run) + SECOND_TOLERANCE + NUMERIC_TOLERANCE)
       return -Infinity;
     const capacity = Math.min(
-      Math.floor(fundingCapKm(plan, run) * METRES_PER_KM),
+      Math.floor(fundingCapKm(plan, run, runs, balance) * METRES_PER_KM),
       fundedMetres(run, available(run), pace),
     );
     if (capacity < metres.get(run)!) return -Infinity;
@@ -230,12 +273,13 @@ function maximumFundedWeekKm(plan: Plan, runs: Workout[]) {
 
 /** Fund one existing week in metres and seconds. Only relaxed blocks absorb
  * the remainder; complete faster repetitions and long-run targets stay intact. */
-function fundWeek(
+export function fundWeek(
   plan: Plan,
   runs: Workout[],
   targetKm: number,
   failureMessage: string,
   openingLongKm?: number,
+  balance = true,
 ) {
   const p = plan.profile;
   const familiar = familiarDayLimits(plan);
@@ -251,6 +295,7 @@ function fundWeek(
   const limit = (w: Workout) =>
     Math.min(
       w.kind === 'long' ? p.longMinutes : p.weekdayMinutes,
+      roadWorkoutMinutesCap(p, w),
       Math.min(
         runningDayLimit(p, weekday(w.date)),
         familiarDaySeconds(plan, w, familiar) / SECONDS_PER_MINUTE,
@@ -269,9 +314,21 @@ function fundWeek(
             ? TRAINING_POLICY.family.marathon.longCeilingKm
             : Infinity,
         )
-      : fundingCapKm(plan, w);
+      : fundingCapKm(plan, w, runs, balance);
   const assign = (w: Workout, km: number) => {
     if (km > capKm(w) + NUMERIC_TOLERANCE) fail();
+    const executable = executableDistanceRange(w.steps);
+    if (
+      w.prescriptionVersion === 'pace-resolved-v1' &&
+      w.steps.some((s) => s.target?.mode === 'pace') &&
+      Math.abs(km - w.estimatedKm) < NUMERIC_TOLERANCE &&
+      executable &&
+      km >= executable.lowerKm - DISTANCE_TOLERANCE_KM &&
+      km <= executable.upperKm + DISTANCE_TOLERANCE_KM &&
+      w.minutes * SECONDS_PER_MINUTE <= limit(w) + SECOND_TOLERANCE &&
+      w.minutes * SECONDS_PER_MINUTE >= MINIMUM_SESSION_SECONDS
+    )
+      return;
     const seconds = fundedSeconds(w, Math.round(km * METRES_PER_KM), pace);
     if (
       seconds > limit(w) + SECOND_TOLERANCE + NUMERIC_TOLERANCE ||
@@ -337,7 +394,7 @@ function fundWeek(
     )
       Object.assign(w.steps[0], {
         metres: Math.round(km * METRES_PER_KM),
-        planningPaceSecondsPerKm: pace,
+        planningPaceSecondsPerKm: fundingPace(w, pace),
       });
     w.minutes = seconds / SECONDS_PER_MINUTE;
     w.estimatedKm = km;
@@ -353,19 +410,105 @@ function fundWeek(
   // Remove unused display-rounding allowances before allocating the remainder.
   const candidates = fundingCandidates(runs);
   for (const w of candidates.filter((run) => !run.hard)) {
-    if (w.estimatedKm * pace >= MINIMUM_SESSION_SECONDS)
+    // Earlier display rounding can leave a five-minute outing at e.g. 0.8 km
+    // instead of its 0.834 km funding minimum. Restore that metre allowance
+    // before sharing a small remainder; otherwise adding distance can calculate
+    // fewer than five minutes and incorrectly reject an otherwise funded week.
+    if (
+      w.steps.length === 1 &&
+      w.steps[0].movement !== 'walk' &&
+      w.estimatedKm * fundingPace(w, pace) < MINIMUM_SESSION_SECONDS
+    )
+      assign(
+        w,
+        Math.ceil(
+          (MINIMUM_SESSION_SECONDS / fundingPace(w, pace)) * METRES_PER_KM,
+        ) / METRES_PER_KM,
+      );
+    if (w.estimatedKm * fundingPace(w, pace) >= MINIMUM_SESSION_SECONDS)
       assign(
         w,
         Math.min(
           w.estimatedKm,
           capKm(w),
-          metresWithinSeconds(limit(w), pace) / METRES_PER_KM,
+          metresWithinSeconds(limit(w), fundingPace(w, pace)) / METRES_PER_KM,
         ),
       );
   }
   let remaining = Math.round(
     (targetKm - runs.reduce((n, w) => n + w.estimatedKm, 0)) * METRES_PER_KM,
   );
+  // Share a reduction across supporting runs. Taking the entire correction
+  // from the first outing makes it seesaw whenever the long run advances.
+  if (balance && usesDistinctLongBalance(plan) && remaining < 0) {
+    let active = candidates.filter((w) => !w.hard);
+    while (remaining < 0 && active.length) {
+      const room = (w: Workout) =>
+        Math.max(
+          0,
+          Math.round(w.estimatedKm * METRES_PER_KM) -
+            Math.ceil(
+              (minimumAdjustableSeconds(w) / fundingPace(w, pace)) *
+                METRES_PER_KM,
+            ),
+        );
+      const totalRoom = active.reduce((sum, w) => sum + room(w), 0);
+      if (!totalRoom) break;
+      const deficit = -remaining;
+      let removed = 0;
+      for (const w of active) {
+        const delta = Math.min(
+          -remaining,
+          room(w),
+          Math.ceil((deficit * room(w)) / totalRoom),
+        );
+        if (!delta) continue;
+        assign(
+          w,
+          (Math.round(w.estimatedKm * METRES_PER_KM) - delta) / METRES_PER_KM,
+        );
+        remaining += delta;
+        removed += delta;
+      }
+      if (!removed) break;
+      active = active.filter((w) => room(w) > 0);
+    }
+  }
+  // Road recipes can leave different amounts of easy distance to fund. Share
+  // that remainder among eligible easy outings instead of dumping it into the
+  // first recovery slot. Fixed long runs and complete quality sets stay intact.
+  if (isRoadRaceProfile(p) && remaining > 0) {
+    let active = candidates.filter((w) => !w.hard);
+    while (remaining > 0 && active.length) {
+      const share = Math.ceil(remaining / active.length);
+      let added = 0;
+      for (const w of active) {
+        const current = Math.round(w.estimatedKm * METRES_PER_KM);
+        const capacity = Math.min(
+          Math.floor(capKm(w) * METRES_PER_KM),
+          fundedMetres(w, limit(w), pace),
+        );
+        const delta = Math.max(
+          0,
+          Math.min(share, remaining, capacity - current),
+        );
+        if (delta) {
+          assign(w, (current + delta) / METRES_PER_KM);
+          remaining -= delta;
+          added += delta;
+        }
+      }
+      if (!added) break;
+      active = active.filter(
+        (w) =>
+          Math.round(w.estimatedKm * METRES_PER_KM) <
+          Math.min(
+            Math.floor(capKm(w) * METRES_PER_KM),
+            fundedMetres(w, limit(w), pace),
+          ),
+      );
+    }
+  }
   for (const w of candidates) {
     if (!remaining) break;
     if (w.hard && remaining < 0) continue;
@@ -379,7 +522,10 @@ function fundWeek(
         ? Math.min(current + remaining, capacityMetres)
         : Math.max(
             current + remaining,
-            Math.ceil((minimumAdjustableSeconds(w) / pace) * METRES_PER_KM),
+            Math.ceil(
+              (minimumAdjustableSeconds(w) / fundingPace(w, pace)) *
+                METRES_PER_KM,
+            ),
           );
     if (target === current) continue;
     assign(w, target / METRES_PER_KM);
@@ -394,24 +540,118 @@ function fundWeek(
 
 /** Finish the opening allocation after recipes and distance formatting. Conflicting
  * ceilings are explicit errors instead of a different starting weekly or long distance. */
+export function openingBaselineTargetKm(plan: Plan) {
+  const declared = plan.profile.weeklyKm;
+  if (!usesDistinctLongBalance(plan)) return declared;
+  const opening = plan.workouts.filter(
+    (w) => w.week === plan.weeks[0]?.index && w.kind !== 'race',
+  );
+  // A role correction is not permission to hide an unrelated time/cap conflict.
+  if (
+    maximumFundedWeekKm(plan, opening, false) + DISTANCE_TOLERANCE_KM <
+    declared
+  )
+    return declared;
+  const capacities = plan.weeks
+    .filter(
+      (week) =>
+        week.start >= plan.profile.startDate &&
+        addDays(week.start, 6) <= plan.profile.raceDate &&
+        !['Recovery', 'Taper', 'Race week'].includes(week.phase) &&
+        !weekIncludesTaper(plan.profile, week.start),
+    )
+    .map((week) =>
+      maximumFundedWeekKm(
+        plan,
+        plan.workouts.filter(
+          (w) =>
+            w.week === week.index &&
+            w.kind !== 'race' &&
+            w.status !== 'skipped',
+        ),
+      ),
+    );
+  const capacity = Math.min(declared, ...capacities);
+  return Number.isFinite(capacity) && capacity > 0
+    ? Math.floor((capacity + NUMERIC_TOLERANCE) * METRES_PER_KM) / METRES_PER_KM
+    : declared;
+}
+
 export function reconcileOpeningBaseline(plan: Plan, allowDeclared = false) {
   if (!hasOpeningBaseline(plan, allowDeclared)) return;
   const runs = plan.workouts.filter(
     (w) => w.week === plan.weeks[0].index && w.kind !== 'race',
   );
+  const target = openingBaselineTargetKm(plan);
   fundWeek(
     plan,
     runs,
-    plan.profile.weeklyKm,
-    OPENING_CAPACITY_ERROR,
+    target,
+    OPENING_CAPACITY_ERROR +
+      (isRoadRaceProfile(plan.profile)
+        ? ' Easy runs cannot exceed the long run, and quality sessions need bounded warm-up and cooldown time. Review the weekly and longest-run inputs, choose more running days if familiar, or fewer workouts.'
+        : ''),
     plan.profile.longestKm,
   );
+  if (usesDistinctLongBalance(plan)) plan.openingWeekKm = target;
+  const prefix = 'Opening-week balance ·';
+  plan.notes = plan.notes.filter((note) => !note.startsWith(prefix));
+  if (target + DISTANCE_TOLERANCE_KM < plan.profile.weeklyKm) {
+    const note = `${prefix} You reported ${plan.profile.weeklyKm} km/week and a long run of ${plan.profile.longestKm} km. This plan starts at ${Number(target.toFixed(2))} km, keeping that familiar long run and shorter supporting runs. Your recorded baseline stays unchanged; unused mileage is not forced into easy runs or extra workouts.`;
+    plan.notes.unshift(note);
+  }
   const conflict = longUltraOpeningBaselineMessage(
     plan.profile,
     runs.reduce((sum, run) => sum + run.minutes, 0),
     runs.find((run) => run.kind === 'long')?.minutes ?? 0,
   );
   if (conflict) throw new PlanError(conflict);
+  refreshWeekTotals(plan);
+}
+
+/** Reapply easy roles after recovery/taper envelopes shorten the long run.
+ * Saved history, manual edits and retained timed pace reviews are not resized. */
+export function reconcileEasyLongBalance(
+  plan: Plan,
+  from: string,
+  protectedIds: readonly string[] = [],
+) {
+  if (!usesDistinctLongBalance(plan) || plan.returnState) return;
+  for (const week of plan.weeks) {
+    const runs = plan.workouts.filter(
+      (w) => w.week === week.index && w.status !== 'skipped',
+    );
+    const long = balanceReferenceLong(plan, week.index);
+    if (
+      !long ||
+      long.returnRole ||
+      long.distanceRevision === 'pace-edited-time' ||
+      (long.changed && long.changeSource !== 'preferences')
+    )
+      continue;
+    for (const run of runs) {
+      if (
+        run.kind !== 'easy' ||
+        run.hard ||
+        run.pairId ||
+        run.status !== 'planned' ||
+        run.date < from ||
+        run.returnRole ||
+        protectedIds.includes(run.id) ||
+        run.distanceRevision === 'pace-edited-time' ||
+        (run.changed && run.changeSource !== 'preferences')
+      )
+        continue;
+      const cap = easyLongRoleCapKm(plan.profile, run.date, long, run.role);
+      if (run.estimatedKm <= cap + NUMERIC_TOLERANCE) continue;
+      fundWeek(
+        plan,
+        [run, long],
+        cap + long.estimatedKm,
+        'The easy-run role cannot fit the minimum session duration. Review the long-run distance and available time.',
+      );
+    }
+  }
   refreshWeekTotals(plan);
 }
 
@@ -445,7 +685,7 @@ export function reconcileOrdinaryWeeklyProgression(
         week.start < plan.profile.startDate ||
         addDays(week.start, 6) > plan.profile.raceDate ||
         ['Recovery', 'Taper', 'Race week'].includes(week.phase) ||
-        taperFactor(plan.profile, addDays(week.start, 6)) < 1
+        weekIncludesTaper(plan.profile, week.start)
       )
         return [];
       const runs = plan.workouts.filter(
@@ -468,7 +708,22 @@ export function reconcileOrdinaryWeeklyProgression(
       ];
     });
   if (!ordinary.length) return;
-  const openingKm = ordinary[0].originalKm;
+  // A partial entry week has no exact full-week anchor. Do not freeze the first
+  // complete week's incidental recipe allocation above the declared baseline.
+  const openingKm = Math.min(
+    ordinary[0].week.start === plan.profile.startDate
+      ? ordinary[0].originalKm
+      : Math.min(ordinary[0].originalKm, plan.profile.weeklyKm),
+    usesDistinctLongBalance(plan)
+      ? Math.min(
+          ...ordinary.map((record) =>
+            Number.isFinite(record.capacityKm)
+              ? record.capacityKm
+              : ordinary[0].originalKm,
+          ),
+        )
+      : Infinity,
+  );
   const failMessage = (index: number, targetKm: number) =>
     `Week ${index + 1} cannot maintain ${Number(targetKm.toFixed(3))} km within the selected running days, session limits and weekly time ceiling. Review these limits together.`;
   let futureCapacity = Infinity;
@@ -484,11 +739,43 @@ export function reconcileOrdinaryWeeklyProgression(
   let previousOrdinaryKm = openingKm;
   let changed = false;
   for (const record of ordinary) {
-    const targetKm =
+    let targetKm =
       plan.profile.volume === 'maintain'
         ? openingKm
         : Math.max(previousOrdinaryKm, record.targetKm);
-    if (Math.abs(record.originalKm - targetKm) > DISTANCE_TOLERANCE_KM) {
+    if (
+      usesDistinctLongBalance(plan) &&
+      isRoadRaceProfile(plan.profile) &&
+      record !== ordinary[0]
+    ) {
+      const policy = roadTrainingPolicy(plan.profile);
+      // Growth is measured from the actual balanced week, not mileage we
+      // deliberately left unallocated. A 1 km long-run step is not a licence
+      // to add another kilometre to every supporting outing at the same time.
+      targetKm = Math.min(
+        targetKm,
+        previousOrdinaryKm +
+          Math.min(
+            policy.weeklyStep,
+            previousOrdinaryKm * policy.growthFraction,
+          ),
+      );
+      targetKm =
+        Math.floor((targetKm + NUMERIC_TOLERANCE) * METRES_PER_KM) /
+        METRES_PER_KM;
+    }
+    if (
+      Math.abs(record.originalKm - targetKm) >
+        (isRoadRaceProfile(plan.profile) ? 0.00001 : DISTANCE_TOLERANCE_KM) ||
+      (isRoadRaceProfile(plan.profile) &&
+        record.runs.some(
+          (run) =>
+            run.kind === 'easy' &&
+            !run.hard &&
+            run.estimatedKm >
+              fundingCapKm(plan, run, record.runs) + NUMERIC_TOLERANCE,
+        ))
+    ) {
       fundWeek(
         plan,
         record.runs,

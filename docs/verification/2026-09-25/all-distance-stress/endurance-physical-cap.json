@@ -1,0 +1,143 @@
+{
+  "summary": {
+    "generatedAt": "2026-09-25T09:04:02.111Z",
+    "libSourceSha256": "4ad75397d37495b505943ac105a7cbaa3369af7963899b68e821e8383683da0d",
+    "libSourceSha256Before": "4ad75397d37495b505943ac105a7cbaa3369af7963899b68e821e8383683da0d",
+    "sourceStable": true,
+    "cases": 1,
+    "passed": 0,
+    "expectedRejections": 1,
+    "failedAccepted": 0,
+    "unexpectedRejections": 0,
+    "normalizationProbes": 0,
+    "generatedWeeks": 0,
+    "byGoal": {
+      "marathon": {
+        "passed": 0,
+        "failed": 0,
+        "expected-rejection": 1,
+        "unexpected-rejection": 0
+      },
+      "base": {
+        "passed": 0,
+        "failed": 0,
+        "expected-rejection": 0,
+        "unexpected-rejection": 0
+      },
+      "custom": {
+        "passed": 0,
+        "failed": 0,
+        "expected-rejection": 0,
+        "unexpected-rejection": 0
+      },
+      "ultra": {
+        "passed": 0,
+        "failed": 0,
+        "expected-rejection": 0,
+        "unexpected-rejection": 0
+      }
+    }
+  },
+  "methodology": "Expected acceptance is declared before generation. Deliberate rejects have independent constraint proofs and matched error categories. Accepted plans are checked independently, then with validatePlan and JSON round-trip. Historical evidence remains in its original folders.",
+  "findings": {},
+  "unexpectedRejections": {},
+  "results": [
+    {
+      "id": "impossible-physical-time-cap",
+      "profile": {
+        "name": "Synthetic endurance stress",
+        "goal": "marathon",
+        "raceName": "Autumn 10K",
+        "startDate": "2026-09-28",
+        "raceDate": "2027-01-31",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 20,
+        "longMinutes": 30,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": 6.5,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "intent": "improve",
+        "qualityMode": "custom",
+        "qualitySessions": 0,
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 40,
+        "runMeasure": "distance",
+        "workoutFormat": "time",
+        "workoutVariety": "varied",
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 50,
+          "date": "2026-09-01",
+          "source": "race",
+          "course": "road"
+        },
+        "workoutTargets": {
+          "mode": "pace",
+          "bandsVersion": 2,
+          "raceScope": "marathon:",
+          "pace": {
+            "easy": {
+              "low": 366,
+              "high": 390
+            },
+            "steady": {
+              "low": 335,
+              "high": 359
+            },
+            "tempo": {
+              "low": 315,
+              "high": 340
+            },
+            "threshold": {
+              "low": 300,
+              "high": 324
+            },
+            "interval": {
+              "low": 276,
+              "high": 301
+            },
+            "repetition": {
+              "low": 257,
+              "high": 281
+            },
+            "race": {
+              "low": 312,
+              "high": 336
+            }
+          }
+        }
+      },
+      "expectation": "reject",
+      "proof": "Even five outings capped at 20/30 minutes cannot contain a 23 km long run at the explicit easy range.",
+      "errorPattern": "fit|time|long-run|capacity|limits",
+      "status": "expected-rejection",
+      "error": {
+        "name": "PlanError",
+        "message": "Your starting weekly distance and long-run baseline cannot fit the selected running days, session limits and weekly time ceiling. Review these inputs together."
+      }
+    }
+  ]
+}

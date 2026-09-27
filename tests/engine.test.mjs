@@ -26,10 +26,9 @@ void test('5K, 10K and base plans remain within time and scheduling constraints'
     const plan = makePlan({ ...p, goal }, date);
     assert.deepEqual(validatePlan(plan), []);
     for (const w of plan.workouts) {
-      assert.equal(
-        w.steps.reduce((n, s) => n + s.seconds, 0),
-        w.minutes * 60,
-      );
+      // Compare the canonical seconds-to-minutes conversion without a second
+      // floating-point multiplication (33.8 * 60 is not exactly 2028).
+      assert.equal(w.steps.reduce((n, s) => n + s.seconds, 0) / 60, w.minutes);
       assert.ok(
         w.kind === 'race' ||
           w.minutes <= (w.kind === 'long' ? p.longMinutes : p.weekdayMinutes),

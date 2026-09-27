@@ -1,3 +1,4 @@
+import { beginRequestObservation } from '@/lib/request-observation';
 import { guardAccount } from '@/lib/accounts';
 import {
   ownerId,
@@ -9,10 +10,11 @@ import {
   failure,
   HttpError,
 } from '@/lib/server';
-import { syncWorkout } from '@/lib/garmin';
+import { enqueueDelivery, runDeliveryJob } from '@/lib/delivery-jobs';
 import { todayInZone } from '@/lib/engine';
 import { shouldReconcile, type DeliveryReceipt } from '@/lib/delivery-policy';
 export async function POST(request: Request) {
+  const observation = beginRequestObservation(request);
   try {
     const owner = ownerId(request);
     guardWrite(request);
@@ -42,20 +44,29 @@ export async function POST(request: Request) {
     for (const row of candidates.slice(0, 2)) {
       attempted++;
       try {
-        const result = await syncWorkout(
+        const jobId = await enqueueDelivery(
           owner,
+          accountContext.epoch,
           row.workout_id,
           state.version,
-          false,
-          accountContext.epoch,
+          'send',
         );
-        if (['review', 'stale', 'failed'].includes(result.status))
+        const result = await runDeliveryJob(owner, accountContext.epoch, jobId);
+        if (['queued', 'review', 'stale', 'failed'].includes(result.status))
           failed.push({
             id: row.workout_id,
             message:
               'This provider entry needs review in Connections before watch use.',
           });
         else updated++;
+        if (result.status === 'queued' && result.retryAt) {
+          retryAfter = Math.max(
+            1,
+            Math.ceil((Date.parse(result.retryAt) - Date.now()) / 1000),
+          );
+          break;
+        }
+        if ([401, 403].includes(result.errorStatus ?? 0)) break;
       } catch (e) {
         failed.push({
           id: row.workout_id,
@@ -77,6 +88,6 @@ export async function POST(request: Request) {
     if (retryAfter) result.headers.set('Retry-After', String(retryAfter));
     return result;
   } catch (e) {
-    return failure(e);
+    return failure(e, observation);
   }
 }

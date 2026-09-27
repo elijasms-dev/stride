@@ -8,6 +8,9 @@ import {
 } from './server';
 import { readAccount } from './accounts';
 import { validDate } from './engine';
+import { activityTime } from './activity-time';
+import { impossibleRunningSummary } from './activity-plausibility';
+import { MAX_RECORDED_MINUTES } from './ultra-policy';
 export function normalizeActivity(input: unknown, athleteId: string) {
   if (!input || typeof input !== 'object' || Array.isArray(input)) return null;
   const a = input as Record<string, unknown>;
@@ -20,18 +23,33 @@ export function normalizeActivity(input: unknown, athleteId: string) {
     !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(local) ||
     !Number.isFinite(a.moving_time) ||
     Number(a.moving_time) <= 0 ||
+    Number(a.moving_time) / 60 > MAX_RECORDED_MINUTES ||
     (a.distance != null &&
-      (!Number.isFinite(a.distance) || Number(a.distance) < 0))
+      (!Number.isFinite(a.distance) ||
+        Number(a.distance) < 0 ||
+        Number(a.distance) > 250000)) ||
+    impossibleRunningSummary(
+      Number(a.moving_time) / 60,
+      a.distance == null ? null : Number(a.distance) / 1000,
+    )
   )
     return null;
+  let timing;
+  try {
+    timing = activityTime({
+      startLocal: local,
+      startUtc: typeof a.start_date === 'string' ? a.start_date : null,
+      timezone: typeof a.timezone === 'string' ? a.timezone : null,
+    });
+  } catch {
+    return null;
+  }
   return {
+    ...timing,
     id: `${athleteId}:${String(a.id)}`,
     providerId: String(a.id),
     name: (typeof a.name === 'string' ? a.name : 'Run').slice(0, 160),
     date: local.slice(0, 10),
-    startLocal: local,
-    startUtc: typeof a.start_date === 'string' ? a.start_date : null,
-    timezone: typeof a.timezone === 'string' ? a.timezone : null,
     pairedEventId:
       typeof a.paired_event_id === 'number' ||
       typeof a.paired_event_id === 'string'

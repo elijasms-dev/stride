@@ -1,7 +1,14 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Check } from 'lucide-react';
-import { addDays, dateLabel, type Plan, type Workout } from '@/lib/engine';
+import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { dateRailWindow, dateRailTarget } from '@/lib/date-rail-window';
+import {
+  addDays,
+  dateLabel,
+  validDate,
+  type Plan,
+  type Workout,
+} from '@/lib/engine';
 import {
   calendarSessions,
   orderedCalendarSessions,
@@ -39,6 +46,7 @@ export function DateRail({
   } | null>(null);
   const suppressClick = useRef(false);
   const centered = useRef(false);
+  const focusSelected = useRef(false);
   const [dragging, setDragging] = useState(false);
   const visibleSessions = useMemo(() => calendarSessions(plan), [plan]);
   const dates = useMemo(
@@ -55,6 +63,7 @@ export function DateRail({
       ].sort(),
     [plan.weeks, visibleSessions, today, selectedDate],
   );
+  const windowed = dateRailWindow(dates, selectedDate);
   const sessionsByDate = useMemo(() => {
     const map = new Map<string, Workout[]>();
     for (const workout of visibleSessions) {
@@ -97,6 +106,10 @@ export function DateRail({
           : 'instant',
     });
     centered.current = true;
+    if (focusSelected.current) {
+      selected.focus({ preventScroll: true });
+      focusSelected.current = false;
+    }
   }, [selectedDate, plan.id, motion]);
   return (
     <div className="date-rail-wrap">
@@ -104,13 +117,56 @@ export function DateRail({
         <span>
           {dateLabel(selectedDate, { month: 'long', year: 'numeric' })}
         </span>
-        <span className="date-rail-hint">Scroll through days</span>
+        <button
+          type="button"
+          className="text-button date-rail-skip"
+          onClick={() => {
+            const target = document.getElementById('selected-day-workout');
+            target?.focus({ preventScroll: true });
+            target?.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+          }}
+        >
+          Skip to workout
+        </button>
+      </div>
+      <div className="date-rail-controls">
+        <button
+          type="button"
+          className="icon-button"
+          aria-label="Previous seven days"
+          disabled={windowed.selectedIndex === 0}
+          onClick={() => onSelect(dateRailTarget(dates, selectedDate, -7))}
+        >
+          <ChevronLeft size={20} aria-hidden="true" />
+        </button>
+        <label className="date-rail-picker">
+          <span className="sr-only">Choose any date</span>
+          <input
+            type="date"
+            value={selectedDate}
+            min={dates[0]}
+            max={dates.at(-1)}
+            onChange={(event) => {
+              if (validDate(event.currentTarget.value))
+                onSelect(event.currentTarget.value);
+            }}
+          />
+        </label>
+        <button
+          type="button"
+          className="icon-button"
+          aria-label="Next seven days"
+          disabled={windowed.selectedIndex === dates.length - 1}
+          onClick={() => onSelect(dateRailTarget(dates, selectedDate, 7))}
+        >
+          <ChevronRight size={20} aria-hidden="true" />
+        </button>
       </div>
       <fieldset
         ref={rail}
         id="weekly-sessions"
         className="day-strip date-rail"
-        aria-label="Choose a day. Scroll to browse your plan."
+        aria-label="Choose a day. Use arrow keys to move through dates, or choose any date above."
         data-dragging={dragging || undefined}
         onScroll={cancelHold}
         onPointerDown={(event) => {
@@ -194,7 +250,8 @@ export function DateRail({
           }
         }}
       >
-        {dates.map((date, index) => {
+        {windowed.dates.map((date, visibleIndex) => {
+          const index = windowed.start + visibleIndex;
           const sessions = orderedCalendarSessions(
             sessionsByDate.get(date) ?? [],
             date,
@@ -229,12 +286,12 @@ export function DateRail({
                 cancelHold();
                 suppressClick.current = false;
                 const next = Math.max(0, Math.min(dates.length - 1, target));
+                focusSelected.current = true;
                 onSelect(dates[next]);
-                rail.current
-                  ?.querySelector<HTMLButtonElement>(
-                    `[data-date="${dates[next]}"]`,
-                  )
-                  ?.focus({ preventScroll: true });
+                if (dates[next] === selectedDate) {
+                  event.currentTarget.focus();
+                  focusSelected.current = false;
+                }
               }}
             >
               <span>{dateLabel(date, { weekday: 'short' })}</span>

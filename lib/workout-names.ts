@@ -152,9 +152,9 @@ function labelFor(workout: Workout, work: Step[]) {
       ? 'marathon effort'
       : /half/.test(id)
         ? 'half-marathon effort'
-        : /race-rhythm-10/.test(id)
+        : /race-rhythm-10|^road-10k-/.test(id)
           ? '10K effort'
-          : /race-rhythm-5/.test(id)
+          : /race-rhythm-5|^road-5k-/.test(id)
             ? '5K effort'
             : /ultra/.test(id)
               ? 'ultra steady'

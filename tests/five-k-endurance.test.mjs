@@ -51,7 +51,7 @@ test('established 5K runners retain familiar endurance within their existing wee
   assert.match(longs(plan)[0].title, /^16 km/);
   assert.match(longs(plan)[0].purpose, /5K/);
   assert.match(longs(plan)[0].purpose, /without a fast finish/);
-  assert.ok(plan.notes.some((n) => n.startsWith('5K endurance keeps')));
+  assert.ok(plan.notes.some((n) => n.startsWith('5K preparation uses')));
   for (const week of plan.weeks) {
     const runs = running(plan, week.index);
     assert.ok(total(runs) <= profile.weeklyKm * profile.easyPace);
@@ -79,7 +79,14 @@ test('a declared familiar long distance is retained without extending it toward 
     [6.5, 16, 104],
     [5, 12, 60],
   ]) {
-    const plan = make({ easyPace, longestKm, runMeasure: 'time' });
+    // A smaller familiar long run needs a correspondingly fundable week;
+    // ordinary easy days must not secretly become the longest outing.
+    const plan = make({
+      weeklyKm: Math.min(60, longestKm * 4),
+      easyPace,
+      longestKm,
+      runMeasure: 'time',
+    });
     assert.equal(longs(plan)[0].estimatedKm, longestKm);
     assert.equal(longs(plan)[0].minutes, maximum);
     assert.ok(longs(plan).every((w) => w.minutes <= maximum));
@@ -139,7 +146,7 @@ test('availability changes preserve the declared long baseline without manufactu
 });
 
 test('a shorter baseline retains the ordinary progression ceiling rather than inheriting an advanced target', () => {
-  const plan = make({ longestKm: 8, volume: 'gradual' });
+  const plan = make({ weeklyKm: 32, longestKm: 8, volume: 'gradual' });
   assert.equal(longs(plan)[0].estimatedKm, 8);
   assert.ok(longs(plan).every((w) => w.estimatedKm <= 11));
   assert.ok(!plan.notes.some((n) => n.startsWith('5K endurance keeps')));
@@ -180,12 +187,18 @@ test('recovery, atypical race weekdays and partial starts retain lower allocatio
         assert.ok(w.minutes <= 88 * 0.8);
       const remaining =
         (Date.parse(plan.profile.raceDate) - Date.parse(w.date)) / 86400000;
-      if (remaining <= 14) assert.ok(w.minutes <= 60);
+      // The named 5K now tapers for seven days. Familiar endurance may remain
+      // intact before then; the race week contains no separate long run.
+      if (remaining > 7) assert.ok(w.minutes <= 88);
       assert.ok(remaining >= 8);
     }
   }
   const partial = make({ startDate: addDays(start, 3) });
-  assert.ok(longs(partial)[0].minutes < 88);
+  // Omitted earlier weekdays do not erase familiar long-run capacity. The
+  // remaining calendar budget can still fund that long with shorter support.
+  assert.ok(longs(partial)[0].minutes <= 88);
+  assert.ok(total(running(partial, 0)) < total(running(make(), 0)));
+  assert.ok(running(partial, 0).every(w => w.date >= partial.profile.startDate));
 });
 
 test('same-day and short blocks do not add endurance to compensate for missing preparation', () => {
@@ -193,7 +206,7 @@ test('same-day and short blocks do not add endurance to compensate for missing p
     const plan = make({ raceDate: addDays(start, days) });
     assert.deepEqual(validatePlan(plan), []);
     assert.ok(plan.workouts.every((w) => w.date <= plan.profile.raceDate));
-    assert.ok(longs(plan).every((w) => w.minutes <= 60));
+    assert.ok(longs(plan).every((w) => w.minutes <= 88));
   }
 });
 

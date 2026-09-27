@@ -9,6 +9,7 @@ import { allocateGenerationWeek } from './generation-allocation.ts';
 import { marathonPaceDose } from '../marathon-book.ts';
 
 import { isLongUltra } from '../ultra-policy.ts';
+import { roadQualitySessionCap } from '../road-training-policy.ts';
 import {
   usesMarathonRhythm,
   allocateRunningMinutes,
@@ -45,6 +46,7 @@ export function generatePlanWeeks(
 ) {
   const {
     p,
+    road,
     bookMarathon,
     start,
     count,
@@ -105,7 +107,8 @@ export function generatePlanWeeks(
             dayDiff(date, p.raceDate) >=
               SESSION_POLICY.qualityMinimumDaysBeforeRace)) &&
         weekQualityDays.includes(weekday(date)) &&
-        (usesMarathonRhythm(p) ||
+        (road ||
+          usesMarathonRhythm(p) ||
           phase !== 'Foundation' ||
           p.experience === 'established');
       const pairedQuality =
@@ -129,6 +132,7 @@ export function generatePlanWeeks(
         ? p.longMinutes
         : Math.min(
             p.weekdayMinutes,
+            road && isQuality ? roadQualitySessionCap(p) : Infinity,
             raceWeekSessionCap(p, date),
             (isQuality ? p.qualityLimitKm : p.easyLimitKm) != null
               ? (isQuality ? p.qualityLimitKm! : p.easyLimitKm!) *
@@ -140,7 +144,15 @@ export function generatePlanWeeks(
         GENERATION_POLICY.minimumSessionMinutes,
         isLong
           ? Math.round(budget * longPace * 60) / 60
-          : Math.floor(Math.min(budget * pace, cap)),
+          : // Read the funded minutes directly. Dividing by pace and then
+            // multiplying can turn 30 into 29.999999999999996 and erase a
+            // complete introductory workout when the result is floored.
+            Math.floor(
+              Math.min(
+                allocation.get(date) ?? GENERATION_POLICY.minimumSessionMinutes,
+                cap,
+              ),
+            ),
       );
       let kind: WorkoutKind = isLong ? 'long' : 'easy';
       const gentle = p.difficulty === 'gentle';
@@ -175,7 +187,9 @@ export function generatePlanWeeks(
               : p.marathonApproach === 'endurance'
                 ? 'Medium-long aerobic run'
                 : 'Aerobic endurance run'
-            : usesFiveDaySplit(p) || (!isNovice && (weights.get(date) ?? 1) < 1)
+            : !road &&
+                (usesFiveDaySplit(p) ||
+                  (!isNovice && (weights.get(date) ?? 1) < 1))
               ? 'Recovery run'
               : bookMarathon
                 ? 'General aerobic run'
@@ -198,6 +212,14 @@ export function generatePlanWeeks(
         minutes >= SESSION_POLICY.introductoryWorkoutMinutes &&
         (p.method !== 'double-threshold' || phase === 'Maintenance')
       ) {
+        const workAllowanceMinutes =
+          p.method === 'threshold-singles'
+            ? Math.min(
+                desired * pace * SESSION_POLICY.thresholdSinglesWorkFraction,
+                p.recentQualityMinutes ?? 0,
+              ) / Math.max(1, qualityDays.length)
+            : (desired * pace * SESSION_POLICY.qualityWorkFraction) /
+              Math.max(1, qualityDays.length);
         const decision = selectTemplate(
           { ...p, goal: trainingFamily(p) },
           sessionPhase,
@@ -208,6 +230,8 @@ export function generatePlanWeeks(
                 (phase === 'Maintenance' || w.week >= count - preparationWeeks),
             ),
             availableMinutes: minutes,
+            workAllowanceMinutes,
+            originalGoal: p.goal,
             marathonModel: bookMarathon,
             week: w,
             slot: qualityDays.indexOf(weekday(date)),
@@ -243,13 +267,7 @@ export function generatePlanWeeks(
           minutes,
           gentle,
           sessionPhase,
-          p.method === 'threshold-singles'
-            ? Math.min(
-                desired * pace * SESSION_POLICY.thresholdSinglesWorkFraction,
-                p.recentQualityMinutes ?? 0,
-              ) / Math.max(1, qualityDays.length)
-            : (desired * pace * SESSION_POLICY.qualityWorkFraction) /
-                Math.max(1, qualityDays.length),
+          workAllowanceMinutes,
           targetWorkMinutes,
           p,
         );
@@ -387,10 +405,7 @@ export function generatePlanWeeks(
         title,
         kind,
         minutes,
-        estimatedKm:
-          isLong
-            ? longDistance
-            : round(minutes / pace, 3),
+        estimatedKm: isLong ? longDistance : round(minutes / pace, 3),
         hard,
         templateId,
         stimulus,
@@ -403,7 +418,7 @@ export function generatePlanWeeks(
             ? 'medium-long'
             : templateId
               ? stimulus
-              : (weights.get(date) ?? 1) < 1
+              : !road && (weights.get(date) ?? 1) < 1
                 ? 'recovery'
                 : 'easy',
         purpose,
@@ -431,10 +446,12 @@ export function generatePlanWeeks(
             0,
             Math.min(
               p.weekdayMinutes,
-              !isNovice && longDate && weekday(s.date) !== support
+              road && longDate ? longDistance * pace : Infinity,
+              !road && !isNovice && longDate && weekday(s.date) !== support
                 ? Math.floor(longDistance * pace)
                 : Infinity,
               (weights.get(s.date) ?? 1) < 1 &&
+                !road &&
                 !['easy-doubles', 'double-threshold'].includes(p.method ?? '')
                 ? recoveryRunCap(
                     p,

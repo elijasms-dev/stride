@@ -1,9 +1,11 @@
+import { roadOpeningFailures } from './road-overhaul-helpers.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { addDays, demoProfile, makePlan, validatePlan } from '../lib/engine.ts';
 import { PlanError } from '../lib/plan/errors.ts';
 import { prescribedDistanceKm, updateRunMeasure } from '../lib/run-distance.ts';
 import { withWorkoutTargets } from '../lib/workout-targets.ts';
+import { distanceEstimate } from '../lib/prescription.ts';
 
 const start = '2026-09-21';
 const manualPaces = {
@@ -112,8 +114,9 @@ function checkDistances(before, after) {
     }
   }
   assert.ok(
-    Math.abs(totalKm(running(after)) - before.profile.weeklyKm) <= 0.001,
+    Math.abs(totalKm(running(after)) - totalKm(running(before))) <= 0.001,
   );
+  assert.deepEqual(roadOpeningFailures(after, before.profile), []);
   assert.equal(
     running(after).find((w) => w.kind === 'long').estimatedKm,
     before.profile.longestKm,
@@ -323,6 +326,11 @@ void test('extra planning time cannot consume a paired day’s six-hour recovery
     startTime: index === 0 ? '06:00' : '12:30',
     steps: [{ ...easy.steps[0], seconds: 1800 }],
   }));
+  // The synthetic duration changed, so its saved derived range must change too.
+  // The assertion below isolates the pair's recovery gap, not stale metadata.
+  original.workouts.forEach((w) => {
+    w.distanceEstimate = distanceEstimate(w.steps, original.profile);
+  });
   original.weeks[0] = {
     ...original.weeks[0],
     targetKm: 10,

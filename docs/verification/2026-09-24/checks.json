@@ -1,0 +1,71 @@
+{
+  "date": "2026-09-24",
+  "scope": "Local working tree; no push or production deployment",
+  "tests": {
+    "tests": 2673,
+    "pass": 2673,
+    "fail": 0,
+    "skipped": 0
+  },
+  "typecheck": "passed",
+  "applicationAndPublicAssetLint": "passed",
+  "productionBuild": "passed",
+  "trainingGate": {
+    "seed": 20260919,
+    "git": {
+      "sha": "f6e80a3352ec8539a98c5dcb7ec1598202e88eaa",
+      "dirty": true
+    },
+    "engineVersion": "stride-0.11.0",
+    "policyVersion": "provisional-2026-09-23-v33",
+    "acceptedCases": 48,
+    "passedCases": 48,
+    "rejectedCases": 4,
+    "failures": 0,
+    "operations": 576,
+    "failureDetails": []
+  },
+  "roadMatrix": {
+    "generatedAt": "2026-09-24T08:57:04.525Z",
+    "gitBase": "f6e80a3352ec8539a98c5dcb7ec1598202e88eaa",
+    "libSourceSha256": "253b92c7ea4c0de1a9851f1e5749f8e1ff22ecd66b8d8b144c7e7af0c5c51dfc",
+    "scenarios": 793,
+    "accepted": 733,
+    "correctlyRejected": 60,
+    "failed": 0,
+    "ordinaryWeeks": 4744,
+    "generatedWeeks": 8127,
+    "checkedRuns": 38043,
+    "output": "/Users/elijassohlstrom/Documents/Codex/2026-09-11/github-plugin-github-openai-curated-remote/work/stride/docs/verification/2026-09-23/road-overhaul",
+    "failures": []
+  },
+  "localMigrationsApplied": [
+    "0007_numerous_mariko_yashida.sql",
+    "0008_perfect_blockbuster.sql",
+    "0009_greedy_manta.sql"
+  ],
+  "browser": {
+    "viewports": [
+      [
+        390,
+        844
+      ],
+      [
+        320,
+        568
+      ]
+    ],
+    "narrowLogButtonBottom": 552,
+    "narrowViewportHeight": 568,
+    "offlineOptInRequired": true,
+    "realRunOrPlanMutated": false
+  },
+  "unverified": [
+    "native GPS/background/kill/battery/audio",
+    "real HealthKit/Health Connect/Strava/Garmin integration",
+    "production gateway isolation and burst capacity",
+    "real Stripe webhooks/scheduler and live payment lifecycle",
+    "physical phone full-airplane-mode recording",
+    "complete VoiceOver/TalkBack and WCAG audit"
+  ]
+}

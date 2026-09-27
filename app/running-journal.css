@@ -3857,6 +3857,177 @@ details > summary {
   animation: none !important;
 }
 
+/* Saved choices and observed training share the plan's compact, readable hierarchy. */
+fieldset.pe-view-switch {
+  border: 0;
+  margin: 0;
+  min-inline-size: 0;
+}
+.plan-preferences-summary {
+  margin: 0 0 24px;
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface, var(--background));
+}
+.plan-preferences-summary .section-heading {
+  margin-bottom: 14px;
+}
+.plan-preferences-summary h2,
+.weekly-review h3 {
+  font-size: 15px;
+  margin: 0;
+}
+.plan-preferences-summary dl,
+.weekly-review-totals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px 24px;
+  margin: 0;
+}
+.plan-preferences-summary dt,
+.weekly-review-totals dt {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+.plan-preferences-summary dd,
+.weekly-review-totals dd {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.plan-preferences-summary p {
+  margin: 14px 0 0;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.6;
+  max-width: 80ch;
+}
+.weekly-review {
+  border-top: 1px solid var(--border);
+  margin-top: 18px;
+}
+.weekly-review > summary {
+  cursor: pointer;
+  padding: 16px 0;
+  font-size: 14px;
+}
+.weekly-review > summary > span {
+  margin-left: 12px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.weekly-review-body {
+  padding-bottom: 18px;
+}
+.weekly-review-body > p {
+  max-width: 80ch;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.weekly-review-totals {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 18px 0;
+}
+.weekly-review-totals dd {
+  font-size: 20px;
+}
+.weekly-review-totals small {
+  display: block;
+  color: var(--muted-foreground);
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 4px;
+}
+.weekly-review-evidence {
+  margin-top: 20px;
+}
+.weekly-review-evidence .settings-link {
+  text-align: left;
+  width: 100%;
+}
+@media (max-width: 600px) {
+  .plan-preferences-summary {
+    padding: 16px;
+  }
+  .plan-preferences-summary dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .weekly-review > summary > span {
+    display: block;
+    margin: 5px 0 0 17px;
+  }
+}
+@media (max-width: 380px) {
+  .plan-preferences-summary dl,
+  .weekly-review-totals {
+    grid-template-columns: 1fr;
+  }
+}
+
+.watch-setup-guide {
+  margin: 14px 0;
+}
+.watch-setup-steps {
+  padding: 0;
+  margin: 20px 0;
+  list-style: none;
+  display: grid;
+  gap: 18px;
+}
+.watch-setup-steps li {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 12px;
+}
+.watch-setup-marker {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+.watch-setup-steps li[data-complete='true'] .watch-setup-marker {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
+}
+.watch-setup-steps strong {
+  font-size: 14px;
+}
+.watch-setup-status {
+  display: block;
+  font-size: 11px;
+  color: var(--muted-foreground);
+  margin-top: 3px;
+}
+.watch-setup-steps p,
+.watch-setup-footnote {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted-foreground);
+  margin: 6px 0 0;
+}
+.watch-setup-action {
+  padding: 14px;
+  background: var(--soft);
+  border-radius: 12px;
+}
+.watch-setup-action p {
+  margin: 0 0 10px;
+  font-size: 13px;
+}
+.watch-setup-footnote {
+  margin-top: 14px;
+}
+
 /* Exact-distance shortcuts share the existing form selection treatment. */
 .ultra-distance-choices {
   display: grid;
@@ -3871,8 +4042,34 @@ details > summary {
   color: var(--background);
   border-color: var(--foreground);
 }
+.benchmark-pace-preview {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+.benchmark-pace-preview > div {
+  min-width: 0;
+  background: var(--soft);
+  border-radius: 12px;
+  padding: 14px;
+}
+.benchmark-pace-preview dt {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.benchmark-pace-preview dd {
+  margin: 6px 0 0;
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+.benchmark-pace-preview dd small {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
 @media (max-width: 480px) {
-  .ultra-distance-choices {
+  .ultra-distance-choices,
+  .benchmark-pace-preview {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

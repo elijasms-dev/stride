@@ -6,6 +6,7 @@ export type Props = {
   onWorkout: (workout: Workout) => void;
   onDay: (date: string) => void;
   onAdjust: () => void;
+  onPreferences?: () => void;
   onNew: () => void;
   onVariety: () => void;
   selected: number;

@@ -1,4 +1,22 @@
-import { actionProgressLabel, withActionProgress } from './action-progress';
+import {
+  actionProgressBlocking,
+  actionProgressLabel,
+  withActionProgress,
+} from './action-progress';
+
+export class NetworkRequestError extends Error {}
+export class ApiRequestError extends Error {
+  status: number;
+  code?: string;
+  constructor(message: string, status: number, code?: string) {
+    super(message);
+    this.status = status;
+    this.code = code;
+  }
+}
+export const isRetryableRequest = (error: unknown) =>
+  error instanceof NetworkRequestError ||
+  (error instanceof ApiRequestError && error.status >= 500);
 
 type Stamp = { accountId: string; accountEpoch: number };
 type Payload = {
@@ -82,7 +100,7 @@ export function createApiClient(
         });
       } catch {
         if (invalid) throw new SessionChangedError();
-        throw new Error(
+        throw new NetworkRequestError(
           'The request did not finish. Your input is still here. Check the connection, refresh saved data, and try again.',
         );
       }
@@ -97,9 +115,11 @@ export function createApiClient(
       if (!response.ok) {
         if (dispatched !== generation) throw new StaleResponseError();
         if (data.code === 'ACCOUNT_CONTEXT_CHANGED') invalidate();
-        throw new Error(
+        throw new ApiRequestError(
           (data.error || 'That request did not go through. Try again.') +
             (data.requestId ? ' Reference: ' + data.requestId : ''),
+          response.status,
+          data.code,
         );
       }
       const hasStamp =
@@ -155,6 +175,7 @@ export function createApiClient(
           ? null
           : (progressLabel ?? actionProgressLabel(path, init)),
         () => request<T>(path, init),
+        { blocking: actionProgressBlocking(path, init) },
       );
     },
     subscribe(this: void, listener: () => void) {

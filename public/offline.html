@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="robots" content="noindex" />
+    <title>Stride · Offline journal</title>
+    <link rel="stylesheet" href="/offline.css" />
+    <script type="module" src="/offline.js"></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <img src="/favicon.svg" width="36" height="36" alt="" /><span
+          >STRIDE</span
+        ><a href="/">Reconnect</a>
+      </header>
+      <h1>Your offline journal</h1>
+      <p id="status" role="status">Opening device storage…</p>
+      <div id="unlock" hidden>
+        <p>
+          Open the private plan saved in this browser. Only continue on your own
+          device.
+        </p>
+        <button id="open">Open saved plan</button
+        ><button id="erase" class="secondary">
+          Erase this device’s copy and pending entries
+        </button>
+      </div>
+      <section id="journal" hidden>
+        <p id="saved"></p>
+        <h2>Training schedule</h2>
+        <label>Week beginning <input id="week" type="date" /></label>
+        <div id="runs"></div>
+        <h2>Log a run</h2>
+        <p>
+          This saves a manual log on this device. Reopen Stride online to sync
+          it. GPS recording is not available here.
+        </p>
+        <form id="log">
+          <label>Date<input name="date" type="date" required /></label
+          ><label
+            >Duration in minutes<input
+              name="minutes"
+              type="number"
+              min="1"
+              max="4320"
+              step="any"
+              required /></label
+          ><label
+            >Distance in km (optional)<input
+              name="km"
+              type="number"
+              min="0.01"
+              max="250"
+              step="any" /></label
+          ><label
+            >Effort, 1 to 10<input
+              name="effort"
+              type="number"
+              min="1"
+              max="10"
+              step="1"
+              required /></label
+          ><label
+            >How did it feel?<select name="feeling" required>
+              <option value="">Select</option>
+              <option value="good">Good</option>
+              <option value="okay">Okay</option>
+              <option value="tired">Tired</option>
+            </select></label
+          ><label>Notes<textarea name="note" maxlength="2000"></textarea></label
+          ><button type="submit">Save on this device</button>
+        </form>
+        <p id="result" role="status"></p>
+        <h2>Pending entries</h2>
+        <div id="pending"></div>
+      </section>
+    </main>
+  </body>
+</html>

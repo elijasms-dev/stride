@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-09-24T10:14:34.388054+00:00",
+  "policy": "provisional-2026-09-24-v34",
+  "libSourceSha256": "c4dfd6ae9a496ace480e1e78e92e7052c1d27f4936dd4f3c6d09af1d76b38204",
+  "unitTests": {
+    "passed": 2791,
+    "failed": 0
+  },
+  "independent": {
+    "cases": 1645,
+    "accepted": 1209,
+    "rejected": 436,
+    "failed": 0,
+    "weeks": 20229
+  },
+  "roadMatrix": {
+    "scenarios": 801,
+    "accepted": 732,
+    "correctlyRejected": 69,
+    "failed": 0,
+    "generatedWeeks": 8115,
+    "checkedRuns": 38031
+  },
+  "trainingContracts": {
+    "accepted": 48,
+    "rejected": 4,
+    "operations": 576,
+    "failed": 0
+  },
+  "marathonSnapshots": {
+    "passed": 21,
+    "changed": 0
+  },
+  "typecheck": "passed",
+  "lint": "passed",
+  "productionBuild": "passed via npm run build",
+  "sitesBuildWrapper": "existing npm and pnpm lockfile conflict",
+  "pushed": false,
+  "deployed": false
+}

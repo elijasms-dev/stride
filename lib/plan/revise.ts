@@ -1,3 +1,5 @@
+import { advanceBeginner, rebuildBeginner } from './beginner.ts';
+import { needsSessionBalanceReview } from './session-balance.ts';
 import {
   PLAN_LOAD_LIMITS,
   PROFILE_TRAINING_LIMITS,
@@ -7,7 +9,6 @@ import {
 import { schedulingEasyPace } from '../fitness-pacing.ts';
 import { applyPreferredStartTimes } from '../runner-customization.ts';
 import { currentTrainingBaseline } from '../training-history.ts';
-import { isLongUltra } from '../ultra-policy.ts';
 import { resizeWorkout } from '../workout-library.ts';
 import {
   applyActualTrainingEnvelope,
@@ -24,6 +25,7 @@ import {
 } from './generation-reconcile.ts';
 import { TRAINING_POLICY } from './policy.ts';
 import { validateProfile } from './profile.ts';
+import { refreshRecipePreferences } from './recipe-preferences.ts';
 import {
   applyReturnStage,
   noviceReview,
@@ -74,6 +76,7 @@ export function revisePreferences(
   // A reviewed policy upgrade must rebuild upcoming prescriptions even when
   // the runner keeps the same preferences. Preview and apply share this path.
   forceReplan ||= plan.policyVersion !== TRAINING_POLICY.version;
+  forceReplan ||= needsSessionBalanceReview(plan);
   const allowed = [
     'days',
     'longDay',
@@ -157,7 +160,8 @@ export function revisePreferences(
   // Compare effective settings after normalization too. Legacy marathon quality
   // counts and equivalent day selections must not rebuild an unchanged plan on
   // each review, consuming rounding allowances or reinterpreting partial logs.
-  profile = validateProfile(profile, profile.startDate);
+  profile = validateProfile(profile, asOf);
+  if (plan.beginner) return rebuildBeginner(plan, profile, asOf);
   if (
     !forceReplan &&
     allowed.every(
@@ -168,12 +172,22 @@ export function revisePreferences(
   const changedKeys = allowed.filter(
     (key) => comparable(profile, key) !== comparable(plan.profile, key),
   );
+  const sameBenchmarkPerformance =
+    profile.recentRace &&
+    plan.profile.recentRace &&
+    profile.recentRace.distanceKm === plan.profile.recentRace.distanceKm &&
+    profile.recentRace.timeMinutes === plan.profile.recentRace.timeMinutes;
   if (
     !forceReplan &&
-    changedKeys.every((key) => ['carbsPerHour', 'practiceInDark'].includes(key))
+    changedKeys.every(
+      (key) =>
+        ['carbsPerHour', 'practiceInDark'].includes(key) ||
+        (key === 'recentRace' && sameBenchmarkPerformance),
+    )
   ) {
     const next = structuredClone(plan);
-    next.profile = validateProfile(profile, profile.startDate);
+    // Evidence provenance is descriptive; it must not regenerate prescriptions.
+    next.profile = profile;
     return next;
   }
   const localKeys = [
@@ -189,6 +203,28 @@ export function revisePreferences(
     'carbsPerHour',
     'practiceInDark',
   ];
+  if (
+    !forceReplan &&
+    changedKeys.every(
+      (key) =>
+        [
+          'workoutVariety',
+          'workoutFormat',
+          'carbsPerHour',
+          'practiceInDark',
+        ].includes(key) ||
+        (key === 'recentRace' && sameBenchmarkPerformance),
+    )
+  ) {
+    const next = refreshRecipePreferences(
+      { ...structuredClone(plan), profile },
+      asOf,
+    );
+    refreshFeasibility(next, asOf);
+    const issues = validatePlan(next);
+    if (issues.length) throw new PlanError(issues[0]);
+    return next;
+  }
   // Raising a session limit should let a reviewed rebuild use the runner's
   // existing baseline. It does not establish a higher baseline: recent history,
   // elapsed allocations, manual edits and taper still govern the rebuild.
@@ -201,7 +237,7 @@ export function revisePreferences(
     changedKeys.every((key) => localKeys.includes(key))
   ) {
     const next = structuredClone(plan);
-    next.profile = validateProfile(profile, profile.startDate);
+    next.profile = profile;
     next.constraintsFrom = asOf;
     const pace = schedulingEasyPace(profile);
     for (const w of next.workouts) {
@@ -310,16 +346,16 @@ export function revisePreferences(
       saved.reason =
         'The start time follows your reviewed day-by-day schedule.';
     }
-    refreshFeasibility(next, asOf);
     if (next.policyVersion === TRAINING_POLICY.version)
       ensureGeneratedMarathonRhythm(next, asOf);
     normalizeGeneratedLongRuns(next, asOf);
+    refreshFeasibility(next, asOf);
     const issues = validatePlan(next);
     if (issues.length) throw new PlanError(issues[0]);
     return next;
   }
   const baseline = currentTrainingBaseline(plan, asOf);
-  const generated = makePlan(profile, profile.startDate, false, {
+  const generated = makePlan(profile, asOf, false, {
     from: asOf,
     baseline,
     preserveProgression: baseline.supportsProgression,
@@ -399,16 +435,17 @@ export function revisePreferences(
   }
   applyActualTrainingEnvelope(next, asOf);
   rebalanceFutureQuality(next, asOf);
-  if (isLongUltra(next.profile)) refreshFeasibility(next, asOf);
   if (next.policyVersion === TRAINING_POLICY.version)
     ensureGeneratedMarathonRhythm(next, asOf);
   normalizeGeneratedLongRuns(next, asOf);
+  refreshFeasibility(next, asOf);
   const issues = validatePlan(next);
   if (issues.length) throw new PlanError(issues[0]);
   return next;
 }
 
 export function advanceRunWalk(plan: Plan, asOf: string): Plan {
+  if (plan.beginner) return advanceBeginner(plan, asOf);
   const review = noviceReview(plan, asOf);
   if (!review?.ready)
     throw new PlanError(

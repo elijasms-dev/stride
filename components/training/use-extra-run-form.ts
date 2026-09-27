@@ -5,10 +5,12 @@ import { runFeedbackError } from '@/lib/form-values';
 import { recordingCandidates } from '@/lib/training-history';
 import type { SubmitEvent } from 'react';
 import { useState } from 'react';
+import { useDurableDraft } from '@/lib/durable-draft';
 import { useRunFeedbackValidation } from '../run-feedback-validation';
 import type { Activity } from '../settings';
 
 export function useExtraRunForm({
+  draftScope = '',
   plan,
   today,
   onClose,
@@ -19,6 +21,7 @@ export function useExtraRunForm({
   imported,
   existing,
 }: {
+  draftScope?: string;
   plan: Plan;
   today: string;
   onClose: () => void;
@@ -43,6 +46,49 @@ export function useExtraRunForm({
     [correctionReason, setCorrectionReason] = useState(''),
     [error, setError] = useState(''),
     [target, setTarget] = useState(imported ? '' : 'extra');
+  const draft = {
+    date,
+    minutes: Number.isFinite(minutes) ? minutes : null,
+    distance,
+    effort,
+    feeling,
+    note,
+    correctionReason,
+    target,
+  };
+  const { draftStatus, clearDraft } = useDurableDraft({
+    scope: draftScope,
+    key: `extra-run:${existing?.id ?? imported?.id ?? today}`,
+    value: draft,
+    isValid: (value: unknown): value is typeof draft => {
+      if (!value || typeof value !== 'object') return false;
+      const v = value as typeof draft;
+      return (
+        [
+          'date',
+          'effort',
+          'feeling',
+          'note',
+          'correctionReason',
+          'target',
+        ].every((key) => typeof v[key as keyof typeof draft] === 'string') &&
+        (v.minutes === null ||
+          (typeof v.minutes === 'number' && Number.isFinite(v.minutes))) &&
+        (v.distance === null ||
+          (typeof v.distance === 'number' && Number.isFinite(v.distance)))
+      );
+    },
+    restore: (value) => {
+      setDate(value.date);
+      setMinutes(value.minutes ?? NaN);
+      setDistance(value.distance);
+      setEffort(value.effort);
+      setFeeling(value.feeling);
+      setNote(value.note);
+      setCorrectionReason(value.correctionReason);
+      setTarget(value.target);
+    },
+  });
   const matches = recordingCandidates(plan.workouts, date);
   const extras = (plan.extraRuns ?? []).filter(
     (r) => r.date === date && !r.activityId,
@@ -103,12 +149,14 @@ export function useExtraRunForm({
         });
       else if (target === 'extra') await onAction('freeRun', { run });
       else await onAction('attachRecording', { id: target, run });
+      clearDraft();
       (onSaved ?? onClose)();
     } catch (e) {
       setError((e as Error).message);
     }
   }
   return {
+    draftStatus,
     plan,
     today,
     onClose,

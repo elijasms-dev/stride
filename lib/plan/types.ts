@@ -1,9 +1,14 @@
 /** Plan types responsibilities; extracted without changing policy or behavior. */
 import type { TrainingMethod } from '../advanced-methods.ts';
+import type { ActivityTime } from '../activity-time.ts';
 import type { RecentRace } from '../fitness-pacing.ts';
 import type { distanceEstimate } from '../prescription.ts';
 import type { DayPreference } from '../runner-customization.ts';
-import type { StepTarget, WorkoutTargets } from '../workout-targets.ts';
+import type {
+  EffortRole,
+  StepTarget,
+  WorkoutTargets,
+} from '../workout-targets.ts';
 
 export type Goal =
   | '5k'
@@ -40,6 +45,8 @@ export type WorkoutKind =
   | 'race';
 
 export type Profile = {
+  /** Explicit programme choice; omitted preserves existing adaptive plans. */
+  planLevel?: 'beginner' | 'standard';
   recentRace?: RecentRace;
   dayPreferences?: DayPreference[];
   weeklyMinutesLimit?: number | null;
@@ -104,6 +111,8 @@ export type Profile = {
 
 export type Step = {
   target?: StepTarget;
+  /** Prescription role is independent of the wording of the effort cue. */
+  effortRole?: EffortRole;
   label: string;
   seconds: number;
   metres?: number;
@@ -114,7 +123,7 @@ export type Step = {
   movement?: 'run' | 'walk';
 };
 
-export type Feedback = {
+export type Feedback = ActivityTime & {
   effort: number;
   feeling: 'good' | 'okay' | 'tired';
   enjoyment?: 'yes' | 'maybe' | 'no';
@@ -136,6 +145,14 @@ export type Feedback = {
 };
 
 export type Workout = {
+  /** Derived accounting is checked only for explicitly resolved prescriptions. */
+  prescriptionVersion?: 'pace-resolved-v1';
+  /** Easy-pace basis used by this snapshot, in minutes/km; history never borrows new fitness. */
+  prescriptionPaceBasis?: number;
+  /** A reviewed pace changed the estimate of fixed timed endpoints. Explicit
+   * distance conversion retains this origin; newly allocated runs do not. */
+  distanceRevision?: 'pace-edited-time';
+  beginnerLesson?: { stage: number; lesson: number; stageStarted: string };
   id: string;
   date: string;
   originalDate: string;
@@ -187,12 +204,52 @@ export type Week = {
   rationale?: string[];
 };
 
+export type FeasibilityCheck = {
+  code: 'training-exposure' | 'long-ultra-capacity' | 'retained-constraint';
+  message: string;
+};
+export type FeasibilityEvidence = {
+  unit: 'km' | 'minutes';
+  required: number;
+  phase: 'before-start' | 'active' | 'after-event';
+  /** Completed long-run slots (or easy slots in two-day plans), not all journal
+   * activity. Extra runs remain in weekly review and baseline evidence. */
+  recorded: {
+    sessions: number;
+    longest: number;
+    unknownDistanceSessions: number;
+    /** Planning-pace conversion only; never credited as measured distance. */
+    longestEstimatedKm: number;
+  };
+  remaining: { sessions: number; longest: number };
+  unresolved: { sessions: number };
+};
+
 export type Plan = {
+  firstRace?: {
+    program: 'first-race-v1';
+    goal: '5k' | '10k' | 'half' | 'marathon';
+  };
+  beginner?: {
+    program: 'nhs-c25k-v1';
+    pausedUntil?: string;
+    breaks?: { from: string; to: string }[];
+    stage: number;
+    stageStarted: string;
+    completedAt?: string;
+  };
   id: string;
   activationRequestId?: string;
   activationInput?: string;
   engineVersion: string;
   policyVersion: string;
+  /** New standard road plans keep supporting easy runs clearly shorter. */
+  sessionBalanceVersion?: 'distinct-long-v1';
+  /** Accepted opening allocation; future edits cannot rewrite this baseline. */
+  openingWeekKm?: number;
+  /** Reviewed budget before the returning-runner factor and session-role clipping.
+   * Carries frequency/time reductions forward; not evidence of completed running. */
+  allocationBaseline?: { weeklyKm: number; weeklyMinutes: number };
   profile: Profile;
   weeks: Week[];
   workouts: Workout[];
@@ -217,6 +274,8 @@ export type Plan = {
     status: 'forecast' | 'review-required' | 'event-deferred';
     reasons: string[];
     asOf: string;
+    checks?: FeasibilityCheck[];
+    evidence?: FeasibilityEvidence;
   };
   returnState?: {
     from: string;
@@ -232,7 +291,7 @@ export type Plan = {
   extraRuns?: ExtraRun[];
 };
 
-export type ExtraRun = {
+export type ExtraRun = ActivityTime & {
   id: string;
   corrections?: {
     at: string;
@@ -256,6 +315,7 @@ export type ExtraRun = {
 };
 
 export type State = {
+  acknowledgedMutationId?: string;
   accountId?: string;
   accountEpoch?: number;
   accountStatus?: string;

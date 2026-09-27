@@ -10,6 +10,7 @@ import {
   marathonPaceOpportunity,
 } from '../marathon-book.ts';
 import { runningDayLimit } from '../runner-customization.ts';
+import { roadQualitySessionCap } from '../road-training-policy.ts';
 
 import { isLongUltra, LONG_ULTRA_POLICY } from '../ultra-policy.ts';
 import {
@@ -52,6 +53,7 @@ export function allocateGenerationWeek(
 ) {
   const {
     p,
+    road,
     bookMarathon,
     recoveryFactor,
     start,
@@ -197,10 +199,11 @@ export function allocateGenerationWeek(
   const qualityReserve =
     !recovery &&
     !taper &&
-    usesStandardQualityRhythm(p) &&
+    (road ? qualityDays.length > 0 : usesStandardQualityRhythm(p)) &&
     dates.some((d) => qualityDays.includes(weekday(d)))
-      ? SESSION_POLICY.introductoryWorkoutMinutes -
-        GENERATION_POLICY.minimumSessionMinutes
+      ? (SESSION_POLICY.introductoryWorkoutMinutes -
+          GENERATION_POLICY.minimumSessionMinutes) *
+        (road ? qualityDays.length : 1)
       : 0;
   const usualLongDistance = Math.min(
     long,
@@ -244,6 +247,7 @@ export function allocateGenerationWeek(
     longDate &&
       p.goal !== 'base' &&
       !bookMarathon &&
+      !road &&
       dayDiff(longDate, p.raceDate) <= SESSION_POLICY.lateLongCapDays
       ? (family === 'ultra'
           ? LATE_LONG_CAP_MINUTES.ultra
@@ -377,13 +381,23 @@ export function allocateGenerationWeek(
     cap: Math.min(
       usesMarathonRhythm(p) ? runningDayLimit(p, weekday(d)) : Infinity,
       p.weekdayMinutes,
+      road && weekQualityDays.includes(weekday(d))
+        ? roadQualitySessionCap(p)
+        : Infinity,
+      // An ordinary easy day must not become an undeclared new longest run.
+      // Surplus volume belongs across the week, within each session's role.
+      road && longDate && !weekQualityDays.includes(weekday(d))
+        ? longDistance * pace
+        : Infinity,
       !isNovice &&
+        !road &&
         longDate &&
         !weekQualityDays.includes(weekday(d)) &&
         weekday(d) !== support
         ? Math.floor(longDistance * pace)
         : Infinity,
       (weights.get(d) ?? 1) < 1 &&
+        !road &&
         !['easy-doubles', 'double-threshold'].includes(p.method ?? '')
         ? recoveryRunCap(
             p,
@@ -450,7 +464,7 @@ export function allocateGenerationWeek(
     !recovery &&
     !taper &&
     p.goal !== 'base' &&
-    (p.intent !== 'finish' || usesStandardQualityRhythm(p))
+    (road || p.intent !== 'finish' || usesStandardQualityRhythm(p))
   ) {
     for (const date of regularDates.filter((d) =>
       weekQualityDays.includes(weekday(d)),

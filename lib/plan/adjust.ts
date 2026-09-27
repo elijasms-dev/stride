@@ -1,3 +1,4 @@
+import { pauseBeginner } from './beginner.ts';
 import {
   PLAN_LOAD_LIMITS,
   RETURN_TRAINING_POLICY,
@@ -125,6 +126,7 @@ export function moveWorkout(
   }
   const timingError = applyPreferredStartTimes(moved, next.profile);
   if (timingError) throw new PlanError(timingError);
+  if (next.firstRace) rebalanceFutureQuality(next, asOf);
   const errors = validatePlan(next);
   if (errors.length) throw new PlanError(errors[0]);
   return next;
@@ -149,6 +151,13 @@ export function adjustPlan(
     throw new PlanError(
       'Choose a break of 1–21 days beginning within the plan, or a recent break to record.',
     );
+  if (plan.beginner) {
+    if (mode !== 'rest')
+      throw new PlanError(
+        'For the beginner course, choose a rest break to return to an easier stage. Shortened attempts can be logged as partial without rewriting the lessons.',
+      );
+    return pauseBeginner(plan, from, to, asOf);
+  }
   const next = structuredClone(plan),
     baseline = currentTrainingBaseline(plan, from > asOf ? asOf : from);
   for (const w of next.workouts) {

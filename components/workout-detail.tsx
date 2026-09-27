@@ -14,6 +14,7 @@ import { workoutGuidance } from '@/lib/coaching-context';
 import { BusyButton } from './action-progress';
 import { NumericInput } from './numeric-input';
 import { useState } from 'react';
+import { useDurableDraft } from '@/lib/durable-draft';
 import WorkoutEdit from './workout-edit';
 import { distanceEstimate } from '@/lib/prescription';
 import { prescribedDistanceKm } from '@/lib/run-distance';
@@ -53,6 +54,40 @@ export type Action = (
   action: string,
   payload?: Record<string, unknown>,
 ) => Promise<void>;
+type FeedbackDraft = {
+  actualDate: string;
+  effort: string;
+  feeling: string;
+  enjoyment: string;
+  minutes: number;
+  distance: number | null;
+  execution: string;
+  qualityDone: number | null;
+  note: string;
+  correctionReason: string;
+};
+function validFeedbackDraft(value: unknown): value is FeedbackDraft {
+  if (!value || typeof value !== 'object') return false;
+  const v = value as Record<string, unknown>;
+  return (
+    [
+      'actualDate',
+      'effort',
+      'feeling',
+      'enjoyment',
+      'execution',
+      'note',
+      'correctionReason',
+    ].every((key) => typeof v[key] === 'string') &&
+    typeof v.minutes === 'number' &&
+    Number.isFinite(v.minutes) &&
+    ['distance', 'qualityDone'].every(
+      (key) =>
+        v[key] === null ||
+        (typeof v[key] === 'number' && Number.isFinite(v[key])),
+    )
+  );
+}
 export default function WorkoutDetail({
   workout: w,
   plan,
@@ -69,7 +104,9 @@ export default function WorkoutDetail({
   busy,
   initialMode = 'view',
   imported,
+  draftScope = '',
 }: {
+  draftScope?: string;
   workout: Workout;
   plan: import('@/lib/engine').Plan;
   version: number;
@@ -124,6 +161,38 @@ export default function WorkoutDetail({
   const feedbackValidation = useRunFeedbackValidation(effort, feeling);
   const [pendingAction, setPendingAction] = useState<string | null>(null);
   const logging = mode === 'log' || mode === 'correctLog';
+  const { draftStatus, clearDraft } = useDurableDraft<FeedbackDraft>({
+    scope: draftScope,
+    key: `workout:${plan.id}:${w.id}:${imported?.id ?? w.feedback?.recordedAt ?? 'new'}`,
+    value: {
+      actualDate,
+      effort,
+      feeling,
+      enjoyment,
+      minutes,
+      distance,
+      execution,
+      qualityDone,
+      note,
+      correctionReason,
+    },
+    enabled: logging && !isDemo,
+    isValid: validFeedbackDraft,
+    restore: (saved) => {
+      if (!imported) setActualDate(saved.actualDate);
+      setEffort(saved.effort);
+      setFeeling(saved.feeling);
+      setEnjoyment(saved.enjoyment);
+      if (!imported) {
+        setMinutes(saved.minutes);
+        setDistance(saved.distance);
+      }
+      setExecution(saved.execution as typeof execution);
+      setQualityDone(saved.qualityDone);
+      setNote(saved.note);
+      setCorrectionReason(saved.correctionReason);
+    },
+  });
   const runWalk = isRunWalkWorkout(w);
   const estimate = distanceEstimate(w.steps, profile);
   const effortLabel = workoutEffort(w);
@@ -132,6 +201,7 @@ export default function WorkoutDetail({
     setPendingAction(action);
     try {
       await onAction(action, { id: w.id, ...payload });
+      if (['complete', 'correctLog'].includes(action)) clearDraft();
       if (!['sync', 'checkDelivery', 'confirmWatch'].includes(action))
         onClose();
     } catch (e) {
@@ -377,89 +447,96 @@ export default function WorkoutDetail({
     >
       {mode === 'view' && (
         <>
-          {initialMode === 'delivery' && deliveryContent}
-          <div className="detail-topline">
-            <span className="pill filled">
-              {w.status === 'completed'
-                ? 'Completed'
-                : w.status === 'skipped'
-                  ? 'Skipped'
-                  : w.kind === 'race'
-                    ? 'Race day'
-                    : w.kind === 'long'
-                      ? w.hard
-                        ? 'Quality long run'
-                        : 'Long run'
-                      : w.hard
-                        ? 'Quality session'
-                        : 'Easy effort'}
-            </span>
-            {w.status !== 'completed' && (
-              <DropdownMenu defaultOpen={initialMode === 'actions'}>
-                <DropdownMenuTrigger
-                  className="secondary-button small-button"
-                  aria-label="More workout actions"
-                >
-                  More actions <MoreHorizontal size={17} />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="workout-menu">
-                  <DropdownMenuItem
-                    disabled={!editable || isDemo}
-                    onClick={() => setMode('move')}
+          <section
+            className="workout-detail-scroll"
+            // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- Keyboard users must be able to scroll the independent instructions pane.
+            tabIndex={0}
+            aria-label="Workout instructions"
+          >
+            {initialMode === 'delivery' && deliveryContent}
+            <div className="detail-topline">
+              <span className="pill filled">
+                {w.status === 'completed'
+                  ? 'Completed'
+                  : w.status === 'skipped'
+                    ? 'Skipped'
+                    : w.kind === 'race'
+                      ? 'Race day'
+                      : w.kind === 'long'
+                        ? w.hard
+                          ? 'Quality long run'
+                          : 'Long run'
+                        : w.hard
+                          ? 'Quality session'
+                          : 'Easy effort'}
+              </span>
+              {w.status !== 'completed' && (
+                <DropdownMenu defaultOpen={initialMode === 'actions'}>
+                  <DropdownMenuTrigger
+                    className="secondary-button small-button"
+                    aria-label="More workout actions"
                   >
-                    <CalendarDays size={16} />{' '}
-                    {w.pairId ? 'Move paired day' : 'Move date'}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    disabled={
-                      w.status !== 'planned' || w.kind === 'race' || isDemo
-                    }
-                    onClick={() => setMode('skip')}
-                  >
-                    <SkipForward size={16} /> Skip this run
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    disabled={!editable || isDemo}
-                    onClick={() => setMode('advanced')}
-                  >
-                    <SlidersHorizontal size={16} /> Shorten or substitute
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
-          {w.status === 'completed' ? (
-            <>
-              <RecordedRunSummary
-                workout={w}
-                profile={profile}
-                disabled={busy || isDemo || w.date > today}
-                onCorrect={() => setMode('correctLog')}
-              />
-              <details className="recorded-prescription">
-                <summary>View prescribed workout</summary>
-                <p className="subtle">
-                  Scheduled for {dateLabel(w.date)}. These are the original
-                  instructions
-                  {completedLog
-                    ? '; your recorded results are above.'
-                    : ', not recorded results.'}
-                </p>
-                {prescriptionContent}
-              </details>
-              <details className="workout-supporting-detail">
-                <summary>Recovery & daily guidance</summary>
-                <DailyGuide
-                  guide={dailyGuide(plan, recordedWorkoutDate(w), w)}
+                    More actions <MoreHorizontal size={17} />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="workout-menu">
+                    <DropdownMenuItem
+                      disabled={!editable || isDemo}
+                      onClick={() => setMode('move')}
+                    >
+                      <CalendarDays size={16} />{' '}
+                      {w.pairId ? 'Move paired day' : 'Move date'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      disabled={
+                        w.status !== 'planned' || w.kind === 'race' || isDemo
+                      }
+                      onClick={() => setMode('skip')}
+                    >
+                      <SkipForward size={16} /> Skip this run
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      disabled={!editable || isDemo}
+                      onClick={() => setMode('advanced')}
+                    >
+                      <SlidersHorizontal size={16} /> Shorten or substitute
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
+            {w.status === 'completed' ? (
+              <>
+                <RecordedRunSummary
+                  workout={w}
+                  profile={profile}
+                  disabled={busy || isDemo || w.date > today}
+                  onCorrect={() => setMode('correctLog')}
                 />
-              </details>
-            </>
-          ) : (
-            prescriptionContent
-          )}
-          {w.skipReason && <p className="subtle">Skipped: {w.skipReason}</p>}
-          <div className="modal-actions">
+                <details className="recorded-prescription">
+                  <summary>View prescribed workout</summary>
+                  <p className="subtle">
+                    Scheduled for {dateLabel(w.date)}. These are the original
+                    instructions
+                    {completedLog
+                      ? '; your recorded results are above.'
+                      : ', not recorded results.'}
+                  </p>
+                  {prescriptionContent}
+                </details>
+                <details className="workout-supporting-detail">
+                  <summary>Recovery & daily guidance</summary>
+                  <DailyGuide
+                    guide={dailyGuide(plan, recordedWorkoutDate(w), w)}
+                  />
+                </details>
+              </>
+            ) : (
+              prescriptionContent
+            )}
+            {w.skipReason && <p className="subtle">Skipped: {w.skipReason}</p>}
+          </section>
+          <div className="modal-actions workout-detail-footer">
             <span className="subtle">
               {isDemo
                 ? 'Example workout · build your own plan to log runs.'
@@ -513,6 +590,15 @@ export default function WorkoutDetail({
             });
           }}
         >
+          {draftScope && (
+            <output className="subtle" aria-live="polite">
+              {draftStatus === 'unavailable'
+                ? 'This browser cannot keep a local draft. Keep this form open until your run is saved.'
+                : draftStatus === 'restored'
+                  ? 'Your unsaved feedback was restored on this device. Review it before saving.'
+                  : 'Your feedback draft is kept on this device until you save the run.'}
+            </output>
+          )}
           <fieldset disabled={busy} className="form-section form-content">
             {mode === 'correctLog' && (
               <Field label="Reason for correction">

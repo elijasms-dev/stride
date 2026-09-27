@@ -1,0 +1,513 @@
+{
+  "purpose": "Read-only reproduction: identical current inputs differing only in runMeasure produce different marathon-effort doses on initial generation.",
+  "source": "docs/verification/2026-09-25/plan-quality-review/example-plans.json",
+  "entry": "makePlan(input, input.startDate)",
+  "sourceReferences": [
+    "lib/workout-targets.ts:408 invokes withRunDistance without preserveFundedDistance",
+    "lib/run-distance.ts:174-203 preserves work only when preserveFundedDistance is true, otherwise allocates distance proportionally by elapsed seconds"
+  ],
+  "cases": [
+    {
+      "input": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "MARATHON race day",
+        "startDate": "2026-09-28",
+        "raceDate": "2027-02-14",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": null,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 45,
+          "date": "2026-09-20",
+          "source": "race",
+          "course": "road"
+        },
+        "qualityMode": "custom",
+        "qualitySessions": 2,
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 40,
+        "runMeasure": "time"
+      },
+      "validationErrors": [],
+      "longWorkouts": [
+        {
+          "week": 5,
+          "date": "2026-11-01",
+          "title": "Long run · 40 min marathon effort",
+          "templateId": "marathon-book-mp-40",
+          "estimatedKm": 23,
+          "minutes": 135.25,
+          "targetWorkMinutes": 40,
+          "qualityMinutes": 40,
+          "steps": [
+            {
+              "kind": "warmup",
+              "label": "Warm up",
+              "seconds": 900,
+              "intensity": 2,
+              "target": {
+                "low": 317,
+                "high": 381,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "stride-daniels-1"
+              }
+            },
+            {
+              "kind": "aerobic",
+              "label": "Easy endurance running",
+              "seconds": 4515,
+              "intensity": 3,
+              "target": {
+                "low": 317,
+                "high": 381,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "stride-daniels-1"
+              }
+            },
+            {
+              "kind": "work",
+              "label": "40 min race rhythm",
+              "seconds": 2400,
+              "intensity": 5,
+              "target": {
+                "low": 289,
+                "high": 300,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "riegel-1.06"
+              }
+            },
+            {
+              "kind": "cooldown",
+              "label": "Cool down",
+              "seconds": 300,
+              "intensity": 2,
+              "target": {
+                "low": 317,
+                "high": 381,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "stride-daniels-1"
+              }
+            }
+          ]
+        },
+        {
+          "week": 9,
+          "date": "2026-11-29",
+          "title": "Long run · 55 min marathon effort",
+          "templateId": "marathon-book-mp-55",
+          "estimatedKm": 27,
+          "minutes": 156.6,
+          "targetWorkMinutes": 55,
+          "qualityMinutes": 55,
+          "steps": [
+            {
+              "kind": "warmup",
+              "label": "Warm up",
+              "seconds": 900,
+              "intensity": 2,
+              "target": {
+                "low": 317,
+                "high": 381,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "stride-daniels-1"
+              }
+            },
+            {
+              "kind": "aerobic",
+              "label": "Easy endurance running",
+              "seconds": 4896,
+              "intensity": 3,
+              "target": {
+                "low": 317,
+                "high": 381,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "stride-daniels-1"
+              }
+            },
+            {
+              "kind": "work",
+              "label": "55 min race rhythm",
+              "seconds": 3300,
+              "intensity": 5,
+              "target": {
+                "low": 289,
+                "high": 300,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "riegel-1.06"
+              }
+            },
+            {
+              "kind": "cooldown",
+              "label": "Cool down",
+              "seconds": 300,
+              "intensity": 2,
+              "target": {
+                "low": 317,
+                "high": 381,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "stride-daniels-1"
+              }
+            }
+          ]
+        },
+        {
+          "week": 15,
+          "date": "2027-01-10",
+          "title": "Long run · 70 min marathon effort",
+          "templateId": "marathon-book-mp-70",
+          "estimatedKm": 33,
+          "minutes": 190.65,
+          "targetWorkMinutes": 70,
+          "qualityMinutes": 70,
+          "steps": [
+            {
+              "kind": "warmup",
+              "label": "Warm up",
+              "seconds": 900,
+              "intensity": 2,
+              "target": {
+                "low": 317,
+                "high": 381,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "stride-daniels-1"
+              }
+            },
+            {
+              "kind": "aerobic",
+              "label": "Easy endurance running",
+              "seconds": 6039,
+              "intensity": 3,
+              "target": {
+                "low": 317,
+                "high": 381,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "stride-daniels-1"
+              }
+            },
+            {
+              "kind": "work",
+              "label": "70 min race rhythm",
+              "seconds": 4200,
+              "intensity": 5,
+              "target": {
+                "low": 289,
+                "high": 300,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "riegel-1.06"
+              }
+            },
+            {
+              "kind": "cooldown",
+              "label": "Cool down",
+              "seconds": 300,
+              "intensity": 2,
+              "target": {
+                "low": 317,
+                "high": 381,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "stride-daniels-1"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "input": {
+        "name": "",
+        "goal": "marathon",
+        "raceName": "MARATHON race day",
+        "startDate": "2026-09-28",
+        "raceDate": "2027-02-14",
+        "weeklyKm": 70,
+        "longestKm": 23,
+        "currentRuns": 5,
+        "days": [
+          0,
+          1,
+          2,
+          4,
+          6
+        ],
+        "longDay": 6,
+        "weekdayMinutes": 120,
+        "longMinutes": 300,
+        "experience": "established",
+        "difficulty": "balanced",
+        "volume": "gradual",
+        "timezone": "Europe/London",
+        "units": "km",
+        "easyPace": null,
+        "runsPerWeek": 5,
+        "availableDays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "recentRace": {
+          "distanceKm": 10,
+          "timeMinutes": 45,
+          "date": "2026-09-20",
+          "source": "race",
+          "course": "road"
+        },
+        "qualityMode": "custom",
+        "qualitySessions": 2,
+        "recentQualitySessions": 2,
+        "recentQualityMinutes": 40,
+        "runMeasure": "distance"
+      },
+      "validationErrors": [],
+      "longWorkouts": [
+        {
+          "week": 5,
+          "date": "2026-11-01",
+          "title": "23 km · Long run · 6.3 km marathon effort",
+          "templateId": "marathon-book-mp-40",
+          "estimatedKm": 23,
+          "minutes": 137.55,
+          "targetWorkMinutes": 40,
+          "qualityMinutes": 31.5,
+          "steps": [
+            {
+              "kind": "warmup",
+              "label": "Warm up",
+              "seconds": 900,
+              "metres": 2362,
+              "intensity": 2,
+              "target": {
+                "low": 317,
+                "high": 381,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "stride-daniels-1"
+              }
+            },
+            {
+              "kind": "aerobic",
+              "label": "Easy endurance running",
+              "seconds": 5163,
+              "metres": 13551,
+              "intensity": 3,
+              "target": {
+                "low": 317,
+                "high": 381,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "stride-daniels-1"
+              }
+            },
+            {
+              "kind": "work",
+              "label": "6.3 km race rhythm",
+              "seconds": 1890,
+              "metres": 6300,
+              "intensity": 5,
+              "target": {
+                "low": 289,
+                "high": 300,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "riegel-1.06"
+              }
+            },
+            {
+              "kind": "cooldown",
+              "label": "Cool down",
+              "seconds": 300,
+              "metres": 787,
+              "intensity": 2,
+              "target": {
+                "low": 317,
+                "high": 381,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "stride-daniels-1"
+              }
+            }
+          ]
+        },
+        {
+          "week": 9,
+          "date": "2026-11-29",
+          "title": "27 km · Long run · 8.663 km marathon effort",
+          "templateId": "marathon-book-mp-55",
+          "estimatedKm": 27,
+          "minutes": 159.76666666666668,
+          "targetWorkMinutes": 55,
+          "qualityMinutes": 43.315000000000005,
+          "steps": [
+            {
+              "kind": "warmup",
+              "label": "Warm up",
+              "seconds": 900,
+              "metres": 2362,
+              "intensity": 2,
+              "target": {
+                "low": 317,
+                "high": 381,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "stride-daniels-1"
+              }
+            },
+            {
+              "kind": "aerobic",
+              "label": "Easy endurance running",
+              "seconds": 5787,
+              "metres": 15188,
+              "intensity": 3,
+              "target": {
+                "low": 317,
+                "high": 381,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "stride-daniels-1"
+              }
+            },
+            {
+              "kind": "work",
+              "label": "8.663 km race rhythm",
+              "seconds": 2599,
+              "metres": 8663,
+              "intensity": 5,
+              "target": {
+                "low": 289,
+                "high": 300,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "riegel-1.06"
+              }
+            },
+            {
+              "kind": "cooldown",
+              "label": "Cool down",
+              "seconds": 300,
+              "metres": 787,
+              "intensity": 2,
+              "target": {
+                "low": 317,
+                "high": 381,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "stride-daniels-1"
+              }
+            }
+          ]
+        },
+        {
+          "week": 15,
+          "date": "2027-01-10",
+          "title": "33 km · Long run · 11.025 km marathon effort",
+          "templateId": "marathon-book-mp-70",
+          "estimatedKm": 33,
+          "minutes": 194.68333333333334,
+          "targetWorkMinutes": 70,
+          "qualityMinutes": 55.125,
+          "steps": [
+            {
+              "kind": "warmup",
+              "label": "Warm up",
+              "seconds": 900,
+              "metres": 2362,
+              "intensity": 2,
+              "target": {
+                "low": 317,
+                "high": 381,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "stride-daniels-1"
+              }
+            },
+            {
+              "kind": "aerobic",
+              "label": "Easy endurance running",
+              "seconds": 7173,
+              "metres": 18826,
+              "intensity": 3,
+              "target": {
+                "low": 317,
+                "high": 381,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "stride-daniels-1"
+              }
+            },
+            {
+              "kind": "work",
+              "label": "11.025 km race rhythm",
+              "seconds": 3308,
+              "metres": 11025,
+              "intensity": 5,
+              "target": {
+                "low": 289,
+                "high": 300,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "riegel-1.06"
+              }
+            },
+            {
+              "kind": "cooldown",
+              "label": "Cool down",
+              "seconds": 300,
+              "metres": 787,
+              "intensity": 2,
+              "target": {
+                "low": 317,
+                "high": 381,
+                "mode": "pace",
+                "source": "benchmark",
+                "model": "stride-daniels-1"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

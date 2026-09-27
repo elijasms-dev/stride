@@ -1,3 +1,4 @@
+import { roadOpeningFailures } from './road-overhaul-helpers.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -7,7 +8,6 @@ import {
   makePlan,
   revisePreferences,
   taperFactor,
-  trainingPhaseOn,
   validatePlan,
 } from '../lib/engine.ts';
 import { qualityWorkMinutes } from '../lib/prescription.ts';
@@ -20,7 +20,7 @@ const input = (patch = {}) => ({
   goal: '5k',
   raceName: 'Synthetic 5K',
   raceDate: addDays(start, 27),
-  weeklyKm: 25,
+  weeklyKm: 20,
   longestKm: 8,
   currentRuns: 3,
   runsPerWeek: 3,
@@ -45,6 +45,32 @@ const training = (plan, week) =>
   );
 const main = (w) => w.hard && w.kind !== 'race';
 const minutes = (runs) => runs.reduce((sum, w) => sum + w.minutes, 0);
+
+function assertRoadPhaseFollowsRace(plan) {
+  const p = plan.profile;
+  // Reviewed v33 windows for these fixture abilities: the clock is race-relative
+  // even when signup happens inside the window; the first quality dose still
+  // depends on actual reported history, not the calendar's apparent urgency.
+  const preparationDays =
+    p.goal === 'half'
+      ? p.currentRuns >= 4 && p.weeklyKm >= 35
+        ? 42
+        : 35
+      : p.goal === '10k' &&
+          p.currentRuns >= 5 &&
+          p.weeklyKm >= 45 &&
+          p.longestKm >= 12
+        ? 35
+        : 28;
+  for (const week of plan.weeks) {
+    const activeStart = week.start < p.startDate ? p.startDate : week.start;
+    const left = dayDiff(activeStart, p.raceDate);
+    if (['Recovery', 'Taper', 'Race week'].includes(week.phase)) continue;
+    if (left <= preparationDays) assert.equal(week.phase, 'Race preparation');
+    else assert.notEqual(week.phase, 'Race preparation');
+    if (week.phase === 'Foundation') assert.ok(left > preparationDays);
+  }
+}
 
 function assertBoundedPlan(plan) {
   assert.deepEqual(validatePlan(plan), []);
@@ -156,17 +182,21 @@ for (const [weeklyKm, longestKm] of [
     assertBoundedPlan(p);
   });
 
-test('a four-week established 5K block starts with current-event practice, not two foundation weeks', () => {
+test('a four-week developing 5K block retains the race-relative phase and starts with controlled threshold', () => {
   const p = build();
   assert.equal(p.weeks[0].phase, 'Race preparation');
   assert.equal(p.weeks[1].phase, 'Race preparation');
   assert.equal(p.weeks[0].longKm, 8);
-  assert.ok(p.weeks[0].targetKm >= 22 && p.weeks[0].targetKm <= 25);
+  assert.deepEqual(roadOpeningFailures(p), []);
+  assert.equal(p.profile.weeklyKm, 20);
   const first = training(p).find(main);
-  assert.equal(first.stimulus, 'race-rhythm');
-  assert.match(first.title, /5K/);
-  assert.ok(first.steps.some((s) => /5K/i.test(s.effort)));
-  assert.equal(p.profile.weeklyKm, 25);
+  assert.equal(first.stimulus, 'threshold');
+  assert.equal(qualityWorkMinutes(first), 6);
+  assert.ok(
+    first.steps.filter((s) => s.kind === 'work').every((s) => s.intensity <= 5),
+  );
+  assert.ok(training(p).some((w) => w.stimulus === 'race-rhythm'));
+  assert.equal(p.profile.weeklyKm, 20);
   assert.equal(p.profile.longestKm, 8);
   assert.equal(p.profile.recentQualityMinutes ?? null, null);
   assert.equal(p.baselineEvidence, undefined);
@@ -178,20 +208,28 @@ for (let offset = 0; offset < 7; offset++)
     const startDate = addDays(start, offset);
     for (let extra = 0; extra < 7; extra++) {
       const p = build({ startDate, raceDate: addDays(startDate, 27 + extra) });
-      assert.ok(p.weeks.every((w) => w.phase !== 'Foundation'));
-      const specific = training(p).filter((w) => w.stimulus === 'race-rhythm');
-      assert.ok(specific.length > 0, `${startDate} to ${p.profile.raceDate}`);
-      for (const w of specific)
-        assert.notEqual(
-          trainingPhaseOn(p.profile, p.weeks[w.week].phase, w.date),
-          'Foundation',
-        );
+      assertRoadPhaseFollowsRace(p);
+      const quality = training(p).filter(
+        (w) => main(w) && taperFactor(p.profile, w.date) === 1,
+      );
+      assert.ok(quality.length >= 2);
+      assert.equal(quality[0].stimulus, 'threshold');
+      assert.equal(qualityWorkMinutes(quality[0]), 6);
+      // Two controlled exposures establish the role before specific practice.
+      // Partial starts do not invent a missed workout to force a third exposure.
+      if (quality.length >= 3)
+        assert.ok(quality.some((w) => w.stimulus === 'race-rhythm'));
+      assert.ok(
+        quality.every(
+          (w) => qualityWorkMinutes(w) >= 6 && qualityWorkMinutes(w) <= 10,
+        ),
+      );
       assertBoundedPlan(p);
     }
   });
 
 for (const [goal, weeklyKm, longestKm, days] of [
-  ['5k', 25, 8, [1, 3, 5]],
+  ['5k', 20, 8, [1, 3, 5]],
   ['10k', 35, 12, [0, 1, 3, 5]],
   ['half', 50, 18, [0, 1, 3, 5]],
 ])
@@ -209,7 +247,7 @@ for (const [goal, weeklyKm, longestKm, days] of [
           startDate,
           raceDate: addDays(startDate, span),
         });
-        assert.ok(p.weeks.every((w) => w.phase !== 'Foundation'));
+        assertRoadPhaseFollowsRace(p);
         assert.equal(p.profile.startDate, startDate);
         assert.equal(p.profile.recentQualityMinutes ?? null, null);
         assertBoundedPlan(p);
@@ -234,8 +272,8 @@ test('short-road opening work respects a bounded share of declared quality, not 
   const known = build({ recentQualityMinutes: 20 });
   const firstUnknown = training(unknown).find(main);
   const firstKnown = training(known).find(main);
-  assert.equal(firstUnknown.stimulus, 'race-rhythm');
-  assert.equal(firstKnown.stimulus, 'race-rhythm');
+  assert.equal(firstUnknown.stimulus, 'threshold');
+  assert.equal(firstKnown.stimulus, 'threshold');
   assert.ok(qualityWorkMinutes(firstKnown) > qualityWorkMinutes(firstUnknown));
   assert.ok(qualityWorkMinutes(firstKnown) <= 20 * 0.5);
   assert.equal(known.profile.recentQualityMinutes, 20);
@@ -249,7 +287,7 @@ test('short-road opening work respects a bounded share of declared quality, not 
       runsPerWeek: 5,
       days: [0, 1, 2, 3, 5],
       recentQualitySessions,
-      recentQualityMinutes: 40,
+      recentQualityMinutes: 20,
     });
   const one = tenK(1),
     two = tenK(2);
@@ -257,7 +295,7 @@ test('short-road opening work respects a bounded share of declared quality, not 
   const twoDose = qualityWorkMinutes(training(two).find(main));
   assert.ok(oneDose > twoDose);
   assert.ok(oneDose <= 16);
-  assert.ok(twoDose <= (40 / 2) * 0.5);
+  assert.ok(twoDose <= (20 / 2) * 0.8);
   for (const p of [unknown, known, one, two]) assertBoundedPlan(p);
 });
 
@@ -287,16 +325,22 @@ test('a race date never fabricates readiness for a novice below the event baseli
 });
 
 test('full-length road plans keep an opening foundation and later event preparation', () => {
-  for (const [goal, span, weeklyKm, longestKm] of [
-    ['5k', 83, 25, 8],
-    ['10k', 83, 35, 12],
-    ['half', 111, 50, 18],
+  for (const [goal, span, weeklyKm, longestKm, days] of [
+    ['5k', 83, 20, 8, [1, 3, 5]],
+    ['10k', 83, 35, 12, [0, 1, 3, 5]],
+    // A 50 km half baseline cannot fit on only three runs while preserving the
+    // 18 km long run and the bounded introductory quality session. Four familiar
+    // running days distribute that existing volume without oversized padding.
+    ['half', 111, 50, 18, [0, 1, 3, 5]],
   ]) {
     const p = build({
       goal,
       raceDate: addDays(start, span),
       weeklyKm,
       longestKm,
+      days,
+      currentRuns: days.length,
+      runsPerWeek: days.length,
     });
     assert.equal(p.weeks[0].phase, 'Foundation');
     assert.ok(p.weeks.some((w) => w.phase === 'Build'));
@@ -353,4 +397,11 @@ test('reviewing a short event block preserves recorded history and is stable on 
       steps: w.steps,
     }));
   assert.deepEqual(prescriptions(twice), prescriptions(once));
+});
+
+test('short-road entry rejects a weekly baseline that requires an easy run beyond its declared long run', () => {
+  assert.throws(
+    () => build({ weeklyKm: 25, longestKm: 8 }),
+    /starting weekly distance and long-run baseline cannot fit/,
+  );
 });

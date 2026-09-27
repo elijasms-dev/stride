@@ -10,8 +10,12 @@ const daysBetween = (a: string, b: string) =>
     (Date.parse(b + 'T12:00:00Z') - Date.parse(a + 'T12:00:00Z')) / 86400000,
   );
 
-export const usesMarathonBook = (p: Pick<Profile, 'goal' | 'method'>) =>
-  p.goal === 'marathon' && (!p.method || p.method === 'balanced');
+export const usesMarathonBook = (
+  p: Pick<Profile, 'goal' | 'method' | 'planLevel'>,
+) =>
+  p.planLevel !== 'beginner' &&
+  p.goal === 'marathon' &&
+  (!p.method || p.method === 'balanced');
 
 export function marathonReference(p: Profile) {
   // Entry evidence, not desired mileage, selects an approximate reference band.

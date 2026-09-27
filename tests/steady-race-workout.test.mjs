@@ -54,8 +54,8 @@ const plan = (patch = {}) =>
   );
 const adapted = (p) => p.workouts.filter(isSteadyRaceAdaptation);
 const dose = (w) => {
-  const { title, purpose, reason, ...saved } = w;
-  return { ...saved, steps: w.steps.map(({ label, ...s }) => s) };
+  const { title: _title, purpose: _purpose, reason: _reason, ...saved } = w;
+  return { ...saved, steps: w.steps.map(({ label: _label, ...s }) => s) };
 };
 
 test('gentler 10K blocks agree across title, instructions and actual steady targets', () => {
@@ -63,13 +63,18 @@ test('gentler 10K blocks agree across title, instructions and actual steady targ
   assert.deepEqual(validatePlan(p), []);
   assert.ok(adapted(p).length > 0);
   for (const w of adapted(p)) {
-    assert.match(w.title, /steady efforts/);
+    assert.match(w.title, /steady efforts/i);
     assert.match(w.purpose, /gentler session/);
     assert.match(w.reason, /steady aerobic work/);
     for (const s of w.steps.filter((s) => s.kind === 'work')) {
-      assert.match(s.label, /steady/);
+      assert.match(s.label, /steady/i);
       assert.equal(s.intensity, 5);
-      assert.deepEqual(s.target, { mode: 'pace', low: 320, high: 340 });
+      assert.deepEqual(s.target, {
+        mode: 'pace',
+        low: 320,
+        high: 340,
+        source: 'manual',
+      });
     }
   }
 });
@@ -97,7 +102,7 @@ for (const mode of ['effort', 'pace', 'heart-rate']) {
       Stream.fromByteArray(encodeWorkout(w)),
     ).read();
     assert.deepEqual(errors, []);
-    assert.match(messages.workoutMesgs[0].wktName, /steady efforts/);
+    assert.match(messages.workoutMesgs[0].wktName, /steady efforts/i);
     w.steps.forEach((s, i) => {
       const out = messages.workoutStepMesgs[i];
       assert.equal(out.wktStepName, s.label.slice(0, 32));
@@ -155,7 +160,7 @@ test('explicit target review corrects future instructions while preserving prote
       assert.deepEqual(w, old);
     assert.deepEqual(dose(w), dose(old));
   }
-  assert.match(next.workouts.find((w) => w.id === runs[3].id).title, /steady/);
+  assert.match(next.workouts.find((w) => w.id === runs[3].id).title, /steady/i);
 });
 
 test('native and custom races share the correction without treating normal half effort as softened', () => {
@@ -172,7 +177,7 @@ test('native and custom races share the correction without treating normal half 
         templateId,
         eventDistanceKm,
       });
-      assert.match(next.title, /steady efforts/);
+      assert.match(next.title, /steady efforts/i);
       assert.deepEqual(dose(next), dose({ ...w, templateId, eventDistanceKm }));
     }
   }
@@ -231,11 +236,11 @@ test('normal 10K training retains race pace and explicit variety keeps gentle cu
     next = refreshWorkoutVariety(p, start);
   assert.deepEqual(validatePlan(next), []);
   for (const w of adapted(next)) {
-    assert.match(w.title, /steady efforts/);
+    assert.match(w.title, /steady efforts/i);
     assert.ok(
       w.steps
         .filter((s) => s.kind === 'work')
-        .every((s) => /steady/.test(s.label)),
+        .every((s) => /steady/i.test(s.label)),
     );
   }
 });
@@ -246,7 +251,7 @@ test('an alternative menu describes the steady session that will actually be app
   assert.ok(w);
   const before = structuredClone(p);
   for (const option of workoutAlternatives(p, w.id)) {
-    assert.match(option.title, /steady/);
+    assert.match(option.title, /steady/i);
     assert.match(option.cue, /Steady and comfortable/);
     const next = substituteWorkout(p, w.id, option.id, start);
     const saved = next.workouts.find((x) => x.id === w.id);

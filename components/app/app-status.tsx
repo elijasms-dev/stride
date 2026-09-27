@@ -5,7 +5,8 @@ import { Check, CloudOff } from 'lucide-react';
 import { useAppContext } from './app-context';
 
 export function AppStatus() {
-  const { loading, loadError, busy, offline, isDemo } = useAppContext();
+  const { loading, loadError, busy, offline, isDemo, device, syncingPending } =
+    useAppContext();
   return (
     <>
       {!isDemo && (
@@ -18,15 +19,19 @@ export function AppStatus() {
             <Check size={15} aria-hidden="true" />
           )}
           <span>
-            {busy
-              ? 'Saving…'
-              : loading
-                ? 'Refreshing…'
-                : loadError
-                  ? 'Refresh needed'
-                  : offline
-                    ? 'Offline'
-                    : 'Saved'}
+            {syncingPending
+              ? 'Syncing pending saves…'
+              : device?.pending.length
+                ? `${device.pending.length} saved locally`
+                : busy
+                  ? 'Saving…'
+                  : loading
+                    ? 'Refreshing…'
+                    : loadError
+                      ? 'Refresh needed'
+                      : offline
+                        ? 'Offline'
+                        : 'Saved'}
           </span>
         </output>
       )}

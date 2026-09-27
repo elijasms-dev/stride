@@ -203,7 +203,7 @@ test('marathon preferences retain selectable zero, one and two workout options',
     assert.doesNotMatch(frequency, /disabled=""|aria-disabled="true"/);
     assert.match(
       frequency,
-      new RegExp(`checked="" value="${qualityMode === 'custom' ? 2 : 1}"`),
+      new RegExp(`checked="" value="${qualityMode === 'custom' ? 2 : 'automatic'}"`),
     );
   }
 });

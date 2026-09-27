@@ -44,7 +44,7 @@ const work = (w) =>
   w.steps.filter((s) => s.kind === 'work' && s.intensity >= 4);
 const target = (p) =>
   p.workouts.find(
-    (w) => w.templateId === 'race-rhythm-10' && w.qualityMinutes === 10,
+    (w) => w.stimulus === 'race-rhythm' && w.qualityMinutes === 10,
   );
 const session = (id, cap, minutes = 60, p = profile()) => {
   const t = WORKOUT_LIBRARY.find((t) => t.id === id);
@@ -103,9 +103,9 @@ test('a new allocation gets the gentle reduction, even when it has existing dist
   );
 });
 
-test('unchanged and one-minute-shorter limits keep the familiar two-by-five-minute set', () => {
-  const p = make(),
-    w = target(p),
+test('unchanged and one-minute-shorter limits keep a saved legacy two-by-five-minute set', () => {
+  const p = { profile: profile({ goal: 'custom', raceDistanceKm: 10 }) },
+    w = session('race-rhythm-10', 12.5, 47, p.profile),
     before = structuredClone(w);
   assert.equal(w.minutes, 47);
   const same = resizeWorkout(w, p.profile, 'Race preparation', 47);
@@ -126,9 +126,9 @@ test('unchanged and one-minute-shorter limits keep the familiar two-by-five-minu
   assert.deepEqual(w, before);
 });
 
-test('repeated shortening keeps complete work until the whole set no longer fits', () => {
-  const p = make();
-  let w = target(p);
+test('repeated shortening keeps the complete saved legacy set until it no longer fits', () => {
+  const p = { profile: profile({ goal: 'custom', raceDistanceKm: 10 }) };
+  let w = session('race-rhythm-10', 12.5, 47, p.profile);
   for (const limit of [46, 45, 40, 35, 30, 27]) {
     w = resizeWorkout(w, p.profile, 'Race preparation', limit);
     assert.equal(w.minutes, limit);
@@ -170,11 +170,14 @@ test('a lower explicit work budget still removes full repetitions and cannot inc
 test('taper retains its smaller saved dose, never the original full template dose', () => {
   const p = make(),
     w = p.workouts.find(
-      (w) => w.templateId === 'race-rhythm-10' && w.qualityMinutes === 5,
+      (w) =>
+        w.hard &&
+        w.kind !== 'race' &&
+        ['Taper', 'Race week'].includes(p.weeks[w.week].phase),
     );
   assert.ok(w);
   const next = resizeWorkout(w, p.profile, 'Taper', w.minutes - 1);
-  assert.equal(next.qualityMinutes, 5);
+  assert.equal(next.qualityMinutes, w.qualityMinutes);
   assert.deepEqual(work(next), work(w));
   assert.ok(next.minutes < w.minutes);
 });
@@ -184,7 +187,8 @@ test('public shorten and lower-limit preference edits preserve history, schedule
     w = target(p);
   p.workouts[0].status = 'completed';
   const before = structuredClone(p);
-  const next = shortenWorkout(p, w.id, 46, '2026-09-11');
+  const lowerLimit = w.minutes - 1;
+  const next = shortenWorkout(p, w.id, lowerLimit, '2026-09-11');
   assert.deepEqual(validatePlan(next), []);
   assert.equal(next.workouts.find((s) => s.id === w.id).qualityMinutes, 10);
   for (const old of before.workouts.filter((s) => s.id !== w.id))
@@ -193,7 +197,11 @@ test('public shorten and lower-limit preference edits preserve history, schedule
       old,
     );
   assert.deepEqual(p, before);
-  const limited = revisePreferences(p, { weekdayMinutes: 46 }, '2026-09-11');
+  const limited = revisePreferences(
+    p,
+    { weekdayMinutes: lowerLimit },
+    '2026-09-11',
+  );
   assert.deepEqual(validatePlan(limited), []);
   assert.equal(limited.workouts.find((s) => s.id === w.id).qualityMinutes, 10);
   assert.deepEqual(
@@ -201,7 +209,7 @@ test('public shorten and lower-limit preference edits preserve history, schedule
     p.workouts[0],
   );
   assert.deepEqual(
-    revisePreferences(limited, { weekdayMinutes: 46 }, '2026-09-11'),
+    revisePreferences(limited, { weekdayMinutes: lowerLimit }, '2026-09-11'),
     limited,
   );
 });

@@ -4,17 +4,20 @@ import { type Plan, dateLabel } from '@/lib/engine';
 import {
   TARGET_BANDS,
   targetBandLabels,
-  paceText,
-  parsePace,
   targetLabel,
-  validateWorkoutTargets,
+  benchmarkWorkoutTargets,
   type WorkoutTargets,
-  type TargetBand,
 } from '@/lib/workout-targets';
 import { Modal, Field, api } from './stride-ui';
 import { BusyButton } from './action-progress';
 import type { Action } from './workout-detail';
-type Values = Record<TargetBand, { low: string; high: string }>;
+import { pacingEvidence } from '@/lib/fitness-pacing';
+import { todayInZone, eventDistanceDisplay } from '@/lib/engine';
+import { elapsedTimeText } from '@/lib/benchmark-input';
+import {
+  initialTargetSettings,
+  targetSettingsConfig,
+} from '@/lib/workout-target-form';
 type Preview = {
   plan: Plan;
   version: number;
@@ -35,32 +38,16 @@ export default function WorkoutTargetSettings({
   onClose: () => void;
   busy: boolean;
 }) {
-  const saved = plan.profile.workoutTargets ?? { mode: 'effort' };
   const unit = plan.profile.units;
-  const [mode, setMode] = useState<WorkoutTargets['mode']>(saved.mode);
-  const values = (kind: 'pace' | 'heartRate'): Values =>
-    Object.fromEntries(
-      TARGET_BANDS.map((band) => {
-        const range = saved[kind]?.[band];
-        return [
-          band,
-          {
-            low: range
-              ? kind === 'pace'
-                ? paceText(range.low, unit)
-                : String(range.low)
-              : '',
-            high: range
-              ? kind === 'pace'
-                ? paceText(range.high, unit)
-                : String(range.high)
-              : '',
-          },
-        ];
-      }),
-    ) as Values;
-  const [pace, setPace] = useState(() => values('pace'));
-  const [hr, setHr] = useState(() => values('heartRate'));
+  const initial = initialTargetSettings(plan.profile);
+  const [mode, setMode] = useState(initial.mode);
+  const [pace, setPace] = useState(initial.pace);
+  const [hr, setHr] = useState(initial.heartRate);
+  const automaticTargets = benchmarkWorkoutTargets(plan.profile);
+  const evidence = pacingEvidence(
+    plan.profile,
+    todayInZone(plan.profile.timezone),
+  );
   const [preview, setPreview] = useState<Preview | null>(null);
   const [config, setConfig] = useState<WorkoutTargets | null>(null);
   const [error, setError] = useState('');
@@ -69,8 +56,8 @@ export default function WorkoutTargetSettings({
     preview?.plan.workouts
       .filter(
         (w) =>
-          JSON.stringify(w.steps) !==
-          JSON.stringify(plan.workouts.find((old) => old.id === w.id)?.steps),
+          JSON.stringify(w) !==
+          JSON.stringify(plan.workouts.find((old) => old.id === w.id)),
       )
       .sort(
         (a, b) =>
@@ -81,38 +68,11 @@ export default function WorkoutTargetSettings({
     setError('');
     setLoading(true);
     try {
-      const next: WorkoutTargets = { ...saved, mode };
-      if (mode !== 'effort') {
-        const key = mode === 'pace' ? 'pace' : 'heartRate';
-        next[key] = {};
-        for (const band of TARGET_BANDS) {
-          const raw = (mode === 'pace' ? pace : hr)[band];
-          if (!raw.low.trim() && !raw.high.trim()) continue;
-          const savedRange = saved[key]?.[band];
-          const low =
-            mode === 'pace'
-              ? savedRange && raw.low === paceText(savedRange.low, unit)
-                ? savedRange.low
-                : parsePace(raw.low, unit)
-              : raw.low.trim()
-                ? Number(raw.low)
-                : null;
-          const high =
-            mode === 'pace'
-              ? savedRange && raw.high === paceText(savedRange.high, unit)
-                ? savedRange.high
-                : parsePace(raw.high, unit)
-              : raw.high.trim()
-                ? Number(raw.high)
-                : null;
-          if (low === null || high === null)
-            throw new Error(
-              `${targetBandLabels[band]}: enter both ends of the range${mode === 'pace' ? ' as minutes:seconds' : ''}.`,
-            );
-          next[key]![band] = { low, high };
-        }
-      }
-      const targets = validateWorkoutTargets(next);
+      const targets = targetSettingsConfig(plan.profile, {
+        mode,
+        pace,
+        heartRate: hr,
+      });
       const result = await api<Preview>('/api/plan', {
         method: 'POST',
         body: JSON.stringify({ action: 'targetsPreview', version, targets }),
@@ -144,12 +104,23 @@ export default function WorkoutTargetSettings({
       )}
       {!preview ? (
         <>
-          <div className="target-mode-picker" aria-label="Workout target mode">
+          <div
+            className="target-mode-picker"
+            aria-label="Workout target mode"
+            style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}
+          >
             {(
               [
+                [
+                  'automatic',
+                  'Automatic',
+                  plan.profile.recentRace
+                    ? 'From your benchmark'
+                    : 'Effort until a benchmark',
+                ],
                 ['effort', 'Effort', 'How it feels'],
-                ['pace', 'Pace', `Time per ${unit}`],
-                ['heart-rate', 'Heart rate', 'Beats per minute'],
+                ['pace', 'Manual pace', `Time per ${unit}`],
+                ['heart-rate', 'Manual heart rate', 'Beats per minute'],
               ] as const
             ).map(([value, label, hint]) => (
               <button
@@ -165,7 +136,67 @@ export default function WorkoutTargetSettings({
               </button>
             ))}
           </div>
-          {mode === 'effort' ? (
+          {mode === 'automatic' ? (
+            <section aria-label="Automatic target source">
+              {automaticTargets ? (
+                <>
+                  <p>
+                    Your{' '}
+                    {eventDistanceDisplay(
+                      plan.profile.recentRace!.distanceKm,
+                      unit,
+                    )}{' '}
+                    {unit} result in{' '}
+                    {elapsedTimeText(plan.profile.recentRace!.timeMinutes)}{' '}
+                    supplies estimated training paces. These are coaching
+                    estimates, not measured zones or guaranteed race times.
+                  </p>
+                  <dl className="target-range-row">
+                    {TARGET_BANDS.map((band) => {
+                      const range = automaticTargets.pace?.[band];
+                      return range ? (
+                        <div key={band}>
+                          <dt>{targetBandLabels[band]}</dt>
+                          <dd>
+                            {targetLabel({ ...range, mode: 'pace' }, unit)}
+                          </dd>
+                        </div>
+                      ) : null;
+                    })}
+                  </dl>
+                  <p className="subtle">
+                    Controlled tempo, threshold and repetitions have separate
+                    ranges. Walking, recoveries, run/walk sessions, hills and
+                    short strides retain their effort cues. These are estimated
+                    training ranges, not a measure of prediction confidence.
+                  </p>
+                  {evidence.notices.map((notice) => (
+                    <p className="subtle" key={notice}>
+                      {notice}
+                    </p>
+                  ))}
+                  <p className="subtle">
+                    If this result does not reflect current conditions or
+                    fitness, choose effort or review manual ranges.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p>
+                    {plan.profile.recentRace
+                      ? 'This benchmark is outside the supported training-pace model. Runs keep their effort cues.'
+                      : 'No benchmark is saved. Runs use effort cues until you add a recent race or time trial in plan preferences. Automatic mode will then use its estimated paces.'}
+                  </p>
+                  {plan.profile.recentRace &&
+                    evidence.notices.map((notice) => (
+                      <p className="subtle" key={notice}>
+                        {notice}
+                      </p>
+                    ))}
+                </>
+              )}
+            </section>
+          ) : mode === 'effort' ? (
             <p>
               Follow the breathing and effort cues in each step. No pace or
               heart-rate alerts are prescribed.
@@ -177,6 +208,28 @@ export default function WorkoutTargetSettings({
                 running; leave any other range blank to keep those sessions on
                 effort.
               </p>
+              {evidence.notices
+                .filter(
+                  (notice) =>
+                    notice.startsWith('Your manual') ||
+                    notice.startsWith('Your declared') ||
+                    notice.startsWith('Your easy pace'),
+                )
+                .map((notice) => (
+                  <p className="subtle" key={notice}>
+                    {notice}
+                  </p>
+                ))}
+              {plan.profile.workoutTargets?.bandsVersion === undefined &&
+                (plan.profile.workoutTargets?.pace?.tempo ||
+                  plan.profile.workoutTargets?.pace?.interval ||
+                  plan.profile.workoutTargets?.heartRate?.tempo ||
+                  plan.profile.workoutTargets?.heartRate?.interval) && (
+                  <p className="subtle">
+                    Previously shared ranges are shown separately so you can
+                    review threshold and repetition targets for each effort.
+                  </p>
+                )}
               {mode === 'pace' && (
                 <p className="subtle">
                   Pace ranges round outward to whole seconds per kilometre for
@@ -227,9 +280,10 @@ export default function WorkoutTargetSettings({
                 </div>
               ))}
               <p className="subtle">
-                Hills, walking, recovery steps and double-threshold sessions
-                keep their existing effort cues. Short efforts use effort in
-                heart-rate mode; don’t speed up just to chase a reading.
+                Hills, run/walk sessions, recovery steps, short strides and
+                double-threshold sessions keep their effort cues. Short efforts
+                use effort in heart-rate mode; don’t speed up just to chase a
+                reading.
               </p>
               {mode === 'heart-rate' && (
                 <p className="notice">
@@ -265,7 +319,14 @@ export default function WorkoutTargetSettings({
           <p>
             {changed.length} upcoming{' '}
             {changed.length === 1 ? 'workout' : 'workouts'} will use your{' '}
-            {mode === 'heart-rate' ? 'heart-rate' : mode} settings.
+            {mode === 'automatic'
+              ? automaticTargets
+                ? 'automatic benchmark'
+                : 'automatic effort'
+              : mode === 'heart-rate'
+                ? 'heart-rate'
+                : mode}{' '}
+            settings.
           </p>
           {changed.some(
             (w) =>
@@ -289,8 +350,10 @@ export default function WorkoutTargetSettings({
           )}
           {!changed.length && (
             <p className="subtle">
-              These preferences will be saved for future workouts. There are no
-              eligible step targets to change in this block.
+              {JSON.stringify(preview.plan.profile.workoutTargets) ===
+              JSON.stringify(plan.profile.workoutTargets)
+                ? 'Your target preferences are unchanged. Saving will not rewrite your plan.'
+                : 'The target source will be saved for future workouts. No eligible step targets change in this block.'}
             </p>
           )}
           {changed.slice(0, 3).map((w) => (
@@ -321,7 +384,7 @@ export default function WorkoutTargetSettings({
                 setError('');
               }}
             >
-              Edit ranges
+              Edit target choice
             </button>
             <BusyButton
               className="primary-button"

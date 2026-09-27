@@ -88,7 +88,12 @@ for (const distance of [
       const work = w.steps.filter((s) => s.kind === 'work');
       assert.ok(work.length);
       for (const s of work)
-        assert.deepEqual(s.target, { mode: 'pace', low: 290, high: 310 });
+        assert.deepEqual(s.target, {
+          mode: 'pace',
+          low: 290,
+          high: 310,
+          source: 'manual',
+        });
       if (![10, 21.0975].includes(distance))
         assert.doesNotMatch(
           JSON.stringify([
@@ -241,6 +246,7 @@ test('gentle custom work stays steady instead of receiving the race target', () 
       ? {
           ...s,
           intensity: 5,
+          effortRole: 'steady',
           effort: 'Steady and comfortable · 5–6 / 10',
         }
       : s,
@@ -248,7 +254,12 @@ test('gentle custom work stays steady instead of receiving the race target', () 
   const next = withWorkoutTargets(w, plan.profile);
   assert.match(next.title, /steady efforts/);
   for (const s of next.steps.filter((s) => s.kind === 'work'))
-    assert.deepEqual(s.target, { mode: 'pace', low: 320, high: 340 });
+    assert.deepEqual(s.target, {
+      mode: 'pace',
+      low: 320,
+      high: 340,
+      source: 'manual',
+    });
 });
 
 test('standard events and ultra guidance keep their existing instructions', () => {

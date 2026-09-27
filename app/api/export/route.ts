@@ -1,3 +1,4 @@
+import { beginRequestObservation } from '@/lib/request-observation';
 import { exportCalendar } from '@/lib/calendar';
 import { todayInZone } from '@/lib/engine';
 import {
@@ -11,6 +12,7 @@ import {
 import { encodeWorkout } from '@/lib/fit';
 import { exportProgram } from '@/lib/program-export';
 export async function GET(request: Request) {
+  const observation = beginRequestObservation(request);
   try {
     const owner = ownerId(request),
       state = await readState(owner),
@@ -154,6 +156,6 @@ export async function GET(request: Request) {
       },
     );
   } catch (e) {
-    return failure(e);
+    return failure(e, observation);
   }
 }

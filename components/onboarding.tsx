@@ -1,5 +1,12 @@
 'use client';
+import { isBeginnerProfile } from '@/lib/beginner-course';
+import { BeginnerCourseOverview } from './beginner-course-fields';
 import { RecentRaceFields } from './recent-race-fields';
+import {
+  loadOnboardingDraft,
+  saveOnboardingDraft,
+  clearOnboardingDraft,
+} from '@/lib/onboarding-draft';
 import { UltraDistanceChoices, UltraRoutineFields } from './ultra-fields';
 import { TrainingPattern } from './training-pattern';
 import { BusyButton } from './action-progress';
@@ -60,7 +67,7 @@ export default function Onboarding({
 }) {
   // Activation changes the active plan before this dialog closes. Keep its
   // draft attached to the plan it was opened for throughout that transition.
-  const [storageKey] = useState(() => `stride-onboarding:${draftScope}`);
+  const [initialScope] = useState(draftScope);
   const [initial] = useState(() => {
     const timezone =
       defaults?.timezone ||
@@ -100,50 +107,18 @@ export default function Onboarding({
           easyPace: null,
           ...defaults,
         };
-    try {
-      const saved = JSON.parse(sessionStorage.getItem(storageKey) || 'null');
-      if (
-        saved?.profile &&
-        Array.isArray(saved.profile.days) &&
-        saved.profile.days.every(
-          (d: unknown) =>
-            Number.isInteger(d) && Number(d) >= 0 && Number(d) <= 6,
-        ) &&
-        ['5k', '10k', 'half', 'marathon', 'ultra', 'custom', 'base'].includes(
-          saved.profile.goal,
-        ) &&
-        ['km', 'mi'].includes(saved.profile.units) &&
-        validTimezone(saved.profile.timezone) &&
-        Number.isInteger(saved.step) &&
-        saved.step >= 0 &&
-        Number.isFinite(saved.savedAt) &&
-        Date.now() >= saved.savedAt &&
-        Date.now() - saved.savedAt < 30 * 86400000
-      )
-        return {
-          profile: {
-            ...saved.profile,
-            availableDays: saved.profile.availableDays ?? [
-              ...saved.profile.days,
-            ],
-            runsPerWeek: saved.profile.runsPerWeek ?? saved.profile.days.length,
-            startDate: validDate(saved.profile.startDate)
-              ? saved.profile.startDate
-              : trainingDay(saved.profile.timezone),
-            raceDate: validDate(saved.profile.raceDate)
-              ? saved.profile.raceDate
-              : '',
-          } as Profile,
-          raw: saved.raw || {},
-          resumed: true,
-          step: Math.min(2, saved.step || 0),
-          scheduleTouched: saved.scheduleTouched ?? saved.step >= 2,
-        };
-    } catch {}
+    const stored = loadOnboardingDraft(initialScope);
+    if (stored.draft)
+      return {
+        ...stored.draft,
+        resumed: true,
+        storageUnavailable: stored.unavailable,
+      };
     return {
       profile,
       raw: {},
       resumed: false,
+      storageUnavailable: stored.unavailable,
       step: 0,
       scheduleTouched: !!existing,
     };
@@ -153,6 +128,9 @@ export default function Onboarding({
   const [raw, setRaw] = useState<Record<string, NumericDraft>>(initial.raw);
   const [scheduleTouched, setScheduleTouched] = useState(
     initial.scheduleTouched,
+  );
+  const [draftUnavailable, setDraftUnavailable] = useState(
+    initial.storageUnavailable,
   );
   const [previewWeek, setPreviewWeek] = useState(0);
   const [preview, setPreview] = useState<Plan | null>(null),
@@ -178,20 +156,16 @@ export default function Onboarding({
     [],
   );
   useEffect(() => {
-    if (finished.current || !draftScope) return;
-    try {
-      sessionStorage.setItem(
-        storageKey,
-        JSON.stringify({
-          profile: p,
-          raw,
-          step: Math.min(step, 2),
-          scheduleTouched,
-          savedAt: Date.now(),
-        }),
-      );
-    } catch {}
-  }, [p, raw, step, storageKey, draftScope, scheduleTouched]);
+    if (finished.current || !draftScope || draftScope !== initialScope) return;
+    setDraftUnavailable(
+      !saveOnboardingDraft(initialScope, {
+        profile: p,
+        raw,
+        step: Math.min(step, 2),
+        scheduleTouched,
+      }),
+    );
+  }, [p, raw, step, initialScope, draftScope, scheduleTouched]);
   useEffect(() => {
     const tick = () => {
       if (!validTimezone(p.timezone)) return;
@@ -306,11 +280,18 @@ export default function Onboarding({
         const range = runningDayRange(p);
         const recommended = Math.min(
           range.max,
-          Math.max(range.min, p.currentRuns || 2),
+          Math.max(range.min, p.currentRuns || (isBeginnerProfile(p) ? 3 : 2)),
         );
-        next = { ...next, runsPerWeek: recommended };
+        const beginnerRuns = isBeginnerProfile(p)
+          ? 3
+          : p.planLevel === 'beginner'
+            ? p.goal === 'marathon'
+              ? 4
+              : 3
+            : recommended;
+        next = { ...next, runsPerWeek: Math.min(range.max, beginnerRuns) };
         setNotice(
-          `We suggested ${recommended} runs per week from your recent routine. Choose how often you want to run, then every day you could run.`,
+          `We suggested ${next.runsPerWeek} runs per week from your recent routine. Choose how often you want to run, then every day you could run.`,
         );
       }
       setP(next);
@@ -426,10 +407,16 @@ export default function Onboarding({
         ))}
       </div>
       {notice && <output className="notice">{notice}</output>}
+      {draftUnavailable && (
+        <p className="notice error" role="alert">
+          Your draft could not be saved on this device. Keep this window open
+          until you finish, or enable browser storage and try again.
+        </p>
+      )}
       <p className="subtle">
         {existing && step === 0
           ? 'Change any of your inputs. Your current plan stays active until you review and confirm the replacement.'
-          : 'Your draft stays in this tab when you close.'}
+          : 'Your draft stays on this device for up to 30 days when you close.'}
       </p>
       <NumericDraftContext.Provider
         value={{
@@ -475,6 +462,11 @@ export default function Onboarding({
                         setP((prev) => ({
                           ...prev,
                           goal,
+                          planLevel: ['5k', '10k', 'half', 'marathon'].includes(
+                            goal,
+                          )
+                            ? prev.planLevel
+                            : undefined,
                           raceDistanceKm:
                             goal === 'ultra'
                               ? 50
@@ -632,7 +624,9 @@ export default function Onboarding({
                   </Field>
                   <Field
                     label={
-                      p.goal === 'base' ? 'Block finish date' : 'Race date'
+                      p.goal === 'base' || isBeginnerProfile(p)
+                        ? 'Block finish date'
+                        : 'Race date'
                     }
                   >
                     <input
@@ -670,7 +664,18 @@ export default function Onboarding({
                     label="Running background"
                     value={p.experience}
                     onChange={(v) =>
-                      update('experience', v as Profile['experience'])
+                      setP((prev) => ({
+                        ...prev,
+                        experience: v as Profile['experience'],
+                        ...(v === 'new' &&
+                        ['5k', '10k', 'half', 'marathon'].includes(prev.goal)
+                          ? {
+                              planLevel: 'beginner',
+                              qualityMode: 'automatic',
+                              qualitySessions: 0,
+                            }
+                          : {}),
+                      }))
                     }
                     options={[
                       { value: 'established', label: 'I run consistently' },
@@ -682,6 +687,60 @@ export default function Onboarding({
                     ]}
                   />
                 </Field>
+                {['5k', '10k', 'half', 'marathon'].includes(p.goal) && (
+                  <Field
+                    label="Plan approach"
+                    hint="Your current running base and whether this is your first race are separate choices."
+                  >
+                    <Choice
+                      label="Plan approach"
+                      value={p.planLevel ?? 'standard'}
+                      onChange={(v) =>
+                        setP((prev) => ({
+                          ...prev,
+                          planLevel: v as Profile['planLevel'],
+                          qualityMode: 'automatic',
+                          qualitySessions: v === 'beginner' ? 0 : undefined,
+                          ...(v === 'beginner'
+                            ? {
+                                method: 'balanced',
+                                intent: 'finish',
+                                doubleDays: [],
+                                marathonApproach: 'balanced',
+                              }
+                            : {}),
+                        }))
+                      }
+                      options={[
+                        {
+                          value: 'beginner',
+                          label: 'Beginner · build towards a first finish',
+                        },
+                        {
+                          value: 'standard',
+                          label: 'Standard · train from an established routine',
+                        },
+                      ]}
+                    />
+                  </Field>
+                )}
+                {p.planLevel === 'beginner' && (
+                  <p className="notice">
+                    Beginner race blocks use easy running, supporting runs and a
+                    progressive long run. Allow about{' '}
+                    {p.goal === 'marathon'
+                      ? '18'
+                      : p.goal === 'half'
+                        ? '12'
+                        : '8'}{' '}
+                    weeks once the entry running base is established. Starting
+                    from zero uses the timed learning-to-run course first. The
+                    race date never accelerates that course.
+                    {p.goal === 'marathon'
+                      ? ' This distance-based first-marathon option requires four running days; three-day run/walk marathon programmes are not included.'
+                      : ' This option uses three running days, with a fourth available for half-marathon preparation.'}
+                  </p>
+                )}
                 <Field label="Distance units">
                   <Choice
                     label="Distance units"
@@ -720,6 +779,16 @@ export default function Onboarding({
                     placeholder="e.g. 4"
                   />
                 </Field>
+                {isBeginnerProfile(p) && (
+                  <p className="notice">
+                    Your zero running baseline starts Couch to 5K: easy timed
+                    run/walk lessons with rest days. No pace or race result is
+                    needed. The goal is 30 minutes of continuous running;
+                    completing 5 km can take longer. A longer race goal needs a
+                    separate distance-specific build after reviewing your actual
+                    running base.
+                  </p>
+                )}
                 <UltraRoutineFields profile={p} onChange={setP} />
                 <RecentRaceFields profile={p} onChange={setP} />
                 <Field
@@ -793,34 +862,51 @@ export default function Onboarding({
                 >
                   Edit running days and preferences
                 </button>
-                <div className="preview-metrics">
-                  {[
-                    ['First week', preview.weeks[0]?.targetKm ?? 0],
-                    [
-                      'Peak week',
-                      Math.max(0, ...preview.weeks.map((w) => w.targetKm)),
-                    ],
-                    [
-                      'Longest run',
-                      Math.max(0, ...preview.weeks.map((w) => w.longKm)),
-                    ],
-                  ].map(([label, km]) => (
-                    <div key={String(label)}>
-                      <span>{label}</span>
-                      <strong>
-                        {Number(
-                          (
-                            Number(km) / (p.units === 'mi' ? MILE_KM : 1)
-                          ).toFixed(1),
-                        )}{' '}
-                        <small>{p.units}</small>
-                      </strong>
-                    </div>
-                  ))}
-                </div>
+                {preview.beginner ? (
+                  <>
+                    <p className="notice">
+                      First outing: 28½ minutes including walking; eight
+                      one-minute jogs. Zero speed workouts. The calendar holds
+                      each stage until your completion review.
+                    </p>
+                    <BeginnerCourseOverview />
+                  </>
+                ) : (
+                  <div className="preview-metrics">
+                    {[
+                      ['First week', preview.weeks[0]?.targetKm ?? 0],
+                      [
+                        'Peak week',
+                        Math.max(0, ...preview.weeks.map((w) => w.targetKm)),
+                      ],
+                      [
+                        'Longest run',
+                        Math.max(0, ...preview.weeks.map((w) => w.longKm)),
+                      ],
+                    ].map(([label, km]) => (
+                      <div key={String(label)}>
+                        <span>{label}</span>
+                        <strong>
+                          {Number(
+                            (
+                              Number(km) / (p.units === 'mi' ? MILE_KM : 1)
+                            ).toFixed(1),
+                          )}{' '}
+                          <small>{p.units}</small>
+                        </strong>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <p className="plan-control-hint">
-                  Weekly totals include estimated distance for timed workout
-                  steps. Recovery and taper weeks are lighter.
+                  {preview.beginner ? (
+                    'Totals show outing minutes including walking. Distance is unprescribed; progress follows comfortable completion reviews.'
+                  ) : (
+                    <>
+                      Weekly totals include estimated distance for timed workout
+                      steps. Recovery and taper weeks are lighter.
+                    </>
+                  )}
                 </p>
                 <div className="plan-bars">
                   {preview.weeks.map((w) => (
@@ -859,7 +945,7 @@ export default function Onboarding({
                     options={preview.weeks.map((week) => ({
                       value: String(week.index),
                       label:
-                        preview.profile.goal === 'base'
+                        preview.beginner || preview.profile.goal === 'base'
                           ? `Week ${week.index + 1} · ${week.phase}`
                           : `${previewWeeks[week.index].countdown} · ${previewWeeks[week.index].phase} · Week ${week.index + 1}`,
                     }))}
@@ -868,14 +954,18 @@ export default function Onboarding({
                 <div className="preview-first-week">
                   <div className="section-heading">
                     <div>
-                      {preview.profile.goal !== 'base' && previewContext && (
-                        <p className="eyebrow">
-                          {dateLabel(previewContext.start)} ·{' '}
-                          {previewContext.countdown}
-                        </p>
-                      )}
+                      {!preview.beginner &&
+                        preview.profile.goal !== 'base' &&
+                        previewContext && (
+                          <p className="eyebrow">
+                            {dateLabel(previewContext.start)} ·{' '}
+                            {previewContext.countdown}
+                          </p>
+                        )}
                       <h3>
-                        {preview.profile.goal !== 'base' && previewContext
+                        {!preview.beginner &&
+                        preview.profile.goal !== 'base' &&
+                        previewContext
                           ? previewContext.phase
                           : `Week ${previewIndex + 1}`}
                       </h3>
@@ -987,9 +1077,8 @@ export default function Onboarding({
                       previewVersion.current,
                     );
                     finished.current = true;
-                    try {
-                      sessionStorage.removeItem(storageKey);
-                    } catch {}
+                    if (!clearOnboardingDraft(initialScope))
+                      setDraftUnavailable(true);
                   } catch (e) {
                     setError((e as Error).message);
                   } finally {
@@ -1014,9 +1103,13 @@ export default function Onboarding({
             disabled={loading || busy}
             onClick={() => {
               finished.current = true;
-              try {
-                sessionStorage.removeItem(storageKey);
-              } catch {}
+              if (!clearOnboardingDraft(initialScope)) {
+                setDraftUnavailable(true);
+                setError(
+                  'The saved draft could not be removed. Check browser storage access and try Discard draft again.',
+                );
+                return;
+              }
               onClose();
             }}
           >

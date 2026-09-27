@@ -205,3 +205,67 @@
 .workout-prescription > .workout-stats[data-metrics='2'] > div:last-child {
   grid-column: auto;
 }
+
+/* Keep the run action visible while longer instructions scroll independently. */
+.stride-modal:has(.workout-detail-footer) {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+}
+.stride-modal:has(.workout-detail-footer) > .modal-heading {
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+.workout-detail-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-block: 16px;
+  padding-inline: 2px;
+  flex: 1 1 auto;
+  scrollbar-width: thin;
+}
+.workout-detail-scroll:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+.stride-modal .workout-detail-footer {
+  flex-shrink: 0;
+  padding-top: 16px;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  margin-top: 0;
+  border-top: 1px solid var(--border);
+  background: var(--paper);
+}
+.workout-detail-footer .subtle {
+  flex: 1 1 180px;
+}
+.workout-detail-footer .primary-button {
+  min-height: 48px;
+}
+.workout-supporting-detail > summary,
+.reason-details > summary {
+  min-height: 44px;
+  align-content: center;
+}
+.stride-modal [data-slot='dialog-close'] {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+}
+.stride-modal .small-button {
+  min-height: 44px;
+}
+@media (max-width: 560px) {
+  .stride-modal:has(.workout-detail-footer) .modal-heading {
+    padding-right: 3rem;
+  }
+  .workout-detail-footer .primary-button {
+    width: 100%;
+  }
+  .workout-detail-footer .subtle:empty {
+    display: none;
+  }
+}

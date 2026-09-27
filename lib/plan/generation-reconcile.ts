@@ -3,12 +3,16 @@ import { PLAN_LOAD_LIMITS } from './policy-constants.ts';
 /** Plan generation-reconcile responsibilities; extracted without changing policy or behavior. */
 import { schedulingEasyPace } from '../fitness-pacing.ts';
 import { peakLongRunKm } from '../progression-engine.ts';
+import { isRoadRaceProfile, roadPeakLongKm } from '../road-training-policy.ts';
 import { runningDayLimit } from '../runner-customization.ts';
-import { withWorkoutTargets } from '../workout-targets.ts';
+import { withAllocatedWorkoutTargets as withWorkoutTargets } from '../workout-targets.ts';
 import { addDays, weekday } from './calendar.ts';
-import { hasOpeningBaseline } from './generation-baseline.ts';
+import {
+  hasOpeningBaseline,
+  reconcileEasyLongBalance,
+} from './generation-baseline.ts';
 import { TRAINING_POLICY } from './policy.ts';
-import { taperFactor } from './generation-calendar.ts';
+import { weekIncludesTaper } from './generation-calendar.ts';
 import { trainingFamily } from './profile.ts';
 import { refreshWeekTotals } from './totals.ts';
 import { type Plan } from './types.ts';
@@ -21,7 +25,11 @@ export function normalizeGeneratedLongRuns(
   from: string,
   protectedIds: readonly string[] = [],
 ) {
-  if (plan.policyVersion !== TRAINING_POLICY.version || plan.returnState)
+  if (
+    plan.firstRace ||
+    plan.policyVersion !== TRAINING_POLICY.version ||
+    plan.returnState
+  )
     return;
   const ceiling =
     trainingFamily(plan.profile) === 'marathon'
@@ -55,8 +63,9 @@ export function normalizeGeneratedLongRuns(
     )
       continue;
     const ordinary =
+      addDays(week.start, 6) <= plan.profile.raceDate &&
       !['Recovery', 'Taper', 'Race week'].includes(week.phase) &&
-      taperFactor(plan.profile, addDays(week.start, 6)) >= 1;
+      !weekIncludesTaper(plan.profile, week.start);
     const keepBaseline = ordinary && opening && week.index === 0;
     const fractionalHold =
       ordinary &&
@@ -66,11 +75,13 @@ export function normalizeGeneratedLongRuns(
           Math.min(
             // An already familiar distance above the family forecast is a hold,
             // not permission to round upward past that forecast or downward.
-            peakLongRunKm(
-              trainingFamily(plan.profile),
-              familiarLong,
-              plan.profile.intent,
-            ),
+            isRoadRaceProfile(plan.profile)
+              ? roadPeakLongKm(plan.profile, familiarLong, longPace)
+              : peakLongRunKm(
+                  trainingFamily(plan.profile),
+                  familiarLong,
+                  plan.profile.intent,
+                ),
             plan.profile.longLimitKm ?? Infinity,
             plan.profile.longMinutes / longPace,
             runningDayLimit(plan.profile, weekday(long.date)) / longPace,
@@ -101,6 +112,7 @@ export function normalizeGeneratedLongRuns(
       Object.assign(long, withWorkoutTargets(long, plan.profile));
     }
   }
+  reconcileEasyLongBalance(plan, from, protectedIds);
   refreshWeekTotals(plan);
 }
 

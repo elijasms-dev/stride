@@ -1,0 +1,97 @@
+{
+  "generatedAt": "2026-09-24T10:40:48.303Z",
+  "librarySourceSha256": "664483c43171618dadf2bde76e22336c7c54e5eb85fb945556738c818cdb619f",
+  "result": "PASS",
+  "beginner": {
+    "cases": 4705,
+    "accepted": 1898,
+    "controlledRejections": 2807,
+    "failures": 0,
+    "calendarWeeks": 19757,
+    "scheduledLessons": 42999
+  },
+  "fullCoursePatterns": {
+    "cases": 147,
+    "failures": 0
+  },
+  "reviews": [
+    {
+      "name": "three distinct comfortable lessons allow one stage advance",
+      "status": "passed"
+    },
+    {
+      "name": "two lessons only cannot advance",
+      "status": "passed"
+    },
+    {
+      "name": "unknown execution cannot advance",
+      "status": "passed"
+    },
+    {
+      "name": "partial execution cannot advance",
+      "status": "passed"
+    },
+    {
+      "name": "same lesson repeated cannot advance",
+      "status": "passed"
+    },
+    {
+      "name": "same actual day cannot advance",
+      "status": "passed"
+    },
+    {
+      "name": "tired feedback cannot advance",
+      "status": "passed"
+    },
+    {
+      "name": "duplicate provider activity cannot advance",
+      "status": "passed"
+    },
+    {
+      "name": "wrong stage cannot advance",
+      "status": "passed"
+    },
+    {
+      "name": "wrong stage start cannot advance",
+      "status": "passed"
+    },
+    {
+      "name": "short actual outing cannot advance",
+      "status": "passed"
+    },
+    {
+      "name": "calendar passing without logs cannot advance",
+      "status": "passed"
+    },
+    {
+      "name": "minimum seven days cannot be bypassed by three lessons",
+      "status": "passed"
+    },
+    {
+      "name": "shortened lesson cannot certify its full unshortened course requirement",
+      "status": "passed"
+    }
+  ],
+  "operations": [
+    {
+      "name": "JSON recovery retains beginner provenance",
+      "status": "passed"
+    },
+    {
+      "name": "workout variety cannot replace course lessons",
+      "status": "passed"
+    },
+    {
+      "name": "distance preference keeps timed beginner lessons",
+      "status": "passed"
+    },
+    {
+      "name": "ordinary unrelated preference retains course state",
+      "status": "passed"
+    },
+    {
+      "name": "moving between adjacent beginner runs rejects",
+      "status": "passed"
+    }
+  ]
+}

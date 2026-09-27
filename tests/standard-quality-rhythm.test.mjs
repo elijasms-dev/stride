@@ -16,7 +16,7 @@ import {
 } from '../lib/training-structure.ts';
 import {
   ensureGeneratedQualityRhythm,
-  standardQualityRhythmErrors,
+  roadQualityFrequencyErrors,
 } from '../lib/plan/generation-rhythm.ts';
 const start = '2026-09-21';
 const input = (patch = {}) => ({
@@ -56,11 +56,12 @@ function rhythm(plan) {
     const quality = runs.filter((w) => w.hard || w.kind === 'long');
     assert.equal(
       quality.length,
-      2,
+      1 + requestedQualityCount(plan.profile),
       `${plan.profile.goal} week ${week.index + 1}`,
     );
     assert.equal(quality.filter((w) => w.kind === 'long').length, 1);
-    assert.ok(qualityWorkMinutes(quality.find((w) => w.kind !== 'long')) >= 6);
+    for (const workout of quality.filter((w) => w.kind !== 'long'))
+      assert.ok(qualityWorkMinutes(workout) >= 6);
     assert.ok(
       runs.reduce((n, w) => n + qualityWorkMinutes(w), 0) <=
         runs.reduce((n, w) => n + w.minutes, 0) * 0.22 + 0.1,
@@ -121,7 +122,7 @@ const familyProfiles = [
 ];
 for (const [goal, patch] of familyProfiles)
   for (const runMeasure of ['time', 'distance'])
-    void test(`${goal} ${patch.raceDistanceKm ?? ''} ${runMeasure} maintains one weekday quality workout plus the long run`, () => {
+    void test(`${goal} ${patch.raceDistanceKm ?? ''} ${runMeasure} maintains its ability-appropriate weekday count plus the long run`, () => {
       const profile = input({ goal, ...patch, runMeasure });
       const before = structuredClone(profile);
       const plan = makePlan(profile, start, false);
@@ -178,8 +179,8 @@ for (const goal of ['5k', 'half', 'marathon'])
           goal,
           qualityMode: 'custom',
           qualitySessions,
-          weeklyKm: 75,
-          longestKm: goal === 'marathon' ? 24 : 10,
+          weeklyKm: goal === 'marathon' ? 75 : 55,
+          longestKm: goal === 'marathon' ? 24 : goal === 'half' ? 18 : 13,
         }),
         start,
         false,
@@ -202,19 +203,20 @@ for (const goal of ['5k', 'half', 'marathon'])
       assert.deepEqual(validatePlan(p), []);
     });
 
-void test('the weekday repair transfers existing easy time and preserves completed work and explicit edits', () => {
+void test('the legacy marathon weekday repair transfers existing easy time and preserves explicit edits', () => {
   const p = makePlan(
     input({
       qualityMode: 'custom',
       qualitySessions: 0,
+      goal: 'marathon',
       volume: 'maintain',
-      weeklyKm: 15,
-      longestKm: 4.5,
-      easyPace: 5,
+      weeklyKm: 75,
+      longestKm: 26,
+      easyPace: 6,
       currentRuns: 6,
       runsPerWeek: 6,
       days: [0, 1, 2, 3, 4, 6],
-      raceDate: addDays(start, 55),
+      raceDate: addDays(start, 125),
     }),
     start,
     false,
@@ -268,6 +270,8 @@ void test('a real shortfall reports a controlled error instead of adding load or
           easyPace: 5,
           currentRuns: 5,
           runsPerWeek: 5,
+          qualityMode: 'custom',
+          qualitySessions: 1,
         }),
         start,
         false,
@@ -285,16 +289,16 @@ void test('validator detects an ordinary missing weekday stimulus but permits re
   q.hard = false;
   q.kind = 'easy';
   assert.match(
-    standardQualityRhythmErrors(tampered).join(' '),
-    /Week 1 needs one complete weekday/,
+    roadQualityFrequencyErrors(tampered).join(' '),
+    /Week 1 needs exactly 1 complete weekday/,
   );
   q.changed = true;
   q.changeSource = 'manual';
-  assert.deepEqual(standardQualityRhythmErrors(tampered), []);
+  assert.deepEqual(roadQualityFrequencyErrors(tampered), []);
   delete q.changed;
   delete q.changeSource;
   tampered.returnState = {};
-  assert.deepEqual(standardQualityRhythmErrors(tampered), []);
+  assert.deepEqual(roadQualityFrequencyErrors(tampered), []);
 });
 
 void test('finish and gentle ultra routines use sustainable endurance rhythm rather than threshold fallback', () => {

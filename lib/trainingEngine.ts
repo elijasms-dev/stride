@@ -3,10 +3,7 @@
  * Cloudflare Workers compatible: standard TypeScript only (no fs, path, or Node APIs).
  */
 
-import {
-  calculateTrainingPaces,
-  validateRecentRace,
-} from './fitness-pacing.ts';
+import { deriveFitness, validateRecentRace } from './fitness-pacing.ts';
 
 import type {
   DailyWorkout,
@@ -317,7 +314,7 @@ export function reconcileDailySplits(
 export function scaleWorkout(
   targetKm: number,
   template: WorkoutTemplate,
-  paces?: ReturnType<typeof calculateTrainingPaces>,
+  paces?: NonNullable<ReturnType<typeof deriveFitness>['paces']>,
 ): ScaledWorkout {
   const safeTarget = Math.max(0.5, targetKm);
   const warmupRatio = clampRatio(template.warmupRatio, 0.18, 0.15, 0.2);
@@ -609,16 +606,19 @@ function validateInput(input: UserTrainingInput): UserTrainingInput {
 
 export function generateTrainingPlan(raw: UserTrainingInput): TrainingPlan {
   const input = validateInput(raw);
-  let paces: ReturnType<typeof calculateTrainingPaces> | undefined;
+  let fitness: ReturnType<typeof deriveFitness> | undefined;
   if (input.recentRace !== undefined) {
     try {
-      paces = calculateTrainingPaces(validateRecentRace(input.recentRace));
+      fitness = deriveFitness(validateRecentRace(input.recentRace));
     } catch (error) {
       throw new TrainingEngineError((error as Error).message, {
         code: 'INVALID_BENCHMARK',
       });
     }
   }
+  // Supported performance estimates only. A valid result outside the model's
+  // domain remains useful evidence, but must not become an extrapolated target.
+  const paces = fitness?.paces ?? undefined;
   const week1Long = week1LongRunKm(input);
   const unconstrainedPeak = peakLongRunTargetKm(input.goal, week1Long);
   const taperWeeks = taperWeekCount(input.goal, input.weeksUntilRace);
@@ -642,6 +642,11 @@ export function generateTrainingPlan(raw: UserTrainingInput): TrainingPlan {
   );
 
   const notes: string[] = [];
+  if (fitness && !paces)
+    notes.push(
+      'The benchmark is retained, but this plan uses effort guidance because the performance is outside the supported pace model.',
+      ...fitness.confidence.reasons,
+    );
   if (peakLongRunAchievedKm + KM_EPS < unconstrainedPeak) {
     notes.push(
       `Peak long run is ${peakLongRunAchievedKm} km rather than the ${unconstrainedPeak} km benchmark because the available build weeks limit progression before taper.`,

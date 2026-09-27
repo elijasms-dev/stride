@@ -2070,3 +2070,75 @@ textarea {
     overflow-wrap: anywhere;
   }
 }
+
+/* A bounded date window keeps the workout close for touch and screen readers. */
+.date-rail-heading {
+  margin-bottom: 0;
+  flex-wrap: wrap;
+  gap: 0 12px;
+}
+.date-rail-skip {
+  min-height: 44px;
+  font-size: 0.875rem;
+}
+.date-rail-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.date-rail-controls .icon-button {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+}
+.date-rail-picker {
+  flex: 1;
+  min-width: 0;
+  max-width: 240px;
+}
+.date-rail-picker input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  color: var(--foreground);
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  font: inherit;
+}
+#selected-day-workout {
+  min-width: 0;
+}
+#selected-day-workout:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
+  border-radius: 12px;
+}
+.action-progress-toast {
+  position: fixed;
+  z-index: 60;
+  left: 50%;
+  bottom: max(24px, env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100vw - 32px);
+  width: max-content;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--foreground);
+  box-shadow: 0 4px 24px #00000018;
+  font-size: 0.875rem;
+  pointer-events: none;
+}
+@media (max-width: 760px) {
+  .action-progress-toast {
+    bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  }
+}

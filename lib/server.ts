@@ -1,4 +1,7 @@
+import { encryptCredential, decryptCredential, credentialNeedsRotation, CredentialConfigurationError, type CredentialSecrets } from './credential-encryption';
+import { safeRequestObservation, type RequestObservation } from './request-observation';
 import { FitExportError } from './fit-error';
+import { withCurrentFeasibility } from './plan/feasibility';
 import { readAccount } from './accounts';
 import { env } from 'cloudflare:workers';
 import { PlanError, type State } from './engine';
@@ -20,6 +23,111 @@ export class AccountContextError extends HttpError {
       'Your account changed or this window is out of date. Reopen your journal before saving.',
     );
   }
+}
+export class MutationConflictError extends HttpError {
+  constructor() {
+    super(
+      409,
+      'This save identifier already belongs to different information. Reopen the saved run before making a correction.',
+    );
+  }
+}
+
+export type JournalMutation = { id: string; requestHash: string };
+
+function canonicalJson(value: unknown): string {
+  if (Array.isArray(value))
+    return '[' + value.map(canonicalJson).join(',') + ']';
+  if (value && typeof value === 'object')
+    return (
+      '{' +
+      Object.entries(value)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([key, item]) => JSON.stringify(key) + ':' + canonicalJson(item))
+        .join(',') +
+      '}'
+    );
+  return JSON.stringify(value);
+}
+
+export async function journalMutation(
+  input: Record<string, unknown>,
+): Promise<JournalMutation | undefined> {
+  if (input.mutationId === undefined) return undefined;
+  if (
+    typeof input.mutationId !== 'string' ||
+    !/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i.test(input.mutationId)
+  )
+    throw new HttpError(
+      400,
+      'This save identifier is invalid. Reopen the run and try again.',
+    );
+  if (
+    ![
+      'freeRun',
+      'complete',
+      'correctLog',
+      'correctExtra',
+      'attachRecording',
+      'skip',
+    ].includes(String(input.action))
+  )
+    throw new HttpError(400, 'This operation does not support a queued save.');
+  const payload = Object.fromEntries(
+    Object.entries(input).filter(
+      ([key]) => key !== 'version' && key !== 'mutationId',
+    ),
+  );
+  const digest = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(canonicalJson(payload)),
+  );
+  return {
+    id: input.mutationId,
+    requestHash: Array.from(new Uint8Array(digest), (n) =>
+      n.toString(16).padStart(2, '0'),
+    ).join(''),
+  };
+}
+
+export async function replayMutation(
+  owner: string,
+  epoch: number,
+  mutation?: JournalMutation,
+): Promise<State | null> {
+  if (!mutation) return null;
+  const receipt = await database()
+    .prepare(
+      'SELECT request_hash FROM journal_mutations WHERE owner=? AND epoch=? AND id=?',
+    )
+    .bind(owner, epoch, mutation.id)
+    .first<{ request_hash: string }>();
+  if (!receipt) return null;
+  if (receipt.request_hash !== mutation.requestHash)
+    throw new MutationConflictError();
+  const state = await readState(owner);
+  if (state.accountEpoch !== epoch || state.accountStatus !== 'active')
+    throw new AccountContextError();
+  return { ...state, acknowledgedMutationId: mutation.id };
+}
+
+export function mutationReceiptStatement(
+  owner: string,
+  epoch: number,
+  mutation: JournalMutation,
+  at: string,
+  fence: 'state' | 'account',
+  token: string,
+) {
+  const condition =
+    fence === 'state'
+      ? 'EXISTS(SELECT 1 FROM athlete_state s WHERE s.owner=accounts.owner AND s.write_token=?)'
+      : 'operation_id=?';
+  return database()
+    .prepare(
+      `INSERT INTO journal_mutations(owner,epoch,id,request_hash,created_at) SELECT owner,epoch,?,?,? FROM accounts WHERE owner=? AND epoch=? AND ${condition}`,
+    )
+    .bind(mutation.id, mutation.requestHash, at, owner, epoch, token);
 }
 export function database() {
   if (!env.DB)
@@ -87,7 +195,7 @@ export function json(data: unknown, status = 200) {
     },
   });
 }
-export function failure(error: unknown) {
+function failureResponse(error: unknown) {
   if (error instanceof FitExportError)
     return json({ error: error.message, code: error.code }, 502);
   if (error instanceof HttpError) {
@@ -96,6 +204,9 @@ export function failure(error: unknown) {
         error: error.message,
         ...(error instanceof AccountContextError
           ? { code: 'ACCOUNT_CONTEXT_CHANGED' }
+          : {}),
+        ...(error instanceof MutationConflictError
+          ? { code: 'MUTATION_CONFLICT' }
           : {}),
         ...(error.retryAfter ? { retryAfter: error.retryAfter } : {}),
       },
@@ -107,15 +218,6 @@ export function failure(error: unknown) {
   }
   if (error instanceof PlanError) return json({ error: error.message }, 422);
   const requestId = crypto.randomUUID();
-  // No identity, request body, notes, URL, provider payload or secret enters logs.
-  console.error(
-    JSON.stringify({
-      event: 'stride_request_failed',
-      requestId,
-      status: 500,
-      at: new Date().toISOString(),
-    }),
-  );
   const r = json(
     {
       error:
@@ -126,6 +228,25 @@ export function failure(error: unknown) {
   );
   r.headers.set('X-Request-Id', requestId);
   return r;
+}
+export function failure(error: unknown, observation?: RequestObservation) {
+  const response = failureResponse(error);
+  if (response.status >= 500) {
+    const requestId = response.headers.get('X-Request-Id') ?? crypto.randomUUID();
+    response.headers.set('X-Request-Id', requestId);
+    // Never include message/stack, URL, account, request body or provider payload.
+    console.error(JSON.stringify({
+      event: 'stride_request_failed', requestId, status: response.status,
+      ...safeRequestObservation(observation),
+      category: error instanceof FitExportError ? 'workout-export' :
+        error instanceof SyntaxError ? 'invalid-stored-data' :
+        error instanceof TypeError ? 'runtime-type-error' :
+        response.status === 502 ? 'provider-unavailable' :
+        response.status === 503 ? 'service-unavailable' : 'unexpected',
+      at: new Date().toISOString(),
+    }));
+  }
+  return response;
 }
 export async function requestLimit(
   owner: string,
@@ -169,6 +290,7 @@ export async function readState(owner: string): Promise<State> {
     .bind(owner)
     .all<{ data: string }>();
   const loose = standaloneRuns.results.map((r) => JSON.parse(r.data));
+  const storedPlan: State['plan'] = row ? JSON.parse(row.data) : null;
   return row
     ? {
         standaloneRuns: loose,
@@ -176,7 +298,7 @@ export async function readState(owner: string): Promise<State> {
         accountEpoch: account.epoch,
         accountStatus: account.status,
         version: row.version,
-        plan: JSON.parse(row.data),
+        plan: storedPlan ? withCurrentFeasibility(storedPlan) : null,
         updatedAt: row.updated_at,
       }
     : {
@@ -189,6 +311,13 @@ export async function readState(owner: string): Promise<State> {
         updatedAt: null,
       };
 }
+export const RETAINED_REVISIONS = 50;
+export function pruneRevisionsStatement(owner: string, writeToken: string) {
+  // Current journal contains the full recorded history. Only older undo
+  // snapshots are compacted; latest and previous always remain recoverable.
+  return database().prepare('DELETE FROM revisions WHERE owner=? AND version NOT IN (SELECT version FROM revisions WHERE owner=? ORDER BY version DESC LIMIT ?) AND EXISTS(SELECT 1 FROM athlete_state s WHERE s.owner=revisions.owner AND s.write_token=?)')
+    .bind(owner, owner, RETAINED_REVISIONS, writeToken);
+}
 export async function saveState(
   owner: string,
   version: number,
@@ -197,6 +326,7 @@ export async function saveState(
   epoch: number,
   transferRevision?: number,
   importIdentity?: ProviderIdentity,
+  mutation?: JournalMutation,
 ): Promise<State> {
   const db = database(),
     date = new Date().toISOString(),
@@ -211,7 +341,7 @@ export async function saveState(
   const saved = await db.batch([
     db
       .prepare(
-        `INSERT INTO athlete_state(owner,version,data,updated_at,write_token) SELECT owner,?,?,?,? FROM accounts WHERE owner=? AND epoch=? AND status='active' AND (? IS NULL OR revision=?) AND (?=0 OR EXISTS(SELECT 1 FROM athlete_state a WHERE a.owner=accounts.owner AND a.version=?)) AND (? IS NULL OR EXISTS(SELECT 1 FROM connections c WHERE c.owner=accounts.owner AND c.provider_athlete_id=? AND c.generation=?)) ON CONFLICT(owner) DO UPDATE SET version=excluded.version,data=excluded.data,updated_at=excluded.updated_at,write_token=excluded.write_token WHERE athlete_state.version=?`,
+        `INSERT INTO athlete_state(owner,version,data,updated_at,write_token) SELECT owner,?,?,?,? FROM accounts WHERE owner=? AND epoch=? AND status='active' AND (? IS NULL OR revision=?) AND (?=0 OR EXISTS(SELECT 1 FROM athlete_state a WHERE a.owner=accounts.owner AND a.version=?)) AND (? IS NULL OR EXISTS(SELECT 1 FROM connections c WHERE c.owner=accounts.owner AND c.provider_athlete_id=? AND c.generation=?)) AND NOT EXISTS(SELECT 1 FROM journal_mutations m WHERE m.owner=accounts.owner AND m.epoch=accounts.epoch AND m.id=?) ON CONFLICT(owner) DO UPDATE SET version=excluded.version,data=excluded.data,updated_at=excluded.updated_at,write_token=excluded.write_token WHERE athlete_state.version=?`,
       )
       .bind(
         nextVersion,
@@ -227,6 +357,7 @@ export async function saveState(
         importIdentity?.generation ?? null,
         importIdentity?.athleteId ?? null,
         importIdentity?.generation ?? null,
+        mutation?.id ?? null,
         version,
       ),
     db
@@ -260,57 +391,45 @@ export async function saveState(
           ),
         ]
       : []),
+    ...(mutation
+      ? [mutationReceiptStatement(owner, epoch, mutation, date, 'state', token)]
+      : []),
+    pruneRevisionsStatement(owner, token),
   ]);
-  if (saved[0].meta.changes !== 1)
+  if (saved[0].meta.changes !== 1) {
+    const replay = await replayMutation(owner, epoch, mutation);
+    if (replay) return replay;
     throw new HttpError(
       409,
       'Your journal or account changed in another window. Reload before saving.',
     );
+  }
   return {
+    ...(mutation ? { acknowledgedMutationId: mutation.id } : {}),
     accountId: (await readAccount(owner)).account_id,
     accountEpoch: epoch,
     version: nextVersion,
-    plan: data,
+    plan: data ? withCurrentFeasibility(data) : null,
     updatedAt: date,
     lastChange: label,
   };
 }
-async function cipherKey() {
-  const secret = (env as unknown as Record<string, string>)
-    .STRIDE_ENCRYPTION_KEY;
-  if (!secret)
-    throw new HttpError(
-      503,
-      'Secure connections are not configured yet. Your plan and workout downloads are available.',
-    );
-  const digest = await crypto.subtle.digest(
-    'SHA-256',
-    new TextEncoder().encode(secret),
-  );
-  return crypto.subtle.importKey('raw', digest, 'AES-GCM', false, [
-    'encrypt',
-    'decrypt',
-  ]);
-}
+function credentialSecrets() { return env as unknown as CredentialSecrets; }
 export async function encrypt(value: string) {
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const bytes = new Uint8Array(
-    await crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv },
-      await cipherKey(),
-      new TextEncoder().encode(value),
-    ),
-  );
-  return btoa(String.fromCharCode(...iv, ...bytes));
+  try { return await encryptCredential(value, credentialSecrets()); }
+  catch (error) {
+    if (error instanceof CredentialConfigurationError)
+      throw new HttpError(503, 'Secure connections are not configured yet. Your plan and workout downloads are available.');
+    throw error;
+  }
 }
 export async function decrypt(value: string) {
-  const bytes = Uint8Array.from(atob(value), (c) => c.charCodeAt(0));
-  const plain = await crypto.subtle.decrypt(
-    { name: 'AES-GCM', iv: bytes.slice(0, 12) },
-    await cipherKey(),
-    bytes.slice(12),
-  );
-  return new TextDecoder().decode(plain);
+  try { return await decryptCredential(value, credentialSecrets()); }
+  catch (error) {
+    if (error instanceof CredentialConfigurationError)
+      throw new HttpError(503, 'Secure connections are temporarily unavailable. Your plan and workout downloads are available.');
+    throw error;
+  }
 }
 export type ProviderConnection = {
   key: string;
@@ -360,11 +479,14 @@ export async function provider(owner: string): Promise<ProviderConnection> {
       409,
       'Reconnect Intervals.icu to verify the athlete account before sending or importing.',
     );
-  return {
-    key: await decrypt(row.encrypted_key),
-    athleteId: row.provider_athlete_id,
-    generation: row.generation,
-  };
+  const key = await decrypt(row.encrypted_key);
+  if (credentialNeedsRotation(row.encrypted_key, credentialSecrets())) {
+    const replacement = await encrypt(key);
+    // Compare-and-swap: rotation must never overwrite a concurrent reconnect.
+    await database().prepare('UPDATE connections SET encrypted_key=? WHERE owner=? AND generation=? AND encrypted_key=?')
+      .bind(replacement, owner, row.generation, row.encrypted_key).run();
+  }
+  return { key, athleteId: row.provider_athlete_id, generation: row.generation };
 }
 export async function assertConnection(
   owner: string,

@@ -1,4 +1,5 @@
 import type { ConnectionSummary } from './connection-status';
+import type { Plan, ExtraRun, Workout } from './plan/types.ts';
 
 export type Activity = {
   id: string;
@@ -75,5 +76,63 @@ export function mergeImportPage(
       return true;
     }),
     nextCursor: page.nextCursor,
+  };
+}
+
+export type LinkedActivityReview = {
+  saved: { date: string; minutes: number; km: number | null };
+  workout?: Workout;
+  extraRun?: ExtraRun;
+  differences: ('date' | 'distance' | 'duration')[];
+};
+
+/** Compare a fresh, positively identified recording with saved observations.
+ * A mismatch is not proof the provider changed: the runner may have corrected
+ * their log. Missing rows/page gaps never imply a deleted source activity. */
+export function linkedActivityReview(
+  activity: Activity,
+  plan: Pick<Plan, 'workouts' | 'extraRuns'>,
+): LinkedActivityReview | null {
+  const extraRun = plan.extraRuns?.find(
+    (run) => run.activityId === activity.id,
+  );
+  const workout = extraRun
+    ? undefined
+    : plan.workouts.find(
+        (run) =>
+          run.status === 'completed' &&
+          run.feedback?.activityId === activity.id,
+      );
+  const saved = extraRun
+    ? { date: extraRun.date, minutes: extraRun.minutes, km: extraRun.km }
+    : workout?.feedback
+      ? {
+          date: workout.feedback.actualDate ?? workout.date,
+          minutes: workout.feedback.actualMinutes,
+          km: workout.feedback.actualKm,
+        }
+      : null;
+  if (!saved) return null;
+  const differences: LinkedActivityReview['differences'] = [];
+  const latestKm =
+    activity.distance != null && activity.distance > 0
+      ? activity.distance / 1000
+      : null;
+  if (saved.date !== activity.date) differences.push('date');
+  // Ignore sub-metre/sub-second representation differences in summary values.
+  if (
+    (saved.km === null) !== (latestKm === null) ||
+    (saved.km !== null &&
+      latestKm !== null &&
+      Math.abs(saved.km - latestKm) > 0.001 + 1e-9)
+  )
+    differences.push('distance');
+  if (Math.abs(saved.minutes * 60 - activity.movingTime) > 1 + 1e-9)
+    differences.push('duration');
+  return {
+    saved,
+    ...(workout ? { workout } : {}),
+    ...(extraRun ? { extraRun } : {}),
+    differences,
   };
 }

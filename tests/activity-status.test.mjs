@@ -243,8 +243,8 @@ async function fixture(t, options = {}) {
         .get(owner)?.version ?? 0,
   };
 }
-async function check() {
-  const response = await activitiesRoute(request('/api/activities'));
+async function check(path = '/api/activities') {
+  const response = await activitiesRoute(request(path));
   return { status: response.status, data: await response.json() };
 }
 async function action(f, payload, epoch = 0) {
@@ -521,7 +521,10 @@ void test('S10: older overlapping failed check cannot overwrite the latest succe
   t.after(() => release.resolve(new Response('', { status: 503 })));
   const older = check();
   await entered.promise;
-  assert.equal((await check()).status, 200);
+  assert.equal(
+    (await check('/api/activities?before=' + addDays(today, -42))).status,
+    200,
+  );
   const latest = f.status();
   release.resolve(new Response(sentinel, { status: 503 }));
   assert.equal((await older).status, 502);
@@ -621,4 +624,144 @@ void test('S14: recovery exports exclude status; restore clears it and reconnect
       .epoch,
     1,
   );
+});
+
+void test('S15: invalid import cursors are field errors without provider calls or check status changes', async (t) => {
+  const f = await fixture(t),
+    before = f.status();
+  for (const cursor of [
+    '',
+    'bad-date',
+    '2026-02-30',
+    '2026-13-01',
+    addDays(today, 1),
+    addDays(today, -731),
+  ]) {
+    const result = await check(
+      '/api/activities?before=' + encodeURIComponent(cursor),
+    );
+    assert.equal(result.status, 422, JSON.stringify({ cursor, result }));
+    assert.match(result.data.error, /within the last two years/);
+  }
+  assert.equal(f.calls.length, 0);
+  assert.deepEqual(f.status(), before);
+});
+
+void test('S16: valid cursor pagination keeps the 42-day window and stops at the history boundary', async (t) => {
+  const f = await fixture(t, { activities: [] }),
+    cursor = addDays(today, -42),
+    result = await check('/api/activities?before=' + cursor);
+  assert.equal(result.status, 200);
+  assert.equal(result.data.to, cursor);
+  assert.equal(result.data.from, addDays(cursor, -41));
+  assert.equal(result.data.nextCursor, addDays(cursor, -42));
+  assert.equal(result.data.hasMore, true);
+  assert.match(
+    f.calls[0],
+    new RegExp('oldest=' + addDays(cursor, -41) + '&newest=' + cursor),
+  );
+  const last = await check('/api/activities?before=' + addDays(today, -730));
+  assert.equal(last.status, 200);
+  assert.equal(last.data.hasMore, false);
+  assert.equal(last.data.nextCursor, null);
+});
+
+void test('S17: import budget precedes journal reads, resets, and does not consume another owner budget', async (t) => {
+  const f = await fixture(t, { activities: [] });
+  for (let i = 0; i < 30; i++) assert.equal((await check()).status, 200);
+  assert.equal(f.calls.length, 30);
+  // An expensive/malformed journal must never be read for a rejected request.
+  f.sqlite
+    .prepare(
+      'INSERT INTO athlete_state(owner,version,data,updated_at) VALUES(?,?,?,?)',
+    )
+    .run(owner, 1, sentinel, new Date().toISOString());
+  const response = await activitiesRoute(request('/api/activities'));
+  assert.equal(response.status, 429);
+  assert.ok(Number(response.headers.get('Retry-After')) > 0);
+  assert.equal(f.calls.length, 30);
+  assert.equal(
+    (await activitiesRoute(request('/api/activities', undefined, 0, other)))
+      .status,
+    200,
+  );
+  assert.equal(f.calls.length, 31);
+  f.sqlite.prepare('DELETE FROM athlete_state WHERE owner=?').run(owner);
+  f.sqlite
+    .prepare(
+      "UPDATE request_limits SET reset_at=0 WHERE owner=? AND bucket='activity-import'",
+    )
+    .run(owner);
+  assert.equal((await check()).status, 200);
+  assert.equal(f.calls.length, 32);
+});
+
+void test('S19: plan route unexpected errors expose only a correlated, privacy-safe diagnostic', async (t) => {
+  const f = await fixture(t),
+    logs = [];
+  t.mock.method(console, 'error', (...args) => logs.push(args));
+  f.sqlite
+    .prepare(
+      'INSERT INTO athlete_state(owner,version,data,updated_at) VALUES(?,?,?,?)',
+    )
+    .run(owner, 1, sentinel, new Date().toISOString());
+  const response = await planRoute(
+      request('/api/plan', { action: 'skip', version: 1, id: sentinel }),
+    ),
+    result = await response.json();
+  assert.equal(response.status, 500);
+  assert.equal(response.headers.get('X-Request-Id'), result.requestId);
+  assert.equal(logs.length, 1);
+  const diagnostic = JSON.parse(logs[0][0]);
+  assert.equal(diagnostic.requestId, result.requestId);
+  assert.equal(diagnostic.event, 'stride_request_failed');
+  assert.deepEqual(Object.keys(diagnostic).sort(), [
+    'at',
+    'category',
+    'durationMs',
+    'event',
+    'operation',
+    'requestId',
+    'status',
+  ]);
+  assert.equal(diagnostic.operation, 'plan');
+  assert.equal(diagnostic.category, 'invalid-stored-data');
+  assert.equal(diagnostic.status, 500);
+  assert.ok(
+    Number.isFinite(diagnostic.durationMs) &&
+      diagnostic.durationMs >= 0 &&
+      diagnostic.durationMs <= 3_600_000,
+  );
+  for (const forbidden of [
+    sentinel,
+    owner,
+    'synthetic-status-provider-key',
+    'SyntaxError',
+  ]) {
+    assert.ok(!JSON.stringify(logs).includes(forbidden));
+    assert.ok(!JSON.stringify(result).includes(forbidden));
+  }
+  f.sqlite.prepare('DELETE FROM athlete_state WHERE owner=?').run(owner);
+  const expected = await planRoute(
+    request('/api/plan', {
+      action: 'preview',
+      profile: { weeklyKm: -1, note: sentinel },
+    }),
+  );
+  assert.equal(expected.status, 422);
+  assert.equal(
+    logs.length,
+    1,
+    'Expected validation errors need no raw exception logging',
+  );
+});
+
+void test('S18: concurrent import requests enforce the same atomic account budget', async (t) => {
+  const f = await fixture(t, { activities: [] });
+  const responses = await Promise.all(
+    Array.from({ length: 35 }, () => check()),
+  );
+  assert.equal(responses.filter((r) => r.status === 200).length, 30);
+  assert.equal(responses.filter((r) => r.status === 429).length, 5);
+  assert.equal(f.calls.length, 30);
 });
