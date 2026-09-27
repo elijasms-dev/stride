@@ -7,6 +7,7 @@ import { applyAdvancedMethod } from '../advanced-methods.ts';
 import { roadPreparationConstraint } from '../road-feasibility.ts';
 import {
   isRoadRaceProfile,
+  isShortRoadRaceProfile,
   roadTrainingPolicy,
   roadTaperDays,
 } from '../road-training-policy.ts';
@@ -57,6 +58,7 @@ import {
 } from './generation-policy.ts';
 import {
   fundWeek,
+  maximumFundedWeekKm,
   reconcileOpeningBaseline,
   reconcileOrdinaryWeeklyProgression,
 } from './generation-baseline.ts';
@@ -295,7 +297,7 @@ function makeValidatedPlan(
       ...(isRoadRaceProfile(p)
         ? [
             `${p.goal === 'half' ? 'Half-marathon' : p.goal.toUpperCase()} preparation uses the ${roadTrainingPolicy(p).ability} running-capacity band. The first long run starts from your declared routine. Supporting easy runs stay shorter; any opening weekly-distance adjustment is explained separately. Later long runs progress in whole kilometres or hold, within your available time and weekly allocation.`,
-            `Your ${requestedQuality} weekday ${requestedQuality === 1 ? 'workout is' : 'workouts are'} separate from the easy long run. Recovery weeks reduce the workload; the final ${roadTaperDays(p)} days taper toward race day. Workout doses follow your background and planned exposures, not spare time in your schedule.`,
+            `Your ${requestedQuality} weekday ${requestedQuality === 1 ? 'workout is' : 'workouts are'} separate from the easy long run. ${p.goal === 'half' ? 'Recovery weeks reduce the workload' : `Every ${p.recoveryWeeks ?? TRAINING_POLICY.recoveryEveryWeeks} weeks, a two-workout choice reduces to one; a single workout stays in place, with no scheduled full recovery week`}; the final ${roadTaperDays(p)} days taper toward race day. Workout doses follow your background and planned exposures, not spare time in your schedule.`,
           ]
         : []),
       ...(!isRoadRaceProfile(p) &&
@@ -406,7 +408,12 @@ function makeValidatedPlan(
         fundWeek(
           plan,
           runs,
-          allocatedKm,
+          // Continuous short-race quality can reach its padding cap before
+          // the preliminary easy-pace estimate. Fund only executable mileage;
+          // opening-baseline and progression reconciliation still apply below.
+          isShortRoadRaceProfile(p)
+            ? Math.min(allocatedKm, maximumFundedWeekKm(plan, runs, false))
+            : allocatedKm,
           'The planned weekly distance cannot fit the prescribed pace ranges and session limits. Review the pace and available time together.',
           undefined,
           false,

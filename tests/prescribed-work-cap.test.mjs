@@ -216,7 +216,17 @@ test('public shorten and lower-limit preference edits preserve history, schedule
 
 test('alternatives can use a full saved gentle allowance without exceeding it', () => {
   const p = make(),
-    w = target(p);
+    // This alternative is authored for Race preparation. Continuous quality
+    // after removal of full short-race recovery creates an earlier Build
+    // race-rhythm exposure, which must not accidentally select this fixture.
+    w = p.workouts.find(
+      (run) =>
+        run.stimulus === 'race-rhythm' &&
+        run.qualityMinutes >= 9 &&
+        run.qualityMinutes < 12 &&
+        p.weeks[run.week].phase === 'Race preparation',
+    );
+  assert.ok(w);
   const option = workoutAlternatives(p, w.id).find(
     (t) => t.id === 'race-rhythm-10-short',
   );

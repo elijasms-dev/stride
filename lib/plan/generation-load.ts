@@ -6,6 +6,7 @@ import {
 
 import { marathonBlockPhase, marathonTaperDays } from '../marathon-book.ts';
 
+import { isShortRoadRaceProfile } from '../road-training-policy.ts';
 import { longRunForWeek } from '../progression-engine.ts';
 import { dayDiff, addDays } from './calendar.ts';
 import { TRAINING_POLICY } from './policy.ts';
@@ -62,6 +63,7 @@ export function calculateWeekLoad(
     dayDiff(addDays(start, w * DAYS_PER_WEEK), p.raceDate) <=
       (bookMarathon ? marathonTaperDays(p) - 1 : taperWeeks * DAYS_PER_WEEK);
   const recovery =
+    !isShortRoadRaceProfile(p) &&
     !taper &&
     w > 0 &&
     (w + 1) % (p.recoveryWeeks ?? TRAINING_POLICY.recoveryEveryWeeks) === 0;
@@ -104,7 +106,7 @@ export function calculateWeekLoad(
     taper: taper || taperAtWeekStart,
     taperFraction: weekTaperFraction,
     wholeKilometres: true,
-    recoveryEveryWeeks: p.recoveryWeeks,
+    recoveryEveryWeeks: isShortRoadRaceProfile(p) ? null : p.recoveryWeeks,
     recoveryOffset: longProgressionStart,
     maximumStepKm: road?.longStepKm,
   });

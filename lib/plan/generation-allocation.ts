@@ -10,10 +10,14 @@ import {
   marathonPaceOpportunity,
 } from '../marathon-book.ts';
 import { runningDayLimit } from '../runner-customization.ts';
-import { roadQualitySessionCap } from '../road-training-policy.ts';
+import {
+  isShortRoadRaceProfile,
+  roadQualitySessionCap,
+} from '../road-training-policy.ts';
 
 import { isLongUltra, LONG_ULTRA_POLICY } from '../ultra-policy.ts';
 import {
+  qualitySchedule,
   usesMarathonRhythm,
   usesStandardQualityRhythm,
   desiredRuns,
@@ -70,6 +74,9 @@ export function allocateGenerationWeek(
     mediumDay,
   } = context;
   const { taper, recovery, phase, long, load } = weekLoad;
+  const scheduledQualityDays = isShortRoadRaceProfile(p)
+    ? qualitySchedule(p, w)
+    : qualityDays;
   const retainedPrefix = (replan?.retainedPrefix ?? []).filter(
     (s) => s.week === w && s.kind !== 'race',
   );
@@ -199,11 +206,11 @@ export function allocateGenerationWeek(
   const qualityReserve =
     !recovery &&
     !taper &&
-    (road ? qualityDays.length > 0 : usesStandardQualityRhythm(p)) &&
-    dates.some((d) => qualityDays.includes(weekday(d)))
+    (road ? scheduledQualityDays.length > 0 : usesStandardQualityRhythm(p)) &&
+    dates.some((d) => scheduledQualityDays.includes(weekday(d)))
       ? (SESSION_POLICY.introductoryWorkoutMinutes -
           GENERATION_POLICY.minimumSessionMinutes) *
-        (road ? qualityDays.length : 1)
+        (road ? scheduledQualityDays.length : 1)
       : 0;
   const usualLongDistance = Math.min(
     long,
@@ -326,7 +333,7 @@ export function allocateGenerationWeek(
         p.qualitySessions === SESSION_POLICY.mixedLongMinimumQualitySessions
         ? qualityDays.slice(0, -1)
         : qualityDays.slice(1)
-      : qualityDays;
+      : scheduledQualityDays;
   const support =
     !recovery &&
     !taper &&
@@ -462,7 +469,7 @@ export function allocateGenerationWeek(
   if (
     !isNovice &&
     !recovery &&
-    !taper &&
+    (!taper || isShortRoadRaceProfile(p)) &&
     p.goal !== 'base' &&
     (road || p.intent !== 'finish' || usesStandardQualityRhythm(p))
   ) {

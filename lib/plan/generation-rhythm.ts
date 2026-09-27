@@ -1,10 +1,14 @@
 import { schedulingEasyPace } from '../fitness-pacing.ts';
 import { qualityWorkMinutes } from '../prescription.ts';
 import { runningDayLimit } from '../runner-customization.ts';
-import { isRoadRaceProfile } from '../road-training-policy.ts';
+import {
+  isRoadRaceProfile,
+  isShortRoadRaceProfile,
+} from '../road-training-policy.ts';
 import {
   qualitySchedule,
   requestedQualityCount,
+  weeklyQualityCount,
   usesMarathonRhythm,
   usesStandardQualityRhythm,
 } from '../training-structure.ts';
@@ -14,7 +18,7 @@ import {
   WORKOUT_LIBRARY,
 } from '../workout-library.ts';
 import { withAllocatedWorkoutTargets as withWorkoutTargets } from '../workout-targets.ts';
-import { addDays, weekday } from './calendar.ts';
+import { addDays, dayDiff, weekday } from './calendar.ts';
 import { PlanError } from './errors.ts';
 import { taperFactor, weekIncludesTaper } from './generation-calendar.ts';
 import { round } from './math.ts';
@@ -153,7 +157,6 @@ export function roadQualityFrequencyErrors(
   )
     return [];
   const from = plan.constraintsFrom ?? p.startDate;
-  const expected = requestedQualityCount(p);
   const errors: string[] = [];
   // A replan can reserve a recorded day before the caller merges its immutable
   // journal prefix. Only actual completed records qualify as this context;
@@ -188,9 +191,6 @@ export function roadQualityFrequencyErrors(
     if (
       week.start < from ||
       week.start < p.startDate ||
-      end >= p.raceDate ||
-      ['Recovery', 'Taper', 'Race week'].includes(week.phase) ||
-      weekIncludesTaper(p, week.start) ||
       recordedDates.some((date) => date >= week.start && date <= end) ||
       demandingDates.some((date) => addDays(date, 1) === week.start)
     )
@@ -207,6 +207,45 @@ export function roadQualityFrequencyErrors(
       )
     )
       continue;
+    const reducedWeek =
+      end >= p.raceDate ||
+      ['Recovery', 'Taper', 'Race week'].includes(week.phase) ||
+      weekIncludesTaper(p, week.start);
+    if (reducedWeek) {
+      // The supplied eight-week intermediate reference retains a familiar
+      // stimulus in taper/race weeks. Partial race weeks without an eligible
+      // pre-race slot and separate beginner/return courses are not that contract.
+      if (
+        isShortRoadRaceProfile(p) &&
+        !plan.firstRace &&
+        !plan.beginner &&
+        (!plan.constraintsFrom || plan.constraintsFrom === p.startDate) &&
+        !plan.baselineEvidence &&
+        !runs.some((run) => run.changed) &&
+        dayDiff(p.startDate, p.raceDate) >= 55 &&
+        requestedQualityCount(p) > 0 &&
+        qualitySchedule(p, week.index).some(
+          (day) => dayDiff(addDays(week.start, day), p.raceDate) >= 3,
+        )
+      ) {
+        const quality = runs.filter(
+          (run) =>
+            ['tempo', 'intervals', 'fartlek'].includes(run.kind) &&
+            run.hard &&
+            !['aerobic', 'economy'].includes(run.stimulus ?? '') &&
+            roadWorkMinutes(run) > 0,
+        );
+        if (!quality.length)
+          errors.push(
+            `Week ${week.index + 1} must retain a running quality session during short-race consolidation or taper.`,
+          );
+        if (week.phase === 'Recovery')
+          errors.push(
+            `Week ${week.index + 1} cannot use a full recovery week in this short-race block.`,
+          );
+      }
+      continue;
+    }
     const expectedDates = Array.from({ length: 7 }, (_, day) =>
       addDays(week.start, day),
     ).filter((date) => p.days.includes(weekday(date)));
@@ -219,6 +258,7 @@ export function roadQualityFrequencyErrors(
       errors.push(
         `Week ${week.index + 1} must retain all ${p.days.length} selected running days; a missing or duplicated run cannot satisfy the workout frequency.`,
       );
+    const expected = weeklyQualityCount(p, week.index);
     const weekdayRuns = runs.filter((run) => run.kind !== 'long');
     const useful = weekdayRuns.filter(
       (run) =>

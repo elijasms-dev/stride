@@ -1,6 +1,7 @@
 'use client';
 
 import { dateLabel } from '@/lib/engine';
+import { isShortRoadRaceProfile } from '@/lib/road-training-policy';
 import { ArrowRight } from 'lucide-react';
 import { Choice } from '../stride-ui';
 import { weeklyTraining } from './comparison-metrics';
@@ -24,6 +25,9 @@ export function TrainingComparison({
   scale,
   trainingDisplay,
 }: ReturnType<typeof useTrainingTools>) {
+  const shortRace =
+    isShortRoadRaceProfile(plan.profile) &&
+    plan.profile.planLevel !== 'beginner';
   return (
     <section className="training-section" hidden={section !== 'compare'}>
       <div className="section-heading">
@@ -40,13 +44,21 @@ export function TrainingComparison({
           options={[
             { value: 'gentle', label: 'Gentler quality sessions' },
             { value: 'maintain', label: 'Maintain starting volume' },
-            { value: 'recover', label: 'Recovery every third week' },
+            {
+              value: 'recover',
+              label: shortRace
+                ? 'Reduce two workouts to one every third week'
+                : 'Recovery every third week',
+            },
             { value: 'finish', label: 'Easy endurance, finish focus' },
           ]}
         />
         <p className="subtle">
           Compare remaining prescriptions from today. Completed runs and manual
           changes stay in place.
+          {shortRace &&
+            option === 'recover' &&
+            ' This option changes the count only when two workouts are selected; it does not add full recovery weeks.'}
         </p>
       </div>
       {compare.error && <p className="notice">{compare.error}</p>}

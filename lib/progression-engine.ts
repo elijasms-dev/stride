@@ -85,7 +85,8 @@ export function longRunForWeek(options: {
   taper: boolean;
   taperFraction: number;
   wholeKilometres?: boolean;
-  recoveryEveryWeeks?: number;
+  /** null means no periodic full recovery weeks (named short-road plans). */
+  recoveryEveryWeeks?: number | null;
   recoveryOffset?: number;
   maximumStepKm?: number;
 }): number {
@@ -108,12 +109,14 @@ export function longRunForWeek(options: {
     const every = options.recoveryEveryWeeks ?? DEFAULT_LONG_RUN_RECOVERY_WEEKS;
     const offset = options.recoveryOffset ?? 0;
     const builds = (end: number) =>
-      Math.max(
-        0,
-        end -
-          Math.floor((end + offset + 1) / every) +
-          Math.floor((offset + 1) / every),
-      );
+      options.recoveryEveryWeeks === null
+        ? Math.max(0, end)
+        : Math.max(
+            0,
+            end -
+              Math.floor((end + offset + 1) / every) +
+              Math.floor((offset + 1) / every),
+          );
     const available = builds(peakWeekIndex);
     const ordinal = builds(Math.min(weekIndex, peakWeekIndex));
     // Count only ordinary build opportunities. The first increase reaches the

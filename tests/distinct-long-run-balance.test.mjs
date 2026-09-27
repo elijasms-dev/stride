@@ -39,16 +39,21 @@ void test('the reported 30/8 km four-day 5K example has distinct roles and a dis
   assert.deepEqual(validatePlan(p), []);
 });
 
-void test('recovery reduces the supporting runs with the long run instead of producing 5.9/5.9/5.9/6', () => {
-  const p = example('5k-q0');
+void test('half-marathon recovery retains distinct supporting roles beside its reduced long run', () => {
+  // The supplied reference retains recovery for half and removes it from 5K.
+  const p = example('half-q0');
   assert.equal(p.weeks[3].phase, 'Recovery');
-  assert.deepEqual(
-    runs(p, 3).map((w) => w.estimatedKm),
-    [3.9, 4.8, 4.8, 6],
+  const recoveryLong = runs(p, 3).find((w) => w.kind === 'long');
+  const previousLong = runs(p, 2).find((w) => w.kind === 'long');
+  assert.ok(recoveryLong.estimatedKm < previousLong.estimatedKm);
+  assert.ok(
+    runs(p, 3)
+      .filter((w) => w.kind === 'easy')
+      .every((w) => w.estimatedKm <= recoveryLong.estimatedKm * 0.8 + 0.001),
   );
   const mutated = structuredClone(p);
   const easy = runs(mutated, 3).find((w) => w.kind === 'easy');
-  easy.estimatedKm = 5.9;
+  easy.estimatedKm = recoveryLong.estimatedKm * 0.99;
   assert.ok(validatePlan(mutated).some((e) => /crowds the long run/.test(e)));
 });
 

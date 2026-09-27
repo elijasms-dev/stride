@@ -80,7 +80,7 @@ test('comparison tab preserves current and alternative training metrics', () => 
   assert.match(html, /Quality sessions/);
   assert.match(html, /Total training time/);
   assert.match(html, /Review this option/);
-  assert.equal(alternative.minutes, current.minutes + 10);
+  assert.ok(Math.abs(alternative.minutes - current.minutes - 10) < 1e-9);
 });
 
 test('training preferences retain preview-first form and busy protection', () => {

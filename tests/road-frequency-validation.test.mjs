@@ -440,9 +440,8 @@ test('zero-history runners still need a base before longer race blocks', () => {
     );
 });
 
-test('recorded history, recovery weeks and deliberate edits keep their meaning', () => {
+test('recorded history and deliberate edits keep their meaning', () => {
   for (const change of [
-    (p) => (p.weeks[0].phase = 'Recovery'),
     (p) => (p.workouts[0].status = 'completed'),
     (p) => {
       p.workouts[0].changed = true;
@@ -453,6 +452,28 @@ test('recorded history, recovery weeks and deliberate edits keep their meaning',
     firstQuality(plan).steps = [easyStep(1560)];
     change(plan);
     assert.deepEqual(roadQualityFrequencyErrors(plan), []);
+  }
+});
+
+test('half-marathon recovery retains its reference exemption, while a forged short-race Recovery label cannot hide missing quality', () => {
+  const half = fixture('half', 1);
+  firstQuality(half).steps = [easyStep(1560)];
+  half.weeks[0].phase = 'Recovery';
+  assert.deepEqual(roadQualityFrequencyErrors(half), []);
+  for (const goal of ['5k', '10k']) {
+    const plan = fixture(goal, 1);
+    firstQuality(plan).steps = [easyStep(1560)];
+    plan.weeks[0].phase = 'Recovery';
+    assert.ok(
+      roadQualityFrequencyErrors(plan).some((error) =>
+        /cannot use a full recovery week/.test(error),
+      ),
+    );
+    assert.ok(
+      roadQualityFrequencyErrors(plan).some((error) =>
+        /must retain a running quality session/.test(error),
+      ),
+    );
   }
 });
 

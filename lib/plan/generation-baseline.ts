@@ -209,7 +209,11 @@ function fundedMetres(run: Workout, seconds: number, pace: number) {
 
 /** Maximum easy-running funding with complete faster blocks and existing long
  * targets fixed. Temporary second budgets do not mutate the plan or workouts. */
-function maximumFundedWeekKm(plan: Plan, runs: Workout[], balance = true) {
+export function maximumFundedWeekKm(
+  plan: Plan,
+  runs: Workout[],
+  balance = true,
+) {
   const p = plan.profile;
   const familiar = familiarDayLimits(plan);
   const pace = Math.max(

@@ -11,6 +11,11 @@ export function isRoadRaceProfile(
   return p.goal === '5k' || p.goal === '10k' || p.goal === 'half';
 }
 
+/** The supplied short-race reference keeps quality during mid-block consolidation. */
+export function isShortRoadRaceProfile(p: Pick<Profile, 'goal'>): boolean {
+  return p.goal === '5k' || p.goal === '10k';
+}
+
 /** Capacity is evidenced by the existing routine, not a predicted finishing time. */
 export function roadAbility(p: Profile): RoadAbility {
   const half = p.goal === 'half';

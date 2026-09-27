@@ -18,6 +18,7 @@ import {
 import { distanceEstimate, qualityWorkMinutes } from '../lib/prescription.ts';
 import { updateRunMeasure } from '../lib/run-distance.ts';
 import { roadOpeningFailures } from '../tests/road-overhaul-helpers.mjs';
+import { referenceOrdinaryQualityCount } from './short-race-reference-oracle.mjs';
 
 export const DEFAULT_SEED = 20260919;
 const start = '2026-09-14';
@@ -283,9 +284,14 @@ function assertContract(plan, input, asOf) {
       const hard = runs.filter(
         (w) => w.kind !== 'long' && w.hard && qualityWorkMinutes(w) > 0,
       );
+      const expectedQuality = referenceOrdinaryQualityCount(
+        plan.profile,
+        week.index,
+        input.qualitySessions,
+      );
       check(
-        hard.length === input.qualitySessions,
-        `Week ${week.index + 1} lost the requested frequency: expected ${input.qualitySessions} weekday workouts, received ${hard.length}`,
+        hard.length === expectedQuality,
+        `Week ${week.index + 1} lost the reference frequency: expected ${expectedQuality} weekday workouts for selected ${input.qualitySessions}, received ${hard.length}`,
       );
       check(
         new Set(runs.map((w) => w.date)).size === 5,

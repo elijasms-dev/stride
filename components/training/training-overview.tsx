@@ -1,6 +1,13 @@
 'use client';
 
-import { dateLabel, kmDisplay, raceDistance } from '@/lib/engine';
+import {
+  dateLabel,
+  kmDisplay,
+  raceDistance,
+  TRAINING_POLICY,
+} from '@/lib/engine';
+import { isShortRoadRaceProfile } from '@/lib/road-training-policy';
+import { requestedQualityCount } from '@/lib/training-structure';
 import type { useTrainingTools } from './use-training-tools';
 
 export function TrainingOverview({
@@ -9,6 +16,11 @@ export function TrainingOverview({
   section,
   unit,
 }: ReturnType<typeof useTrainingTools>) {
+  const shortRace =
+    isShortRoadRaceProfile(plan.profile) &&
+    plan.profile.planLevel !== 'beginner' &&
+    plan.policyVersion === TRAINING_POLICY.version;
+  const quality = requestedQualityCount(plan.profile);
   return (
     <section className="training-baseline" hidden={section !== 'overview'}>
       <span className="eyebrow">Your starting point</span>
@@ -57,8 +69,16 @@ export function TrainingOverview({
               ? 'Hold steady'
               : 'Gradual build'}
           </dd>
-          <dt>Recovery week</dt>
-          <dd>Every {plan.profile.recoveryWeeks ?? 4} weeks</dd>
+          <dt>{shortRace ? 'Workout rhythm' : 'Recovery week'}</dt>
+          <dd>
+            {shortRace
+              ? quality === 2
+                ? `Two workouts reduce to one every ${plan.profile.recoveryWeeks ?? 4} weeks before taper`
+                : quality === 1
+                  ? 'One per week before taper; no full recovery weeks'
+                  : 'All easy; no full recovery weeks'
+              : `Every ${plan.profile.recoveryWeeks ?? 4} weeks`}
+          </dd>
           <dt>Quality ceiling</dt>
           <dd>
             {['threshold-singles', 'double-threshold'].includes(

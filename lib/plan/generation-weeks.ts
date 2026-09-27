@@ -1,3 +1,4 @@
+import { isShortRoadRaceProfile } from '../road-training-policy.ts';
 import {
   GENERATION_POLICY,
   SESSION_POLICY,
@@ -209,7 +210,9 @@ export function generatePlanWeeks(
             : 'Comfortable running that builds your aerobic base and leaves room to recover.';
       if (
         isQuality &&
-        minutes >= SESSION_POLICY.introductoryWorkoutMinutes &&
+        (minutes >= SESSION_POLICY.introductoryWorkoutMinutes ||
+          (isShortRoadRaceProfile(p) &&
+            ['Taper', 'Race week'].includes(sessionPhase))) &&
         (p.method !== 'double-threshold' || phase === 'Maintenance')
       ) {
         const workAllowanceMinutes =
@@ -217,9 +220,20 @@ export function generatePlanWeeks(
             ? Math.min(
                 desired * pace * SESSION_POLICY.thresholdSinglesWorkFraction,
                 p.recentQualityMinutes ?? 0,
-              ) / Math.max(1, qualityDays.length)
+              ) /
+              Math.max(
+                1,
+                isShortRoadRaceProfile(p)
+                  ? weekQualityDays.length
+                  : qualityDays.length,
+              )
             : (desired * pace * SESSION_POLICY.qualityWorkFraction) /
-              Math.max(1, qualityDays.length);
+              Math.max(
+                1,
+                isShortRoadRaceProfile(p)
+                  ? weekQualityDays.length
+                  : qualityDays.length,
+              );
         const decision = selectTemplate(
           { ...p, goal: trainingFamily(p) },
           sessionPhase,

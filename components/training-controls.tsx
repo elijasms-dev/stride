@@ -7,7 +7,10 @@ import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { ChevronDown, SlidersHorizontal, Check } from 'lucide-react';
 import { isLongUltra } from '@/lib/ultra-policy';
 import { usesMarathonBook } from '@/lib/marathon-book';
-import { isRoadRaceProfile } from '@/lib/road-training-policy';
+import {
+  isRoadRaceProfile,
+  isShortRoadRaceProfile,
+} from '@/lib/road-training-policy';
 import {
   ScheduleCustomizationFields,
   WorkoutCustomizationFields,
@@ -26,6 +29,9 @@ import {
 } from '@/lib/training-structure';
 import { dayNames, trainingFamily, type Profile } from '@/lib/engine';
 import { qualitySchedule } from '@/lib/training-structure';
+
+const usesShortRaceRhythm = (p: Profile) =>
+  isShortRoadRaceProfile(p) && p.planLevel !== 'beginner';
 
 function PlanChoice({
   label,
@@ -147,7 +153,9 @@ export function WorkoutFrequencyField({
       <p className="plan-control-hint">
         {easyOnly
           ? 'This plan keeps your runs easy.'
-          : 'Tempo, intervals or marathon-effort work. An easy long run is separate. Recovery and taper weeks can be lighter.'}
+          : usesShortRaceRhythm(p)
+            ? `Tempo, intervals or fartlek. An easy long run is separate. Before taper, selecting two workouts reduces to one every ${p.recoveryWeeks ?? 4} weeks; selecting one keeps one. There are no scheduled full recovery weeks.`
+            : 'Tempo, intervals or marathon-effort work. An easy long run is separate. Recovery and taper weeks can be lighter.'}
         {automatic &&
           !easyOnly &&
           ' The count follows your current routine and goal.'}
@@ -250,8 +258,9 @@ export function PlanCustomizationFields({
           </div>
         </div>
         <p className="plan-control-hint">
-          Your routine sets the starting workload. Recovery, taper and partial
-          weeks are shorter.
+          {usesShortRaceRhythm(profile)
+            ? 'Your routine sets the starting workload. Taper and partial weeks can be shorter. There are no scheduled full recovery weeks.'
+            : 'Your routine sets the starting workload. Recovery, taper and partial weeks are shorter.'}
         </p>
         {(profile.weekdayMinutes < 120 || profile.longMinutes < 300) && (
           <div className="plan-distance-limits">
@@ -644,8 +653,10 @@ export function ScheduleFields({
               <legend className="field-title">Cross-training days</legend>
               <p className="subtle">
                 Reserve these days without running. Keep the activity easy or
-                familiar; its minutes are separate from running load. Recovery
-                and taper weeks contain less supporting work.
+                familiar; its minutes are separate from running load.{' '}
+                {usesShortRaceRhythm(p)
+                  ? 'Taper weeks contain less supporting work.'
+                  : 'Recovery and taper weeks contain less supporting work.'}
               </p>
               {(p.crossTraining ?? []).map((s, i) => (
                 <div className="supporting-session-fields" key={i}>
@@ -1110,14 +1121,39 @@ export function TrainingPreferenceFields({
           )}
 
           <div className="form-grid">
-            <Field label="Recovery rhythm">
+            <Field
+              label={
+                usesShortRaceRhythm(p)
+                  ? 'Workout reduction rhythm'
+                  : 'Recovery rhythm'
+              }
+              hint={
+                usesShortRaceRhythm(p)
+                  ? 'Before taper, two selected workouts reduce to one on this cadence. Zero or one selected workout stays unchanged; the week is not a full recovery week.'
+                  : undefined
+              }
+            >
               <Choice
-                label="Recovery rhythm"
+                label={
+                  usesShortRaceRhythm(p)
+                    ? 'Workout reduction rhythm'
+                    : 'Recovery rhythm'
+                }
                 value={String(p.recoveryWeeks ?? 4)}
                 onChange={(v) => update('recoveryWeeks', Number(v) as 3 | 4)}
                 options={[
-                  { value: '4', label: 'Lighter every fourth week' },
-                  { value: '3', label: 'Lighter every third week' },
+                  {
+                    value: '4',
+                    label: usesShortRaceRhythm(p)
+                      ? 'Reduce two workouts to one every fourth week'
+                      : 'Lighter every fourth week',
+                  },
+                  {
+                    value: '3',
+                    label: usesShortRaceRhythm(p)
+                      ? 'Reduce two workouts to one every third week'
+                      : 'Lighter every third week',
+                  },
                 ]}
               />
             </Field>

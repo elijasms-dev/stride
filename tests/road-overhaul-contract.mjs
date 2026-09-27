@@ -6,6 +6,7 @@ import {
   roadOpeningFailures,
 } from './road-overhaul-helpers.mjs';
 import { ROAD_DISTANCES } from './road-overhaul-cases.mjs';
+import { referenceOrdinaryQualityCount } from '../scripts/short-race-reference-oracle.mjs';
 
 const gap = (a, b) =>
   Math.round(
@@ -118,9 +119,14 @@ export function independentRoadChecks(plan, input) {
         );
     }
     if (ordinary) {
+      const expectedQuality = referenceOrdinaryQualityCount(
+        p,
+        week.index,
+        requested,
+      );
       check(
-        quality.length === requested,
-        `Week ${week.index + 1}: requested ${requested} weekday workouts, received ${quality.length}`,
+        quality.length === expectedQuality,
+        `Week ${week.index + 1}: selected ${requested}, reference requires ${expectedQuality} weekday workouts, received ${quality.length}`,
       );
       check(
         new Set(runs.map((w) => w.date)).size === input.runsPerWeek,

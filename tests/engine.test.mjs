@@ -111,8 +111,9 @@ void test('insufficient time to prepare for a 10K is rejected', () => {
     /starting weekly distance.*cannot fit/,
   );
 });
-void test('recovery and taper reduce load without treating recovery as new build baseline', () => {
-  const plan = makePlan(p, date);
+void test('half-marathon recovery and taper reduce load without treating recovery as new build baseline', () => {
+  // TRAINING_REFERENCE.md preserves fourth-week recovery for half, not 10K.
+  const plan = makePlan({ ...p, goal: 'half' }, date);
   assert.equal(plan.weeks[3].phase, 'Recovery');
   assert.ok(plan.weeks[3].targetKm < plan.weeks[2].targetKm);
   assert.ok(plan.weeks[4].targetKm > plan.weeks[3].targetKm);

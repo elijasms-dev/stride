@@ -4,7 +4,13 @@ import { isLongUltra } from './ultra-policy.ts';
 import type { Profile } from './engine';
 import { runningDayLimit } from './runner-customization.ts';
 import { marathonSupportsMedium, usesMarathonBook } from './marathon-book.ts';
-import { isRoadRaceProfile, roadAbility } from './road-training-policy.ts';
+import {
+  isRoadRaceProfile,
+  isShortRoadRaceProfile,
+  roadAbility,
+} from './road-training-policy.ts';
+
+import { TRAINING_POLICY } from './plan/policy.ts';
 
 const separation = (a: number, b: number) =>
   Math.min(Math.abs(a - b), 7 - Math.abs(a - b));
@@ -86,6 +92,19 @@ export function requestedQualityCount(p: Profile): 0 | 1 | 2 {
     : requested;
 }
 
+/** Short-race consolidation retains one stimulus instead of a full deload.
+ * The stored workout choice stays intact; other distances use their existing rhythm. */
+export function weeklyQualityCount(p: Profile, weekIndex: number): 0 | 1 | 2 {
+  const requested = requestedQualityCount(p);
+  return isShortRoadRaceProfile(p) &&
+    weekIndex > 0 &&
+    (weekIndex + 1) %
+      (p.recoveryWeeks ?? TRAINING_POLICY.recoveryEveryWeeks) ===
+      0
+    ? (Math.min(1, requested) as 0 | 1)
+    : requested;
+}
+
 /** Original classic templates, rotated around the chosen long-run day. */
 export function classicRunningDays(count: number, longDay: number): number[] {
   const offsets: Record<number, number[]> = {
@@ -147,8 +166,16 @@ export function resolveRunningDays(p: Profile): number[] {
 }
 
 /** Solve the whole week: a greedy first choice can hide a feasible second slot. */
-export function qualitySchedule(p: Profile): number[] {
+export function qualitySchedule(p: Profile, weekIndex?: number): number[] {
   if (desiredRuns(p) === 2) return [];
+  const requested =
+    weekIndex === undefined
+      ? requestedQualityCount(p)
+      : weeklyQualityCount(p, weekIndex);
+  // A lighter week removes a familiar slot; re-solving a single slot can move
+  // Sunday's usual workout to Monday and place hard runs on consecutive days.
+  if (weekIndex !== undefined && requested < requestedQualityCount(p))
+    return qualitySchedule(p).slice(0, requested);
   const available = (
     p.method === 'double-threshold' ? (p.doubleDays ?? []) : p.days
   )
@@ -160,7 +187,6 @@ export function qualitySchedule(p: Profile): number[] {
         !(p.method === 'easy-doubles' && p.doubleDays?.includes(d)),
     )
     .sort((a, b) => a - b);
-  const requested = requestedQualityCount(p);
   let best: number[] = [],
     bestScore = -Infinity;
   for (let mask = 0; mask < 1 << available.length; mask++) {

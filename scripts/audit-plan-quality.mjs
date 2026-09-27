@@ -13,6 +13,7 @@ import {
   validatePlan,
   refreshWorkoutVariety,
 } from '../lib/engine.ts';
+import { referenceOrdinaryQualityCount } from './short-race-reference-oracle.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const source = resolve(
@@ -239,12 +240,17 @@ export function auditPlanQuality(plan) {
         ratio: row.easyLongRatio,
       });
     if (fullCalendar && scope === 'ordinary') {
-      if (quality.length !== (plan.profile.qualitySessions ?? 1))
+      const expectedQuality = referenceOrdinaryQualityCount(
+        plan.profile,
+        week.index,
+        plan.profile.qualitySessions ?? 1,
+      );
+      if (quality.length !== expectedQuality)
         issues.push({
           type: 'quality-frequency',
           week: row.week,
           actual: quality.length,
-          expected: plan.profile.qualitySessions ?? 1,
+          expected: expectedQuality,
         });
       if (long) {
         if (

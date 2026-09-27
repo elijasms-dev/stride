@@ -10,6 +10,7 @@ import {
 import { updateRunMeasure } from '../lib/run-distance.ts';
 import { roadProfile } from './road-overhaul-cases.mjs';
 import { dayAfter, weekdayQuality } from './road-overhaul-helpers.mjs';
+import { referenceOrdinaryQualityCount } from '../scripts/short-race-reference-oracle.mjs';
 
 const gap = (a, b) =>
   Math.round(
@@ -31,7 +32,7 @@ function assertSavedFrequency(plan, requested, asOf = plan.profile.startDate) {
     );
     assert.equal(
       runs.filter(weekdayQuality).length,
-      requested,
+      referenceOrdinaryQualityCount(plan.profile, week.index, requested),
       `${plan.profile.goal}, week ${week.index + 1}: selected ${requested}`,
     );
   }
