@@ -3,7 +3,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { dateRailWindow, dateRailTarget } from '../lib/date-rail-window.ts';
+import {
+  dateRailWindow,
+  dateRailTarget,
+  dateRailWeekWindow,
+  dateInPlanWeek,
+  adjacentRailWeek,
+} from '../lib/date-rail-window.ts';
 import { millisecondsUntilTrainingDay } from '../lib/training-day-clock.ts';
 import { trainingDay } from '../lib/form-values.ts';
 import {
@@ -21,7 +27,7 @@ const { demoPlan, addDays } = await import('../lib/engine.ts');
 const noop = () => {};
 const plan = demoPlan('2026-09-21');
 
-test('a long plan exposes seven calendar days, one Tab stop and a full date picker', () => {
+test('a long plan exposes seven keyboard-accessible days with adjacent week arrows', () => {
   const selected = plan.workouts[20].date;
   const html = renderToStaticMarkup(
     createElement(DateRail, {
@@ -35,9 +41,12 @@ test('a long plan exposes seven calendar days, one Tab stop and a full date pick
   );
   assert.equal((html.match(/data-date=/g) ?? []).length, 7);
   assert.equal((html.match(/tabindex="0"/g) ?? []).length, 1);
-  assert.match(html, /Choose any date/);
-  assert.match(html, /Previous seven days/);
-  assert.match(html, /Next seven days/);
+  assert.doesNotMatch(
+    html,
+    /Choose any date|Training week|<select|type="date"/,
+  );
+  assert.match(html, /Previous week/);
+  assert.match(html, /Next week/);
   assert.match(html, /Skip to workout/);
   assert.ok(html.includes(`data-date="${selected}"`));
 });
@@ -58,6 +67,59 @@ test('windowing and week navigation never lose boundary or separate recorded dat
   assert.equal(dateRailTarget(dates, dates.at(-1), 7), dates.at(-1));
   assert.equal(dateRailTarget(dates, dates[4], 7), dates[11]);
   assert.deepEqual(dateRailWindow([], '2026-09-21').dates, []);
+});
+
+test('training-week selection uses programme dates and preserves the weekday across year boundaries', () => {
+  const weeks = [{ start: '2026-12-28' }, { start: '2027-01-04' }];
+  const dates = [
+    '2026-12-01',
+    ...Array.from({ length: 14 }, (_, day) => addDays(weeks[0].start, day)),
+    '2027-02-01',
+  ];
+  const window = dateRailWeekWindow(dates, '2027-01-02', weeks);
+  assert.equal(window.weekIndex, 0);
+  assert.deepEqual(window.dates, dates.slice(1, 8));
+  assert.equal(dateInPlanWeek(weeks, '2027-01-02', 1), '2027-01-09');
+  assert.equal(dateInPlanWeek(weeks, '2027-01-09', 0), '2027-01-02');
+  assert.equal(dateInPlanWeek(weeks, '2026-12-01', 1), '2027-01-04');
+  assert.equal(dateInPlanWeek(weeks, '2027-01-09', 8), '2027-01-09');
+  assert.equal(
+    adjacentRailWeek(dates.slice(1, -1), '2027-01-02', weeks, -1),
+    '2027-01-02',
+  );
+  assert.equal(
+    adjacentRailWeek(dates.slice(1, -1), '2027-01-09', weeks, 1),
+    '2027-01-09',
+  );
+  assert.equal(adjacentRailWeek(dates, '2027-01-02', weeks, -1), '2026-12-26');
+  assert.equal(adjacentRailWeek(dates, '2027-01-09', weeks, 1), '2027-01-16');
+  for (const day of ['2026-12-01', '2027-02-01']) {
+    const outside = dateRailWeekWindow(dates, day, weeks);
+    assert.equal(outside.weekIndex, -1);
+    assert.ok(outside.dates.includes(day));
+  }
+});
+
+test('sparse historical records still navigate consecutive calendar weeks', () => {
+  const weeks = [{ start: '2026-09-14' }];
+  const dates = [
+    '2026-04-01',
+    '2026-04-20',
+    '2026-05-22',
+    '2026-07-03',
+    '2026-08-20',
+    '2026-09-02',
+    ...Array.from({ length: 7 }, (_, i) => addDays(weeks[0].start, i)),
+  ];
+  const window = dateRailWeekWindow(dates, '2026-04-01', weeks);
+  assert.deepEqual(
+    window.dates,
+    Array.from({ length: 7 }, (_, i) => addDays('2026-03-30', i)),
+  );
+  assert.equal(adjacentRailWeek(dates, '2026-04-01', weeks, 1), '2026-04-08');
+  assert.equal(adjacentRailWeek(dates, '2026-04-01', weeks, -1), '2026-04-01');
+  assert.equal(adjacentRailWeek(dates, '2026-09-16', weeks, -1), '2026-09-09');
+  assert.equal(adjacentRailWeek(dates, '2026-09-16', weeks, 1), '2026-09-16');
 });
 
 test('day rollover scheduling follows DST and timezone boundaries without frequent polling', () => {
@@ -111,7 +173,7 @@ test('drafts are bounded, expiring and separated by account epoch and record', (
   assert.notEqual(durableDraftKey('a:b', 'c'), durableDraftKey('a', 'b:c'));
 });
 
-test('the actual week schedule precedes collapsed routine and progression details', () => {
+test('the Plan page focuses on the actual schedule and keeps secondary actions in its menu', () => {
   const html = renderToStaticMarkup(
     createElement(FullPlan, {
       plan,
@@ -127,11 +189,11 @@ test('the actual week schedule precedes collapsed routine and progression detail
       isDemo: false,
     }),
   );
-  assert.ok(
-    html.indexOf('class="pe-weeks"') <
-      html.indexOf('Your routine and progression'),
+  assert.match(html, /class="pe-weeks"/);
+  assert.doesNotMatch(
+    html,
+    /Your routine and progression|class="pe-plan-context"|Built around your running/,
   );
-  assert.match(html, /<details class="pe-plan-context">/);
   assert.match(html, /More plan options/);
 });
 

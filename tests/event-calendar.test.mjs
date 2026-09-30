@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { changeEvent, avoidRecordedOverlap } from '../lib/event-transition.ts';
 import { exportCalendar } from '../lib/calendar.ts';
-import { makePlan, demoProfile, addDays } from '../lib/engine.ts';
+import { makePlan, demoProfile, addDays, validatePlan } from '../lib/engine.ts';
 import { validateRecovery } from '../lib/recovery.ts';
 const start = '2026-07-13',
   today = '2026-09-07';
@@ -140,4 +140,73 @@ void test('new-plan preview and activation share a recorded-day exclusion and ca
   assert.ok(result.workouts.every((w) => w.date !== today));
   p.returnState = { stage: 1 };
   assert.throws(() => avoidRecordedOverlap(candidate, p), /return review/);
+});
+
+void test('a recorded opening day remains validation evidence when archived into a new block', () => {
+  const asOf = '2026-09-28';
+  const profile = {
+    ...demoProfile(asOf),
+    startDate: asOf,
+    raceDate: addDays(asOf, 55),
+    timezone: 'UTC',
+  };
+  const previous = makePlan(profile, asOf);
+  const recorded = previous.workouts[0];
+  recorded.status = 'completed';
+  recorded.feedback = {
+    actualDate: asOf,
+    actualMinutes: 30,
+    actualKm: 5.125,
+    effort: 3,
+    feeling: 'good',
+    note: '',
+    recordedAt: asOf + 'T08:00:00Z',
+  };
+  const next = avoidRecordedOverlap(
+    makePlan(profile, asOf),
+    previous,
+    [],
+    asOf,
+  );
+  assert.ok(next.workouts.every((w) => w.date !== asOf));
+  next.workouts.push({ ...structuredClone(recorded), week: -1 });
+  assert.deepEqual(validatePlan(next), []);
+
+  const missing = structuredClone(next);
+  const future = missing.workouts.find(
+    (w) => w.week === 1 && w.kind === 'easy',
+  );
+  missing.workouts = missing.workouts.filter((w) => w.id !== future.id);
+  assert.ok(
+    validatePlan(missing).some((error) => /Week 2 must retain/.test(error)),
+  );
+
+  const unrecorded = structuredClone(next);
+  delete unrecorded.workouts.at(-1).feedback;
+  assert.ok(
+    validatePlan(unrecorded).some((error) =>
+      /declared weekly distance/.test(error),
+    ),
+  );
+
+  const standalone = structuredClone(next);
+  standalone.workouts = standalone.workouts.filter((w) => w.week >= 0);
+  standalone.extraRuns = [
+    {
+      id: 'recorded-before-plan',
+      date: asOf,
+      minutes: 30,
+      km: 5.125,
+      effort: 3,
+      feeling: 'good',
+      note: '',
+      source: 'Manual',
+      recordedAt: asOf + 'T08:00:00Z',
+    },
+  ];
+  assert.deepEqual(validatePlan(standalone), []);
+  standalone.workouts = standalone.workouts.filter((w) => w.id !== future.id);
+  assert.ok(
+    validatePlan(standalone).some((error) => /Week 2 must retain/.test(error)),
+  );
 });

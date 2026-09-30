@@ -4,6 +4,7 @@ import { distanceEstimate } from './prescription.ts';
 import { supportingSession, workoutGuidance } from './coaching-context.ts';
 import { planWeekFocus } from './plan-guidance.ts';
 import { resolveEffortRole } from './workout-targets.ts';
+import { recordedHeartRate } from './recorded-heart-rate.ts';
 
 function targetMetrics(step: Step, workout: Workout, plan: Plan) {
   const match = step.effort.match(/(\d+)(?:[–-](\d+))?\s*\/\s*10/);
@@ -106,6 +107,10 @@ function session(workout: Workout, plan: Plan) {
           actual_date: workout.feedback.actualDate ?? workout.date,
           duration_minutes: workout.feedback.actualMinutes,
           distance_km: workout.feedback.actualKm,
+          average_heart_rate_bpm:
+            recordedHeartRate(workout.feedback).averageHeartRate ?? null,
+          max_heart_rate_bpm:
+            recordedHeartRate(workout.feedback).maxHeartRate ?? null,
           effort: workout.feedback.effort,
           feeling: workout.feedback.feeling,
           enjoyment: workout.feedback.enjoyment ?? null,

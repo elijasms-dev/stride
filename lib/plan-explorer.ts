@@ -86,3 +86,12 @@ export function calendarWorkoutStatus(workout: Workout) {
   if (workout.kind === 'long') return 'Long run';
   return workout.hard ? 'Quality workout' : 'Easy effort';
 }
+
+/** Highlight existing prescriptions without changing the training schedule. */
+export function isKeyTrainingWorkout(workout: Workout) {
+  return (
+    workout.status !== 'skipped' &&
+    workout.kind !== 'race' &&
+    (workout.kind === 'long' || workout.hard)
+  );
+}

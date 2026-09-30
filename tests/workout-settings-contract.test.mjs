@@ -201,17 +201,20 @@ const targetProps = (plan) => ({
   busy: false,
 });
 
-test('benchmark settings accurately render automatic selection and exact derived ranges', () => {
+test('benchmark settings show programme guidance without copying a universal pace table', () => {
   const plan = targetPlan();
   const draft = initialTargetSettings(plan.profile);
   assert.equal(draft.mode, 'automatic');
   assert.equal(targetSettingsConfig(plan.profile, draft), null);
   const html = render(WorkoutTargetSettings, targetProps(plan));
-  assert.match(html, /aria-pressed="true">Automatic/);
-  assert.match(html, /From your benchmark/);
-  assert.match(html, /5 km result in 0:25:00/);
-  assert.match(html, /not a measure of prediction confidence/);
-  assert.ok(html.includes(draft.pace.easy.low));
+  assert.match(html, /Programme guidance/);
+  assert.match(html, /Your reference result/);
+  assert.match(html, /value="0:25:00"/);
+  assert.match(
+    html,
+    /not an easy-run target or a prediction for another distance/,
+  );
+  assert.equal(draft.pace.easy.low, '');
   assert.deepEqual(
     updateWorkoutTargets(plan, null, start),
     plan,
@@ -241,7 +244,7 @@ test('effort override and reset are reversible while protected and recorded pres
   assert.ok(
     reset.workouts
       .filter(eligible)
-      .some((w) => w.steps.some((s) => s.target?.mode === 'pace')),
+      .every((w) => w.steps.every((s) => !s.target)),
   );
   for (const id of [completed.id, protectedId])
     assert.deepEqual(
@@ -259,8 +262,8 @@ test('automatic without a benchmark remains explicit in the UI and resets an old
   });
   const reset = updateWorkoutTargets(plan, null, start);
   const html = render(WorkoutTargetSettings, targetProps(reset));
-  assert.match(html, /No benchmark is saved/);
-  assert.match(html, /aria-pressed="true">Automatic/);
+  assert.match(html, /Add race benchmark/);
+  assert.match(html, /Programme guidance/);
   assert.ok(reset.workouts.every((w) => w.steps.every((s) => !s.target)));
 });
 
@@ -351,7 +354,14 @@ test('reasonable overlap and event-specific race ranges are accepted without mad
     profile('10k', { recentRace: { distanceKm: 5, timeMinutes: 25 } }),
     'threshold',
   );
-  assert.deepEqual(validateWorkoutTargets(auto), auto);
+  assert.equal(
+    auto,
+    undefined,
+    'A benchmark alone cannot select programme-specific targets',
+  );
+  assert.deepEqual(validateWorkoutTargets({ mode: 'automatic' }), {
+    mode: 'automatic',
+  });
 });
 
 test('the frequency UI cannot fund two workouts by hiding a second long run in an easy day', () => {

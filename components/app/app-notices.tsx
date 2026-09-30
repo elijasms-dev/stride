@@ -1,17 +1,12 @@
 'use client';
 /* oxlint-disable next/no-html-link-for-pages -- Authentication transitions require a new document to discard the pinned account session. */
-import { NotificationBar, type AppNotification } from '../notification-bar';
 /* oxlint-disable react/react-compiler -- This app hydrates device preferences after SSR; it does not use the React Compiler. */
-import { TRAINING_POLICY } from '@/lib/engine';
-import { needsSessionBalanceReview } from '@/lib/plan/session-balance';
 import { ArrowUpRight, CloudOff, RotateCcw } from 'lucide-react';
 import { useAppContext } from './app-context';
 import { PendingSaves } from './device-journal-settings';
 
 export function AppNotices() {
   const {
-    draftScope,
-    data,
     loading,
     loadError,
     offline,
@@ -19,7 +14,6 @@ export function AppNotices() {
     view,
     plan,
     isDemo,
-    today,
     openModal,
     showWorkout,
     returnCheck,
@@ -29,49 +23,6 @@ export function AppNotices() {
   } = useAppContext();
   return (
     <>
-      <NotificationBar
-        key={`${draftScope}:${plan.id}`}
-        notifications={[
-          ...(data.accountStatus === 'closed'
-            ? [
-                {
-                  id: 'journal-closed',
-                  title: 'Your journal is closed',
-                  description:
-                    'Restore a saved copy or start with an empty journal when you are ready.',
-                  actionLabel: 'Open journal options',
-                  onAction: () => openModal('accountData'),
-                } satisfies AppNotification,
-              ]
-            : []),
-          ...(!isDemo && plan.profile.raceDate < today
-            ? [
-                {
-                  id: 'block-ended',
-                  title: 'Your training block has ended',
-                  description:
-                    'Review your next goal and choose how you would like to continue training.',
-                  actionLabel: 'Review next block',
-                  onAction: () => openModal('event'),
-                } satisfies AppNotification,
-              ]
-            : []),
-          ...(!isDemo &&
-          (plan.policyVersion !== TRAINING_POLICY.version ||
-            needsSessionBalanceReview(plan))
-            ? [
-                {
-                  id: 'training-update',
-                  title: 'Training update available',
-                  description:
-                    'Your plan uses an earlier version of our training guidance. Preview changes to upcoming runs before applying them. Your recorded runs stay saved.',
-                  actionLabel: 'Review training update',
-                  onAction: () => openModal('preferences'),
-                } satisfies AppNotification,
-              ]
-            : []),
-        ]}
-      />
       {isDemo && view !== 'settings' && (
         <div className="demo-banner">
           <span>

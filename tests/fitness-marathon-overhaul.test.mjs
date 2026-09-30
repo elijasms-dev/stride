@@ -260,7 +260,7 @@ test('explicit frequency choices are retained while one weekday workout uses the
   }
 });
 
-test('benchmark targets use current fitness and preserve explicit effort/HR/manual targets', () => {
+test('generic benchmark roles remain effort and preserve explicit effort/HR/manual targets', () => {
   const p = profile({ recentRace: { distanceKm: 10, timeMinutes: 50 } });
   const work = {
     kind: 'work',
@@ -270,10 +270,11 @@ test('benchmark targets use current fitness and preserve explicit effort/HR/manu
   };
   const tempo = { kind: 'tempo', stimulus: 'threshold' };
   const target = workoutStepTarget(tempo, work, p);
-  assert.ok(validStepTarget(target));
-  const expected = calculateTrainingPaceRanges(p.recentRace).threshold;
-  assert.deepEqual({ low: target.low, high: target.high }, expected);
-  assert.equal(target.source, 'benchmark');
+  assert.equal(
+    target,
+    undefined,
+    'no universal threshold conversion is prescribed',
+  );
   assert.equal(
     workoutStepTarget(tempo, work, {
       ...p,
@@ -309,7 +310,7 @@ test('benchmark targets use current fitness and preserve explicit effort/HR/manu
   assert.ok(
     plan.workouts
       .filter((w) => w.hard && w.kind === 'tempo')
-      .every((w) => w.steps.some((s) => validStepTarget(s.target))),
+      .every((w) => w.steps.every((s) => s.target === undefined)),
   );
 });
 
@@ -428,9 +429,9 @@ test('reapplying unchanged fitness targets preserves mixed long-run distance and
   }
 });
 
-test('a fixed marathon ignores stale custom distance when predicting race targets', () => {
+test('a fixed marathon ignores stale custom distance when matching a direct race result', () => {
   const p = profile({
-    recentRace: { distanceKm: 10, timeMinutes: 50 },
+    recentRace: { distanceKm: 42.195, timeMinutes: 240, representative: true },
     raceDistanceKm: 10,
   });
   const step = {
@@ -444,8 +445,18 @@ test('a fixed marathon ignores stale custom distance when predicting race target
     step,
     p,
   );
-  const expected = (predictRaceTime(p.recentRace, 42.195) * 60) / 42.195;
-  assert.ok(target.low < expected && target.high > expected);
+  const expected = Math.round((240 * 60) / 42.195);
+  assert.equal(target.low, expected);
+  assert.equal(target.high, expected);
+  assert.equal(target.model, 'same-distance-result-v1');
+  assert.equal(
+    workoutStepTarget({ kind: 'long', stimulus: 'race-rhythm' }, step, {
+      ...p,
+      recentRace: { distanceKm: 10, timeMinutes: 50, representative: true },
+    }),
+    undefined,
+    'a 10K result does not become a marathon target',
+  );
 });
 
 test('decimal planning paces retain the same whole long allocation in distance and time modes', () => {

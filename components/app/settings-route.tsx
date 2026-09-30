@@ -5,10 +5,12 @@ import { TabsContent } from '@/components/ui/tabs';
 import { Settings } from '../settings';
 import { useAppContext } from './app-context';
 import { DeviceJournalSettings } from './device-journal-settings';
+import { WeatherSettings } from '../weather-widget';
 
 export function SettingsRoute() {
   const {
     data,
+    account,
     busy,
     theme,
     setTheme,
@@ -26,6 +28,9 @@ export function SettingsRoute() {
   return (
     <TabsContent value="settings" className="main-panel">
       <Settings
+        profileName={
+          account.profile?.display_name ?? (isDemo ? '' : plan.profile.name)
+        }
         homePreferences={homePreferences}
         onHomePreferences={updateHomePreferences}
         homePreferencesTemporary={homePreferencesTemporary}
@@ -56,6 +61,7 @@ export function SettingsRoute() {
         }
         busy={busy}
       />
+      <WeatherSettings />
       <DeviceJournalSettings />
     </TabsContent>
   );

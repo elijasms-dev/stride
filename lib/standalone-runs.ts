@@ -9,6 +9,7 @@ import {
   mutationReceiptStatement,
 } from './server';
 import { activityTime } from './activity-time';
+import { replaceRecordedHeartRate } from './recorded-heart-rate';
 import { verifiedActivity } from './provider-activities';
 import { todayInZone } from './engine';
 import { validateRun } from './run-input';
@@ -30,6 +31,7 @@ export async function saveStandaloneRun(
   r.id = r.activityId ? 'intervals:' + r.activityId : crypto.randomUUID();
   r.recordedAt = new Date().toISOString();
   r.source = 'Manual';
+  replaceRecordedHeartRate(r, {});
   let identity: ProviderIdentity | undefined;
   if (r.activityId) {
     const actual = await verifiedActivity(owner, r.activityId, r.date);
@@ -39,6 +41,7 @@ export async function saveStandaloneRun(
       actual.distance && actual.distance > 0 ? actual.distance / 1000 : null;
     r.source = actual.source;
     Object.assign(r, activityTime(actual));
+    replaceRecordedHeartRate(r, actual);
   }
   validateRun(r, todayInZone(profile?.timezone || 'UTC'));
   const current = await readState(owner);
@@ -185,6 +188,7 @@ export async function correctStandaloneRun(
     throw new HttpError(422, 'Add a brief reason for this correction.');
   if ((r.activityId ?? null) !== (original.activityId ?? null))
     throw new HttpError(422, 'Keep the original provider recording link.');
+  replaceRecordedHeartRate(r, original);
   const at = new Date().toISOString(),
     token = crypto.randomUUID();
   const next = {

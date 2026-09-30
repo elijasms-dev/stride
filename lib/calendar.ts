@@ -64,7 +64,7 @@ export function exportCalendar(
         : []),
       ...w.steps.map(
         (s, i) =>
-          `${i + 1}. ${s.label}: ${stepLength(s)}; ${s.target ? targetLabel(s.target, plan.profile.units) + '; ' : ''}${s.effort}`,
+          `${i + 1}. ${s.label}: ${stepLength(s)}; ${s.target ? targetLabel(s.target, plan.profile.units) + '; ' : ''}${s.pacing?.guidance ?? s.effort}`,
       ),
       'Snapshot only. Later changes require a new export; check for duplicates in your calendar.',
     ].join('\n');

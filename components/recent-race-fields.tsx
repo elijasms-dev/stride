@@ -2,8 +2,7 @@
 import type { Profile } from '@/lib/engine';
 import { BENCHMARK_DISTANCES } from '@/lib/benchmark-input';
 import {
-  pacingEvidence,
-  calculateTrainingPaceRanges,
+  benchmarkEvidence,
   validateRecentRace,
   type RecentRace,
 } from '@/lib/fitness-pacing';
@@ -25,16 +24,11 @@ export function RecentRaceFields({
   const race = profile.recentRace;
   const today = asOf ?? trainingDayIfValid(profile.timezone) ?? undefined;
   const factor = profile.units === 'mi' ? MILE_KM : 1;
-  let paces: ReturnType<typeof calculateTrainingPaceRanges> | null = null;
-  let evidence: ReturnType<typeof pacingEvidence> | null = null;
+  let evidence: ReturnType<typeof benchmarkEvidence> | null = null;
   let benchmarkError = '';
   if (race && race.distanceKm > 0 && race.timeMinutes > 0) {
     try {
-      evidence = pacingEvidence(
-        { ...profile, recentRace: validateRecentRace(race, today) },
-        today,
-      );
-      paces = evidence.fitness.ranges;
+      evidence = benchmarkEvidence(validateRecentRace(race, today), today);
     } catch (error) {
       benchmarkError =
         error instanceof Error
@@ -43,17 +37,65 @@ export function RecentRaceFields({
     }
   }
   const update = (patch: Partial<RecentRace>) =>
-    race && onChange({ ...profile, recentRace: { ...race, ...patch } });
+    race &&
+    onChange({
+      ...profile,
+      recentRace: { ...race, representative: false, ...patch },
+    });
   return (
     <fieldset className="form-section">
-      <legend>Recent race benchmark (optional)</legend>
+      <legend>Your reference result (optional)</legend>
       <p className="subtle">
-        Use a recent race result to estimate easy, tempo, threshold, interval
-        and repetition paces. Any workout targets you set manually take
-        priority.
+        Choose a race or time trial that reflects your current running. Your
+        programme determines which targets this result can support. You can
+        train by effort without adding a result.
       </p>
       {race ? (
         <>
+          {evidence && !benchmarkError && (
+            <section
+              className="pace-reference-summary"
+              aria-label="Reference result pace"
+            >
+              <strong>
+                {paceText(
+                  (race.timeMinutes * 60) / race.distanceKm,
+                  profile.units,
+                )}{' '}
+                /{profile.units}
+              </strong>
+              <p>
+                Your average pace for this result. It is not an easy-run target
+                or a prediction for another distance.
+              </p>
+              <label className="pace-confirmation">
+                <input
+                  type="checkbox"
+                  checked={race.representative === true}
+                  onChange={(event) =>
+                    update({ representative: event.currentTarget.checked })
+                  }
+                />
+                <span>
+                  This result reflects my current fitness and the conditions I
+                  am training for.
+                </span>
+              </label>
+              <details>
+                <summary>About this result</summary>
+                <ul className="subtle">
+                  {evidence.notices.map((notice) => (
+                    <li key={notice}>{notice}</li>
+                  ))}
+                </ul>
+                <p>
+                  Course and date help you judge the result. Stride does not
+                  invent a pace correction for hills, weather or an older
+                  result.
+                </p>
+              </details>
+            </section>
+          )}
           <fieldset
             className="ultra-distance-choices"
             aria-label="Common benchmark distances"
@@ -87,7 +129,11 @@ export function RecentRaceFields({
                 onValueChange={(value) =>
                   onChange({
                     ...profile,
-                    recentRace: { ...race, distanceKm: value ?? 0 },
+                    recentRace: {
+                      ...race,
+                      representative: false,
+                      distanceKm: value ?? 0,
+                    },
                   })
                 }
               />
@@ -148,68 +194,6 @@ export function RecentRaceFields({
           </div>
           {benchmarkError && (
             <output className="field-error">{benchmarkError}</output>
-          )}
-          {evidence && !paces && (
-            <section aria-label="Benchmark pace estimates">
-              <p>
-                This benchmark is outside the supported training-pace model.
-                Runs keep their effort cues.
-              </p>
-              <ul className="subtle">
-                {evidence.notices.map((notice) => (
-                  <li key={notice}>{notice}</li>
-                ))}
-              </ul>
-            </section>
-          )}
-          {paces && (
-            <section aria-label="Benchmark pace estimates">
-              <h3>Estimated training paces</h3>
-              <dl className="benchmark-pace-preview">
-                {(
-                  [
-                    ['easy', 'Easy'],
-                    ['tempo', 'Tempo'],
-                    ['threshold', 'Threshold'],
-                    ['interval', 'Intervals'],
-                    ['repetition', 'Repetitions'],
-                  ] as const
-                ).map(([key, label]) => (
-                  <div key={key}>
-                    <dt>{label}</dt>
-                    <dd>
-                      {paceText(paces[key].low, profile.units)}–
-                      {paceText(paces[key].high, profile.units)}{' '}
-                      <small>/{profile.units}</small>
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-              <p className="subtle">
-                These effort ranges estimate your current fitness. Keep easy
-                running conversational. Conditions and endurance affect how well
-                the estimates transfer; the ranges are not measured
-                physiological thresholds.
-              </p>
-              {profile.workoutTargets && (
-                <p className="subtle">
-                  Your manual workout targets take priority. These estimates do
-                  not replace them.
-                </p>
-              )}
-              <ul className="subtle">
-                {evidence?.notices.map((notice) => (
-                  <li key={notice}>{notice}</li>
-                ))}
-              </ul>
-              <p className="subtle">
-                The selected plan changes race-specific targets and workout
-                structure. A new benchmark updates your fitness zones. Review
-                the plan preview before applying changes. Date, result type and
-                course describe the result; they do not change the pace
-                calculation.
-              </p>
-            </section>
           )}
           <button
             type="button"

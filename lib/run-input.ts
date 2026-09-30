@@ -4,6 +4,10 @@ import { PlanError } from './plan/errors.ts';
 import { type ExtraRun } from './plan/types.ts';
 import { activityTime } from './activity-time.ts';
 import { impossibleRunningSummary } from './activity-plausibility.ts';
+import {
+  recordedHeartRate,
+  validRecordedHeartRate,
+} from './recorded-heart-rate.ts';
 export function validateRun(
   raw: unknown,
   today: string,
@@ -39,8 +43,13 @@ export function validateRun(
     throw new PlanError(
       'This distance and duration imply an impossible running speed. Check the units and duration; the run has not been saved.',
     );
+  if (!validRecordedHeartRate(r))
+    throw new PlanError(
+      'Check the recorded heart rate: use positive bpm values with a maximum no lower than the average.',
+    );
   return {
     ...activityTime(r),
+    ...recordedHeartRate(r),
     id: typeof r.id === 'string' ? r.id : '',
     date: r.date,
     minutes: r.minutes,

@@ -1,5 +1,6 @@
 import { type Profile, type Workout } from './plan/types.ts';
 import { customRaceName, withSpecificWorkoutName } from './workout-names.ts';
+import { currentRaceInstruction } from './source-pacing.ts';
 
 export function customWorkoutEventDistance(profile: Profile) {
   // This pass covers road-event rhythm from 5K through 30K. Short races,
@@ -53,6 +54,10 @@ export function withWorkoutEventContext(
     eventContextText(text, distance, workout.eventDistanceKm);
   const steps = workout.steps.map((step) => ({
     ...step,
+    ...(step.paceInstruction?.sourceId === 'stride-adaptive' &&
+    step.paceInstruction.kind === 'current-race'
+      ? { paceInstruction: currentRaceInstruction(distance) }
+      : {}),
     label: contextualize(step.label),
     effort: contextualize(step.effort),
   }));

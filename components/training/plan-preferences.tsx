@@ -16,6 +16,7 @@ export function PlanPreferences({
   onClose,
   onAction,
   busy,
+  onPaces,
 }: {
   initialPatch?: Partial<PreferencePatch>;
   plan: Plan;
@@ -24,6 +25,7 @@ export function PlanPreferences({
   onClose: () => void;
   onAction: (action: string, payload: Record<string, unknown>) => Promise<void>;
   busy: boolean;
+  onPaces?: () => void;
 }) {
   const state = usePlanPreferences({
     initialPatch,
@@ -54,7 +56,7 @@ export function PlanPreferences({
             disabled={checking || busy}
             className="form-section form-content"
           >
-            <PlanCustomizationFields profile={p} onChange={setP} />
+            <PlanCustomizationFields profile={p} onChange={setP} onPaces={onPaces} />
             <BusyButton
               busy={checking}
               busyLabel="Reviewing your plan…"

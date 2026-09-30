@@ -50,7 +50,22 @@ test('recipe preferences change runnable sets without rebuilding mileage, histor
     (item) => item.id === 'marathon-q2-distance',
   );
   const original = makePlan(
-    { ...c.profile, workoutFormat: 'distance' },
+    {
+      ...c.profile,
+      workoutFormat: 'distance',
+      // Exact-distance sets need an explicit pace basis. The saved 10K result
+      // alone does not prescribe marathon/threshold paces in every source.
+      workoutTargets: {
+        mode: 'pace',
+        raceScope: 'marathon:',
+        pace: {
+          easy: { low: 360, high: 360 },
+          tempo: { low: 300, high: 320 },
+          interval: { low: 270, high: 290 },
+          race: { low: 330, high: 340 },
+        },
+      },
+    },
     c.profile.startDate,
     false,
   );

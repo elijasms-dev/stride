@@ -13,7 +13,7 @@ import {
   initialTargetSettings,
   targetSettingsConfig,
 } from '../lib/workout-target-form.ts';
-import { FITNESS_MODEL_VERSION } from '../lib/fitness-pacing.ts';
+import { currentRaceInstruction } from '../lib/source-pacing.ts';
 import { addDays, demoProfile, makePlan } from '../lib/engine.ts';
 import { exportProgram } from '../lib/program-export.ts';
 
@@ -59,18 +59,18 @@ test('role and target selection are independent of cue wording', () => {
   );
 });
 
-test('automatic threshold and tempo use independent explicit bands', () => {
-  const config = benchmarkWorkoutTargets(profile);
-  assert.ok(config.pace.threshold);
-  assert.ok(config.pace.repetition);
-  const actual = workoutStepTarget(threshold, step, profile);
-  assert.deepEqual(
-    { low: actual.low, high: actual.high },
-    config.pace.threshold,
+test('automatic generic roles retain effort without a source-specific numerical rule', () => {
+  assert.equal(benchmarkWorkoutTargets(profile), undefined);
+  assert.equal(workoutStepTarget(threshold, step, profile), undefined);
+  assert.equal(workoutStepTarget(rhythm, step, profile), undefined);
+  assert.equal(
+    workoutStepTarget(threshold, step, {
+      ...profile,
+      recentRace: { ...profile.recentRace, representative: true },
+    }),
+    undefined,
+    'confirmation does not invent threshold equivalence',
   );
-  assert.equal(actual.source, 'benchmark');
-  assert.equal(actual.model, FITNESS_MODEL_VERSION);
-  assert.equal(workoutStepTarget(rhythm, step, profile).model, 'riegel-1.06');
 });
 
 test('manual threshold, tempo and repetition remain separately configurable', () => {
@@ -164,8 +164,8 @@ for (const raceDistanceKm of [25, 30]) {
       resolveEffortRole(rhythm, { ...step, intensity: 5 }, custom),
       'steady',
     );
-    assert.ok(gentle.low >= balanced.low);
-    assert.ok(gentle.high >= balanced.high);
+    assert.equal(balanced, undefined);
+    assert.equal(gentle, undefined);
     const start = '2026-09-28';
     const actual = ['balanced', 'gentle'].map((difficulty) => {
       const p = {
@@ -195,8 +195,8 @@ for (const raceDistanceKm of [25, 30]) {
     });
     assert.equal(actual[0].effortRole, 'race');
     assert.equal(actual[1].effortRole, 'steady');
-    assert.ok(actual[1].target.low >= actual[0].target.low);
-    assert.ok(actual[1].target.high >= actual[0].target.high);
+    assert.equal(actual[0].target, undefined);
+    assert.equal(actual[1].target, undefined);
   });
 }
 
@@ -251,8 +251,12 @@ test('portable program exports preserve benchmark, manual and unknown provenance
   const plan = makePlan(p, p.startDate);
   const original = plan.workouts[0];
   const targeted = withWorkoutTargets(
-    { ...original, stimulus: 'threshold', steps: [step] },
-    { ...p, recentRace: profile.recentRace },
+    {
+      ...original,
+      stimulus: 'threshold',
+      steps: [{ ...step, paceInstruction: currentRaceInstruction(5) }],
+    },
+    { ...p, recentRace: { ...profile.recentRace, representative: true } },
   );
   assert.equal(targeted.steps[0].target.source, 'benchmark');
   const cases = [
@@ -280,7 +284,7 @@ test('portable program exports preserve benchmark, manual and unknown provenance
     assert.match(metrics.basis, basis);
     assert.equal(
       metrics.model,
-      source === 'benchmark' ? FITNESS_MODEL_VERSION : null,
+      source === 'benchmark' ? 'same-distance-result-v1' : null,
     );
     assert.equal(session.main_set[0].effort_role, 'threshold');
   }

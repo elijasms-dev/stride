@@ -1,5 +1,6 @@
 import { schedulingEasyPace } from '../fitness-pacing.ts';
 import { qualityWorkMinutes } from '../prescription.ts';
+import { reviewedQualityMinutes } from '../pace-review-eligibility.ts';
 import { runningDayLimit } from '../runner-customization.ts';
 import {
   isRoadRaceProfile,
@@ -84,7 +85,8 @@ const usefulQuality = (w: Workout) =>
   w.kind !== 'long' &&
   w.hard &&
   ['tempo', 'intervals', 'fartlek'].includes(w.kind) &&
-  qualityWorkMinutes(w) >= PLAN_LOAD_LIMITS.minimumTempoWorkMinutes - 1e-6;
+  Math.max(qualityWorkMinutes(w), reviewedQualityMinutes(w) ?? 0) >=
+    PLAN_LOAD_LIMITS.minimumTempoWorkMinutes - 1e-6;
 
 /** Validate the same eligible weeks that generation can repair, without mutation. */
 export function standardQualityRhythmErrors(plan: Plan): string[] {
@@ -265,7 +267,8 @@ export function roadQualityFrequencyErrors(
         ['tempo', 'intervals', 'fartlek'].includes(run.kind) &&
         run.hard &&
         !['aerobic', 'economy'].includes(run.stimulus ?? '') &&
-        roadWorkMinutes(run) >= PLAN_LOAD_LIMITS.minimumTempoWorkMinutes - 1e-6,
+        Math.max(roadWorkMinutes(run), reviewedQualityMinutes(run) ?? 0) >=
+          PLAN_LOAD_LIMITS.minimumTempoWorkMinutes - 1e-6,
     );
     const invalidQuality = weekdayRuns.some((run) => {
       const dose = roadWorkMinutes(run);

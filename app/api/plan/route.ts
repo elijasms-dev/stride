@@ -1,8 +1,9 @@
 import { beginRequestObservation } from '@/lib/request-observation';
 import {
-  validateWorkoutTargets,
-  updateWorkoutTargets,
-} from '@/lib/workout-targets';
+  assertNoPacingPreferenceChange,
+  paceReviewFingerprint,
+  preparePaceReview,
+} from '@/lib/pacing-review';
 import { MAX_RECORDED_MINUTES } from '@/lib/ultra-policy';
 import { updateRunMeasure } from '@/lib/run-distance';
 import {
@@ -12,6 +13,10 @@ import {
 import { measure } from '@/lib/measurement';
 import { validateRun } from '@/lib/run-input';
 import { activityTime } from '@/lib/activity-time';
+import {
+  recordedHeartRate,
+  replaceRecordedHeartRate,
+} from '@/lib/recorded-heart-rate';
 import { impossibleRunningSummary } from '@/lib/activity-plausibility';
 import { saveStandaloneRun, correctStandaloneRun } from '@/lib/standalone-runs';
 import {
@@ -190,43 +195,31 @@ export async function POST(request: Request) {
     }
     if (b.action === 'targetsPreview' || b.action === 'targets') {
       if (!current.plan) throw new PlanError('Build a plan first.');
-      let config;
-      try {
-        config = b.targets === null ? null : validateWorkoutTargets(b.targets);
-      } catch (e) {
-        throw new PlanError((e as Error).message);
-      }
-      const effectiveDate = todayInZone(current.plan.profile.timezone);
+      const today = todayInZone(current.plan.profile.timezone);
       const receipts = await database()
         .prepare('SELECT workout_id FROM deliveries WHERE owner=?')
         .bind(owner)
         .all<{ workout_id: string }>();
       const protectedIds = receipts.results.map((r) => r.workout_id);
-      const candidate = updateWorkoutTargets(
+      const review = preparePaceReview(
         current.plan,
-        config,
+        b.targets,
+        b.pacing,
+        today,
+        protectedIds,
+      );
+      const candidate = review.plan;
+      const { effectiveDate } = review;
+      const fingerprint = await paceReviewFingerprint(
+        candidate,
         effectiveDate,
         protectedIds,
       );
-      const digest = await crypto.subtle.digest(
-        'SHA-256',
-        new TextEncoder().encode(JSON.stringify(candidate)),
-      );
-      const fingerprint = Array.from(new Uint8Array(digest), (n) =>
-        n.toString(16).padStart(2, '0'),
-      ).join('');
       if (b.action === 'targetsPreview')
         return json({
-          plan: candidate,
+          ...review,
           version: current.version,
-          effectiveDate,
           fingerprint,
-          protectedCount: current.plan.workouts.filter(
-            (w) =>
-              w.status === 'planned' &&
-              w.date >= effectiveDate &&
-              protectedIds.includes(w.id),
-          ).length,
         });
       if (b.effectiveDate !== effectiveDate || b.fingerprint !== fingerprint)
         throw new HttpError(
@@ -240,7 +233,7 @@ export async function POST(request: Request) {
           owner,
           current.version,
           candidate,
-          'Saved workout targets; running days and session time unchanged',
+          'Saved reviewed pace evidence and targets; schedule and prescribed work unchanged',
           accountContext.epoch,
         ),
       );
@@ -369,6 +362,11 @@ export async function POST(request: Request) {
     }
     if (b.action === 'preferencesPreview') {
       if (!current.plan) throw new PlanError('Build a plan first.');
+      assertNoPacingPreferenceChange(
+        current.plan.profile,
+        b.preferences,
+        todayInZone(current.plan.profile.timezone),
+      );
       return json({
         version: current.version,
         effectiveDate: todayInZone(current.plan.profile.timezone),
@@ -460,6 +458,7 @@ export async function POST(request: Request) {
             409,
             'A new day has started. Preview your changes again.',
           );
+        assertNoPacingPreferenceChange(plan.profile, b.preferences, today);
         plan = revisePreferences(plan, b.preferences as PreferencePatch, today);
         label = 'Updated future training preferences';
       } else if (b.action === 'correctExtra') {
@@ -475,6 +474,7 @@ export async function POST(request: Request) {
           throw new PlanError('Add a brief correction reason.');
         if ((r.activityId ?? null) !== (original.activityId ?? null))
           throw new PlanError('Keep the original provider recording link.');
+        replaceRecordedHeartRate(r, original);
         Object.assign(original, r, {
           ...activityTime(original),
           id: original.id,
@@ -519,6 +519,8 @@ export async function POST(request: Request) {
           throw new PlanError(
             'That activity is already in your running journal.',
           );
+        // Measured summaries come from a verified provider response, not the form.
+        replaceRecordedHeartRate(r, {});
         if (r.activityId) {
           const actual = await verifiedActivity(
             owner,
@@ -533,6 +535,7 @@ export async function POST(request: Request) {
               : null;
           r.source = actual.source;
           Object.assign(r, activityTime(actual));
+          replaceRecordedHeartRate(r, actual);
           validateRun(r, today);
         }
         if (b.action === 'attachRecording') {
@@ -552,6 +555,7 @@ export async function POST(request: Request) {
               throw new PlanError(
                 'Choose a recording from the same date as this run.',
               );
+            replaceRecordedHeartRate(existing.feedback, r);
             existing.feedback = {
               ...existing.feedback,
               ...activityTime(r),
@@ -569,6 +573,7 @@ export async function POST(request: Request) {
               throw new PlanError(
                 'Choose a recording from the same date as this run.',
               );
+            replaceRecordedHeartRate(extra, r);
             Object.assign(extra, {
               ...activityTime(r),
               minutes: Number(r.minutes),
@@ -599,6 +604,7 @@ export async function POST(request: Request) {
         plan.extraRuns ??= [];
         plan.extraRuns.push({
           ...activityTime(r),
+          ...recordedHeartRate(r),
           id: crypto.randomUUID(),
           date: r.date,
           minutes: Number(r.minutes),
@@ -672,6 +678,7 @@ export async function POST(request: Request) {
             'This distance and duration imply an impossible running speed. Check the units and duration; the run has not been saved.',
           );
         Object.assign(f, activityTime(f));
+        replaceRecordedHeartRate(f, {});
         if (f.activityId && b.action !== 'correctLog') {
           const actual = await verifiedActivity(
             owner,
@@ -686,6 +693,7 @@ export async function POST(request: Request) {
               : null;
           f.source = actual.source;
           Object.assign(f, activityTime(actual));
+          replaceRecordedHeartRate(f, actual);
           validateRun(
             {
               date: f.actualDate ?? workout.date,
@@ -746,6 +754,7 @@ export async function POST(request: Request) {
         if (b.action === 'correctLog') {
           f.source = workout.feedback?.source ?? 'Manual';
           Object.assign(f, activityTime(workout.feedback ?? {}));
+          replaceRecordedHeartRate(f, workout.feedback);
         }
         f.enjoyment = mergeWorkoutEnjoyment(
           f.enjoyment,
@@ -840,10 +849,9 @@ export async function POST(request: Request) {
     )
       return json(current);
     if (plan) rebalanceFutureQuality(plan, todayInZone(plan.profile.timezone));
-    const issues = validatePlan({
-      ...plan,
-      workouts: plan.workouts.filter((w) => w.week >= 0),
-    });
+    // Archived completed runs explain reserved days in a newly activated block.
+    // The validator already excludes them from active scheduling checks.
+    const issues = validatePlan(plan);
     if (issues.length) throw new PlanError(issues[0]);
     const saved = await saveState(
       owner,

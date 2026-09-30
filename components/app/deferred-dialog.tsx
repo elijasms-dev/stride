@@ -17,7 +17,7 @@ const screenNames: Record<string, string> = {
   workout: 'Workout details',
   day: 'Your daily guide',
   'run-measure': 'Run distance settings',
-  targets: 'Workout targets',
+  targets: 'Your training paces',
   'plan-tools': 'Plan tools',
   'variety-review': 'Workout options',
   event: 'Your next event',

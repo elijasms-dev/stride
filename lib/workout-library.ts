@@ -1,3 +1,8 @@
+import {
+  currentRaceInstruction,
+  eventPacingDistance,
+  type PaceInstruction,
+} from './source-pacing.ts';
 import { PlanError } from './plan/errors.ts';
 import { usesMarathonRhythm } from './training-structure.ts';
 import { schedulingEasyPace } from './fitness-pacing.ts';
@@ -39,6 +44,7 @@ export type Stimulus =
   | 'race-rhythm';
 export type WorkoutTemplate = {
   id: string;
+  paceInstruction?: PaceInstruction;
   title: string;
   kind: WorkoutKind;
   stimulus: Stimulus;
@@ -802,8 +808,36 @@ addRecipe('marathon-steady', {
 WORKOUT_LIBRARY.push(...STRUCTURED_FORMATS);
 WORKOUT_LIBRARY.push(...MARATHON_WORKOUTS);
 WORKOUT_LIBRARY.push(...ROAD_WORKOUTS);
-for (const t of WORKOUT_LIBRARY)
+for (const t of WORKOUT_LIBRARY) {
   if (t.workSeconds.length > 1) t.completeSet = true;
+  // These recipes explicitly name a race effort. Their doses remain Stride-authored.
+  if (t.id.startsWith('marathon-book-') && t.stimulus === 'aerobic-power')
+    t.paceInstruction = currentRaceInstruction(5);
+  else if (t.stimulus === 'race-rhythm' && t.goals.length === 1) {
+    const distance = (
+      { '5k': 5, '10k': 10, half: 21.0975, marathon: 42.195 } as Partial<
+        Record<Goal, number>
+      >
+    )[t.goals[0]];
+    if (distance !== undefined)
+      t.paceInstruction = currentRaceInstruction(distance);
+  }
+}
+
+function templatePaceInstruction(t: WorkoutTemplate, p?: Profile) {
+  if (
+    p &&
+    t.stimulus === 'race-rhythm' &&
+    t.paceInstruction?.sourceId === 'stride-adaptive' &&
+    t.paceInstruction.kind === 'current-race'
+  ) {
+    const distance = eventPacingDistance(p);
+    return distance !== undefined && distance >= 1 && distance <= 100
+      ? currentRaceInstruction(distance)
+      : undefined;
+  }
+  return t.paceInstruction;
+}
 
 function resolveDistanceTemplate(
   t: WorkoutTemplate,
@@ -825,6 +859,8 @@ function resolveDistanceTemplate(
       kind: 'work',
       seconds: 300,
       effort: gentle ? 'Steady and comfortable' : t.cue,
+      paceInstruction:
+        gentle && t.intensity >= 6 ? undefined : templatePaceInstruction(t, p),
       intensity: gentle ? Math.min(5, t.intensity) : t.intensity,
     },
     p ?? { goal: t.goals[0] },
@@ -1011,6 +1047,7 @@ function structuredFormat(
           {
             kind: 'work',
             intensity: candidate.intensity,
+            paceInstruction: templatePaceInstruction(candidate, p),
             seconds: Math.max(...candidate.workSeconds),
           },
           p,
@@ -1949,6 +1986,10 @@ export function scaleTemplate(
             planningPaceSecondsPerKm: t.planningPaceSecondsPerKm,
           }
         : {}),
+      ...(templatePaceInstruction(t, profile) &&
+      !(gentle && t.intensity >= 6 && t.stimulus !== 'economy')
+        ? { paceInstruction: templatePaceInstruction(t, profile) }
+        : {}),
       effort:
         gentle && t.intensity >= 6 && t.stimulus !== 'economy'
           ? 'Steady and comfortable · 5–6 / 10'
@@ -2081,7 +2122,9 @@ export function resizeWorkout(
     ),
   );
   const runWalk =
-    (!isRoadRaceProfile(p) && p.experience === 'new' && p.planLevel !== 'beginner') ||
+    (!isRoadRaceProfile(p) &&
+      p.experience === 'new' &&
+      p.planLevel !== 'beginner') ||
     w.steps.some(
       (s) =>
         s.movement === 'walk' &&

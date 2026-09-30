@@ -14,11 +14,13 @@ import {
   ShieldCheck,
   ChevronRight,
   UserRound,
+  PencilLine,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Choice } from './stride-ui';
 import { PlanChangeHistory } from './plan-change-history';
 export function Settings({
+  profileName = '',
   homePreferences,
   onHomePreferences,
   homePreferencesTemporary,
@@ -44,6 +46,7 @@ export function Settings({
   onUndo,
   busy,
 }: {
+  profileName?: string;
   homePreferences: HomePreferences;
   onHomePreferences: (patch: Partial<HomePreferences>) => void;
   homePreferencesTemporary: boolean;
@@ -69,34 +72,71 @@ export function Settings({
   onUndo: () => void;
   busy: boolean;
 }) {
+  const name = profileName.trim();
+  const monogram = name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => Array.from(part)[0] ?? '')
+    .join('')
+    .toUpperCase();
   return (
     <div className="settings-page">
       <div className="page-heading">
         <h1>Settings</h1>
       </div>
-      <button className="settings-watch-card" onClick={onConnection}>
+      <button
+        type="button"
+        className="settings-profile settings-profile-primary"
+        aria-label={name ? `Edit your profile, ${name}` : 'Edit your profile'}
+        onClick={onProfile}
+      >
+        <span className="settings-profile-avatar" aria-hidden="true">
+          <svg viewBox="0 0 80 80" fill="none" focusable="false">
+            <path d="M40 4C60 3 76 20 75 41S58 77 38 75 4 58 5 38 20 3 40 4Z" />
+            <path d="M58 8C70 15 78 29 76 43M22 72C10 66 3 53 4 39" />
+          </svg>
+          {monogram || <UserRound size={28} />}
+        </span>
+        <span className="settings-profile-copy">
+          <span className="settings-profile-label">Your profile</span>
+          <strong>{name || 'Your running identity'}</strong>
+          <small>Name, units and time zone.</small>
+        </span>
+        <span className="settings-profile-edit" aria-hidden="true">
+          Edit profile <PencilLine size={17} />
+        </span>
+      </button>
+      <button
+        type="button"
+        className="settings-watch-card"
+        aria-label={
+          connection
+            ? 'Watch & sync: manage connection'
+            : 'Watch & sync: connect Garmin with Intervals.icu'
+        }
+        onClick={onConnection}
+      >
         <span className="settings-watch-icon">
           <Watch size={30} aria-hidden="true" />
         </span>
         <span className="settings-watch-copy">
           <strong>Watch & sync</strong>
           <span>Your upcoming workouts and recorded runs.</span>
-          <small>
-            <i className={`status-dot ${connection ? 'connected' : ''}`} />
+          <small
+            className={
+              connection ? 'settings-watch-status' : 'settings-watch-action'
+            }
+          >
+            <i
+              aria-hidden="true"
+              className={`status-dot ${connection ? 'connected' : ''}`}
+            />
             {connection
               ? 'Intervals connected'
               : 'Connect Garmin with Intervals.icu'}
           </small>
         </span>
         <ChevronRight size={22} aria-hidden="true" />
-      </button>
-      <button className="settings-link settings-profile" onClick={onProfile}>
-        <UserRound size={22} aria-hidden="true" />
-        <span>
-          <strong>Your profile</strong>
-          <small>Name, units and time zone.</small>
-        </span>
-        <ChevronRight size={20} aria-hidden="true" />
       </button>
       <section className="settings-section">
         <h2>Appearance</h2>
@@ -121,11 +161,17 @@ export function Settings({
             <strong>Motion</strong>
             <small>Gentle transitions between days and weeks.</small>
           </div>
-          <Switch
-            aria-label="Enable motion"
-            checked={motion}
-            onCheckedChange={onMotion}
-          />
+          <span className="settings-switch-control">
+            <Switch
+              className="settings-toggle"
+              aria-label="Enable motion"
+              checked={motion}
+              onCheckedChange={onMotion}
+            />
+            <span className="settings-switch-state" aria-hidden="true">
+              {motion ? 'On' : 'Off'}
+            </span>
+          </span>
         </div>
       </section>
       <section
@@ -133,14 +179,12 @@ export function Settings({
         aria-labelledby="home-preferences-heading"
       >
         <h2 id="home-preferences-heading">Your home screen</h2>
-        <p
-          className="settings-hint"
-          role={homePreferencesTemporary ? 'status' : undefined}
-        >
-          {homePreferencesTemporary
-            ? 'These choices apply for this visit. Your browser is not allowing them to be saved.'
-            : 'Saved automatically in this browser.'}
-        </p>
+        {homePreferencesTemporary && (
+          <output className="settings-hint">
+            These choices apply for this visit. Your browser is not allowing
+            them to be saved.
+          </output>
+        )}
         <div className="setting-row">
           <div>
             <strong>Open Stride on</strong>
@@ -194,13 +238,19 @@ export function Settings({
               stay visible.
             </small>
           </div>
-          <Switch
-            aria-label="Show distance estimates on Today"
-            checked={homePreferences.showEstimates}
-            onCheckedChange={(value) =>
-              onHomePreferences({ showEstimates: value })
-            }
-          />
+          <span className="settings-switch-control">
+            <Switch
+              className="settings-toggle"
+              aria-label="Show distance estimates on Today"
+              checked={homePreferences.showEstimates}
+              onCheckedChange={(value) =>
+                onHomePreferences({ showEstimates: value })
+              }
+            />
+            <span className="settings-switch-state" aria-hidden="true">
+              {homePreferences.showEstimates ? 'On' : 'Off'}
+            </span>
+          </span>
         </div>
         <button
           className="text-button settings-reset"
@@ -230,18 +280,20 @@ export function Settings({
         </button>
         <button className="settings-link" onClick={onTargets}>
           <span>
-            <strong>Workout targets</strong>
+            <strong>Your training paces</strong>
             <small>
-              {targetMode === 'automatic-benchmark'
-                ? 'Automatic · benchmark paces'
-                : targetMode === 'automatic-effort'
-                  ? 'Automatic · effort'
-                  : targetMode === 'pace'
-                    ? 'Manual pace'
-                : targetMode === 'heart-rate'
-                  ? 'Heart rate'
-                  : 'Effort'}{' '}
-              · Review automatic, effort, pace or heart rate.
+              {targetMode === 'automatic'
+                ? 'Programme guidance and personal choices'
+                : targetMode === 'automatic-benchmark'
+                  ? 'Programme guidance · reference result saved'
+                  : targetMode === 'automatic-effort'
+                    ? 'Automatic · effort'
+                    : targetMode === 'pace'
+                      ? 'Manual pace'
+                      : targetMode === 'heart-rate'
+                        ? 'Heart rate'
+                        : 'Effort'}{' '}
+              · Review your reference and each target.
             </small>
           </span>
           <ChevronRight size={20} aria-hidden="true" />

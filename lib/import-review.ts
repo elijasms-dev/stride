@@ -1,7 +1,8 @@
 import type { ConnectionSummary } from './connection-status';
 import type { Plan, ExtraRun, Workout } from './plan/types.ts';
+import type { RecordedHeartRate } from './recorded-heart-rate.ts';
 
-export type Activity = {
+export type Activity = RecordedHeartRate & {
   id: string;
   name: string;
   date: string;

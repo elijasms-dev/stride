@@ -24,6 +24,7 @@ const card = (workout, patch = {}) =>
     profile: plan.profile,
     showEstimates: true,
     onOpen: noop,
+    motion: false,
     ...patch,
   });
 const feedback = (actualDate) => ({
@@ -47,7 +48,7 @@ test('Today keeps the exact event distance visible without inventing a finish ti
   };
   const html = card(race, { showEstimates: false });
   assert.match(html, /42\.195/);
-  assert.match(html, /km target/);
+  assert.match(html, /today-distance-unit"> km<\/span><\/strong><span>target/);
   assert.doesNotMatch(html, /16h 39m|estimated time|duration/);
   assert.doesNotMatch(html, /By feel<span/);
 });
@@ -76,7 +77,7 @@ test('Today labels mixed distance and timed sessions as estimated time', () => {
     onWorkout: noop,
     onPlan: noop,
   });
-  assert.match(upcoming, /52m estimated/);
+  assert.match(upcoming, /52m<\/span>/);
 });
 
 test('completed Today cards show actuals and never use prescribed distance or pace as recorded data', () => {
@@ -95,6 +96,7 @@ test('completed Today cards show actuals and never use prescribed distance or pa
     ],
   };
   const html = card(completed);
+  assert.match(html, /<span class="today-hero-kind">Recorded run<\/span>/);
   assert.match(html, /37m/);
   assert.match(html, /Distance not recorded/);
   assert.match(html, /recorded effort/);
@@ -111,10 +113,10 @@ test('a completed workout without feedback does not display prescribed numbers a
     feedback: undefined,
   });
   assert.match(html, /Recorded distance, time and effort are unavailable/);
-  assert.doesNotMatch(html, /1h 39m|workout-stats|recorded time/);
+  assert.doesNotMatch(html, /1h 39m|today-session-stats|recorded time/);
 });
 
-test('Today target-only cards use two columns and retain exact distance when estimates are hidden', () => {
+test('Today excludes distance estimates but retains exact distance targets when estimates are hidden', () => {
   const timed = {
     ...source,
     steps: [{ ...source.steps[0], metres: undefined }],
@@ -124,8 +126,109 @@ test('Today target-only cards use two columns and retain exact distance when est
     title: '10 km · Easy run',
     steps: [{ ...source.steps[0], metres: 10000 }],
   };
-  assert.match(card(timed, { showEstimates: false }), /data-metrics="2"/);
-  assert.match(card(measured, { showEstimates: false }), /km target/);
+  assert.doesNotMatch(
+    card(timed, { showEstimates: false }),
+    /today-distance-metric/,
+  );
+  assert.match(
+    card(measured, { showEstimates: false }),
+    /today-distance-unit"> km<\/span><\/strong><span>target/,
+  );
+});
+
+test('a recorded zero distance is shown as zero rather than replaced with a prescribed estimate', () => {
+  const html = card({
+    ...source,
+    status: 'completed',
+    feedback: { ...feedback(source.date), actualKm: 0 },
+  });
+  assert.match(
+    html,
+    /<strong>0<span class="today-distance-unit"> km<\/span><\/strong><span>recorded distance<\/span>/,
+  );
+  assert.doesNotMatch(html, /Distance not recorded|km target|estimated range/);
+});
+
+test('the Today hero summarizes mixed work paces instead of promoting the first work target', () => {
+  const html = card({
+    ...source,
+    steps: [
+      { kind: 'warmup', seconds: 600, effort: 'Comfortable', label: 'Warm up' },
+      {
+        kind: 'work',
+        seconds: 300,
+        effort: 'Fast',
+        label: 'First work segment',
+        target: { mode: 'pace', low: 300, high: 310 },
+      },
+      {
+        kind: 'work',
+        seconds: 300,
+        effort: 'Controlled',
+        label: 'Second work segment',
+        target: { mode: 'pace', low: 330, high: 340 },
+      },
+    ],
+  });
+  assert.match(html, /Varied paces/);
+  assert.doesNotMatch(html, /5:00–5:10|5:30–5:40/);
+  assert.doesNotMatch(
+    html,
+    /Session details below|href="#today-workout-details"/,
+  );
+});
+
+test('Today puts only saved pace or heart-rate targets below the stats', () => {
+  const workout = {
+    ...source,
+    steps: [
+      {
+        kind: 'aerobic',
+        seconds: 1800,
+        metres: 5000,
+        effort: 'Easy',
+        label: 'Easy run',
+      },
+    ],
+  };
+  assert.doesNotMatch(card(workout), /today-saved-target/);
+  for (const [target, expected] of [
+    [{ mode: 'pace', low: 350, high: 380 }, '5:50–6:20'],
+    [{ mode: 'heart-rate', low: 130, high: 145 }, '130–145'],
+  ]) {
+    const html = card({ ...workout, steps: [{ ...workout.steps[0], target }] });
+    assert.ok(
+      html.indexOf('today-saved-target') > html.indexOf('today-target-metric'),
+    );
+    assert.ok(html.includes(expected));
+    assert.match(html, /<span>effort<\/span>/);
+  }
+});
+
+test('Up next shows its distance only once and keeps its existing workout action', () => {
+  const workout = {
+    ...source,
+    title: '9.5 km · Recovery run',
+    steps: [
+      {
+        kind: 'aerobic',
+        seconds: 3420,
+        metres: 9500,
+        effort: 'Easy',
+        label: 'Easy run',
+      },
+    ],
+    minutes: 57,
+  };
+  const html = render(UpcomingSessions, {
+    plan: { ...plan, workouts: [workout] },
+    fromDate: workout.date,
+    onWorkout: noop,
+    onPlan: noop,
+  });
+  assert.match(html, /<strong>Recovery run<\/strong>/);
+  assert.match(html, /9\.5 km · 57m/);
+  assert.equal((html.match(/9\.5 km/g) ?? []).length, 1);
 });
 
 test('Today calendar and date rail put retained completed workouts on their recorded day, deduplicated', () => {
@@ -157,7 +260,8 @@ test('Today calendar and date rail put retained completed workouts on their reco
     onHold: noop,
   });
   assert.match(html, /data-date="2026-09-10"[^>]*data-day-state="completed"/);
-  assert.doesNotMatch(html, /data-date="2026-09-09"/);
+  assert.match(html, /data-date="2026-09-09"[^>]*data-day-state="rest"/);
+  assert.equal((html.match(/data-day-state="completed"/g) ?? []).length, 1);
   assert.equal((html.match(/tabindex="0"/g) ?? []).length, 1);
   assert.equal(JSON.stringify(saved), before);
 });

@@ -1,0 +1,102 @@
+/* Full-width disclosure rows share one text baseline and a trailing affordance. */
+.plan-explorer :is(.pe-plan-context, .pe-week-context) > summary,
+.plan-explorer .pe-support > details > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  margin: 0;
+  padding: 12px 0;
+  line-height: 1.5;
+  text-align: left;
+}
+.plan-explorer :is(.pe-plan-context, .pe-week-context) > summary > svg {
+  flex: 0 0 auto;
+  align-self: center;
+}
+.plan-explorer .pe-support > details {
+  padding-block: 0;
+}
+.plan-change-history {
+  min-width: 0;
+}
+.plan-change-history > .section-heading {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.plan-change-history > .section-heading h3 {
+  margin: 0;
+}
+.plan-change-history > .section-heading .text-button {
+  min-height: 44px;
+  margin: 0;
+}
+.plan-change-item {
+  margin-top: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+.plan-change-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-height: 64px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: var(--text-main);
+  text-align: left;
+  cursor: pointer;
+}
+.plan-change-copy {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 4px;
+}
+.plan-change-copy strong {
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.plan-change-copy small {
+  color: var(--text-label);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+.plan-change-toggle > svg {
+  flex: 0 0 auto;
+}
+.plan-change-toggle[aria-expanded='true'] > svg {
+  transform: rotate(180deg);
+}
+.plan-change-toggle:hover,
+.plan-change-toggle[aria-expanded='true'] {
+  background: var(--surface-raised);
+}
+.plan-change-toggle:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+.plan-change-content {
+  min-width: 0;
+  border-top: 1px solid var(--border);
+  padding: 16px;
+}
+.plan-change-content > :first-child {
+  margin-top: 0;
+}
+
+.plan-explorer .plan-fit .reason-details > .weekly-review-totals {
+  margin-inline: 16px;
+}

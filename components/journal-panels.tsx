@@ -113,11 +113,13 @@ export function UpcomingSessions({
                 </small>
               </span>
               <span className="upcoming-body">
-                <strong>{w.title}</strong>
+                <strong>
+                  {w.title.replace(/^\d+(?:\.\d+)? (?:km|mi) · /, '')}
+                </strong>
                 <span>
                   {w.kind === 'race'
                     ? `${eventDistanceDisplay(w.estimatedKm, plan.profile.units)} ${plan.profile.units}`
-                    : `${prescribedDistanceKm(w) !== null || showEstimates ? `${workoutDistanceLabel(w, plan.profile)} · ` : ''}${runDuration(w.minutes)}${w.steps.some((step) => step.metres !== undefined) ? ' estimated' : ''}`}
+                    : `${prescribedDistanceKm(w) !== null || showEstimates ? `${workoutDistanceLabel(w, plan.profile)} · ` : ''}${runDuration(w.minutes)}`}
                 </span>
               </span>
               <ArrowRight size={17} />

@@ -1,8 +1,11 @@
 import { validStepTarget } from './workout-targets.ts';
+import { validPaceInstruction, validStepPacing } from './source-pacing.ts';
+import { validReviewedQualityProvenance } from './pace-review-eligibility.ts';
 import { MAX_RECORDED_MINUTES } from './ultra-policy.ts';
 import { validWorkoutEnjoyment } from './workout-enjoyment.ts';
 import { validateRun } from './run-input.ts';
 import { activityTime } from './activity-time.ts';
+import { validRecordedHeartRate } from './recorded-heart-rate.ts';
 import { impossibleRunningSummary } from './activity-plausibility.ts';
 import { type ExtraRun } from './plan/types.ts';
 import { distanceEstimate, qualityWorkMinutes } from './prescription.ts';
@@ -84,6 +87,8 @@ function tree(value: unknown, depth = 0) {
 }
 function feedback(raw: unknown, today: string) {
   object(raw, 'Run feedback');
+  if (!validRecordedHeartRate(raw))
+    fail('check recorded heart-rate summaries.');
   number(raw.actualMinutes, 1, MAX_RECORDED_MINUTES, 'recorded time');
   if (raw.actualKm !== null)
     number(raw.actualKm, 0.001, 250, 'recorded distance');
@@ -397,6 +402,13 @@ export function validateRecovery(input: unknown): RecoveryFile {
       text(s.effort, 500, 'effort cue');
       if (s.target !== undefined && !validStepTarget(s.target))
         fail('invalid workout target range.');
+      if (
+        s.paceInstruction !== undefined &&
+        !validPaceInstruction(s.paceInstruction)
+      )
+        fail('invalid pacing source instruction.');
+      if (s.pacing !== undefined && !validStepPacing(s.pacing, s.target))
+        fail('invalid pacing evidence or target snapshot.');
       number(
         s.seconds,
         0.1,
@@ -421,6 +433,11 @@ export function validateRecovery(input: unknown): RecoveryFile {
       if (s.movement !== undefined && !['run', 'walk'].includes(s.movement))
         fail('unknown movement type.');
     }
+    if (
+      w.paceReviewEligibility !== undefined &&
+      !validReviewedQualityProvenance(w)
+    )
+      fail('invalid saved quality eligibility or changed prescription.');
     if (
       Math.abs(w.steps.reduce((n, s) => n + s.seconds, 0) - w.minutes * 60) > 1
     )
@@ -476,6 +493,8 @@ export function validateRecovery(input: unknown): RecoveryFile {
       feedback(
         {
           ...activityTime(r),
+          averageHeartRate: r.averageHeartRate,
+          maxHeartRate: r.maxHeartRate,
           actualDate: r.date,
           actualMinutes: r.minutes,
           actualKm: r.km,

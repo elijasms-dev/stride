@@ -1,0 +1,203 @@
+/* The hero supplies position: relative, isolation: isolate and overflow: hidden.
+   All colour and movement stay inside this decorative scene. */
+.session-atmosphere {
+  --scene-colour: var(--run-easy, #10b981);
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  contain: layout paint style;
+  color: var(--scene-colour);
+}
+.session-atmosphere[data-mood='quality'] {
+  --scene-colour: var(--run-quality, #ff7a36);
+}
+.session-atmosphere[data-mood='long'] {
+  --scene-colour: var(--run-long, #9b7bff);
+}
+.session-atmosphere[data-mood='rest'] {
+  --scene-colour: var(--text-label, #94a3b8);
+}
+.session-atmosphere__drawing {
+  position: absolute;
+  right: -2%;
+  top: 0;
+  width: 76%;
+  max-width: 900px;
+  height: 100%;
+  overflow: visible;
+  /* A fade keeps the drawing out of the reading column, without tinting the hero. */
+  mask-image: linear-gradient(to right, transparent, #000 48%);
+}
+.session-atmosphere__drawing :is(path, circle) {
+  stroke: currentColor;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.session-atmosphere .session-atmosphere__wash {
+  fill: currentColor;
+  fill-opacity: 0.035;
+  stroke: none;
+}
+.session-atmosphere .session-atmosphere__wash-near {
+  fill-opacity: 0.045;
+}
+.session-atmosphere .session-atmosphere__contour {
+  stroke-opacity: 0.25;
+}
+.session-atmosphere .session-atmosphere__near {
+  stroke-opacity: 0.4;
+  stroke-width: 1.4;
+}
+.session-atmosphere .session-atmosphere__pencil {
+  stroke-opacity: 0.13;
+  stroke-width: 0.8;
+}
+.session-atmosphere .session-atmosphere__distant {
+  stroke-opacity: 0.16;
+}
+.session-atmosphere .session-atmosphere__hatch {
+  stroke-opacity: 0.19;
+  stroke-width: 0.85;
+}
+.session-atmosphere .session-atmosphere__botanical {
+  stroke-opacity: 0.36;
+}
+.session-atmosphere .session-atmosphere__track {
+  stroke-opacity: 0.3;
+}
+.session-atmosphere .session-atmosphere__trail {
+  stroke-opacity: 0.34;
+  stroke-width: 1.1;
+}
+.session-atmosphere .session-atmosphere__stars {
+  stroke-opacity: 0.33;
+}
+.session-atmosphere .session-atmosphere__moon-fill {
+  fill-opacity: 0.05;
+}
+.session-atmosphere
+  :is(
+    .session-atmosphere__sway,
+    .session-atmosphere__sway-delayed,
+    .session-atmosphere__drift,
+    .session-atmosphere__velocity,
+    .session-atmosphere__near-ridge,
+    .session-atmosphere__far-ridge,
+    .session-atmosphere__moon,
+    .session-atmosphere__stars
+  ) {
+  animation-play-state: paused;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.session-atmosphere .session-atmosphere__sway {
+  animation: session-scene-sway 16s ease-in-out infinite alternate paused;
+  transform-origin: bottom center;
+}
+.session-atmosphere .session-atmosphere__sway-delayed {
+  animation: session-scene-sway 19s ease-in-out -8s infinite alternate paused;
+  transform-origin: bottom center;
+}
+.session-atmosphere .session-atmosphere__drift {
+  animation: session-scene-drift 30s ease-in-out infinite alternate paused;
+}
+.session-atmosphere .session-atmosphere__velocity {
+  animation: session-scene-glide 12s ease-in-out -3s infinite alternate paused;
+}
+.session-atmosphere .session-atmosphere__far-ridge {
+  animation: session-scene-drift 42s ease-in-out infinite alternate paused;
+}
+.session-atmosphere .session-atmosphere__near-ridge {
+  animation: session-scene-advance 32s ease-in-out -4s infinite alternate paused;
+}
+.session-atmosphere .session-atmosphere__moon {
+  animation: session-scene-float 28s ease-in-out infinite alternate paused;
+}
+.session-atmosphere .session-atmosphere__stars {
+  animation: session-scene-float 36s ease-in-out -12s infinite alternate paused;
+}
+.session-atmosphere[data-motion='true'][data-visible='true']
+  :is(
+    .session-atmosphere__sway,
+    .session-atmosphere__sway-delayed,
+    .session-atmosphere__drift,
+    .session-atmosphere__velocity,
+    .session-atmosphere__near-ridge,
+    .session-atmosphere__far-ridge,
+    .session-atmosphere__moon,
+    .session-atmosphere__stars
+  ) {
+  animation-play-state: running;
+}
+.session-atmosphere[data-motion='false'] * {
+  animation: none;
+}
+@keyframes session-scene-sway {
+  from {
+    transform: rotate(-1.5deg);
+  }
+  to {
+    transform: rotate(1.5deg);
+  }
+}
+@keyframes session-scene-drift {
+  from {
+    transform: translateX(-3px);
+  }
+  to {
+    transform: translateX(4px);
+  }
+}
+@keyframes session-scene-glide {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(8px, -9px);
+  }
+}
+@keyframes session-scene-advance {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(-4px, 4px);
+  }
+}
+@keyframes session-scene-float {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-4px);
+  }
+}
+@media (max-width: 640px) {
+  .session-atmosphere__drawing {
+    right: -22%;
+    width: 102%;
+    opacity: 0.52;
+    mask-image: linear-gradient(to right, transparent, #000 67%);
+  }
+  .session-atmosphere .session-atmosphere__wash {
+    fill-opacity: 0.025;
+  }
+  .session-atmosphere[data-mood='rest'] .session-atmosphere__drawing {
+    right: -8%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .session-atmosphere * {
+    animation: none !important;
+  }
+}
+@media (forced-colors: active), print {
+  .session-atmosphere {
+    display: none;
+  }
+}

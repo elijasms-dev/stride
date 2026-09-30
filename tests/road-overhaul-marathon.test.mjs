@@ -5,6 +5,13 @@ import { makePlan } from '../lib/engine.ts';
 import { marathonSnapshot } from './road-overhaul-helpers.mjs';
 import { assertMarathonTraining } from './marathon-variety-contract.mjs';
 import { marathonExecutionHash } from './pacing-marathon-contract.mjs';
+import { assertSourcePacingMigration } from './source-pacing-migration-contract.mjs';
+const sourcePacing = JSON.parse(
+  readFileSync(
+    new URL('./fixtures/source-pacing-v1-migrations.json', import.meta.url),
+    'utf8',
+  ),
+);
 
 // Every earlier fixture remains immutable. The new snapshot has an explicit
 // link to the pacing baseline and reviewed executable differences, with separate
@@ -51,6 +58,34 @@ for (const scenario of baseline.cases) {
     if (!migration.paceModelChanged)
       assert.equal(reviewed.previousExecution, migration.originalExecution);
     assertMarathonTraining(plan, input);
+    const sourceMigration = sourcePacing.marathon.find(
+      (c) => c.name === scenario.name,
+    );
+    if (sourceMigration) {
+      assert.equal(
+        sourceMigration.previousSnapshot,
+        reviewed.expected.complete,
+      );
+      assert.equal(
+        sourceMigration.previousExecution,
+        reviewed.expectedExecution,
+      );
+      assertSourcePacingMigration(plan, input);
+    }
+    // Preserve the exact older snapshots for all legacy fields. New provenance
+    // is independently validated; it must not hide endpoint/target changes.
+    for (const workout of plan.workouts)
+      for (const step of workout.steps) {
+        delete step.pacing;
+        delete step.paceInstruction;
+      }
+    if (sourceMigration) {
+      assert.equal(
+        marathonExecutionHash(plan),
+        sourceMigration.expectedExecution,
+      );
+      return assert.deepEqual(marathonSnapshot(plan), sourceMigration.expected);
+    }
     if (reviewed.executionUnchanged)
       assert.equal(marathonExecutionHash(plan), reviewed.previousExecution);
     assert.equal(marathonExecutionHash(plan), reviewed.expectedExecution);

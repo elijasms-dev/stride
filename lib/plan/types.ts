@@ -1,7 +1,9 @@
 /** Plan types responsibilities; extracted without changing policy or behavior. */
 import type { TrainingMethod } from '../advanced-methods.ts';
 import type { ActivityTime } from '../activity-time.ts';
+import type { RecordedHeartRate } from '../recorded-heart-rate.ts';
 import type { RecentRace } from '../fitness-pacing.ts';
+import type { PaceInstruction, StepPacing } from '../source-pacing.ts';
 import type { distanceEstimate } from '../prescription.ts';
 import type { DayPreference } from '../runner-customization.ts';
 import type {
@@ -111,6 +113,10 @@ export type Profile = {
 
 export type Step = {
   target?: StepTarget;
+  /** Source meaning is independent of workout names and event distance. */
+  paceInstruction?: PaceInstruction;
+  /** Frozen explanation accompanies numeric and effort-only prescriptions. */
+  pacing?: StepPacing;
   /** Prescription role is independent of the wording of the effort cue. */
   effortRole?: EffortRole;
   label: string;
@@ -123,26 +129,27 @@ export type Step = {
   movement?: 'run' | 'walk';
 };
 
-export type Feedback = ActivityTime & {
-  effort: number;
-  feeling: 'good' | 'okay' | 'tired';
-  enjoyment?: 'yes' | 'maybe' | 'no';
-  actualMinutes: number;
-  actualKm: number | null;
-  note: string;
-  recordedAt: string;
-  activityId?: string;
-  source?: string;
-  actualDate?: string;
-  execution?:
-    | 'as-planned'
-    | 'partial'
-    | 'easy-substitute'
-    | 'not-attempted'
-    | 'unknown';
-  completedQualityMinutes?: number;
-  executionSource?: 'self-report';
-};
+export type Feedback = ActivityTime &
+  RecordedHeartRate & {
+    effort: number;
+    feeling: 'good' | 'okay' | 'tired';
+    enjoyment?: 'yes' | 'maybe' | 'no';
+    actualMinutes: number;
+    actualKm: number | null;
+    note: string;
+    recordedAt: string;
+    activityId?: string;
+    source?: string;
+    actualDate?: string;
+    execution?:
+      | 'as-planned'
+      | 'partial'
+      | 'easy-substitute'
+      | 'not-attempted'
+      | 'unknown';
+    completedQualityMinutes?: number;
+    executionSource?: 'self-report';
+  };
 
 export type Workout = {
   /** Derived accounting is checked only for explicitly resolved prescriptions. */
@@ -152,6 +159,15 @@ export type Workout = {
   /** A reviewed pace changed the estimate of fixed timed endpoints. Explicit
    * distance conversion retains this origin; newly allocated runs do not. */
   distanceRevision?: 'pace-edited-time';
+  /** Original accepted fixed endpoints for a pace-only review. Actual load still
+   * uses current targets; this snapshot only preserves session classification. */
+  paceReviewEligibility?: {
+    version: 'fixed-endpoints-v1';
+    kind: WorkoutKind;
+    stimulus?: string;
+    templateId?: string;
+    steps: Step[];
+  };
   beginnerLesson?: { stage: number; lesson: number; stageStarted: string };
   id: string;
   date: string;
@@ -291,28 +307,29 @@ export type Plan = {
   extraRuns?: ExtraRun[];
 };
 
-export type ExtraRun = ActivityTime & {
-  id: string;
-  corrections?: {
-    at: string;
-    reason: string;
+export type ExtraRun = ActivityTime &
+  RecordedHeartRate & {
+    id: string;
+    corrections?: {
+      at: string;
+      reason: string;
+      date: string;
+      minutes: number;
+      km: number | null;
+      effort: number;
+      feeling: string;
+      note: string;
+    }[];
     date: string;
     minutes: number;
     km: number | null;
     effort: number;
-    feeling: string;
+    feeling: 'good' | 'okay' | 'tired';
     note: string;
-  }[];
-  date: string;
-  minutes: number;
-  km: number | null;
-  effort: number;
-  feeling: 'good' | 'okay' | 'tired';
-  note: string;
-  activityId?: string;
-  source?: string;
-  recordedAt: string;
-};
+    activityId?: string;
+    source?: string;
+    recordedAt: string;
+  };
 
 export type State = {
   acknowledgedMutationId?: string;

@@ -1,7 +1,6 @@
 import type { Profile } from './plan/types.ts';
 import {
   TARGET_BANDS,
-  benchmarkWorkoutTargets,
   paceText,
   parsePace,
   manualTargetRange,
@@ -30,7 +29,7 @@ export function initialTargetSettings(
   profile: TargetProfile,
 ): TargetSettingsDraft {
   const saved = profile.workoutTargets;
-  const source = saved ?? benchmarkWorkoutTargets(profile);
+  const source = saved;
   const values = (kind: 'pace' | 'heartRate'): TargetRangeValues =>
     Object.fromEntries(
       TARGET_BANDS.map((band) => {
@@ -65,7 +64,7 @@ export function targetSettingsConfig(
   const next: WorkoutTargets = { ...saved, mode: draft.mode, bandsVersion: 2 };
   if (draft.mode === 'effort') return validateWorkoutTargets(next);
   const key = draft.mode === 'pace' ? 'pace' : 'heartRate';
-  const initial = saved ?? benchmarkWorkoutTargets(profile);
+  const initial = saved;
   next[key] = {};
   for (const band of TARGET_BANDS) {
     const raw = draft[key][band];

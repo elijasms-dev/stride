@@ -16,7 +16,9 @@ const signature = (s: Step) =>
     s.movement,
     s.intensity,
     s.effort,
+    s.effortRole,
     s.target,
+    s.pacing,
   ]);
 
 /** Presentation only: collapse genuinely identical repetitions without changing

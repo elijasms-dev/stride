@@ -9,6 +9,8 @@ import {
   qualityWorkMinutes,
 } from '../prescription.ts';
 import { validEffortRole, validStepTarget } from '../workout-targets.ts';
+import { validPaceInstruction, validStepPacing } from '../source-pacing.ts';
+import { validReviewedQualityProvenance } from '../pace-review-eligibility.ts';
 import { schedulingEasyPace } from '../fitness-pacing.ts';
 import { peakLongRunKm } from '../progression-engine.ts';
 import {
@@ -39,12 +41,20 @@ import { trainingFamily } from './profile.ts';
 import { type Plan, type Workout } from './types.ts';
 import { sessionBalanceErrors } from './session-balance.ts';
 import { openingBaselineTargetKm } from './generation-baseline.ts';
+import { validRecordedHeartRate } from '../recorded-heart-rate.ts';
 
 export function validatePlan(
   plan: Plan,
   observedWorkouts: Workout[] = [],
 ): string[] {
   const errors: string[] = [];
+  if (
+    plan.workouts.some(
+      (w) => w.feedback && !validRecordedHeartRate(w.feedback),
+    ) ||
+    (plan.extraRuns ?? []).some((run) => !validRecordedHeartRate(run))
+  )
+    errors.push('Invalid recorded heart-rate summary.');
   if (
     plan.openingWeekKm !== undefined &&
     (!Number.isFinite(plan.openingWeekKm) ||
@@ -56,6 +66,13 @@ export function validatePlan(
   errors.push(...sessionBalanceErrors(plan));
   const ids = new Set<string>();
   for (const w of plan.workouts) {
+    if (
+      w.paceReviewEligibility !== undefined &&
+      !validReviewedQualityProvenance(w)
+    )
+      errors.push(
+        'Invalid saved quality eligibility: a pace review must retain the complete original prescription.',
+      );
     if (ids.has(w.id))
       errors.push(
         'Duplicate workout identity. Rebuild the affected future schedule.',
@@ -110,6 +127,10 @@ export function validatePlan(
       s.steps.some(
         (step) =>
           (step.target !== undefined && !validStepTarget(step.target)) ||
+          (step.paceInstruction !== undefined &&
+            !validPaceInstruction(step.paceInstruction)) ||
+          (step.pacing !== undefined &&
+            !validStepPacing(step.pacing, step.target)) ||
           (step.effortRole !== undefined && !validEffortRole(step.effortRole)),
       )
     )
@@ -369,14 +390,17 @@ export function validatePlan(
   errors.push(...firstRacePlanErrors(plan));
   if (!plan.beginner && !plan.firstRace) {
     errors.push(...qualityBudgetErrors(plan, observedWorkouts));
-    errors.push(...baselineAndLongRunErrors(plan));
+    errors.push(...baselineAndLongRunErrors(plan, observedWorkouts));
   }
   return [...new Set(errors)];
 }
 
 /** New prescriptions retain the declared opening load and clean long-run steps.
  * Older saved policies, observed history and deliberate edits keep their meaning. */
-function baselineAndLongRunErrors(plan: Plan): string[] {
+function baselineAndLongRunErrors(
+  plan: Plan,
+  observedWorkouts: Workout[] = [],
+): string[] {
   if (plan.policyVersion !== TRAINING_POLICY.version || plan.returnState)
     return [];
   const errors: string[] = [];
@@ -392,8 +416,31 @@ function baselineAndLongRunErrors(plan: Plan): string[] {
   const openingRuns = first
     ? plan.workouts.filter((w) => w.week === first.index && w.kind !== 'race')
     : [];
+  // A new block can reserve a day already completed in the outgoing block.
+  // Its remaining opening runs are a partial forecast, not a replacement for
+  // the full declared baseline. Missing days without actual evidence still fail.
+  const recordedOpening =
+    first &&
+    ([...plan.workouts, ...observedWorkouts].some((w) => {
+      const date = w.feedback?.actualDate ?? w.date;
+      return (
+        w.status === 'completed' &&
+        Number.isFinite(w.feedback?.actualMinutes) &&
+        (w.feedback?.actualMinutes ?? 0) > 0 &&
+        date >= first.start &&
+        date <= addDays(first.start, 6)
+      );
+    }) ||
+      (plan.extraRuns ?? []).some(
+        (run) =>
+          Number.isFinite(run.minutes) &&
+          run.minutes > 0 &&
+          run.date >= first.start &&
+          run.date <= addDays(first.start, 6),
+      ));
   const freshOpening =
     first &&
+    !recordedOpening &&
     first.start === plan.profile.startDate &&
     addDays(first.start, 6) <= plan.profile.raceDate &&
     ordinary(first) &&

@@ -319,10 +319,18 @@ void test('preferences, measurement, targets and variety preserve beginner recip
   ]) {
     errors(updated);
     assert.deepEqual(updated.beginner, p.beginner);
-    assert.deepEqual(
-      updated.workouts.map((w) => w.steps),
-      p.workouts.map((w) => w.steps),
-    );
+    const prescriptions = (plan) =>
+      plan.workouts.map((w) =>
+        w.steps.map(({ pacing: _pacing, ...prescription }) => prescription),
+      );
+    assert.deepEqual(prescriptions(updated), prescriptions(p));
+    for (const step of updated.workouts.flatMap((w) => w.steps))
+      if (step.pacing) {
+        assert.equal(step.pacing.source.id, 'nhs-c25k');
+        assert.equal(step.pacing.method, 'effort');
+        assert.equal(step.pacing.target, undefined);
+        assert.equal(step.pacing.guidance, step.effort);
+      }
   }
 });
 

@@ -20,6 +20,7 @@ export function distanceEstimate(
   const hasPaceBasis =
     !!p.easyPace ||
     !!(p.workoutTargets?.mode === 'pace' && p.workoutTargets.pace?.easy) ||
+    p.workoutTargets?.overrides?.easy?.mode === 'pace' ||
     !!(p.recentRace && calculateTrainingPaceRanges(p.recentRace));
   let lower = 0,
     upper = 0,

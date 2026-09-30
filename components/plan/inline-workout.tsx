@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowUpRight, Check, ChevronDown, Flag } from 'lucide-react';
+import { ArrowUpRight, Check, ChevronDown, Flag, Star } from 'lucide-react';
 import {
   dateLabel,
   kmDisplay,
@@ -9,7 +9,10 @@ import {
   type Plan,
   type Workout,
 } from '@/lib/engine';
-import { calendarWorkoutStatus } from '@/lib/plan-explorer';
+import {
+  calendarWorkoutStatus,
+  isKeyTrainingWorkout,
+} from '@/lib/plan-explorer';
 import { workoutTone } from '@/lib/day-sessions';
 import { specificWorkoutName } from '@/lib/workout-names';
 import { runDuration } from '@/lib/journal-view';
@@ -70,6 +73,15 @@ export function InlineWorkout({
           )}
           {calendarWorkoutStatus(workout)}
           {workout.session ? ` · ${workout.session}` : ''}
+          {isKeyTrainingWorkout(workout) && (
+            <span
+              className="pe-key-marker"
+              title="Key session — open for its purpose"
+            >
+              <Star size={13} aria-hidden="true" />
+              <span>Key session</span>
+            </span>
+          )}
         </span>
         <strong className="pe-workout-distance">{distance}</strong>
         <span className="pe-workout-title">
@@ -156,6 +168,12 @@ export function WorkoutPrescription({
             ? 'Skipped prescription, excluded from this week’s total.'
             : 'Warm-up and cool-down are included in the total.'}
       </p>
+      {isKeyTrainingWorkout(workout) && workout.purpose && (
+        <div className="pe-key-purpose">
+          <strong>Why this is a key run</strong>
+          <p>{workout.purpose}</p>
+        </div>
+      )}
       <WorkoutSteps workout={workout} profile={plan.profile} />
     </div>
   );

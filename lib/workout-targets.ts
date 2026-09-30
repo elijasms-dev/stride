@@ -1,13 +1,13 @@
 import { firstRaceFeasibility } from './plan/first-race.ts';
+import { validateRecentRace, type RecentRace } from './fitness-pacing.ts';
 import {
-  calculateTrainingPaceRanges,
-  FITNESS_MODEL_VERSION,
-  RACE_EQUIVALENCE_MODEL_VERSION,
-  fitnessPaceRange,
-  predictRaceTime,
-} from './fitness-pacing.ts';
+  PACING_ROLES,
+  resolveStepPacing,
+  type PacingRole,
+} from './source-pacing.ts';
 import {
   executableDistanceRange,
+  qualityWorkMinutes,
   resolvePrescription,
 } from './prescription.ts';
 import {
@@ -28,6 +28,8 @@ import {
   withPrescribedDistanceTitle,
 } from './run-distance.ts';
 import { withWorkoutEventContext } from './workout-event-context.ts';
+import { PLAN_LOAD_LIMITS } from './plan/policy-constants.ts';
+import { validReviewedQualityProvenance } from './pace-review-eligibility.ts';
 
 export const TARGET_BANDS = [
   'easy',
@@ -44,11 +46,16 @@ export type TargetRange = { low: number; high: number };
 export type StepTarget = TargetRange & {
   mode: 'pace' | 'heart-rate';
   /** Absent on historical snapshots whose original source was not recorded. */
-  source?: 'manual' | 'benchmark';
+  source?: 'manual' | 'benchmark' | 'goal';
   model?: string;
 };
+export type TargetOverride =
+  | { mode: 'effort' }
+  | (TargetRange & { mode: 'pace' | 'heart-rate' });
 export type WorkoutTargets = {
-  mode: 'effort' | 'pace' | 'heart-rate';
+  mode: 'automatic' | 'effort' | 'pace' | 'heart-rate';
+  overrides?: Partial<Record<PacingRole, TargetOverride>>;
+  goalTimeMinutes?: number;
   /** Version 1/omitted used a shared tempo/threshold and interval/repetition band. */
   bandsVersion?: 2;
   pace?: Partial<Record<TargetBand, TargetRange>>;
@@ -74,12 +81,13 @@ export function validStepTarget(value: unknown): value is StepTarget {
     typeof t.high === 'number' &&
     Number.isFinite(t.low) &&
     Number.isFinite(t.high) &&
-    t.low < t.high &&
+    t.low <= t.high &&
     t.low >= (pace ? 120 : 40) &&
     t.high <= (pace ? 1200 : 230) &&
     Number.isInteger(t.low) &&
     Number.isInteger(t.high) &&
-    (t.source === undefined || ['manual', 'benchmark'].includes(t.source)) &&
+    (t.source === undefined ||
+      ['manual', 'benchmark', 'goal'].includes(t.source)) &&
     (t.model === undefined ||
       (typeof t.model === 'string' &&
         t.model.length > 0 &&
@@ -90,9 +98,69 @@ export function validateWorkoutTargets(value: unknown): WorkoutTargets {
   if (!value || typeof value !== 'object' || Array.isArray(value))
     throw new Error('Choose effort, pace or heart rate.');
   const input = value as WorkoutTargets;
-  if (!['effort', 'pace', 'heart-rate'].includes(input.mode))
+  if (!['automatic', 'effort', 'pace', 'heart-rate'].includes(input.mode))
     throw new Error('Choose effort, pace or heart rate.');
   const result: WorkoutTargets = { mode: input.mode };
+  if (input.goalTimeMinutes !== undefined) {
+    if (
+      !Number.isFinite(input.goalTimeMinutes) ||
+      input.goalTimeMinutes <= 0 ||
+      input.goalTimeMinutes > 100 * 20
+    )
+      throw new Error(
+        'Enter a positive goal finish time of at most 2,000 minutes.',
+      );
+    result.goalTimeMinutes = input.goalTimeMinutes;
+  }
+  if (input.overrides !== undefined) {
+    if (
+      !input.overrides ||
+      typeof input.overrides !== 'object' ||
+      Array.isArray(input.overrides) ||
+      Object.keys(input.overrides).some(
+        (key) => !PACING_ROLES.includes(key as PacingRole),
+      )
+    )
+      throw new Error('Check the pacing roles in your overrides.');
+    result.overrides = {};
+    for (const role of PACING_ROLES) {
+      const value = input.overrides[role];
+      if (value === undefined) continue;
+      if (!value || typeof value !== 'object' || Array.isArray(value))
+        throw new Error('Check your pacing override.');
+      if (value.mode === 'effort') {
+        result.overrides[role] = { mode: 'effort' };
+        continue;
+      }
+      if (
+        !Number.isFinite(value.low) ||
+        !Number.isFinite(value.high) ||
+        value.low > value.high ||
+        value.low < (value.mode === 'pace' ? 120 : 40) ||
+        value.high > (value.mode === 'pace' ? 1200 : 230)
+      )
+        throw new Error(
+          'Enter an ordered pace or heart-rate target within supported limits.',
+        );
+      const range =
+        value.mode === 'pace' &&
+        Number.isFinite(value.low) &&
+        Number.isFinite(value.high)
+          ? value.low === value.high
+            ? { low: Math.round(value.low), high: Math.round(value.high) }
+            : { low: Math.floor(value.low), high: Math.ceil(value.high) }
+          : value;
+      if (!validStepTarget({ ...range, mode: value.mode }))
+        throw new Error(
+          'Enter an ordered pace or heart-rate target within supported limits.',
+        );
+      result.overrides[role] = {
+        mode: value.mode,
+        low: range.low,
+        high: range.high,
+      };
+    }
+  }
   if (input.bandsVersion !== undefined) {
     if (input.bandsVersion !== 2)
       throw new Error('Check your workout target version.');
@@ -122,8 +190,10 @@ export function validateWorkoutTargets(value: unknown): WorkoutTargets {
         key === 'pace' &&
         typeof raw?.low === 'number' &&
         typeof raw?.high === 'number' &&
-        raw.low < raw.high
-          ? { low: Math.floor(raw.low), high: Math.ceil(raw.high) }
+        raw.low <= raw.high
+          ? raw.low === raw.high
+            ? { low: Math.round(raw.low), high: Math.round(raw.high) }
+            : { low: Math.floor(raw.low), high: Math.ceil(raw.high) }
           : raw;
       if (
         !validStepTarget({
@@ -164,7 +234,7 @@ export function validateWorkoutTargets(value: unknown): WorkoutTargets {
     }
   }
   if (
-    result.mode !== 'effort' &&
+    (result.mode === 'pace' || result.mode === 'heart-rate') &&
     !result[result.mode === 'pace' ? 'pace' : 'heartRate']?.easy
   )
     throw new Error(
@@ -190,16 +260,27 @@ export function targetLabel(
   return !target
     ? 'By effort'
     : target.mode === 'pace'
-      ? `${paceText(target.low, unit)}–${paceText(target.high, unit)} /${unit}`
-      : `${target.low}–${target.high} bpm`;
+      ? `${paceText(target.low, unit)}${target.low === target.high ? '' : `–${paceText(target.high, unit)}`} /${unit}`
+      : `${target.low}${target.low === target.high ? '' : `–${target.high}`} bpm`;
 }
 type TargetWorkout = Pick<
   Workout,
-  'kind' | 'stimulus' | 'templateId' | 'pairType'
+  | 'kind'
+  | 'stimulus'
+  | 'templateId'
+  | 'pairType'
+  | 'beginnerLesson'
+  | 'eventDistanceKm'
 > & { steps?: Pick<Step, 'movement'>[] };
 type TargetStep = Pick<
   Step,
-  'kind' | 'intensity' | 'seconds' | 'metres' | 'movement' | 'effortRole'
+  | 'kind'
+  | 'intensity'
+  | 'seconds'
+  | 'metres'
+  | 'movement'
+  | 'effortRole'
+  | 'paceInstruction'
 > & { effort?: string };
 type TargetProfile = Pick<Profile, 'goal' | 'raceDistanceKm'>;
 
@@ -268,50 +349,14 @@ export function manualTargetRange(
       : undefined)
   );
 }
-/** The same derived ranges used by prescriptions and the target review. */
+/** Compatibility introspection: automatic has no global derived pace bands. */
 export function benchmarkWorkoutTargets(
-  profile: Pick<Profile, 'goal' | 'raceDistanceKm' | 'recentRace'>,
+  _profile: Pick<Profile, 'goal' | 'raceDistanceKm' | 'recentRace'>,
   _stimulus?: Workout['stimulus'],
 ): WorkoutTargets | undefined {
-  const fitness = profile.recentRace
-    ? calculateTrainingPaceRanges(profile.recentRace)
-    : undefined;
-  if (!fitness) return undefined;
-  const distances = {
-    '5k': 5,
-    '10k': 10,
-    half: 21.0975,
-    marathon: 42.195,
-    ultra: 50,
-    custom: 42.195,
-    base: 5,
-  };
-  const distance = ['custom', 'ultra'].includes(profile.goal)
-    ? (profile.raceDistanceKm ?? distances[profile.goal])
-    : distances[profile.goal];
-  const racePace =
-    (predictRaceTime(profile.recentRace!, distance) * 60) / distance;
-  const race =
-    racePace >= 120 && racePace <= 1200
-      ? fitnessPaceRange(racePace)
-      : undefined;
-  // A gentle road replacement cannot be faster than the event work it replaces.
-  // This applies equally to custom road distances using those same recipes.
-  const steady =
-    roadSteadyReplacement(profile) && race
-      ? {
-          low: Math.max(fitness.steady.low, race.low),
-          high: Math.max(fitness.steady.high, race.high),
-        }
-      : fitness.steady;
-  return {
-    mode: 'pace',
-    bandsVersion: 2,
-    raceScope: `${profile.goal}:${profile.raceDistanceKm ?? ''}`,
-    pace: { ...fitness, steady, race },
-  };
+  return undefined;
 }
-/** Resolve explicit targets first, otherwise use the current fitness benchmark. */
+/** Per-step meaning determines the target; universal fitness zones are not applied. */
 export function workoutStepTarget(
   workout: TargetWorkout,
   step: TargetStep,
@@ -320,52 +365,7 @@ export function workoutStepTarget(
     'goal' | 'raceDistanceKm' | 'workoutTargets' | 'recentRace'
   >,
 ): StepTarget | undefined {
-  const config =
-    profile.workoutTargets ??
-    benchmarkWorkoutTargets(profile, workout.stimulus);
-  if (
-    !config ||
-    config.mode === 'effort' ||
-    step.movement === 'walk' ||
-    step.kind === 'recovery' ||
-    workout.pairType === 'double-threshold' ||
-    /hill/i.test(workout.templateId ?? '') ||
-    (config.mode === 'heart-rate' &&
-      step.kind === 'work' &&
-      workout.kind !== 'race' &&
-      (step.seconds <= 120 ||
-        (step.metres !== undefined && step.metres < 1000)))
-  )
-    return undefined;
-  const band = resolveEffortRole(workout, step, profile);
-  if (band === 'effort') return undefined;
-  if (
-    band === 'race' &&
-    config.raceScope !== `${profile.goal}:${profile.raceDistanceKm ?? ''}`
-  )
-    return undefined;
-  const range = manualTargetRange(
-    config,
-    config.mode === 'pace' ? 'pace' : 'heartRate',
-    band,
-  );
-  return range
-    ? {
-        ...range,
-        mode: config.mode,
-        source: profile.workoutTargets ? 'manual' : 'benchmark',
-        ...(!profile.workoutTargets
-          ? {
-              model:
-                band === 'race'
-                  ? RACE_EQUIVALENCE_MODEL_VERSION
-                  : band === 'steady' && roadSteadyReplacement(profile)
-                    ? `${FITNESS_MODEL_VERSION}+${RACE_EQUIVALENCE_MODEL_VERSION}`
-                    : FITNESS_MODEL_VERSION,
-            }
-          : {}),
-      }
-    : undefined;
+  return resolveStepPacing(workout, step, profile).target;
 }
 /** Snapshot explicit or benchmark ranges, never derive them from a distance estimate. */
 export function withWorkoutTargets(
@@ -373,21 +373,37 @@ export function withWorkoutTargets(
   profile: Profile,
   options: { allocation?: boolean } = {},
 ): Workout {
-  if (input.beginnerLesson) return structuredClone(input);
-  const finish = (w: Workout) =>
-    withPrescribedDistanceTitle(
+  if (input.beginnerLesson) {
+    const next = structuredClone(input);
+    next.steps = next.steps.map((step) => ({
+      ...step,
+      pacing: resolveStepPacing(next, step, profile),
+    }));
+    return next;
+  }
+  const finish = (w: Workout) => {
+    const resolved = withPrescribedDistanceTitle(
       resolvePrescription(w, profile, options.allocation ?? false),
       profile,
     );
+    if (
+      resolved.paceReviewEligibility &&
+      !validReviewedQualityProvenance(resolved)
+    )
+      delete resolved.paceReviewEligibility;
+    return resolved;
+  };
   const workout = withSteadyRaceInstructions(
     withWorkoutEventContext(input, profile),
   );
   const steps: Step[] = workout.steps.map((step) => {
-    const { target: _previous, ...plain } = step;
-    const target = workoutStepTarget(workout, step, profile);
+    const { target: _previous, pacing: _pacing, ...plain } = step;
+    const pacing = resolveStepPacing(workout, step, profile);
+    const target = pacing.target;
     const resolved = {
       ...plain,
       effortRole: resolveEffortRole(workout, step, profile),
+      pacing,
     };
     return target ? { ...resolved, target } : resolved;
   });
@@ -416,8 +432,11 @@ export function withWorkoutTargets(
           (s.seconds > 120 && (s.metres === undefined || s.metres >= 1000))
         )
           return s;
-        const { target: _target, ...plain } = s;
-        return plain;
+        const { target: _target, pacing: _pacing, ...plain } = s;
+        return {
+          ...plain,
+          pacing: resolveStepPacing(distanceRun, plain, profile),
+        };
       }),
     });
   if (
@@ -505,8 +524,15 @@ export function updateWorkoutTargets(
   config: WorkoutTargets | null,
   from: string,
   protectedIds: readonly string[] = [],
+  evidence: { recentRace?: RecentRace | null } = {},
 ): Plan {
   const next = structuredClone(plan);
+  if (evidence.recentRace === null) delete next.profile.recentRace;
+  else if (evidence.recentRace !== undefined)
+    next.profile.recentRace = validateRecentRace(evidence.recentRace);
+  const evidenceChanged =
+    JSON.stringify(next.profile.recentRace) !==
+    JSON.stringify(plan.profile.recentRace);
   let unchangedChoice = false;
   if (config === null) {
     unchangedChoice = !next.profile.workoutTargets;
@@ -515,6 +541,25 @@ export function updateWorkoutTargets(
     const targets = validateWorkoutTargets(config);
     const raceScope = `${plan.profile.goal}:${plan.profile.raceDistanceKm ?? ''}`;
     const previous = next.profile.workoutTargets;
+    // A transported setting still tied to another event is not consent to
+    // reuse that event's goal or generic race override. A new reviewed setting
+    // may omit scope (legacy callers) or explicitly name the current event.
+    if (targets.raceScope !== undefined && targets.raceScope !== raceScope) {
+      delete targets.goalTimeMinutes;
+      if (targets.pace) delete targets.pace.race;
+      if (targets.heartRate) delete targets.heartRate.race;
+      if (targets.overrides)
+        for (const role of ['race', 'current-race', 'goal-race'] as const)
+          delete targets.overrides[role];
+    }
+    targets.raceScope = raceScope;
+    const hasEventTargets = (value: WorkoutTargets) =>
+      value.goalTimeMinutes !== undefined ||
+      !!value.pace?.race ||
+      !!value.heartRate?.race ||
+      ['race', 'current-race', 'goal-race'].some(
+        (role) => value.overrides?.[role as PacingRole] !== undefined,
+      );
     // Keep unchanged numeric targets and historical snapshots intact. An
     // explicit review can still repair old labels that contradict their saved
     // steady effort, without re-deriving pace or changing the prescription.
@@ -523,19 +568,28 @@ export function updateWorkoutTargets(
       bandsVersion: value.bandsVersion,
       pace: value.pace,
       heartRate: value.heartRate,
-      raceScope,
+      raceScope: hasEventTargets(value) ? value.raceScope : undefined,
+      overrides: value.overrides,
+      goalTimeMinutes: value.goalTimeMinutes,
     });
     unchangedChoice =
       !!previous &&
-      (previous.raceScope === raceScope ||
-        (!targets.pace?.race && !targets.heartRate?.race)) &&
       JSON.stringify(comparable(validateWorkoutTargets(previous))) ===
         JSON.stringify(comparable(targets));
     if (!unchangedChoice)
       next.profile.workoutTargets = { ...targets, raceScope };
   }
   const protectedSet = new Set(protectedIds);
-  if (unchangedChoice) {
+  const needsSourceReview = next.workouts.some(
+    (w) =>
+      w.status === 'planned' &&
+      w.week >= 0 &&
+      w.date >= from &&
+      !protectedSet.has(w.id) &&
+      !w.beginnerLesson &&
+      w.steps.some((step) => !step.pacing),
+  );
+  if (unchangedChoice && !evidenceChanged && !needsSourceReview) {
     next.workouts = next.workouts.map((workout) =>
       workout.status === 'planned' &&
       workout.week >= 0 &&
@@ -556,6 +610,44 @@ export function updateWorkoutTargets(
     )
       return w;
     const updated = withWorkoutTargets(w, next.profile);
+    if (
+      !w.paceReviewEligibility &&
+      w.hard &&
+      ['tempo', 'intervals', 'fartlek'].includes(w.kind) &&
+      qualityWorkMinutes(w) >=
+        PLAN_LOAD_LIMITS.minimumTempoWorkMinutes - 1e-6 &&
+      qualityWorkMinutes(updated) <
+        PLAN_LOAD_LIMITS.minimumTempoWorkMinutes - 1e-6 &&
+      w.kind === updated.kind &&
+      w.stimulus === updated.stimulus &&
+      w.hard === updated.hard &&
+      w.templateId === updated.templateId &&
+      w.steps.length === updated.steps.length &&
+      w.steps.some(
+        (s) =>
+          s.kind === 'work' &&
+          s.metres !== undefined &&
+          s.target?.mode === 'pace',
+      ) &&
+      w.steps.every((s, i) => {
+        const after = updated.steps[i];
+        return (
+          s.kind === after.kind &&
+          s.intensity === after.intensity &&
+          s.movement === after.movement &&
+          s.effortRole === after.effortRole &&
+          s.metres === after.metres &&
+          (s.metres !== undefined || s.seconds === after.seconds)
+        );
+      })
+    )
+      updated.paceReviewEligibility = {
+        version: 'fixed-endpoints-v1',
+        kind: w.kind,
+        ...(w.stimulus === undefined ? {} : { stimulus: w.stimulus }),
+        ...(w.templateId === undefined ? {} : { templateId: w.templateId }),
+        steps: structuredClone(w.steps),
+      };
     if (updated.estimatedKm !== w.estimatedKm) {
       changedDistance = true;
       updated.changed = true;

@@ -19,6 +19,8 @@ export interface RecentRace {
   date?: string;
   source?: 'race' | 'time-trial';
   course?: 'road' | 'track' | 'trail' | 'treadmill';
+  /** Explicit runner confirmation; no inferred confidence or expiry threshold. */
+  representative?: boolean;
 }
 
 export const RIEGEL_EXPONENT = 1.06;
@@ -26,7 +28,8 @@ export const RIEGEL_EXPONENT = 1.06;
 export function validateRecentRace(value: unknown, asOf?: string): RecentRace {
   if (!value || typeof value !== 'object' || Array.isArray(value))
     throw new Error('Enter both a recent race distance and finish time.');
-  const { distanceKm, timeMinutes, date, source, course } = value as RecentRace;
+  const { distanceKm, timeMinutes, date, source, course, representative } =
+    value as RecentRace;
   if (
     !Number.isFinite(distanceKm) ||
     !Number.isFinite(timeMinutes) ||
@@ -56,12 +59,17 @@ export function validateRecentRace(value: unknown, asOf?: string): RecentRace {
     throw new Error(
       'Recent race: choose a supported course, or leave it blank.',
     );
+  if (representative !== undefined && typeof representative !== 'boolean')
+    throw new Error(
+      'Confirm whether the result represents your current fitness.',
+    );
   const race: RecentRace = {
     distanceKm,
     timeMinutes,
     ...(date !== undefined ? { date } : {}),
     ...(source !== undefined ? { source } : {}),
     ...(course !== undefined ? { course } : {}),
+    ...(representative !== undefined ? { representative } : {}),
   };
   return race;
 }
@@ -125,8 +133,8 @@ export function predictRaceTime(race: RecentRace, distanceKm: number): number {
   return minutes;
 }
 
-/** Legacy numeric API. Marathon remains a separately calculated Riegel
- * equivalence. Use deriveFitness/ranges for actionable targets and model support. */
+/** Legacy mathematical API retained for analysis and historical tests. It is not
+ * the source-based workout prescription resolver and does not certify V.O2 parity. */
 export function calculateTrainingPaces(race: RecentRace) {
   const benchmark = validateRecentRace(race);
   return {
@@ -137,7 +145,7 @@ export function calculateTrainingPaces(race: RecentRace) {
   };
 }
 
-/** Pure, versioned current-fitness derivation. No goal-distance input, calendar
+/** Legacy mathematical current-fitness derivation. No goal-distance input, calendar
  * clock, stale-result correction, or adjustment for hills/conditions. */
 export function deriveFitness(race?: RecentRace | null, asOf?: string) {
   if (!race)
@@ -231,14 +239,21 @@ export function fitnessPaceRange(secondsPerKm: number) {
 export interface PacingProfile {
   easyPace?: number | null;
   recentRace?: RecentRace;
-  workoutTargets?: { mode: string; pace?: { easy?: { high: number } } };
+  workoutTargets?: {
+    mode: string;
+    pace?: { easy?: { high: number } };
+    overrides?: { easy?: { mode: string; high?: number } };
+  };
 }
 
 function manualEasyPace(profile?: PacingProfile) {
+  const override = profile?.workoutTargets?.overrides?.easy;
   const high =
-    profile?.workoutTargets?.mode === 'pace'
-      ? profile.workoutTargets.pace?.easy?.high
-      : undefined;
+    override?.mode === 'pace'
+      ? override.high
+      : profile?.workoutTargets?.mode === 'pace'
+        ? profile.workoutTargets.pace?.easy?.high
+        : undefined;
   return high !== undefined &&
     Number.isFinite(high) &&
     high >= 120 &&

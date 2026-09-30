@@ -137,7 +137,15 @@ for (const goal of ['5k', '10k', 'half'])
           w.steps.filter((s) => s.kind === 'recovery').length,
           workSteps.length - 1,
         );
-        assert.ok(workSteps.every((s) => s.target?.mode === 'pace'));
+        assert.ok(
+          workSteps.every(
+            (s) =>
+              !s.target &&
+              s.pacing?.method === 'effort' &&
+              s.pacing.guidance === s.effort,
+          ),
+          'Unconfirmed reference results retain each authored effort instruction',
+        );
       }
     });
 

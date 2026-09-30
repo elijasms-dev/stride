@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
-  ArrowUpRight,
   ChevronDown,
   Download,
   Ellipsis,
@@ -16,26 +15,25 @@ import {
 import { dateLabel, goalLabel } from '@/lib/engine';
 import { nearestPlanWeek } from '@/lib/plan-explorer';
 import { downloadTrainingPlan, printTrainingPlan } from '@/lib/plan-print';
-import { PlanFit } from '../plan-fit';
-import { PlanPreferencesSummary } from './plan-preferences-summary';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import { ProgressionChart } from './progression-chart';
 import { PlanWeekSchedule } from './week-schedule';
+import { PlanTrainingInsights } from './training-insights';
 import type { Props } from './explorer-types';
 export { PlanWeekSchedule } from './week-schedule';
 
 export function FullPlan({
   plan,
+  insightsPlan = plan,
   today,
   onWorkout,
   onDay,
   onAdjust,
-  onPreferences,
+  onQuickLog,
   onNew,
   onVariety,
   selected,
@@ -85,20 +83,23 @@ export function FullPlan({
   const shown = view === 'full' ? plan.weeks : [selectedWeek];
   return (
     <div className="view-wrapper plan-view plan-explorer">
-      <div className="page-heading">
-        <div>
-          <h1>Your plan</h1>
-          <p className="pe-block-label">
-            {plan.profile.raceName || goalLabel(plan.profile.goal)}{' '}
-            <span>
-              {plan.weeks.length} weeks, {dateLabel(plan.profile.startDate)} to{' '}
+      <div className="page-heading plan-event-header">
+        <div className="plan-event-identity">
+          <div className="plan-event-title-row">
+            <h1>
+              {plan.profile.raceName.trim() || goalLabel(plan.profile.goal)}
+            </h1>
+            <time className="plan-event-date" dateTime={plan.profile.raceDate}>
+              <span>
+                {plan.profile.goal === 'base' ? 'Block ends' : 'Race day'}
+              </span>
               {dateLabel(plan.profile.raceDate, {
                 day: 'numeric',
-                month: 'short',
+                month: 'long',
                 year: 'numeric',
               })}
-            </span>
-          </p>
+            </time>
+          </div>
         </div>
         <div className="plan-heading-actions">
           <button
@@ -130,6 +131,20 @@ export function FullPlan({
                 <Download size={16} aria-hidden="true" />
                 Download readable plan
               </DropdownMenuItem>
+              {!isDemo && (
+                <DropdownMenuItem
+                  render={
+                    <a
+                      href="/api/export?format=program"
+                      download
+                      aria-label="Download training program as JSON"
+                    />
+                  }
+                >
+                  <Download size={16} aria-hidden="true" />
+                  Download training program · JSON
+                </DropdownMenuItem>
+              )}
               {!isDemo && (
                 <DropdownMenuItem onClick={onVariety}>
                   <RefreshCw size={16} aria-hidden="true" />
@@ -246,33 +261,13 @@ export function FullPlan({
           </section>
         ))}
       </div>
-      <details className="pe-plan-context">
-        <summary>
-          Your routine and progression{' '}
-          <ChevronDown size={18} aria-hidden="true" />
-        </summary>
-        <PlanPreferencesSummary
-          profile={plan.profile}
-          onEdit={isDemo ? onNew : onPreferences}
-        />
-        <ProgressionChart
-          plan={plan}
-          selected={selectedWeek.index}
-          onSelect={chooseWeek}
-        />
-      </details>
-      <div className="plan-note pe-plan-notes">
-        <PlanFit plan={plan} asOf={today} />
-        {isDemo ? (
-          <button className="text-button" onClick={onNew}>
-            Make it yours <ArrowUpRight size={17} />
-          </button>
-        ) : (
-          <a className="text-button" href="/api/export?format=program" download>
-            Download training program · JSON <ArrowUpRight size={17} />
-          </a>
-        )}
-      </div>
+      <PlanTrainingInsights
+        plan={insightsPlan}
+        today={today}
+        isDemo={isDemo}
+        onWorkout={onWorkout}
+        onQuickLog={onQuickLog}
+      />
     </div>
   );
 }

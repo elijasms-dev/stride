@@ -1,7 +1,4 @@
-/* One scroll owner and one responsive navigation list: sidebar on desktop, dock on mobile. */
-.app-sidebar-provider {
-  display: contents;
-}
+/* One scroll owner and one navigation list: menu bar on desktop, dock on mobile. */
 .athletic-nav-overlay .responsive-navigation {
   display: flex;
   flex-direction: row;
@@ -9,16 +6,15 @@
   height: auto;
   background: transparent;
 }
-.sidebar-collapse {
-  display: none;
-}
 html:has(.athletic-shell),
 body:has(.athletic-shell) {
   height: 100%;
   overflow: hidden;
 }
 .athletic-shell.app-shell {
-  --content-bottom-inset: max(var(--nav-min-inset), var(--nav-occlusion));
+  --content-bottom-inset: calc(
+    var(--nav-occlusion) + env(safe-area-inset-bottom, 0px) + 16px
+  );
   width: 100%;
   min-height: 100svh;
   height: 100dvh;
@@ -30,9 +26,7 @@ body:has(.athletic-shell) {
 }
 .athletic-shell .athletic-tabs.app-tabs {
   display: grid;
-  grid-template-rows: calc(
-      var(--header-height) + env(safe-area-inset-top, 0px)
-    ) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 0;
   height: 100%;
   min-height: 0;
@@ -45,8 +39,8 @@ body:has(.athletic-shell) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 0;
-  height: calc(var(--header-height) + env(safe-area-inset-top, 0px));
+  min-height: calc(var(--header-height) + env(safe-area-inset-top, 0px));
+  height: auto;
   padding: env(safe-area-inset-top, 0px)
     max(1rem, env(safe-area-inset-right, 0px)) 0
     max(1rem, env(safe-area-inset-left, 0px));
@@ -102,7 +96,7 @@ body:has(.athletic-shell) {
   overflow: auto;
   overscroll-behavior-y: contain;
   scrollbar-gutter: stable both-edges;
-  margin-bottom: var(--content-bottom-inset);
+  margin-bottom: 0;
   padding-bottom: 0;
   scroll-padding-block: 1rem calc(var(--content-bottom-inset) + 1rem);
   scroll-behavior: auto;
@@ -369,6 +363,14 @@ body:has(.athletic-shell) {
   .athletic-main > .workspace {
     padding-top: 1rem;
   }
+  .athletic-topbar.topbar {
+    flex-wrap: wrap;
+    gap: 4px 8px;
+  }
+  .athletic-topbar.topbar .top-actions {
+    gap: 8px;
+    margin-left: auto;
+  }
   .athletic-topbar.topbar .journal-sync {
     font-size: 0.875rem;
   }
@@ -409,62 +411,48 @@ body:has(.athletic-shell) {
   animation-duration: 0.01ms !important;
 }
 
-/* The same navigation nodes become a sidebar; no duplicate landmarks or tab IDs. */
+/* The same tab list becomes a horizontal menu without duplicate IDs or landmarks. */
 @media (min-width: 768px) {
   .athletic-shell.app-shell {
-    --app-sidebar-width: calc(224px + env(safe-area-inset-left, 0px));
     --content-bottom-inset: 0px;
   }
-  .athletic-shell[data-sidebar='collapsed'] {
-    --app-sidebar-width: calc(80px + env(safe-area-inset-left, 0px));
-  }
   .athletic-shell .athletic-tabs.app-tabs {
-    grid-template-columns: var(--app-sidebar-width) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
   }
   .athletic-shell .athletic-topbar.topbar {
-    grid-column: 1 / -1;
     grid-row: 1;
     padding-inline: max(32px, env(safe-area-inset-left, 0px))
       max(32px, env(safe-area-inset-right, 0px));
   }
   .athletic-shell .athletic-main {
-    grid-column: 2;
-    grid-row: 2;
+    grid-row: 3;
     margin-bottom: 0;
     scroll-padding-block: 24px;
   }
   .athletic-main > .workspace {
-    max-width: 1280px;
-    padding: 32px max(32px, env(safe-area-inset-right, 0px)) 32px 32px;
+    max-width: 1152px;
+    padding: 28px max(32px, env(safe-area-inset-right, 0px)) 32px
+      max(32px, env(safe-area-inset-left, 0px));
   }
   .athletic-shell .athletic-nav-overlay {
     position: static;
-    grid-column: 1;
     grid-row: 2;
     inset: auto;
-    display: flex;
-    padding: 24px 12px max(24px, env(safe-area-inset-bottom, 0px))
-      calc(12px + env(safe-area-inset-left, 0px));
+    padding: 8px max(32px, env(safe-area-inset-right, 0px)) 8px
+      max(32px, env(safe-area-inset-left, 0px));
     min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
+    background: var(--header-surface);
+    border-bottom: 1px solid var(--border);
     pointer-events: auto;
   }
   .athletic-nav-overlay .responsive-navigation {
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    min-height: min-content;
+    width: min(100%, 48rem);
   }
   .athletic-nav-overlay .athletic-nav {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: stretch;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     width: 100%;
-    height: auto;
     min-height: 0;
     gap: 8px;
     padding: 0;
@@ -475,69 +463,24 @@ body:has(.athletic-shell) {
     backdrop-filter: none;
   }
   .athletic-nav [role='tab'] {
-    flex: 0 0 auto;
     flex-direction: row;
-    justify-content: flex-start;
-    min-height: 48px;
+    justify-content: center;
+    min-height: 44px;
     width: 100%;
-    gap: 12px;
-    padding: 12px;
+    gap: 10px;
+    padding: 10px 12px;
     border-radius: var(--radius-md);
-    border: 1px solid transparent;
     color: var(--text-label);
-    font-size: 1rem;
-    line-height: 1.5rem;
-    text-align: left;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    text-align: center;
     white-space: normal;
   }
-  .athletic-nav [role='tab'][data-active],
-  .athletic-nav [role='tab']:not([data-active]):not(:disabled):hover {
+  .athletic-nav [role='tab'][data-active] {
     background: var(--selection-surface);
     color: var(--selection-ink);
     border-color: transparent;
     box-shadow: none;
-  }
-  .athletic-nav [role='tab']:focus-visible {
-    outline-color: var(--ring);
-  }
-  .sidebar-collapse {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: auto;
-    min-height: 44px;
-    flex-shrink: 0;
-    padding: 12px;
-    color: var(--text-label);
-    font-size: 0.875rem;
-    text-align: left;
-    background: transparent;
-    border: 1px solid transparent;
-    border-radius: var(--radius-md);
-  }
-  .sidebar-collapse:hover {
-    background: var(--surface-raised);
-    color: var(--text-main);
-  }
-  .sidebar-collapse:focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: 2px;
-  }
-  .sidebar-collapse svg {
-    flex-shrink: 0;
-  }
-  .athletic-shell[data-sidebar='collapsed'] .athletic-nav [role='tab'],
-  .athletic-shell[data-sidebar='collapsed'] .sidebar-collapse {
-    justify-content: center;
-  }
-  .athletic-shell[data-sidebar='collapsed']
-    :is(.athletic-nav [role='tab'] > span, .sidebar-collapse > span) {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
   }
   .athletic-shell .toast-message {
     bottom: 24px;

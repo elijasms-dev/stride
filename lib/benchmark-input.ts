@@ -29,4 +29,6 @@ export const BENCHMARK_DISTANCES = [
   { distanceKm: 10, label: '10K' },
   { distanceKm: 21.0975, label: 'Half marathon' },
   { distanceKm: 42.195, label: 'Marathon' },
+  { distanceKm: 1.609344, label: 'Mile' },
+  { distanceKm: 1.5, label: '1500 m' },
 ] as const;

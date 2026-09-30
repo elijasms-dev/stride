@@ -166,7 +166,7 @@ test('workout details put the prescription and complete steps before collapsed s
     isDemo: false,
     connected: false,
   });
-  const stats = html.indexOf('class="workout-stats"');
+  const stats = html.indexOf('class="prescription-session-stats"');
   const steps = html.indexOf('Your session, step by step');
   const guide = html.indexOf('Preparation, food &amp; recovery');
   assert.ok(stats >= 0 && steps > stats && guide > steps);
@@ -371,7 +371,7 @@ test('completed runs without feedback separate missing observations from the sav
   assert.doesNotMatch(html, /More actions|class="recorded-run-metrics"/);
   assert.ok(
     html.indexOf('class="recorded-prescription"') <
-      html.indexOf('class="workout-stats"'),
+      html.indexOf('class="prescription-session-stats"'),
   );
 });
 

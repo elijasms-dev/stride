@@ -15,12 +15,25 @@ export function PlanRoute() {
     openModal,
     showWorkout,
     showDay,
+    journalPlan,
+    setImported,
+    setExtraToCorrect,
   } = useAppContext();
   return (
     <TabsContent value="plan" className="main-panel">
       <FullPlan
         plan={plan}
+        insightsPlan={journalPlan}
         today={today}
+        onQuickLog={() => {
+          if (isDemo) {
+            openModal('onboarding');
+            return;
+          }
+          setImported(undefined);
+          setExtraToCorrect(undefined);
+          openModal('extraRun');
+        }}
         onWorkout={showWorkout}
         onDay={showDay}
         onAdjust={() => openModal('adjustments')}

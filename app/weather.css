@@ -1,0 +1,351 @@
+/* Optional setup lives in Settings; the workout surface only renders live readings. */
+.stride-weather-setup-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 52px;
+  padding: 1rem;
+  margin-block: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-main);
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 650;
+}
+.stride-weather-setup-trigger > svg {
+  flex-shrink: 0;
+}
+.stride-weather-setup-state {
+  margin-left: auto;
+  color: var(--text-label);
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+.stride-run-weather {
+  margin-block: 0.5rem 1rem;
+  padding: 0.5rem 0.1rem;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--border);
+}
+.stride-run-weather-summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  min-height: 36px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.stride-run-weather-summary > svg {
+  flex-shrink: 0;
+  color: var(--text-label);
+}
+.stride-run-weather-summary > strong {
+  font-family: var(--font-spatial-display), sans-serif;
+  font-size: 1.25rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+.stride-run-weather-now {
+  margin-left: auto;
+  color: var(--text-label);
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
+}
+.stride-run-weather-details {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.stride-run-weather-details > summary {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0;
+  color: var(--text-label);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  cursor: pointer;
+  list-style: none;
+}
+.stride-run-weather-details > summary::-webkit-details-marker {
+  display: none;
+}
+.stride-run-weather-details > summary::after {
+  content: none;
+}
+.stride-run-weather-details > summary > svg {
+  flex-shrink: 0;
+}
+.stride-run-weather-details[open] > summary > svg {
+  transform: rotate(180deg);
+}
+.stride-run-weather-body {
+  padding: 0 0 0.5rem;
+  max-width: 72ch;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+.stride-run-weather-body p {
+  margin: 0 0 0.5rem;
+}
+.stride-run-weather-body ul {
+  list-style: none;
+  margin: 0.75rem 0;
+  padding: 0;
+}
+.stride-run-weather-body li + li {
+  margin-top: 0.75rem;
+}
+.stride-run-weather-body li > strong {
+  font-size: 0.875rem;
+}
+.stride-run-weather-body a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.stride-run-weather-body .stride-weather-result-actions {
+  align-items: center;
+}
+.stride-run-weather-body .stride-weather-result-actions > a {
+  font-size: 0.75rem;
+  color: var(--text-label);
+}
+.stride-weather-stale {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+.stride-weather-panel[data-slot='popover-content'] {
+  width: min(22rem, calc(100vw - 2rem));
+  max-height: min(42rem, var(--available-height));
+  overflow-y: auto;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-main);
+  gap: 0;
+  font-family: var(--font-journal-sans), sans-serif;
+}
+.stride-weather-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.stride-weather-heading [data-slot='popover-title'] {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 750;
+}
+.stride-weather-close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+.stride-weather-result {
+  padding: 0.5rem 0 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.stride-weather-result p {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+.stride-weather-area {
+  color: var(--text-label);
+  overflow-wrap: anywhere;
+}
+.stride-weather-reading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.5rem;
+}
+.stride-weather-reading > strong {
+  font-size: 2rem;
+  font-family: var(--font-spatial-display), sans-serif;
+  line-height: 1.2;
+}
+.stride-weather-reading > span {
+  font-size: 0.875rem;
+}
+.stride-weather-time {
+  color: var(--text-label);
+}
+.stride-weather-result-actions {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.stride-weather-result-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 0.8125rem;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.stride-weather-privacy {
+  color: var(--text-label);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  margin: 0.5rem 0 0.75rem;
+}
+.stride-weather-locate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  color: var(--text-main);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+.stride-weather-search {
+  margin-top: 1rem;
+}
+.stride-weather-search label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--text-label);
+  font-size: 0.8125rem;
+}
+.stride-weather-search > div {
+  display: flex;
+  gap: 0.5rem;
+}
+.stride-weather-search input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  color: var(--text-main);
+  font-size: 1rem;
+}
+.stride-weather-search button {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  color: var(--text-main);
+}
+.stride-weather-status {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--text-label);
+  margin-top: 0.5rem;
+}
+.stride-weather-status:empty {
+  display: none;
+}
+.stride-weather-places {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+}
+.stride-weather-places li + li {
+  border-top: 1px solid var(--border);
+}
+.stride-weather-places button {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.6rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.stride-weather-credit {
+  font-size: 0.6875rem;
+  line-height: 1.6;
+  color: var(--text-label);
+  margin: 1rem 0 0;
+}
+.stride-weather-credit a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.stride-weather-panel button,
+.stride-weather-setup-trigger {
+  cursor: pointer;
+}
+.stride-weather-panel button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.stride-weather-panel button:focus-visible,
+.stride-weather-panel a:focus-visible,
+.stride-weather-panel input:focus-visible,
+.stride-weather-setup-trigger:focus-visible {
+  outline: 2px solid var(--text-main);
+  outline-offset: 3px;
+}
+.stride-weather-panel button:hover:not(:disabled),
+.stride-weather-setup-trigger:hover {
+  background: var(--surface-raised);
+}
+@media (prefers-reduced-motion: reduce) {
+  .stride-weather-panel {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .stride-run-weather-now {
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+  .stride-weather-setup-trigger {
+    flex-wrap: wrap;
+  }
+}
+
+.stride-run-weather button:focus-visible,
+.stride-run-weather a:focus-visible,
+.stride-run-weather summary:focus-visible {
+  outline: 2px solid var(--text-main);
+  outline-offset: 3px;
+}
+.stride-run-weather button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}

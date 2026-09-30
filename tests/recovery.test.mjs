@@ -150,14 +150,39 @@ void test('exact half marathon and sub-metre custom distance survive family sele
 
 void test('tiny distance changes keep the preparation model and non-race schedule at standard anchors', () => {
   // Exact race names may change; dates, workload, targets and recovery must not.
-  const scheduleAndDose = (workout) => {
-    if (workout.eventDistanceKm === undefined) return workout;
-    const { eventDistanceKm, title, purpose, reason, steps, ...schedule } =
-      workout;
-    return {
-      ...schedule,
-      steps: steps.map(({ label, effort, ...dose }) => dose),
-    };
+  const scheduleAndDose = (workout, eventDistance) => {
+    const result = structuredClone(workout);
+    if (result.eventDistanceKm !== undefined) {
+      for (const key of ['eventDistanceKm', 'title', 'purpose', 'reason'])
+        delete result[key];
+      for (const step of result.steps) {
+        delete step.label;
+        delete step.effort;
+        // Saved guidance mirrors the same event-specific human-readable cue.
+        if (step.pacing) delete step.pacing.guidance;
+      }
+    }
+    for (const step of result.steps)
+      if (
+        step.pacing?.method === 'effort' &&
+        step.pacing.source.id === 'stride-adaptive' &&
+        step.pacing.role.startsWith('current-') &&
+        step.pacing.referenceDistanceKm === eventDistance
+      ) {
+        // Exact event names/roles change from 5K to a custom 5.0001 km race.
+        // This is effort-only event identity; source-specific references,
+        // source provenance, evidence and every numerical target stay compared.
+        delete step.pacing.referenceDistanceKm;
+        delete step.pacing.role;
+        delete step.pacing.label;
+        if (
+          step.paceInstruction?.sourceId === 'stride-adaptive' &&
+          step.paceInstruction.kind === 'current-race' &&
+          step.paceInstruction.distanceKm === eventDistance
+        )
+          delete step.paceInstruction.distanceKm;
+      }
+    return result;
   };
   for (const d of [5, 10, 21.0975, 42.195, 50]) {
     const base = {
@@ -182,8 +207,12 @@ void test('tiny distance changes keep the preparation model and non-race schedul
     assert.ok(Math.abs(a.minWeekly - b.minWeekly) <= 0.1);
     assert.ok(Math.abs(a.minLong - b.minLong) <= 0.1);
     assert.deepEqual(
-      p.workouts.filter((w) => w.kind !== 'race').map(scheduleAndDose),
-      q.workouts.filter((w) => w.kind !== 'race').map(scheduleAndDose),
+      p.workouts
+        .filter((w) => w.kind !== 'race')
+        .map((w) => scheduleAndDose(w, d)),
+      q.workouts
+        .filter((w) => w.kind !== 'race')
+        .map((w) => scheduleAndDose(w, d + 0.0001)),
     );
     assert.ok(
       Math.abs(customExposureKm(d + 0.0001) - customExposureKm(d)) < 0.0001,

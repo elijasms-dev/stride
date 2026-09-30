@@ -1,4 +1,5 @@
 'use client';
+import { isKeyTrainingWorkout } from '@/lib/plan-explorer';
 import { GarminHandoff } from './garmin-handoff';
 import { SessionBriefing } from './session-briefing';
 import { RecordedRunSummary } from './recorded-run-summary';
@@ -6,7 +7,7 @@ import { DailyGuide } from './daily-guide';
 import { dailyGuide } from '@/lib/daily-guide';
 import { isRunWalkWorkout } from '@/lib/run-walk';
 import { WorkoutSteps } from './workout-steps';
-import { targetLabel, mainWorkoutTarget } from '@/lib/workout-targets';
+import { SessionSequence, workoutTargetSummary } from './session-sequence';
 import { workoutSendWindow, deliveryLabel } from '@/lib/delivery-policy';
 import { MAX_RECORDED_MINUTES } from '@/lib/ultra-policy';
 
@@ -41,14 +42,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import {
-  Modal,
-  Field,
-  Choice,
-  FormError,
-  EffortGraph,
-  workoutEffort,
-} from './stride-ui';
+import { Modal, Field, Choice, FormError, workoutEffort } from './stride-ui';
 import { dateLabel, type Workout, type Profile } from '@/lib/engine';
 export type Action = (
   action: string,
@@ -160,6 +154,7 @@ export default function WorkoutDetail({
     [correctionReason, setCorrectionReason] = useState('');
   const feedbackValidation = useRunFeedbackValidation(effort, feeling);
   const [pendingAction, setPendingAction] = useState<string | null>(null);
+  const [selectedStep, setSelectedStep] = useState(0);
   const logging = mode === 'log' || mode === 'correctLog';
   const { draftStatus, clearDraft } = useDurableDraft<FeedbackDraft>({
     scope: draftScope,
@@ -214,9 +209,13 @@ export default function WorkoutDetail({
     w.status === 'planned' && w.kind !== 'race' && w.date >= today;
   const sendWindow = workoutSendWindow(w.date, today, !!delivery);
   const completedLog = w.status === 'completed' ? w.feedback : undefined;
+  const targetSummary = workoutTargetSummary(w, profile.units);
   const prescriptionContent = (
     <div className="workout-prescription">
-      <div className="workout-stats" data-metrics={w.kind === 'race' ? 2 : 3}>
+      <div
+        className="prescription-session-stats"
+        data-metrics={w.kind === 'race' ? 2 : 3}
+      >
         <div>
           <strong>{workoutDistanceValue(w, profile)}</strong>
           <span>
@@ -239,8 +238,8 @@ export default function WorkoutDetail({
         )}
         <div>
           <strong>
-            {mainWorkoutTarget(w) ? (
-              targetLabel(mainWorkoutTarget(w), profile.units)
+            {targetSummary ? (
+              targetSummary.value
             ) : (
               <>
                 {effortLabel}
@@ -250,21 +249,30 @@ export default function WorkoutDetail({
               </>
             )}
           </strong>
-          <span>{mainWorkoutTarget(w) ? 'main-set target' : 'effort'}</span>
+          <span>{targetSummary?.label ?? 'effort'}</span>
         </div>
       </div>
       <SessionBriefing workout={w} units={profile.units} />
+      <SessionSequence
+        workout={w}
+        units={profile.units}
+        selectedIndex={selectedStep}
+        onSelect={setSelectedStep}
+      />
       <div className="session-steps">
         <div className="section-heading">
           <h3>Your session, step by step</h3>
           <Footprints size={18} />
         </div>
-        <WorkoutSteps workout={w} profile={profile} />
+        <WorkoutSteps
+          workout={w}
+          profile={profile}
+          selectedIndex={selectedStep}
+        />
       </div>
       {w.kind !== 'race' && (
         <details className="workout-supporting-detail">
-          <summary>Effort profile & distance estimates</summary>
-          <EffortGraph workout={w} units={profile.units} />
+          <summary>Distance & time estimates</summary>
           <p className="subtle">
             {w.steps.some((s) => s.metres !== undefined)
               ? 'Distance steps finish at their kilometre or mile target. Time is a planning estimate; keep the effort comfortable and stop earlier if you reach your available time limit. '
@@ -280,7 +288,11 @@ export default function WorkoutDetail({
         </details>
       )}
       <details className="reason-details">
-        <summary>Why this workout?</summary>
+        <summary>
+          {isKeyTrainingWorkout(w)
+            ? 'Why this is a key run'
+            : 'Why this workout?'}
+        </summary>
         <p>{w.purpose}</p>
         <p>{w.reason}</p>
       </details>

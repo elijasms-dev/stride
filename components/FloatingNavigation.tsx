@@ -6,11 +6,8 @@ import {
   ChartNoAxesCombined,
   Footprints,
   Settings2,
-  PanelLeftClose,
-  PanelLeftOpen,
 } from 'lucide-react';
 import { TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Sidebar, useSidebar } from '@/components/ui/sidebar';
 
 export const APP_NAVIGATION = [
   { value: 'today', label: 'Today', icon: Footprints },
@@ -31,17 +28,12 @@ export function FloatingNavigation({
   overlayRef?: Ref<HTMLDivElement>;
   disabled?: boolean;
 }) {
-  const { open, setOpen } = useSidebar();
   return (
     <div
       ref={overlayRef}
       className="athletic-nav-overlay fixed inset-x-0 bottom-0 z-40 flex justify-center pointer-events-none"
     >
-      <Sidebar
-        collapsible="none"
-        className="responsive-navigation"
-        id="stride-navigation"
-      >
+      <div className="responsive-navigation" id="stride-navigation">
         <TabsList
           className="athletic-nav pointer-events-auto"
           aria-label="Main navigation"
@@ -58,23 +50,7 @@ export function FloatingNavigation({
             </TabsTrigger>
           ))}
         </TabsList>
-        <button
-          type="button"
-          className="sidebar-collapse"
-          onClick={() => setOpen(!open)}
-          aria-expanded={open}
-          aria-controls="stride-navigation"
-          aria-label={open ? 'Collapse navigation' : 'Expand navigation'}
-          title={open ? 'Collapse navigation' : 'Expand navigation'}
-        >
-          {open ? (
-            <PanelLeftClose size={20} aria-hidden="true" />
-          ) : (
-            <PanelLeftOpen size={20} aria-hidden="true" />
-          )}
-          <span>Collapse</span>
-        </button>
-      </Sidebar>
+      </div>
     </div>
   );
 }

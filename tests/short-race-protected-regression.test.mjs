@@ -1,12 +1,20 @@
-/** User-requested regression guard: half/marathon/ultra are outside these fixes.
- * Snapshots preserve their pre-change behavior; they do not establish coaching
- * correctness. Short-race correctness is asserted by separate reference tests.
+/** The original short-race regression fixture stays immutable. Its benchmark
+ * cases now have an explicit source-pacing successor: new generation retires
+ * universal numeric zones, while dates and ordinary frequency remain protected.
+ * Snapshots do not establish coaching correctness.
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { makePlan, validatePlan } from '../lib/engine.ts';
+import { assertSourcePacingMigration } from './source-pacing-migration-contract.mjs';
+const sourcePacing = JSON.parse(
+  readFileSync(
+    new URL('./fixtures/source-pacing-v1-migrations.json', import.meta.url),
+    'utf8',
+  ),
+);
 
 const baseline = JSON.parse(
   readFileSync(
@@ -26,7 +34,17 @@ function canonical(value) {
   if (value && typeof value === 'object')
     return Object.fromEntries(
       Object.keys(value)
-        .filter((key) => !['engineVersion', 'policyVersion'].includes(key))
+        // Source pacing adds explanation metadata only in these effort-based
+        // baselines. Keep every executable endpoint, target and schedule field.
+        .filter(
+          (key) =>
+            ![
+              'engineVersion',
+              'policyVersion',
+              'pacing',
+              'paceInstruction',
+            ].includes(key),
+        )
         .sort()
         .map((key) => [key, canonical(value[key])]),
     );
@@ -58,7 +76,7 @@ void test('protected baseline was captured before the two short-race edits', () 
 });
 
 for (const record of protectedCases) {
-  void test(`${record.id}: protected ${record.status === 'generated' ? 'complete prescription' : 'explicit refusal'} is unchanged`, () => {
+  void test(`${record.id}: ${record.status === 'generated' ? 'source-pacing migration is explicit' : 'explicit refusal is unchanged'}`, () => {
     const input = structuredClone(record.input);
     const before = structuredClone(input);
     if (record.status === 'rejected') {
@@ -72,6 +90,13 @@ for (const record of protectedCases) {
       );
     } else {
       const plan = makePlan(input, input.startDate, false);
+      const migration = sourcePacing.protected.find((c) => c.id === record.id);
+      assert.ok(
+        migration,
+        'A benchmark prescription change needs an explicit versioned migration',
+      );
+      assert.equal(migration.previousHash, record.protectedHash);
+      assertSourcePacingMigration(plan, input, record.weeks);
       assert.deepEqual(validatePlan(plan), []);
       assert.equal(plan.weeks.length, record.weeks.length);
       for (const week of plan.weeks) {
@@ -82,13 +107,13 @@ for (const record of protectedCases) {
               (workout) => workout.week === week.index,
             ),
           }),
-          record.weeks[week.index].prescriptionHash,
+          migration.weeks[week.index].expectedHash,
           `Week ${week.index + 1} prescription changed`,
         );
       }
       assert.equal(
         hash(plan),
-        record.protectedHash,
+        migration.expectedHash,
         'Full plan/profile/notes/feasibility changed',
       );
     }

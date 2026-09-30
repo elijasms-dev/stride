@@ -703,43 +703,301 @@ void test('actual plan-save response preserves pinned client identity', async (t
   assert.equal(client.isInvalid(), false);
 });
 
-void test('target reset restores benchmark mode through review/apply and an unchanged repeat is a journal no-op', async (t) => {
+void test('target reset restores source guidance through review/apply and an unchanged repeat is a journal no-op', async (t) => {
   const { sqlite, plan, today } = await seed(t);
-  plan.profile.recentRace = { distanceKm: 5, timeMinutes: 25, date: '2026-08-01', source: 'race', course: 'road' };
+  plan.profile.recentRace = {
+    distanceKm: 5,
+    timeMinutes: 25,
+    date: '2026-08-01',
+    source: 'race',
+    course: 'road',
+  };
   plan.profile.workoutTargets = { mode: 'effort' };
   await saveState(owner, 1, plan, 'Synthetic explicit effort override', 0);
-  const protectedRun = plan.workouts.find((w) => w.date >= today && w.status === 'planned');
+  const protectedRun = plan.workouts.find(
+    (w) => w.date >= today && w.status === 'planned',
+  );
   receipt(sqlite, protectedRun.id);
   const beforeReview = snapshot(sqlite);
-  const review = await request({ action: 'targetsPreview', version: 2, targets: null });
+  const review = await request({
+    action: 'targetsPreview',
+    version: 2,
+    targets: null,
+  });
   assert.equal(review.status, 200, JSON.stringify(review.data));
   assert.equal(snapshot(sqlite), beforeReview);
-  assert.equal(Object.hasOwn(review.data.plan.profile, 'workoutTargets'), false);
-  assert.ok(review.data.plan.workouts.some((w) => w.steps.some((s) => s.target?.mode === 'pace')));
-  assert.deepEqual(review.data.plan.workouts.find((w) => w.id === protectedRun.id), protectedRun);
-  const saved = await request({ action: 'targets', version: review.data.version, effectiveDate: review.data.effectiveDate, fingerprint: review.data.fingerprint, targets: null });
+  assert.equal(
+    Object.hasOwn(review.data.plan.profile, 'workoutTargets'),
+    false,
+  );
+  assert.ok(
+    review.data.plan.workouts.some((w) => w.steps.some((s) => s.pacing)),
+    'Reset restores source guidance without inventing a marathon target from a 5K result',
+  );
+  assert.deepEqual(
+    review.data.plan.workouts.find((w) => w.id === protectedRun.id),
+    protectedRun,
+  );
+  const saved = await request({
+    action: 'targets',
+    version: review.data.version,
+    effectiveDate: review.data.effectiveDate,
+    fingerprint: review.data.fingerprint,
+    targets: null,
+  });
   assert.equal(saved.status, 200, JSON.stringify(saved.data));
   assert.equal(saved.data.version, 3);
   assert.equal(Object.hasOwn(saved.data.plan.profile, 'workoutTargets'), false);
   const beforeNoop = snapshot(sqlite);
-  const repeated = await request({ action: 'targetsPreview', version: 3, targets: null });
+  const repeated = await request({
+    action: 'targetsPreview',
+    version: 3,
+    targets: null,
+  });
   assert.equal(repeated.status, 200);
-  const noChange = await request({ action: 'targets', version: 3, effectiveDate: repeated.data.effectiveDate, fingerprint: repeated.data.fingerprint, targets: null });
+  const noChange = await request({
+    action: 'targets',
+    version: 3,
+    effectiveDate: repeated.data.effectiveDate,
+    fingerprint: repeated.data.fingerprint,
+    targets: null,
+  });
   assert.equal(noChange.status, 200);
   assert.equal(noChange.data.version, 3);
-  assert.equal(snapshot(sqlite), beforeNoop, 'No revision or state rewrite for an unchanged automatic save');
+  assert.equal(
+    snapshot(sqlite),
+    beforeNoop,
+    'No revision or state rewrite for an unchanged automatic save',
+  );
 });
 
 void test('target route rejects reversed training zones without changing journal state', async (t) => {
   const { sqlite } = await seed(t);
   const before = snapshot(sqlite);
   for (const targets of [
-    { mode: 'pace', pace: { easy: { low: 180, high: 190 }, interval: { low: 600, high: 620 } } },
-    { mode: 'heart-rate', heartRate: { easy: { low: 200, high: 220 }, interval: { low: 80, high: 90 } } },
+    {
+      mode: 'pace',
+      pace: {
+        easy: { low: 180, high: 190 },
+        interval: { low: 600, high: 620 },
+      },
+    },
+    {
+      mode: 'heart-rate',
+      heartRate: {
+        easy: { low: 200, high: 220 },
+        interval: { low: 80, high: 90 },
+      },
+    },
   ]) {
-    const response = await request({ action: 'targetsPreview', version: 1, targets });
+    const response = await request({
+      action: 'targetsPreview',
+      version: 1,
+      targets,
+    });
     assert.equal(response.status, 422);
     assert.match(response.data.error, /should not be entirely/);
     assert.equal(snapshot(sqlite), before);
   }
+});
+
+void test('one pace preview applies benchmark, goal and role overrides while protecting the current window', async (t) => {
+  const { sqlite, plan, today } = await seed(t);
+  const from = addDays(today, 7);
+  const delivered = plan.workouts.find(
+    (w) => w.status === 'planned' && w.date >= addDays(from, 7),
+  );
+  receipt(sqlite, delivered.id);
+  const targets = {
+    mode: 'automatic',
+    raceScope: 'marathon:',
+    goalTimeMinutes: 240,
+    overrides: { easy: { mode: 'pace', low: 360, high: 420 } },
+  };
+  const pacing = {
+    recentRace: {
+      distanceKm: 5,
+      timeMinutes: 27,
+      date: addDays(today, -14),
+      source: 'race',
+      course: 'road',
+    },
+  };
+  const before = snapshot(sqlite);
+  const review = await request({
+    action: 'targetsPreview',
+    version: 1,
+    targets,
+    pacing,
+  });
+  assert.equal(review.status, 200, JSON.stringify(review.data));
+  assert.equal(snapshot(sqlite), before, 'Preview never mutates the journal');
+  assert.equal(review.data.effectiveDate, from);
+  assert.deepEqual(review.data.plan.profile.recentRace, pacing.recentRace);
+  assert.equal(review.data.plan.profile.workoutTargets.goalTimeMinutes, 240);
+  assert.deepEqual(
+    review.data.plan.profile.workoutTargets.overrides.easy,
+    targets.overrides.easy,
+  );
+  assert.equal(review.data.qualityReview.automaticTransition, false);
+  assert.equal(
+    review.data.qualityReview.preference,
+    plan.profile.qualityMode === 'custom' ? 'custom' : 'automatic',
+  );
+  for (const old of plan.workouts) {
+    const next = review.data.plan.workouts.find((w) => w.id === old.id);
+    assert.ok(next);
+    assert.equal(next.date, old.date);
+    assert.equal(next.kind, old.kind);
+    assert.equal(next.hard, old.hard);
+    if (
+      old.status !== 'planned' ||
+      old.date < from ||
+      old.id === delivered.id ||
+      old.week < 0
+    )
+      assert.deepEqual(next, old, old.id);
+  }
+  assert.deepEqual(review.data.plan.extraRuns, plan.extraRuns);
+  const saved = await request({
+    action: 'targets',
+    version: 1,
+    targets,
+    pacing,
+    effectiveDate: review.data.effectiveDate,
+    fingerprint: review.data.fingerprint,
+  });
+  assert.equal(saved.status, 200, JSON.stringify(saved.data));
+  assert.equal(saved.data.version, 2);
+  assert.deepEqual(
+    saved.data.plan,
+    review.data.plan,
+    'Apply is exactly the reviewed candidate',
+  );
+});
+
+void test('pace review rejects changed evidence, future benchmarks and preference-path result edits', async (t) => {
+  const { sqlite, today } = await seed(t);
+  const targets = { mode: 'automatic' };
+  const recentRace = {
+    distanceKm: 5,
+    timeMinutes: 25,
+    date: addDays(today, -10),
+    source: 'race',
+    course: 'road',
+  };
+  const pacing = { recentRace };
+  const review = await request({
+    action: 'targetsPreview',
+    version: 1,
+    targets,
+    pacing,
+  });
+  assert.equal(review.status, 200, JSON.stringify(review.data));
+  const before = snapshot(sqlite);
+  const changed = await request({
+    action: 'targets',
+    version: 1,
+    targets,
+    pacing: { recentRace: { ...recentRace, timeMinutes: 24 } },
+    effectiveDate: review.data.effectiveDate,
+    fingerprint: review.data.fingerprint,
+  });
+  assert.equal(changed.status, 409);
+  for (const action of ['preferencesPreview', 'preferences']) {
+    const result = await request({
+      action,
+      version: 1,
+      effectiveDate: today,
+      preferences: { recentRace },
+    });
+    assert.equal(result.status, 422);
+    assert.match(result.data.error, /Training paces/);
+  }
+  for (const bad of [
+    null,
+    { weeklyKm: 80 },
+    { recentRace: { ...recentRace, date: addDays(today, 1) } },
+  ]) {
+    const result = await request({
+      action: 'targetsPreview',
+      version: 1,
+      targets,
+      pacing: bad,
+    });
+    assert.equal(result.status, 422, JSON.stringify(result.data));
+  }
+  assert.equal(snapshot(sqlite), before);
+});
+
+void test('pace review can clear a benchmark and repeats without a new revision', async (t) => {
+  const { sqlite, plan, today } = await seed(t);
+  plan.profile.recentRace = {
+    distanceKm: 5,
+    timeMinutes: 25,
+    date: addDays(today, -10),
+    source: 'race',
+    course: 'road',
+  };
+  await saveState(owner, 1, plan, 'Synthetic benchmark', 0);
+  const targets = { mode: 'automatic' };
+  const pacing = { recentRace: null };
+  const review = await request({
+    action: 'targetsPreview',
+    version: 2,
+    targets,
+    pacing,
+  });
+  assert.equal(review.status, 200, JSON.stringify(review.data));
+  assert.equal(Object.hasOwn(review.data.plan.profile, 'recentRace'), false);
+  const saved = await request({
+    action: 'targets',
+    version: 2,
+    targets,
+    pacing,
+    effectiveDate: review.data.effectiveDate,
+    fingerprint: review.data.fingerprint,
+  });
+  assert.equal(saved.status, 200, JSON.stringify(saved.data));
+  const before = snapshot(sqlite);
+  const repeated = await request({
+    action: 'targetsPreview',
+    version: 3,
+    targets,
+    pacing,
+  });
+  assert.equal(repeated.status, 200, JSON.stringify(repeated.data));
+  const unchanged = await request({
+    action: 'targets',
+    version: 3,
+    targets,
+    pacing,
+    effectiveDate: repeated.data.effectiveDate,
+    fingerprint: repeated.data.fingerprint,
+  });
+  assert.equal(unchanged.status, 200, JSON.stringify(unchanged.data));
+  assert.equal(unchanged.data.version, 3);
+  assert.equal(snapshot(sqlite), before);
+});
+
+void test('a new local day invalidates a pace preview and cannot shorten the protected window', async (t) => {
+  const { sqlite } = await seed(t);
+  const targets = { mode: 'automatic' };
+  const review = await request({
+    action: 'targetsPreview',
+    version: 1,
+    targets,
+  });
+  assert.equal(review.status, 200, JSON.stringify(review.data));
+  const before = snapshot(sqlite);
+  instant = '2026-09-11T23:30:00.000Z';
+  const saved = await request({
+    action: 'targets',
+    version: 1,
+    targets,
+    effectiveDate: review.data.effectiveDate,
+    fingerprint: review.data.fingerprint,
+  });
+  assert.equal(saved.status, 409);
+  assert.equal(snapshot(sqlite), before);
 });

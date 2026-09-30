@@ -205,14 +205,22 @@ export function PlanCustomizationFields({
   onChange,
   onReviewRoutine,
   allowRunMeasure = false,
+  onPaces,
 }: {
   profile: Profile;
   onChange: (profile: Profile) => void;
   onReviewRoutine?: () => void;
   allowRunMeasure?: boolean;
+  onPaces?: () => void;
 }) {
   if (isBeginnerProfile(profile))
-    return <BeginnerCourseFields profile={profile} onChange={onChange} />;
+    return <>
+      {onPaces && <button type="button" className="pace-settings-link" onClick={onPaces}>
+        <span><strong>Your training paces</strong><small>Comfortable effort first. Review your reference and guidance.</small></span>
+        <span aria-hidden="true">↗</span>
+      </button>}
+      <BeginnerCourseFields profile={profile} onChange={onChange} />
+    </>;
   return (
     <div
       className="plan-customization"
@@ -225,7 +233,10 @@ export function PlanCustomizationFields({
         }
       }}
     >
-      <RecentRaceFields profile={profile} onChange={onChange} />
+      {onPaces ? <button type="button" className="pace-settings-link" onClick={onPaces}>
+        <span><strong>Your training paces</strong><small>Review your reference result and the guidance for each run.</small></span>
+        <span aria-hidden="true">↗</span>
+      </button> : <RecentRaceFields profile={profile} onChange={onChange} />}
       <ScheduleFields
         profile={profile}
         onChange={onChange}

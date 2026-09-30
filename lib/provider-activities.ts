@@ -11,6 +11,7 @@ import { validDate } from './engine';
 import { activityTime } from './activity-time';
 import { impossibleRunningSummary } from './activity-plausibility';
 import { MAX_RECORDED_MINUTES } from './ultra-policy';
+import { recordedHeartRate } from './recorded-heart-rate';
 export function normalizeActivity(input: unknown, athleteId: string) {
   if (!input || typeof input !== 'object' || Array.isArray(input)) return null;
   const a = input as Record<string, unknown>;
@@ -46,6 +47,14 @@ export function normalizeActivity(input: unknown, athleteId: string) {
   }
   return {
     ...timing,
+    // Intervals activity summary fields, not configured zones or interval targets.
+    // https://forum.intervals.icu/t/download-all-activities-in-csv-format/599
+    ...(a.has_heartrate === false || a.icu_ignore_hr === true
+      ? {}
+      : recordedHeartRate({
+          averageHeartRate: a.average_heartrate,
+          maxHeartRate: a.max_heartrate,
+        })),
     id: `${athleteId}:${String(a.id)}`,
     providerId: String(a.id),
     name: (typeof a.name === 'string' ? a.name : 'Run').slice(0, 160),

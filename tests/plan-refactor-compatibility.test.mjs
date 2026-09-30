@@ -5,6 +5,13 @@ import { readFileSync } from 'node:fs';
 import * as engine from '../lib/engine.ts';
 import { independentRoadChecks } from './road-overhaul-contract.mjs';
 import { assertMarathonTraining } from './marathon-variety-contract.mjs';
+import { assertSourcePacingMigration } from './source-pacing-migration-contract.mjs';
+const sourcePacing = JSON.parse(
+  readFileSync(
+    new URL('./fixtures/source-pacing-v1-migrations.json', import.meta.url),
+    'utf8',
+  ),
+);
 
 // Preserve the original v32 fixture. v33 road scenarios retain their independent
 // contracts; the pace model has a separate fixture for the 18 successful numeric
@@ -41,16 +48,19 @@ function canonical(value, legacy = true) {
       Object.keys(value)
         .filter(
           (key) =>
-            !legacy ||
-            !(
-              [
-                'effortRole',
-                'prescriptionVersion',
-                'prescriptionPaceBasis',
-              ].includes(key) ||
-              (value.kind === 'race' &&
-                ['distanceEstimate', 'qualityMinutes'].includes(key))
-            ),
+            // Newly saved source explanations have independent contract tests;
+            // retain all legacy target values and executable content here.
+            !['pacing', 'paceInstruction'].includes(key) &&
+            (!legacy ||
+              !(
+                [
+                  'effortRole',
+                  'prescriptionVersion',
+                  'prescriptionPaceBasis',
+                ].includes(key) ||
+                (value.kind === 'race' &&
+                  ['distanceEstimate', 'qualityMinutes'].includes(key))
+              )),
         )
         .sort()
         .map((key) => [
@@ -279,6 +289,26 @@ for (const c of baseline.cases)
       const reviewed = marathonVariety.cases.find(
         (entry) => entry.name === c.name,
       );
+      const sourceMigration = sourcePacing.policy.find(
+        (entry) => entry.name === c.name,
+      );
+      if (sourceMigration) {
+        assert.deepEqual(
+          sourceMigration.previousExpected,
+          reviewed?.expected ?? paceCase?.expected,
+        );
+        const plan = engine.makePlan(c.profile, baseline.date, false);
+        assertSourcePacingMigration(plan, c.profile);
+        assert.equal(
+          hash(historyAndFrequency(plan), false),
+          paceCase.historyAndFrequencySha256,
+        );
+        assertExecutablePacePlan(plan);
+        return assert.deepEqual(
+          { sha256: hash(plan, false) },
+          sourceMigration.expected,
+        );
+      }
       if (reviewed) {
         if (paceCase) {
           const plan = engine.makePlan(c.profile, baseline.date, false);

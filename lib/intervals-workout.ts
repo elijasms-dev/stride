@@ -5,7 +5,9 @@ import type { Workout } from './engine';
 export function intervalsWorkoutText(workout: Workout): string {
   return workout.steps
     .map((step) => {
-      const cue = `${step.label} · ${step.effort}`.replace(/\s+/g, ' ').trim();
+      const cue = `${step.label} · ${step.pacing?.guidance ?? step.effort}`
+        .replace(/\s+/g, ' ')
+        .trim();
       // m means minutes in the provider grammar; mtr means metres.
       const duration =
         step.metres !== undefined ? `${step.metres}mtr` : `${step.seconds}s`;
@@ -23,7 +25,9 @@ export function intervalsWorkoutText(workout: Workout): string {
         );
       const target =
         step.target?.mode === 'pace'
-          ? `${paceText(step.target.low)}-${paceText(step.target.high)}/km Pace`
+          ? step.target.low === step.target.high
+            ? `${paceText(step.target.low)}/km Pace`
+            : `${paceText(step.target.low)}-${paceText(step.target.high)}/km Pace`
           : 'freeride';
       return `- ${cue} ${duration} ${target} intensity=${intensity}`;
     })

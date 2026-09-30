@@ -13,45 +13,67 @@ import { runDuration } from '@/lib/journal-view';
 import { summaryEffort } from '@/lib/prescription';
 import { prescribedDistanceKm } from '@/lib/run-distance';
 import { recordedWorkoutDate } from '@/lib/run-records';
-import { mainWorkoutTarget, targetLabel } from '@/lib/workout-targets';
+import { workoutTargetSummary } from '../session-sequence';
+import { SessionAtmosphere } from '../session-atmosphere';
 
 export function TodayWorkoutCard({
   workout,
   profile,
   showEstimates,
   onOpen,
+  motion = true,
 }: {
   workout: Workout;
   profile: Profile;
   showEstimates: boolean;
   onOpen: (workout: Workout) => void;
+  motion?: boolean;
 }) {
   const completed = workout.status === 'completed';
   const feedback = completed ? workout.feedback : undefined;
   const race = workout.kind === 'race';
   const exactDistance = prescribedDistanceKm(workout);
   const distanceValue = workoutDistanceValue(workout, profile);
-  const target = mainWorkoutTarget(workout);
+  const target =
+    !completed && workout.steps.some((step) => step.target)
+      ? workoutTargetSummary(workout, profile.units)
+      : null;
   const date = recordedWorkoutDate(workout);
   const showDistance =
     completed || race || exactDistance !== null || showEstimates;
   const estimatedTime = workout.steps.some((step) => step.metres !== undefined);
   const missingRecord = completed && !feedback;
   return (
-    <article className="workout-card" data-tone={workoutTone(workout)}>
-      <div className="card-topline">
-        <span className="eyebrow">
-          {race
-            ? 'Race day'
+    <article className="today-hero" data-tone={workoutTone(workout)}>
+      <SessionAtmosphere
+        mood={
+          workout.status === 'skipped'
+            ? 'rest'
             : workout.kind === 'long'
-              ? workout.hard
-                ? 'Long run · quality'
-                : 'Long run'
-              : workout.hard
-                ? 'Quality session'
-                : 'Easy effort'}
+              ? 'long'
+              : workout.hard || race
+                ? 'quality'
+                : 'easy'
+        }
+        motion={motion}
+      />
+      <div className="today-hero-topline">
+        <span className="today-hero-kind">
+          {completed
+            ? 'Recorded run'
+            : workout.status === 'skipped'
+              ? 'Skipped session'
+              : race
+                ? 'Race day'
+                : workout.kind === 'long'
+                  ? workout.hard
+                    ? 'Long run · quality'
+                    : 'Long run'
+                  : workout.hard
+                    ? 'Quality session'
+                    : 'Easy effort'}
         </span>
-        <div className="workout-status-actions">
+        <div className="today-hero-status">
           {workout.status !== 'planned' && (
             <span className="pill">
               {completed ? (
@@ -65,9 +87,9 @@ export function TodayWorkoutCard({
           )}
         </div>
       </div>
-      <div className="session-heading">
+      <div className="today-hero-heading">
         <h2>{workout.title.replace(/^\d+(?:\.\d+)? (?:km|mi) · /, '')}</h2>
-        <time className="session-date-stamp" dateTime={date}>
+        <time className="today-hero-date" dateTime={date}>
           <span>{dateLabel(date, { month: 'short' })}</span>
           <strong>{dateLabel(date, { day: 'numeric' })}</strong>
         </time>
@@ -79,28 +101,33 @@ export function TodayWorkoutCard({
         </p>
       ) : (
         <div
-          className="workout-stats"
+          className="today-session-stats"
           data-metrics={Number(showDistance) + Number(completed || !race) + 1}
         >
           {showDistance && (
-            <div>
+            <div className="today-distance-metric">
               <strong>
                 {feedback
                   ? feedback.actualKm === null
                     ? '—'
                     : kmDisplay(feedback.actualKm, profile.units)
                   : distanceValue}
+                {(feedback
+                  ? feedback.actualKm !== null
+                  : distanceValue !== '—') && (
+                  <span className="today-distance-unit"> {profile.units}</span>
+                )}
               </strong>
               <span>
                 {feedback
                   ? feedback.actualKm === null
                     ? 'Distance not recorded'
-                    : `${profile.units} recorded`
+                    : 'recorded distance'
                   : race || exactDistance !== null
-                    ? `${profile.units} target`
+                    ? 'target'
                     : distanceValue === '—'
                       ? 'distance not estimated'
-                      : `${profile.units} estimated range`}
+                      : 'estimated range'}
               </span>
             </div>
           )}
@@ -120,34 +147,30 @@ export function TodayWorkoutCard({
               </span>
             </div>
           )}
-          <div>
+          <div className="today-target-metric">
             <strong>
-              {feedback
-                ? feedback.effort
-                : target
-                  ? targetLabel(target, profile.units)
-                  : summaryEffort(workout)}
-              {(completed ||
-                (!target && summaryEffort(workout) !== 'By feel')) && (
+              {feedback ? feedback.effort : summaryEffort(workout)}
+              {(completed || summaryEffort(workout) !== 'By feel') && (
                 <span className="stat-small"> / 10</span>
               )}
             </strong>
-            <span>
-              {completed
-                ? 'recorded effort'
-                : target
-                  ? target.mode === 'pace'
-                    ? 'Target pace'
-                    : 'Target heart rate'
-                  : 'effort'}
-            </span>
+            <span>{completed ? 'recorded effort' : 'effort'}</span>
           </div>
         </div>
       )}
-      <div className="card-footer">
-        <div className="today-run-actions">
+      {target && (
+        <p className="today-saved-target">
+          <span>{target.label}</span> <strong>{target.value}</strong>
+        </p>
+      )}
+      <div className="today-hero-footer">
+        <div className="today-hero-actions">
           <button className="primary-button" onClick={() => onOpen(workout)}>
-            {completed ? 'View run' : 'Open workout'}
+            {completed
+              ? 'View run'
+              : workout.status === 'skipped'
+                ? 'View skipped run'
+                : 'Open workout'}
           </button>
         </div>
       </div>

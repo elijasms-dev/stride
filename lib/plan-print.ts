@@ -53,7 +53,7 @@ function stepHtml(step: Step, workout: Workout, plan: Plan) {
   const target = step.target
     ? targetLabel(step.target, plan.profile.units)
     : '';
-  return `<li class="step ${escapeHtml(step.kind)}"><div class="step-heading"><strong>${escapeHtml(step.label)}</strong><span>${escapeHtml(length)}</span></div><p>${escapeHtml(movement + step.effort)}${target ? ` <strong class="target">${escapeHtml(target)}</strong>` : ''}</p>${allowance ? `<p class="muted">${escapeHtml(allowance)}</p>` : ''}</li>`;
+  return `<li class="step ${escapeHtml(step.kind)}"><div class="step-heading"><strong>${escapeHtml(step.label)}</strong><span>${escapeHtml(length)}</span></div><p>${escapeHtml(movement + (step.pacing?.guidance ?? step.effort))}${target ? ` <strong class="target">${escapeHtml(target)}</strong>` : ''}</p>${allowance ? `<p class="muted">${escapeHtml(allowance)}</p>` : ''}</li>`;
 }
 
 function recordHtml(record: RunRecord, plan: Plan, title: string) {

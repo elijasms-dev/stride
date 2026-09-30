@@ -62,7 +62,7 @@ const { intervals, failure, saveState, encrypt, requestLimit } = await import(
 const { readAccount, guardAccount } = await import(
   new URL('lib/accounts.ts', site)
 );
-const { makePlan, demoProfile, todayInZone } = await import(
+const { makePlan, demoProfile, todayInZone, addDays } = await import(
   new URL('lib/engine.ts', site)
 );
 const today = todayInZone('UTC');
@@ -559,7 +559,19 @@ void test('O10: exactly twenty small revisions end without an empty trailing pag
   const f = fixture();
   t.after(() => f.sqlite.close());
   await readAccount(owner);
-  const plan = samplePlan(0);
+  const plan = makePlan(
+    {
+      ...demoProfile(today),
+      goal: 'base',
+      startDate: today,
+      raceDate: addDays(today, 27),
+    },
+    today,
+  );
+  assert.ok(
+    Buffer.byteLength(JSON.stringify(plan), 'utf8') * 20 < 2000000,
+    'This pagination boundary fixture must fit twenty revisions in the byte budget',
+  );
   for (let version = 0; version < 20; version++)
     await saveState(owner, version, plan, 'Small revision', 0);
   const response = await exportJournal(request('/api/export')),

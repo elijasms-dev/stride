@@ -253,7 +253,7 @@ test('benchmark metadata never overrides manual effort, heart-rate or partial pa
   );
 });
 
-test('benchmark fields show familiar time, exact presets, selected units and qualified estimates', () => {
+test('benchmark fields show familiar time, exact presets, selected units and actual reference pace', () => {
   const original = profile({
     units: 'mi',
     recentRace: { ...race, timeMinutes: 50.5 },
@@ -267,8 +267,11 @@ test('benchmark fields show familiar time, exact presets, selected units and qua
   assert.match(html, /value="0:50:30"/);
   assert.match(html, /value="6\.21371192"/);
   assert.match(html, /Half marathon/);
-  assert.match(html, /Estimated training paces/);
-  assert.match(html, /not measured physiological thresholds/);
+  assert.match(html, /Your average pace for this result/);
+  assert.match(
+    html,
+    /not an easy-run target or a prediction for another distance/,
+  );
   assert.match(html, /No benchmark age/);
   assert.match(html, /max="2026-09-14"/);
   assert.match(html, /\/mi/);
@@ -279,12 +282,23 @@ test('benchmark fields show familiar time, exact presets, selected units and qua
   );
   assert.equal(BENCHMARK_DISTANCES[2].distanceKm, 21.0975);
   assert.equal(BENCHMARK_DISTANCES[3].distanceKm, 42.195);
+  assert.equal(
+    BENCHMARK_DISTANCES.find((d) => d.label === 'Mile').distanceKm,
+    1.609344,
+  );
+  assert.equal(
+    BENCHMARK_DISTANCES.find((d) => d.label === '1500 m').distanceKm,
+    1.5,
+  );
   const manual = render(RecentRaceFields, {
     profile: profile({ workoutTargets: { mode: 'effort' } }),
     asOf: start,
     onChange: noop,
   });
-  assert.match(manual, /estimates do not replace them/);
+  assert.match(
+    manual,
+    /programme determines which targets this result can support/,
+  );
   const invalid = render(RecentRaceFields, {
     profile: profile({ recentRace: { ...race, date: '2026-09-15' } }),
     asOf: start,
@@ -297,8 +311,8 @@ test('benchmark fields show familiar time, exact presets, selected units and qua
     asOf: start,
     onChange: noop,
   });
-  assert.match(unsupported, /outside the supported training-pace model/);
-  assert.match(unsupported, /Runs keep their effort cues/);
+  assert.match(unsupported, /10:00/);
+  assert.match(unsupported, /This result reflects my current fitness/);
   assert.doesNotMatch(unsupported, /class="benchmark-pace-preview"/);
 });
 

@@ -10,6 +10,9 @@ const { planCalendarDays, planWeekSummary, nearestPlanWeek } =
 const { FullPlan, PlanWeekSchedule } =
   await import('../components/plan/plan-explorer.tsx');
 const { WeekRhythm } = await import('../components/week-rhythm.tsx');
+const { ProgressionChart } =
+  await import('../components/plan/progression-chart.tsx');
+const { ProgressView } = await import('../components/plan-views.tsx');
 const { trainingPlanHtml } = await import('../lib/plan-print.ts');
 const noop = () => {};
 
@@ -215,17 +218,137 @@ test('completed rows with missing feedback never pretend planned values were rec
   assert.doesNotMatch(html, /\dm recorded/);
 });
 
-test('chart controls expose both distances and preserve mile units', () => {
+test('Progress owns the planned chart with both distances and mile units', () => {
   const plan = fixture();
   plan.profile.units = 'mi';
-  const html = render(FullPlan, props(plan));
+  const html = render(ProgressView, {
+    plan,
+    today: plan.profile.startDate,
+    onWorkout: noop,
+    onExtra: noop,
+    onCorrectExtra: noop,
+    isDemo: false,
+  });
   assert.match(html, /aria-label="Week 1,[^"]+mi training,[^"]+mi long run/);
-  assert.match(html, /Estimated training/);
+  assert.match(html, /Planned training/);
+  assert.doesNotMatch(render(FullPlan, props(plan)), /class="pe-chart-week/);
   assert.equal(
     (html.match(/class="pe-chart-week[^"]*" aria-label=/g) ?? []).length,
     12,
   );
   assert.match(html, /aria-pressed="true"/);
+});
+
+test('selected plan chart summary shows saved prescriptions and phase without substituting actual results', () => {
+  const plan = fixture();
+  const source = plan.workouts[0];
+  plan.workouts = [
+    {
+      ...source,
+      kind: 'long',
+      week: 1,
+      estimatedKm: 12,
+      status: 'completed',
+      feedback: feedback(plan.weeks[1].start, { actualKm: 7 }),
+    },
+  ];
+  const html = render(ProgressionChart, { plan, selected: 1, onSelect: noop });
+  const summary = html.slice(html.indexOf('class="chart-week-summary"'));
+  assert.match(summary, /Week 2 · Foundation/);
+  assert.match(summary, /Planned training<\/dt><dd>12 km/);
+  assert.match(summary, /Planned long run<\/dt><dd>12 km/);
+  assert.doesNotMatch(summary, />7 km/);
+});
+
+test('recorded weekly chart uses actual dates, excludes unlogged prescriptions and flags partial distance totals', () => {
+  const plan = fixture();
+  const source = plan.workouts[0];
+  const secondWeek = plan.weeks[1].start;
+  plan.workouts = [
+    {
+      ...source,
+      id: 'logged',
+      week: 0,
+      estimatedKm: 30,
+      status: 'completed',
+      feedback: feedback(secondWeek, { actualKm: 7 }),
+    },
+    {
+      ...source,
+      id: 'unlogged',
+      week: 1,
+      estimatedKm: 40,
+      status: 'planned',
+      feedback: undefined,
+    },
+    {
+      ...source,
+      id: 'missing',
+      week: 1,
+      estimatedKm: 20,
+      status: 'completed',
+      feedback: feedback(addDays(secondWeek, 1), { actualKm: null }),
+    },
+  ];
+  const progressProps = {
+    plan,
+    today: secondWeek,
+    onWorkout: noop,
+    onExtra: noop,
+    onCorrectExtra: noop,
+    isDemo: false,
+  };
+  const html = render(ProgressView, progressProps);
+  assert.match(
+    html,
+    /<svg[^>]+class="progression-plot"[^>]+role="img"[^>]+aria-labelledby="[^"]+-title [^"]+-description"/,
+  );
+  assert.match(html, /<title[^>]*>Weekly distance<\/title>/);
+  assert.match(html, /Hatched bars show recorded totals/);
+  assert.match(html, /<select aria-label="Progression week">/);
+  assert.match(html, /<option value="1" selected="">Week 2/);
+  assert.equal(
+    (html.match(/class="progression-recorded-bar"/g) ?? []).length,
+    1,
+    'Only the actual second week receives a recorded-distance bar',
+  );
+  const summary = html
+    .split('class="progression-week-detail"')[1]
+    .split('</section>')[0];
+  assert.doesNotMatch(summary, /Planned estimate|Planned training/);
+  const plannedSummary = html
+    .split('class="chart-week-summary"')[1]
+    .split('</section>')[0];
+  assert.match(plannedSummary, /Planned training<\/dt><dd>60 km/);
+  assert.doesNotMatch(plannedSummary, />7 km/);
+  assert.match(summary, /Known recorded distance<\/dt><dd>7 km/);
+  assert.match(
+    summary,
+    /1 run has no distance recorded. This total is incomplete/,
+  );
+  assert.doesNotMatch(
+    summary,
+    /Known recorded distance<\/dt><dd>(?:30|40|20|60) km/,
+  );
+  const stats = html
+    .split('class="journal-lifetime-stats"')[1]
+    .split('</dl>')[0];
+  assert.match(stats, /Runs logged<\/dt><dd>2/);
+  assert.match(stats, /Time running<\/dt><dd>1h 26m/);
+  assert.ok(
+    html.indexOf('class="pe-progression"') <
+      html.indexOf('class="journal-lifetime"'),
+  );
+  const firstWeek = render(ProgressView, {
+    ...progressProps,
+    today: plan.weeks[0].start,
+  });
+  const firstWeekSummary = firstWeek
+    .split('class="progression-week-detail"')[1]
+    .split('</section>')[0];
+  assert.match(firstWeekSummary, /<option value="0" selected="">Week 1/);
+  assert.match(firstWeekSummary, /Recorded total<\/dt><dd>Not recorded/);
+  assert.doesNotMatch(firstWeekSummary, /Recorded total<\/dt><dd>0 km/);
 });
 
 test('Today lookup works before, inside and after a saved block without changing it', () => {
@@ -246,7 +369,8 @@ test('legacy taper labels resolve consistently in the schedule, chart and export
   plan.profile.method = 'balanced';
   plan.weeks[0].phase = 'Taper';
   const html = render(FullPlan, props(plan));
-  assert.match(html, /aria-label="Week 1, Foundation,/);
+  const chart = render(ProgressionChart, { plan, selected: 0, onSelect: noop });
+  assert.match(chart, /aria-label="Week 1, Foundation,/);
   assert.match(html, /class="pe-phase ">Foundation<\/span>/);
   assert.match(trainingPlanHtml(plan), /Week 1 · Foundation<\/h2>/);
   assert.equal(plan.weeks[0].phase, 'Taper');
@@ -279,4 +403,55 @@ test('weekly rhythm describes actual saved runs for any engine version', () => {
   assert.match(html, /1 quality workout · 1 long run/);
   assert.match(html, /included in the long-run distance and time/);
   assert.doesNotMatch(html, /replaces a weekday quality/);
+});
+
+test('Plan leads with the supplied event identity and date without duplicated construction panels', () => {
+  const plan = fixture();
+  plan.profile.raceName = 'Autumn City Half';
+  const html = render(FullPlan, props(plan));
+  assert.match(html, /<h1>Autumn City Half<\/h1>/);
+  assert.match(html, new RegExp(`dateTime="${plan.profile.raceDate}"`));
+  assert.match(html, /Race day/);
+  assert.match(html, /Adjust plan/);
+  assert.match(html, /More plan options/);
+  assert.match(html, /class="pe-weeks"/);
+  assert.doesNotMatch(
+    html,
+    /Your routine and progression|Built around your running|class="pe-plan-notes"|class="pe-progression"/,
+  );
+  plan.profile.raceName = '';
+  assert.match(render(FullPlan, props(plan)), /<h1>10K training<\/h1>/);
+});
+
+test('planned Progress bars leave unsupported distances blank rather than treating them as zero', () => {
+  const plan = fixture();
+  const source = plan.workouts[0];
+  plan.workouts = [
+    {
+      ...source,
+      week: 0,
+      kind: 'long',
+      distanceEstimate: {
+        lowerKm: null,
+        upperKm: null,
+        basis: 'No supported pace.',
+      },
+      steps: [
+        {
+          kind: 'aerobic',
+          seconds: 1800,
+          intensity: 2,
+          label: 'Easy running',
+          effort: 'Conversational',
+        },
+      ],
+    },
+  ];
+  const html = render(ProgressionChart, { plan, selected: 0, onSelect: noop });
+  assert.match(
+    html,
+    /training distance not estimated, long-run distance not estimated/,
+  );
+  assert.match(html, /Planned training<\/dt><dd>Not estimated/);
+  assert.match(html, /Planned long run<\/dt><dd>Not estimated/);
 });

@@ -137,7 +137,11 @@ export function roadOverhaulCases() {
         add(
           `${goal}-${name}-q${count}`,
           roadProfile(goal, 'advanced', count, 12, patch),
-          goal === 'half' && name === 'fractional' && count === 2
+          (goal === 'half' && name === 'fractional' && count === 2) ||
+            // The old 55 km 5K fixture relied on inferred fast-work targets to
+            // fit two quality days. An unconfirmed 10K result no longer supplies
+            // those paces; keep its explicit capacity refusal as a regression.
+            (goal === '5k' && name === 'benchmark' && count === 2)
             ? 'reject'
             : 'accept',
         );
@@ -188,6 +192,19 @@ export function roadOverhaulCases() {
   }
   // Former accepted fixtures concealed impossible or unfundable daily loads.
   // Retain the exact inputs as rejection regressions, alongside viable examples.
+  add(
+    '5k-benchmark-q2-feasible-45km',
+    roadProfile('5k', 'advanced', 2, 12, {
+      weeklyKm: 45,
+      recentRace: {
+        distanceKm: 10,
+        timeMinutes: 50,
+        date: '2026-09-01',
+        source: 'race',
+        course: 'road',
+      },
+    }),
+  );
   for (const [goal, level, weeklyKm, longestKm, quality] of [
     ['5k', 'developing', 15, 4, 0],
     ['10k', 'developing', 24, 6, 0],

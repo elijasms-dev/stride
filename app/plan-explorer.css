@@ -12,7 +12,7 @@
   display: block;
   margin-top: 4px;
   color: var(--text-label);
-  font-size: 0.82rem;
+  font-size: 0.875rem;
 }
 .plan-explorer .page-heading {
   align-items: flex-start;
@@ -40,14 +40,14 @@
 .pe-chart-heading p,
 .pe-chart-note {
   color: var(--text-label);
-  font-size: 0.78rem;
+  font-size: 0.875rem;
   margin: 6px 0 0;
 }
 .pe-chart-legend {
   display: flex;
   gap: 18px;
   color: var(--text-label);
-  font-size: 0.76rem;
+  font-size: 0.875rem;
   padding-top: 4px;
   flex-wrap: wrap;
 }
@@ -56,10 +56,15 @@
   align-items: center;
   gap: 6px;
   white-space: nowrap;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
 }
 .pe-chart-legend i {
-  width: 8px;
+  width: 12px;
   height: 12px;
+  flex: 0 0 12px;
   border-radius: 2px;
 }
 .pe-week-swatch {
@@ -69,6 +74,7 @@
   background: var(--pe-long);
 }
 .pe-chart-scroll {
+  position: relative;
   border: 0;
   margin: 0;
   min-width: 0;
@@ -76,6 +82,32 @@
   padding: 8px 3px 3px;
   margin: 12px -3px 0;
   scrollbar-width: thin;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 3px;
+  overscroll-behavior-x: contain;
+  background:
+    linear-gradient(to right, var(--canvas) 35%, transparent) left center / 28px
+      100% local no-repeat,
+    linear-gradient(to left, var(--canvas) 35%, transparent) right center / 28px
+      100% local no-repeat,
+    linear-gradient(
+        to right,
+        color-mix(in srgb, var(--text-main) 18%, transparent),
+        transparent
+      )
+      left center / 14px 100% scroll no-repeat,
+    linear-gradient(
+        to left,
+        color-mix(in srgb, var(--text-main) 18%, transparent),
+        transparent
+      )
+      right center / 14px 100% scroll no-repeat;
+}
+.pe-chart-scroll-hint {
+  margin: 10px 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-label);
 }
 .pe-chart {
   display: flex;
@@ -90,7 +122,9 @@
   align-items: stretch;
   gap: 4px;
   padding: 4px 5px;
-  min-width: 30px;
+  min-width: 44px;
+  min-height: 44px;
+  scroll-snap-align: center;
   color: var(--text-main);
   background: transparent;
   border: 1px solid transparent;
@@ -101,11 +135,25 @@
   background: var(--surface-raised);
 }
 .pe-chart-week.is-selected {
-  background: var(--surface-raised);
+  background: color-mix(in srgb, var(--link) 10%, var(--surface));
   border-color: var(--link);
+  box-shadow: inset 0 0 0 1px var(--link);
+}
+.pe-chart-week:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.pe-chart-week.is-selected .pe-chart-value {
+  color: var(--link);
+  font-weight: 800;
+}
+.pe-chart-week.is-selected .pe-chart-week-number {
+  background: var(--link);
+  color: var(--surface);
+  font-weight: 800;
 }
 .pe-chart-value {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 700;
   text-align: center;
   font-variant-numeric: tabular-nums;
@@ -146,9 +194,11 @@
   align-items: center;
   justify-content: center;
   gap: 3px;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 700;
-  height: 16px;
+  height: 24px;
+  flex: 0 0 24px;
+  border-radius: 12px;
 }
 .pe-chart-note {
   line-height: 1.5;
@@ -179,12 +229,12 @@
   background: transparent;
   border: 0;
   border-radius: 6px;
-  font-size: 0.84rem;
+  font-size: 0.875rem;
   font-weight: 700;
   color: var(--text-label);
   cursor: pointer;
 }
-.pe-view-switch button[aria-pressed='true'] {
+.plan-explorer .pe-view-switch button[aria-pressed='true'] {
   background: var(--text-main);
   color: var(--surface);
 }
@@ -216,7 +266,7 @@
   min-width: 176px;
   padding: 0 30px 0 12px;
   font-family: inherit;
-  font-size: 0.84rem;
+  font-size: 0.875rem;
   font-weight: 700;
   cursor: pointer;
 }
@@ -232,7 +282,7 @@
   background: transparent;
   border: 0;
   font-weight: 700;
-  font-size: 0.82rem;
+  font-size: 0.875rem;
   padding: 8px 10px;
   cursor: pointer;
 }
@@ -269,7 +319,7 @@
 }
 .pe-week-heading p {
   color: var(--text-label);
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   margin: 7px 0 0;
 }
 .pe-week-heading p > span {
@@ -283,7 +333,7 @@
   padding: 5px 9px;
   border-radius: 5px;
   font-family: var(--font-journal-sans), sans-serif;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 650;
 }
 .pe-phase.is-reduced {
@@ -296,7 +346,7 @@
 }
 .pe-week-metrics dt {
   color: var(--text-label);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   margin-bottom: 4px;
 }
 .pe-week-metrics dd {
@@ -312,7 +362,7 @@
 .pe-week-metrics dd small {
   font-family: var(--font-journal-sans), sans-serif;
   color: var(--text-label);
-  font-size: 0.77rem;
+  font-size: 0.875rem;
   font-weight: 500;
 }
 .pe-key-workouts {
@@ -322,7 +372,7 @@
   flex-wrap: wrap;
   border-top: 1px solid var(--border);
   padding: 12px 0;
-  font-size: 0.76rem;
+  font-size: 0.875rem;
   color: var(--text-label);
 }
 .pe-key-workouts > strong {
@@ -370,7 +420,7 @@
   padding: 13px 10px;
   background: var(--surface-raised);
   border-bottom: 1px solid var(--border);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--text-label);
 }
 .pe-date strong {
@@ -380,7 +430,7 @@
   color: var(--text-main);
 }
 .pe-date small {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--link);
   font-weight: 750;
 }
@@ -441,7 +491,7 @@
   align-items: center;
   gap: 4px;
   flex-wrap: wrap;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--text-label);
   line-height: 1.4;
   min-height: 18px;
@@ -454,6 +504,25 @@
   background: var(--pe-run);
   flex-shrink: 0;
 }
+.pe-key-marker {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-main);
+  gap: 4px;
+  margin-inline-start: auto;
+}
+.pe-key-marker svg {
+  color: var(--pe-run);
+  fill: currentColor;
+}
+.pe-key-purpose {
+  border-inline-start: 2px solid var(--pe-run, var(--border));
+  padding-inline-start: 12px;
+}
+.pe-key-purpose p {
+  margin-block: 4px 0;
+  color: var(--text-label);
+}
 .pe-workout-distance {
   font-family: var(--font-spatial-display), sans-serif;
   font-size: clamp(1.12rem, 1.65vw, 1.7rem);
@@ -463,13 +532,13 @@
   overflow-wrap: anywhere;
 }
 .pe-workout-title {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 700;
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
 .pe-workout-duration {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--text-label);
   line-height: 1.5;
 }
@@ -480,7 +549,7 @@
   gap: 6px;
   margin-top: auto;
   padding-top: 8px;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--text-label);
 }
 .pe-workout.is-expanded .pe-expand-label svg {
@@ -507,12 +576,12 @@
   cursor: pointer;
 }
 .pe-rest-link strong {
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--text-main);
 }
 .pe-rest-link span {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   line-height: 1.6;
 }
 .pe-rest-link span svg {
@@ -543,10 +612,10 @@
   min-width: 0;
 }
 .pe-extra strong {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
 }
 .pe-extra small {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--text-label);
 }
 .pe-extra svg {
@@ -576,7 +645,7 @@
   gap: 20px;
 }
 .pe-prescription-heading span {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   color: var(--text-label);
 }
 .pe-prescription-heading h3 {
@@ -587,7 +656,7 @@
 }
 .pe-prescription > p {
   color: var(--text-label);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   margin: 8px 0 16px;
   line-height: 1.6;
 }
@@ -595,13 +664,13 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 36px;
+  min-height: 44px;
   border: 1px solid var(--border);
   padding: 6px 10px;
   border-radius: 6px;
   background: var(--surface);
   color: var(--link);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
@@ -628,12 +697,12 @@
   color: var(--text-main);
 }
 .pe-prescription .session-step strong {
-  font-size: 0.83rem;
+  font-size: 0.875rem;
 }
 .pe-prescription .session-step small,
 .pe-prescription .step-target,
 .pe-prescription .step-repeat-note {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   line-height: 1.5;
 }
 .pe-week-footnote {
@@ -641,7 +710,7 @@
   flex-wrap: wrap;
   gap: 5px 12px;
   color: var(--text-label);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   padding-top: 10px;
   line-height: 1.6;
 }
@@ -653,7 +722,7 @@
   display: inline-flex;
   gap: 8px;
   align-items: center;
-  font-size: 0.76rem;
+  font-size: 0.875rem;
   font-weight: 700;
   color: var(--text-main);
   cursor: pointer;
@@ -667,14 +736,14 @@
   transform: rotate(180deg);
 }
 .pe-week-context > p {
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   max-width: 78ch;
 }
 .pe-week-context .week-rhythm {
   margin: 12px 0;
 }
 .pe-support {
-  font-size: 0.82rem;
+  font-size: 0.875rem;
 }
 .pe-support h3 {
   font-size: 0.94rem;
@@ -750,17 +819,17 @@
   .pe-workout-title {
     grid-column: 1;
     grid-row: 2;
-    font-size: 0.84rem;
+    font-size: 0.875rem;
   }
   .pe-workout-duration {
     grid-column: 1;
     grid-row: 3;
-    font-size: 0.75rem;
+    font-size: 0.875rem;
   }
   .pe-expand-label {
     grid-column: 2;
     grid-row: 3;
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     padding: 0;
   }
   .pe-rest-link {
@@ -773,7 +842,7 @@
   }
   .pe-rest-link span {
     text-align: right;
-    font-size: 0.75rem;
+    font-size: 0.875rem;
   }
   .pe-extra {
     padding: 14px 16px;
@@ -781,10 +850,10 @@
     gap: 9px;
   }
   .pe-extra strong {
-    font-size: 0.8rem;
+    font-size: 0.875rem;
   }
   .pe-extra small {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
   }
   .pe-desktop-prescription {
     display: none;
@@ -814,7 +883,7 @@
   .plan-explorer .plan-heading-actions .secondary-button {
     min-height: 40px;
     padding: 8px 11px;
-    font-size: 0.77rem;
+    font-size: 0.875rem;
   }
   .pe-chart-heading {
     flex-direction: column;
@@ -824,7 +893,7 @@
     font-size: 1.05rem;
   }
   .pe-chart-legend {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
   }
   .pe-progression {
     margin-top: 24px;
@@ -834,7 +903,7 @@
     height: 135px;
   }
   .pe-chart-note {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
   }
   .pe-toolbar {
     top: 0;
@@ -859,7 +928,7 @@
   .pe-week-select select {
     width: 100%;
     min-width: 0;
-    font-size: 0.82rem;
+    font-size: 0.875rem;
   }
   .pe-week {
     margin-top: 22px;
@@ -877,7 +946,7 @@
     font-size: 1.4rem;
   }
   .pe-week-heading p {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
   }
   .pe-week-metrics {
     justify-content: space-between;
@@ -888,11 +957,11 @@
     font-size: 1.7rem;
   }
   .pe-week-metrics dt {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
   }
   .pe-key-workouts {
     gap: 8px 16px;
-    font-size: 0.75rem;
+    font-size: 0.875rem;
   }
   .pe-key-workouts > strong {
     width: 100%;
@@ -902,10 +971,10 @@
   }
   .pe-date {
     padding: 16px 5px;
-    font-size: 0.75rem;
+    font-size: 0.875rem;
   }
   .pe-date small {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
   }
   .pe-workout-summary {
     padding: 13px 11px;
@@ -915,25 +984,25 @@
     font-size: 1.35rem;
   }
   .pe-workout-title {
-    font-size: 0.77rem;
+    font-size: 0.875rem;
   }
   .pe-workout-status {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
   }
   .pe-workout-duration,
   .pe-expand-label {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
   }
   .pe-rest-link {
     padding: 13px 11px;
     min-height: 76px;
   }
   .pe-rest-link strong {
-    font-size: 0.8rem;
+    font-size: 0.875rem;
   }
   .pe-rest-link span {
     max-width: 135px;
-    font-size: 0.75rem;
+    font-size: 0.875rem;
   }
   .pe-prescription {
     padding: 15px 11px;
@@ -954,18 +1023,18 @@
   .pe-prescription .step-time {
     grid-column: 2;
     justify-self: start;
-    font-size: 0.8rem;
+    font-size: 0.875rem;
   }
   .pe-prescription .session-repeat-group {
     padding-left: 9px;
   }
   .pe-prescription .session-step strong {
-    font-size: 0.78rem;
+    font-size: 0.875rem;
   }
   .pe-prescription .session-step small,
   .pe-prescription .step-target,
   .pe-prescription .step-repeat-note {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -993,7 +1062,7 @@
   font-size: 0.875rem;
 }
 .plan-explorer .pe-chart-week {
-  min-width: 38px;
+  min-width: 44px;
 }
 .plan-explorer .pe-workout-summary {
   min-height: 246px;
@@ -1078,4 +1147,172 @@
   width: 44px;
   height: 44px;
   min-height: 44px;
+}
+
+/* Observations sit with the plan, independently of the future prescription. */
+.plan-insights {
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+  min-width: 0;
+}
+.plan-insights-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+.plan-insights-heading h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+.plan-insights-heading p,
+.plan-insights-intro,
+.plan-insights-note {
+  color: var(--text-label);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.plan-insights-heading p {
+  margin: 0;
+}
+.plan-insights-intro {
+  margin: 12px 0 24px;
+}
+.plan-insights-empty {
+  padding: 20px 0;
+  max-width: 65ch;
+  line-height: 1.65;
+}
+.plan-insights-totals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin: 0 0 28px;
+  padding-block: 18px;
+  border-block: 1px solid var(--border);
+}
+.plan-insights-totals > div {
+  min-width: 0;
+}
+.plan-insights-totals dt,
+.plan-insights-totals > div > span {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-label);
+  line-height: 1.5;
+}
+.plan-insights-totals dd {
+  margin: 8px 0;
+  font-family: var(--font-spatial-display), sans-serif;
+  font-size: clamp(1.3rem, 2.8vw, 1.9rem);
+  line-height: 1.2;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.plan-insights-totals dd small {
+  color: var(--text-label);
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+.plan-insights-observations {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 40px;
+  margin-bottom: 24px;
+}
+.plan-insights h3 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+  font-weight: 650;
+}
+.plan-insights-observations p,
+.plan-insights-heart-rate p,
+.plan-insights-execution p,
+.plan-insights-data p {
+  font-size: 0.875rem;
+  line-height: 1.7;
+  margin: 10px 0 0;
+  color: var(--text-label);
+}
+.plan-insights strong {
+  color: var(--text-main);
+}
+.plan-insights-table-scroll {
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.plan-insights-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+.plan-insights-table caption {
+  font-size: 0.875rem;
+  font-weight: 650;
+  text-align: left;
+  padding-bottom: 12px;
+}
+.plan-insights-table :is(th, td) {
+  padding: 12px 16px 12px 0;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.5;
+}
+.plan-insights-table thead th {
+  font-size: 0.875rem;
+  color: var(--text-label);
+  font-weight: 500;
+}
+.plan-insights-table tbody th {
+  font-weight: 500;
+}
+.plan-insights-table small {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text-label);
+}
+.plan-insights-execution,
+.plan-insights-heart-rate {
+  margin-block: 24px;
+}
+.plan-insights-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 12px;
+}
+.plan-insights-review-actions .text-button {
+  text-align: left;
+  min-height: 44px;
+}
+.plan-insights-data {
+  margin-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.plan-insights-data > summary {
+  padding-block: 18px;
+  min-height: 44px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.plan-insights-data > summary:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+@media (max-width: 600px) {
+  .plan-insights-observations {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .plan-insights-totals {
+    gap: 14px;
+  }
+  .plan-insights-table :is(th, td) {
+    padding-right: 12px;
+  }
 }

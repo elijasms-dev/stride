@@ -349,7 +349,10 @@ test('resolving a distance interval refreshes stored quality dose and retains it
 for (const goal of ['5k', '10k', 'half', 'marathon']) {
   for (const measure of ['time', 'distance']) {
     test(`${goal} ${measure}: generated allocations, stored ranges and totals agree with executable pace targets`, () => {
-      const plan = makePlan(profile(goal, measure), start);
+      const plan = makePlan(
+        profile(goal, measure, { workoutTargets: manual }),
+        start,
+      );
       assert.deepEqual(validatePlan(plan), []);
       const restored = JSON.parse(JSON.stringify(plan));
       assert.deepEqual(validatePlan(restored), []);
@@ -366,46 +369,58 @@ for (const goal of ['5k', '10k', 'half', 'marathon']) {
   }
 }
 
-test('a faster benchmark updates future automatic targets without rewriting completed prescriptions or logs', () => {
-  const plan = makePlan(profile('10k', 'time'), start);
+test('a faster matching benchmark updates only supported future targets and preserves the schedule and history', () => {
+  const plan = makePlan(
+    profile('5k', 'time', {
+      recentRace: { ...benchmark, representative: true },
+    }),
+    start,
+  );
   const from = addDays(start, 7);
   plan.workouts
     .filter((w) => w.date < from && w.kind !== 'race')
     .forEach(complete);
   const before = structuredClone(plan);
-  const oldTarget = before.workouts
-    .find((w) => w.date >= from && w.kind === 'easy')
-    .steps.find((s) => s.target?.mode === 'pace').target;
-  const next = revisePreferences(
-    plan,
-    {
-      recentRace: {
-        distanceKm: 5,
-        timeMinutes: 24,
-        date: from,
-        source: 'time-trial',
-        course: 'track',
-      },
+  const next = updateWorkoutTargets(plan, null, from, [], {
+    recentRace: {
+      distanceKm: 5,
+      timeMinutes: 24,
+      date: from,
+      source: 'time-trial',
+      course: 'track',
+      representative: true,
     },
-    from,
-  );
-  assert.deepEqual(
-    plan,
-    before,
-    'Benchmark preview must not mutate its source plan',
-  );
-  assert.deepEqual(
-    next.workouts.filter((w) => w.status === 'completed'),
-    before.workouts.filter((w) => w.status === 'completed'),
-  );
-  const newTarget = next.workouts
-    .find((w) => w.date >= from && w.kind === 'easy')
-    .steps.find((s) => s.target?.mode === 'pace').target;
-  assert.ok(newTarget.low < oldTarget.low && newTarget.high < oldTarget.high);
-  for (const workout of next.workouts.filter(
-    (w) => w.date >= from && w.status === 'planned' && w.kind !== 'race',
-  ))
+  });
+  assert.deepEqual(plan, before, 'The source plan remains immutable');
+  let supported = 0;
+  for (const workout of next.workouts) {
+    const old = before.workouts.find((w) => w.id === workout.id);
+    assert.equal(workout.date, old.date);
+    assert.equal(workout.kind, old.kind);
+    if (workout.date < from || workout.status !== 'planned') {
+      assert.deepEqual(workout, old);
+      continue;
+    }
+    workout.steps.forEach((step, i) => {
+      assert.equal(step.metres, old.steps[i].metres);
+      if (step.metres === undefined)
+        assert.equal(step.seconds, old.steps[i].seconds);
+      if (step.pacing?.method === 'same-distance-benchmark') {
+        supported++;
+        assert.equal(step.pacing.referenceDistanceKm, 5);
+        assert.equal(old.steps[i].target.low, 300);
+        assert.equal(step.target.low, 288);
+        assert.equal(step.target.high, 288);
+      } else
+        assert.equal(
+          step.target,
+          undefined,
+          'A faster race result cannot invent generic easy or threshold zones',
+        );
+    });
     assertCanonicalDistance(workout, next.profile);
+  }
+  assert.ok(supported > 0, 'Exercise an actual matching current-race target');
   assertWeeklyTotals(next);
   assert.deepEqual(validatePlan(next), []);
 });
@@ -466,7 +481,11 @@ test('editing timed pace targets preserves protected history and session time wh
 });
 
 test('serialized distance targets cannot evade their time allowance by omitting the planning-pace field', () => {
-  const p = makePlan(profile('10k', 'distance'), start, false);
+  const p = makePlan(
+    profile('10k', 'distance', { workoutTargets: manual }),
+    start,
+    false,
+  );
   const run = p.workouts.find(
     (w) =>
       w.kind === 'easy' &&
@@ -510,6 +529,7 @@ function editedTimeFixture(goal, quality = 0) {
     {
       ...scenario.profile,
       recentRace: { distanceKm: 5, timeMinutes: 20 },
+      workoutTargets: { mode: 'pace', pace: { easy: { low: 360, high: 390 } } },
     },
     scenario.profile.startDate,
     false,
@@ -659,7 +679,11 @@ test('direct distance-target reviews cannot acquire a timed-estimate progression
     (c) => c.id === '10k-q0-distance',
   );
   const before = makePlan(
-    { ...scenario.profile, recentRace: { distanceKm: 5, timeMinutes: 20 } },
+    {
+      ...scenario.profile,
+      recentRace: { distanceKm: 5, timeMinutes: 20 },
+      workoutTargets: { mode: 'pace', pace: { easy: { low: 360, high: 390 } } },
+    },
     scenario.profile.startDate,
     false,
   );

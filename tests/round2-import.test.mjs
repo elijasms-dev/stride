@@ -905,11 +905,11 @@ for (const imported of [false, true])
   void test(`custom time ceilings permit truthful ${imported ? 'imported' : 'manual'} completion and correction`, async (t) => {
     const f = await fixture({
       connected: imported,
-      activities: [recording({ moving_time: 180 * 60, distance: 18000 })],
+      activities: [recording({ moving_time: 190 * 60, distance: 18000 })],
     });
     t.after(() => f.sqlite.close());
     const plan = makePlan(
-      { ...activeProfile(), weeklyMinutesLimit: 170 },
+      { ...activeProfile(), weeklyMinutesLimit: 180 },
       today,
       false,
     );
@@ -920,7 +920,7 @@ for (const imported of [false, true])
     );
     await saveState(owner, 0, plan, 'Synthetic time-ceiling plan', 0);
     const actual = feedback({
-      actualMinutes: 180,
+      actualMinutes: 190,
       actualKm: 18,
       ...(imported ? {} : { activityId: undefined, source: undefined }),
     });
@@ -934,7 +934,7 @@ for (const imported of [false, true])
     assert.equal(
       complete.data.plan.workouts.find((w) => w.id === first.id).feedback
         .actualMinutes,
-      180,
+      190,
     );
     assert.deepEqual(
       complete.data.plan.workouts.filter((w) => w.id !== first.id),
@@ -947,14 +947,14 @@ for (const imported of [false, true])
       correctionReason: 'Corrected duration',
       feedback: {
         ...complete.data.plan.workouts.find((w) => w.id === first.id).feedback,
-        actualMinutes: 190,
+        actualMinutes: 200,
       },
     });
     assert.equal(corrected.status, 200, JSON.stringify(corrected.data));
     assert.equal(
       corrected.data.plan.workouts.find((w) => w.id === first.id).feedback
         .actualMinutes,
-      190,
+      200,
     );
     assert.equal(
       corrected.data.plan.workouts.find((w) => w.id === first.id).minutes,

@@ -13,6 +13,14 @@ import './notifications.css';
 import './plan-explorer.css';
 import './workout-inspection.css';
 import './device-journal.css';
+import './training-ink.css';
+import './pace-settings.css';
+import './disclosure-rows.css';
+import './progress-journal.css';
+import './weather.css';
+import './session-atmosphere.css';
+import './today-stage.css';
+import './settings-profile.css';
 import { APPEARANCE_BOOTSTRAP } from '@/lib/appearance';
 
 const journalSans = Manrope({

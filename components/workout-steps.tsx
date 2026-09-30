@@ -1,16 +1,17 @@
 import { Repeat2 } from 'lucide-react';
 import type { Profile, Step, Workout } from '@/lib/engine';
-import { eventDistanceDisplay, kmDisplay } from '@/lib/engine';
-import { stepLength } from '@/lib/workout-names';
 import { targetLabel } from '@/lib/workout-targets';
 import { workoutStepGroups } from '@/lib/workout-groups';
+import { SavedPaceExplanation, sessionStepLength } from './session-sequence';
 
 export function WorkoutSteps({
   workout,
   profile,
+  selectedIndex,
 }: {
   workout: Workout;
   profile: Profile;
+  selectedIndex?: number;
 }) {
   const row = (s: Step, number: string, repeated = false, note?: string) => (
     <div className={`session-step ${s.kind}`}>
@@ -20,17 +21,17 @@ export function WorkoutSteps({
           {repeated ? s.label.replace(/ · \d+ of \d+$/, '') : s.label}
         </strong>
         {note && <span className="step-repeat-note">{note}</span>}
-        <small>{s.effort}</small>
+        <small>{s.pacing?.guidance ?? s.effort}</small>
+        {s.pacing && <span className="step-pace-role">{s.pacing.label}</span>}
         {s.target && (
           <span className="step-target">
             {targetLabel(s.target, profile.units)}
           </span>
         )}
+        <SavedPaceExplanation step={s} />
       </div>
       <span className="step-time">
-        {s.metres && ['race', 'easy', 'long'].includes(workout.kind)
-          ? `${workout.kind === 'race' ? eventDistanceDisplay(s.metres / 1000, profile.units) : kmDisplay(s.metres / 1000, profile.units)} ${profile.units}`
-          : stepLength(s)}
+        {sessionStepLength(s, workout, profile.units)}
       </span>
     </div>
   );
@@ -40,6 +41,7 @@ export function WorkoutSteps({
         className="session-repeat-group"
         key={group.start}
         aria-label={`Repeat ${group.repetitions} times`}
+        data-selected-step={selectedIndex === group.start || undefined}
       >
         <div className="session-repeat-heading">
           <Repeat2 size={16} />
@@ -57,7 +59,10 @@ export function WorkoutSteps({
           )}
       </section>
     ) : (
-      <div key={group.start}>
+      <div
+        key={group.start}
+        data-selected-step={selectedIndex === group.start || undefined}
+      >
         {row(group.work, String(group.start + 1).padStart(2, '0'))}
       </div>
     ),

@@ -1,14 +1,9 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
-import { dateRailWindow, dateRailTarget } from '@/lib/date-rail-window';
-import {
-  addDays,
-  dateLabel,
-  validDate,
-  type Plan,
-  type Workout,
-} from '@/lib/engine';
+import { dateRailWeekWindow, adjacentRailWeek } from '@/lib/date-rail-window';
+import { addDays, dateLabel, type Plan, type Workout } from '@/lib/engine';
+import { monday } from '@/lib/plan/calendar';
 import {
   calendarSessions,
   orderedCalendarSessions,
@@ -63,7 +58,9 @@ export function DateRail({
       ].sort(),
     [plan.weeks, visibleSessions, today, selectedDate],
   );
-  const windowed = dateRailWindow(dates, selectedDate);
+  const windowed = dateRailWeekWindow(dates, selectedDate, plan.weeks);
+  const previousWeek = adjacentRailWeek(dates, selectedDate, plan.weeks, -1);
+  const nextWeek = adjacentRailWeek(dates, selectedDate, plan.weeks, 1);
   const sessionsByDate = useMemo(() => {
     const map = new Map<string, Workout[]>();
     for (const workout of visibleSessions) {
@@ -87,240 +84,222 @@ export function DateRail({
   useEffect(() => {
     if (timer.current) clearTimeout(timer.current);
     const container = rail.current;
-    const selected = container?.querySelector<HTMLButtonElement>(
-      '[aria-pressed="true"]',
-    );
-    if (!container || !selected) return;
-    const left =
-      container.scrollLeft +
-      selected.getBoundingClientRect().left -
-      container.getBoundingClientRect().left -
-      (container.clientWidth - selected.offsetWidth) / 2;
-    container.scrollTo({
-      left,
-      behavior:
-        centered.current &&
-        motion &&
-        !window.matchMedia('(prefers-reduced-motion: reduce)').matches
-          ? 'smooth'
-          : 'instant',
-    });
-    centered.current = true;
-    if (focusSelected.current) {
-      selected.focus({ preventScroll: true });
-      focusSelected.current = false;
-    }
+    if (!container) return;
+    const centerSelection = (animate: boolean) => {
+      const selected = container.querySelector<HTMLButtonElement>(
+        '[aria-pressed="true"]',
+      );
+      if (!selected) return;
+      const left =
+        container.scrollLeft +
+        selected.getBoundingClientRect().left -
+        container.getBoundingClientRect().left -
+        (container.clientWidth - selected.offsetWidth) / 2;
+      container.scrollTo({
+        left,
+        behavior:
+          animate &&
+          centered.current &&
+          motion &&
+          !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+            ? 'smooth'
+            : 'instant',
+      });
+      centered.current = true;
+      if (focusSelected.current) {
+        selected.focus({ preventScroll: true });
+        focusSelected.current = false;
+      }
+    };
+    centerSelection(true);
+    const observer = new ResizeObserver(() => centerSelection(false));
+    observer.observe(container);
+    return () => observer.disconnect();
   }, [selectedDate, plan.id, motion]);
   return (
     <div className="date-rail-wrap">
-      <div className="date-rail-heading">
-        <span>
-          {dateLabel(selectedDate, { month: 'long', year: 'numeric' })}
-        </span>
+      <a className="date-rail-workout-skip" href="#selected-day-workout">
+        Skip to workout
+      </a>
+      <div className="date-rail-week-strip">
         <button
           type="button"
-          className="text-button date-rail-skip"
-          onClick={() => {
-            const target = document.getElementById('selected-day-workout');
-            target?.focus({ preventScroll: true });
-            target?.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+          className="date-rail-week-arrow"
+          aria-label="Previous week"
+          disabled={previousWeek === selectedDate}
+          onClick={() => onSelect(previousWeek)}
+        >
+          <ChevronLeft size={22} aria-hidden="true" />
+        </button>
+        <fieldset
+          ref={rail}
+          id="weekly-sessions"
+          className="day-strip date-rail"
+          aria-label="Choose a day. Use arrow keys to move through dates, or the previous and next week buttons."
+          data-dragging={dragging || undefined}
+          onScroll={cancelHold}
+          onPointerDown={(event) => {
+            if (!event.isPrimary || event.button !== 0) return;
+            cancelHold();
+            suppressClick.current = false;
+            gesture.current = {
+              id: event.pointerId,
+              x: event.clientX,
+              y: event.clientY,
+              scroll: event.currentTarget.scrollLeft,
+              moved: false,
+              mouse: event.pointerType === 'mouse',
+            };
+            const button = (event.target as Element).closest<HTMLButtonElement>(
+              'button[data-date]',
+            );
+            const workout = button?.dataset.date
+              ? focusedSession(
+                  orderedCalendarSessions(
+                    sessionsByDate.get(button.dataset.date) ?? [],
+                    button.dataset.date,
+                  ),
+                )
+              : null;
+            if (workout)
+              timer.current = setTimeout(() => {
+                suppressClick.current = true;
+                gesture.current = null;
+                onHold(workout);
+              }, 550);
           }}
-        >
-          Skip to workout
-        </button>
-      </div>
-      <div className="date-rail-controls">
-        <button
-          type="button"
-          className="icon-button"
-          aria-label="Previous seven days"
-          disabled={windowed.selectedIndex === 0}
-          onClick={() => onSelect(dateRailTarget(dates, selectedDate, -7))}
-        >
-          <ChevronLeft size={20} aria-hidden="true" />
-        </button>
-        <label className="date-rail-picker">
-          <span className="sr-only">Choose any date</span>
-          <input
-            type="date"
-            value={selectedDate}
-            min={dates[0]}
-            max={dates.at(-1)}
-            onChange={(event) => {
-              if (validDate(event.currentTarget.value))
-                onSelect(event.currentTarget.value);
-            }}
-          />
-        </label>
-        <button
-          type="button"
-          className="icon-button"
-          aria-label="Next seven days"
-          disabled={windowed.selectedIndex === dates.length - 1}
-          onClick={() => onSelect(dateRailTarget(dates, selectedDate, 7))}
-        >
-          <ChevronRight size={20} aria-hidden="true" />
-        </button>
-      </div>
-      <fieldset
-        ref={rail}
-        id="weekly-sessions"
-        className="day-strip date-rail"
-        aria-label="Choose a day. Use arrow keys to move through dates, or choose any date above."
-        data-dragging={dragging || undefined}
-        onScroll={cancelHold}
-        onPointerDown={(event) => {
-          if (!event.isPrimary || event.button !== 0) return;
-          cancelHold();
-          suppressClick.current = false;
-          gesture.current = {
-            id: event.pointerId,
-            x: event.clientX,
-            y: event.clientY,
-            scroll: event.currentTarget.scrollLeft,
-            moved: false,
-            mouse: event.pointerType === 'mouse',
-          };
-          const button = (event.target as Element).closest<HTMLButtonElement>(
-            'button[data-date]',
-          );
-          const workout = button?.dataset.date
-            ? focusedSession(
-                orderedCalendarSessions(
-                  sessionsByDate.get(button.dataset.date) ?? [],
-                  button.dataset.date,
-                ),
-              )
-            : null;
-          if (workout)
-            timer.current = setTimeout(() => {
-              suppressClick.current = true;
+          onPointerMove={(event) => {
+            const active = gesture.current;
+            if (!active || active.id !== event.pointerId) return;
+            if (active.mouse && event.buttons !== 1) {
+              cancelHold();
               gesture.current = null;
-              onHold(workout);
-            }, 550);
-        }}
-        onPointerMove={(event) => {
-          const active = gesture.current;
-          if (!active || active.id !== event.pointerId) return;
-          if (active.mouse && event.buttons !== 1) {
+              setDragging(false);
+              return;
+            }
+            const dx = event.clientX - active.x,
+              dy = event.clientY - active.y;
+            if (Math.hypot(dx, dy) > 8 && !active.moved) {
+              active.moved = true;
+              suppressClick.current = true;
+              cancelHold();
+              if (active.mouse && Math.abs(dx) > Math.abs(dy)) {
+                event.currentTarget.setPointerCapture(event.pointerId);
+                setDragging(true);
+              }
+            }
+            if (
+              active.mouse &&
+              event.currentTarget.hasPointerCapture(event.pointerId)
+            ) {
+              event.preventDefault();
+              event.currentTarget.scrollLeft = active.scroll - dx;
+            }
+          }}
+          onPointerUp={() => {
             cancelHold();
             gesture.current = null;
             setDragging(false);
-            return;
-          }
-          const dx = event.clientX - active.x,
-            dy = event.clientY - active.y;
-          if (Math.hypot(dx, dy) > 8 && !active.moved) {
-            active.moved = true;
-            suppressClick.current = true;
+          }}
+          onPointerCancel={() => {
             cancelHold();
-            if (active.mouse && Math.abs(dx) > Math.abs(dy)) {
-              event.currentTarget.setPointerCapture(event.pointerId);
-              setDragging(true);
-            }
-          }
-          if (
-            active.mouse &&
-            event.currentTarget.hasPointerCapture(event.pointerId)
-          ) {
-            event.preventDefault();
-            event.currentTarget.scrollLeft = active.scroll - dx;
-          }
-        }}
-        onPointerUp={() => {
-          cancelHold();
-          gesture.current = null;
-          setDragging(false);
-        }}
-        onPointerCancel={() => {
-          cancelHold();
-          gesture.current = null;
-          setDragging(false);
-        }}
-        onPointerLeave={(event) => {
-          cancelHold();
-          if (!event.currentTarget.hasPointerCapture(event.pointerId))
             gesture.current = null;
-        }}
-        onClickCapture={(event) => {
-          if (suppressClick.current && event.detail !== 0) {
-            event.preventDefault();
-            event.stopPropagation();
-            suppressClick.current = false;
-          }
-        }}
-      >
-        {windowed.dates.map((date, visibleIndex) => {
-          const index = windowed.start + visibleIndex;
-          const sessions = orderedCalendarSessions(
-            sessionsByDate.get(date) ?? [],
-            date,
-          );
-          const summary = daySessionSummary(sessions);
-          const gap = index > 0 && addDays(dates[index - 1], 1) !== date;
-          return (
-            <button
-              key={date}
-              data-date={date}
-              data-gap={gap || undefined}
-              data-day-state={summary.state}
-              className={`day-button${selectedDate === date ? ' selected' : ''}${date === today ? ' is-today' : ''}`}
-              aria-pressed={selectedDate === date}
-              aria-current={date === today ? 'date' : undefined}
-              tabIndex={selectedDate === date ? 0 : -1}
-              aria-label={`${dateLabel(date, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}, ${sessions.length ? summary.label : (supportingSession(plan, date)?.title ?? 'rest day')}${date === today ? ', today' : ''}`}
-              onClick={() => onSelect(date)}
-              onKeyDown={(event) => {
-                const target =
-                  event.key === 'ArrowRight'
-                    ? index + 1
-                    : event.key === 'ArrowLeft'
-                      ? index - 1
-                      : event.key === 'Home'
-                        ? 0
-                        : event.key === 'End'
-                          ? dates.length - 1
-                          : null;
-                if (target === null) return;
-                event.preventDefault();
-                cancelHold();
-                suppressClick.current = false;
-                const next = Math.max(0, Math.min(dates.length - 1, target));
-                focusSelected.current = true;
-                onSelect(dates[next]);
-                if (dates[next] === selectedDate) {
-                  event.currentTarget.focus();
-                  focusSelected.current = false;
-                }
-              }}
-            >
-              <span>{dateLabel(date, { weekday: 'short' })}</span>
-              <strong>{dateLabel(date, { day: 'numeric' })}</strong>
-              <span className="rail-month">
-                {dateLabel(date, { month: 'short' })}
-              </span>
-              <span className="day-session-markers" aria-hidden="true">
-                {sessions
-                  .filter((session) => session.status !== 'skipped')
-                  .map((session) =>
-                    session.status === 'completed' ? (
-                      <Check key={session.id} size={12} />
-                    ) : (
-                      <i
-                        key={session.id}
-                        className="run-dot"
-                        data-tone={workoutTone(session)}
-                      />
-                    ),
+            setDragging(false);
+          }}
+          onPointerLeave={(event) => {
+            cancelHold();
+            if (!event.currentTarget.hasPointerCapture(event.pointerId))
+              gesture.current = null;
+          }}
+          onClickCapture={(event) => {
+            if (suppressClick.current && event.detail !== 0) {
+              event.preventDefault();
+              event.stopPropagation();
+              suppressClick.current = false;
+            }
+          }}
+        >
+          {windowed.dates.map((date) => {
+            const sessions = orderedCalendarSessions(
+              sessionsByDate.get(date) ?? [],
+              date,
+            );
+            const summary = daySessionSummary(sessions);
+            return (
+              <button
+                key={date}
+                data-date={date}
+                data-day-state={summary.state}
+                className={`day-button${selectedDate === date ? ' selected' : ''}${date === today ? ' is-today' : ''}`}
+                aria-pressed={selectedDate === date}
+                aria-current={date === today ? 'date' : undefined}
+                tabIndex={selectedDate === date ? 0 : -1}
+                aria-label={`${dateLabel(date, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}, ${sessions.length ? summary.label : (supportingSession(plan, date)?.title ?? 'rest day')}${date === today ? ', today' : ''}${selectedDate === date ? ', selected' : ''}`}
+                onClick={() => onSelect(date)}
+                onKeyDown={(event) => {
+                  const target =
+                    event.key === 'ArrowRight'
+                      ? addDays(date, 1)
+                      : event.key === 'ArrowLeft'
+                        ? addDays(date, -1)
+                        : event.key === 'Home'
+                          ? dates[0]
+                          : event.key === 'End'
+                            ? dates.at(-1)!
+                            : null;
+                  if (target === null) return;
+                  event.preventDefault();
+                  cancelHold();
+                  suppressClick.current = false;
+                  const first = monday(dates[0]);
+                  const last = addDays(monday(dates.at(-1)!), 6);
+                  const next =
+                    target < first ? first : target > last ? last : target;
+                  focusSelected.current = true;
+                  onSelect(next);
+                  if (next === selectedDate) {
+                    event.currentTarget.focus();
+                    focusSelected.current = false;
+                  }
+                }}
+              >
+                <span>{dateLabel(date, { weekday: 'short' })}</span>
+                <strong>{dateLabel(date, { day: 'numeric' })}</strong>
+                <span className="rail-month">
+                  {dateLabel(date, { month: 'short' })}
+                </span>
+                <span className="day-session-markers" aria-hidden="true">
+                  {sessions
+                    .filter((session) => session.status !== 'skipped')
+                    .map((session) =>
+                      session.status === 'completed' ? (
+                        <Check key={session.id} size={12} />
+                      ) : (
+                        <i
+                          key={session.id}
+                          className="run-dot"
+                          data-tone={workoutTone(session)}
+                        />
+                      ),
+                    )}
+                  {summary.state === 'skipped' && (
+                    <span className="skipped-day-mark">−</span>
                   )}
-                {summary.state === 'skipped' && (
-                  <span className="skipped-day-mark">−</span>
-                )}
-              </span>
-            </button>
-          );
-        })}
-      </fieldset>
+                </span>
+              </button>
+            );
+          })}
+        </fieldset>
+        <button
+          type="button"
+          className="date-rail-week-arrow"
+          aria-label="Next week"
+          disabled={nextWeek === selectedDate}
+          onClick={() => onSelect(nextWeek)}
+        >
+          <ChevronRight size={22} aria-hidden="true" />
+        </button>
+      </div>
     </div>
   );
 }

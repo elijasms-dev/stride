@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useId, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { api } from '@/lib/client-api';
 import { dateLabel } from '@/lib/plan/calendar';
 import {
@@ -172,7 +173,7 @@ export function PlanChangeHistory({
     latest.label === 'Opened an empty journal' ||
     previous?.label === 'Opened an empty journal';
   return (
-    <section aria-label="Plan change history">
+    <section className="plan-change-history" aria-label="Plan change history">
       <div className="section-heading section-space">
         <h3>Recent changes</h3>
         <button
@@ -202,9 +203,10 @@ export function PlanChangeHistory({
       {(showAll ? history : history.slice(0, 5)).map((item) => {
         const expanded = selected === item.version;
         return (
-          <div className="reason-details" key={item.version}>
+          <div className="plan-change-item" key={item.version}>
             <button
-              className="settings-link"
+              type="button"
+              className="plan-change-toggle"
               aria-expanded={expanded}
               aria-controls={`${id}-${item.version}`}
               onClick={() => {
@@ -215,7 +217,7 @@ export function PlanChangeHistory({
                 setLoading(!expanded);
               }}
             >
-              <span>
+              <span className="plan-change-copy">
                 <strong>{revisionLabel(item.label)}</strong>
                 <small>
                   {new Date(item.created_at).toLocaleDateString('en-GB', {
@@ -225,12 +227,12 @@ export function PlanChangeHistory({
                   · Revision {item.version}
                 </small>
               </span>
-              <span aria-hidden="true">{expanded ? '−' : '+'}</span>
+              <ChevronDown size={18} aria-hidden="true" />
             </button>
             {expanded && (
               <div
                 id={`${id}-${item.version}`}
-                className="form-section preference-inspection"
+                className="plan-change-content preference-inspection"
                 aria-busy={loading}
               >
                 {loading && <output>Loading saved changes…</output>}

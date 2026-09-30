@@ -1,4 +1,5 @@
 import type { Plan, ExtraRun, Workout } from './plan/types.ts';
+import { recordedHeartRate } from './recorded-heart-rate.ts';
 
 // Canonical actual-running ledger; no runtime dependency on plan generation.
 export function recordedWorkoutDate(workout: Workout) {
@@ -18,6 +19,7 @@ export function trainingRecords(
     ...plan.workouts
       .filter((w) => w.status === 'completed' && w.feedback)
       .map((w) => ({
+        ...recordedHeartRate(w.feedback),
         id: w.id,
         workoutId: w.id,
         date: recordedWorkoutDate(w),

@@ -107,6 +107,7 @@ export function AppOverlays() {
         )}
         {modal === 'preferences' && (
           <PlanPreferences
+            onPaces={() => openModal('targets')}
             initialPatch={preferencePatch}
             plan={plan}
             today={today}

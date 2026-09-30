@@ -1,5 +1,6 @@
 import { isRoadRaceProfile } from '../road-training-policy.ts';
 import { requestedQualityCount } from '../training-structure.ts';
+import { reviewedQualityMinutes } from '../pace-review-eligibility.ts';
 import { addDays } from './calendar.ts';
 import { weekIncludesTaper } from './generation-calendar.ts';
 import { calculateWeekLoad } from './generation-load.ts';
@@ -26,6 +27,9 @@ export function forecastEnvelopeErrors(plan: Plan): string[] {
     return [];
   const context = resolveGenerationPolicy(p);
   const errors: string[] = [];
+  const recordedDates = (plan.extraRuns ?? [])
+    .filter((run) => Number.isFinite(run.minutes) && run.minutes > 0)
+    .map((run) => run.date);
   let load = context.initialLoad;
   let previousLong: number | undefined;
   const tolerance = 0.001001;
@@ -38,6 +42,9 @@ export function forecastEnvelopeErrors(plan: Plan): string[] {
     const ordinary =
       week.start >= p.startDate &&
       addDays(week.start, 6) < p.raceDate &&
+      !recordedDates.some(
+        (date) => date >= week.start && date <= addDays(week.start, 6),
+      ) &&
       !['Recovery', 'Taper', 'Race week'].includes(week.phase) &&
       !weekIncludesTaper(p, week.start);
     const absoluteCap = Math.min(
@@ -112,7 +119,7 @@ export function forecastEnvelopeErrors(plan: Plan): string[] {
           .reduce((sum, s) => sum + s.seconds / 60, 0);
       const weekdayRuns = runs.filter((w) => w.kind !== 'long');
       const complete = (w: Plan['workouts'][number]) =>
-        workMinutes(w) >= 6 - 1e-6;
+        Math.max(workMinutes(w), reviewedQualityMinutes(w) ?? 0) >= 6 - 1e-6;
       const strides = (w: Plan['workouts'][number]) =>
         w.kind === 'easy' &&
         !w.hard &&

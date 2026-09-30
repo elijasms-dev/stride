@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, ChevronDown, ChevronRight, Flag } from 'lucide-react';
+import { Check, ChevronRight } from 'lucide-react';
 import { addDays, dateLabel, dayDiff, kmDisplay } from '@/lib/engine';
 import {
   planCalendarDays,
@@ -9,13 +9,9 @@ import {
   planWeekSummary,
 } from '@/lib/plan-explorer';
 import { weekSupportingSessions } from '@/lib/coaching-context';
-import { planWeekFocus } from '@/lib/plan-guidance';
-import { workoutTone } from '@/lib/day-sessions';
-import { specificWorkoutName } from '@/lib/workout-names';
 import { runDuration } from '@/lib/journal-view';
-import { WeekRhythm } from '../week-rhythm';
-import { WeeklyReview } from './weekly-review';
 import { InlineWorkout, WorkoutPrescription } from './inline-workout';
+import { phaseCaption } from './phase-caption';
 import type { Props } from './explorer-types';
 
 export function PlanWeekSchedule({
@@ -61,6 +57,7 @@ export function PlanWeekSchedule({
               </span>
             )}
           </p>
+          <p className="pe-phase-caption">{phaseCaption[phase]}</p>
         </div>
         <dl className="pe-week-metrics">
           <div>
@@ -92,37 +89,6 @@ export function PlanWeekSchedule({
           </div>
         </dl>
       </header>
-      <div className="pe-key-workouts">
-        <strong>
-          {summary.keySessions.length
-            ? 'Key runs'
-            : summary.raceKm
-              ? 'Race week'
-              : 'This week'}
-        </strong>
-        {summary.keySessions.length ? (
-          summary.keySessions.map((run) => (
-            <span data-tone={workoutTone(run)} key={run.id}>
-              <i aria-hidden="true" />
-              {dateLabel(run.date, { weekday: 'short' })}:{' '}
-              {specificWorkoutName(run)}
-            </span>
-          ))
-        ) : (
-          <span>
-            {summary.raceKm
-              ? 'Keep the lead-in comfortable.'
-              : 'Comfortable running and recovery.'}
-          </span>
-        )}
-        {summary.raceKm > 0 && (
-          <span className="pe-race-distance">
-            <Flag size={14} aria-hidden="true" />
-            Plus {kmDisplay(summary.raceKm, plan.profile.units)}{' '}
-            {plan.profile.units} race
-          </span>
-        )}
-      </div>
       <div
         className="pe-calendar"
         aria-label={`Week ${weekIndex + 1} daily schedule`}
@@ -237,34 +203,6 @@ export function PlanWeekSchedule({
           </span>
         )}
       </div>
-      <WeeklyReview
-        plan={plan}
-        weekIndex={weekIndex}
-        today={today}
-        onWorkout={onWorkout}
-      />
-      <details className="pe-week-context">
-        <summary>
-          About this week <ChevronDown size={15} aria-hidden="true" />
-        </summary>
-        <p className="week-focus">{planWeekFocus(plan, week)}</p>
-        <WeekRhythm plan={plan} week={weekIndex} />
-        {support.length > 0 && (
-          <div className="pe-support">
-            <h3>Alongside your running</h3>
-            <p>Optional supporting work, separate from your running total.</p>
-            {support.map((activity) => (
-              <details key={activity.date}>
-                <summary>
-                  {dateLabel(activity.date, { weekday: 'short' })}:{' '}
-                  {activity.title}, {activity.minutes} min
-                </summary>
-                <p>{activity.notes}</p>
-              </details>
-            ))}
-          </div>
-        )}
-      </details>
     </>
   );
 }

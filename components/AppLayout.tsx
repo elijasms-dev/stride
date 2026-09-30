@@ -3,9 +3,9 @@
 import { useEffect, useRef, type ReactNode, type RefObject } from 'react';
 import Link from 'next/link';
 import { Tabs } from '@/components/ui/tabs';
-import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { FloatingNavigation, isAppView } from './FloatingNavigation';
 import { StrideLogo } from './StrideLogo';
+import { WeatherProvider } from './weather-widget';
 
 export type AppLayoutProps = {
   view: string;
@@ -20,15 +20,7 @@ export type AppLayoutProps = {
   navigationDisabled?: boolean;
 };
 
-export function AppLayout(props: AppLayoutProps) {
-  return (
-    <SidebarProvider className="app-sidebar-provider">
-      <AppLayoutContent {...props} />
-    </SidebarProvider>
-  );
-}
-
-function AppLayoutContent({
+export function AppLayout({
   view,
   onViewChange,
   children,
@@ -40,7 +32,6 @@ function AppLayoutContent({
   loading = false,
   navigationDisabled = false,
 }: AppLayoutProps) {
-  const { isMobile, state: sidebarState } = useSidebar();
   const rootRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
 
@@ -48,19 +39,20 @@ function AppLayoutContent({
     const root = rootRef.current,
       dock = navRef.current;
     if (!root || !dock) return;
-    // Measure the actual overlay, including safe area and enlarged text, rather than
-    // assuming a fixed pill height. CSS supplies the matching pre-hydration inset.
+    // The page reserves the measured pill plus its safe-area/bottom inset once.
+    const navigation = dock.querySelector<HTMLElement>('.athletic-nav');
+    if (!navigation) return;
     const desktop = window.matchMedia('(min-width: 768px)');
     const update = () =>
       root.style.setProperty(
         '--nav-occlusion',
         desktop.matches
           ? '0px'
-          : `${Math.ceil(dock.getBoundingClientRect().height)}px`,
+          : `${Math.ceil(navigation.getBoundingClientRect().height)}px`,
       );
     update();
     const observer = new ResizeObserver(update);
-    observer.observe(dock);
+    observer.observe(navigation);
     desktop.addEventListener('change', update);
     return () => {
       observer.disconnect();
@@ -86,7 +78,13 @@ function AppLayoutContent({
         return;
       const rect = target.getBoundingClientRect(),
         viewport = main.getBoundingClientRect();
-      const visibleBottom = viewport.bottom - 8;
+      const navigation = dock.querySelector<HTMLElement>('.athletic-nav');
+      const visibleBottom = Math.min(
+        viewport.bottom - 8,
+        window.matchMedia('(min-width: 768px)').matches || !navigation
+          ? viewport.bottom - 8
+          : navigation.getBoundingClientRect().top - 16,
+      );
       const visibleTop = viewport.top + 8;
       if (rect.height > visibleBottom - visibleTop) return;
       if (rect.bottom > visibleBottom)
@@ -100,58 +98,62 @@ function AppLayoutContent({
   }
 
   return (
-    <div
-      ref={rootRef}
-      className="app-shell running-journal stride-redesign athletic-shell"
-      data-view={view}
-      data-sidebar={sidebarState}
-    >
-      <a className="skip-link athletic-skip-link" href="#main-content">
-        Skip to your training
-      </a>
-      <Tabs
-        value={isAppView(view) ? view : 'today'}
-        onValueChange={(value) => {
-          if (isAppView(value)) onViewChange(value);
-        }}
-        orientation={isMobile ? 'horizontal' : 'vertical'}
-        className="app-tabs athletic-tabs"
+    <WeatherProvider>
+      <div
+        ref={rootRef}
+        className="app-shell running-journal stride-redesign athletic-shell"
+        data-view={view}
       >
-        <header className="topbar athletic-topbar">
-          <Link
-            className="wordmark"
-            href="/"
-            prefetch={false}
-            aria-label="Stride home"
-          >
-            <StrideLogo />
-          </Link>
-          <div className="top-actions">
-            {status}
-            <button
-              type="button"
-              className="avatar-button"
-              aria-label="Your profile"
-              onClick={onProfile}
-              disabled={navigationDisabled}
-            >
-              {profileInitials}
-            </button>
-          </div>
-        </header>
-        <FloatingNavigation overlayRef={navRef} disabled={navigationDisabled} />
-        <main
-          ref={scrollRef}
-          id="main-content"
-          className="athletic-main"
-          tabIndex={-1}
-          aria-busy={loading || undefined}
-          onFocusCapture={(event) => revealFocusedControl(event.target)}
+        <a className="skip-link athletic-skip-link" href="#main-content">
+          Skip to your training
+        </a>
+        <Tabs
+          value={isAppView(view) ? view : 'today'}
+          onValueChange={(value) => {
+            if (isAppView(value)) onViewChange(value);
+          }}
+          orientation="horizontal"
+          className="app-tabs athletic-tabs"
         >
-          <div className="workspace">{children}</div>
-        </main>
-      </Tabs>
-      {overlays}
-    </div>
+          <header className="topbar athletic-topbar">
+            <Link
+              className="wordmark"
+              href="/"
+              prefetch={false}
+              aria-label="Stride home"
+            >
+              <StrideLogo />
+            </Link>
+            <div className="top-actions">
+              {status}
+              <button
+                type="button"
+                className="avatar-button"
+                aria-label="Your profile"
+                onClick={onProfile}
+                disabled={navigationDisabled}
+              >
+                {profileInitials}
+              </button>
+            </div>
+          </header>
+          <FloatingNavigation
+            overlayRef={navRef}
+            disabled={navigationDisabled}
+          />
+          <main
+            ref={scrollRef}
+            id="main-content"
+            className="athletic-main"
+            tabIndex={-1}
+            aria-busy={loading || undefined}
+            onFocusCapture={(event) => revealFocusedControl(event.target)}
+          >
+            <div className="workspace">{children}</div>
+          </main>
+        </Tabs>
+        {overlays}
+      </div>
+    </WeatherProvider>
   );
 }

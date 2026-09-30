@@ -187,7 +187,7 @@ export function encodeWorkout(workout: Workout): Uint8Array {
       encoder.onMesg(Profile.MesgNum.WORKOUT_STEP, {
         messageIndex: index,
         wktStepName: s.label.slice(0, 32),
-        notes: s.effort,
+        notes: s.pacing?.guidance ?? s.effort,
         durationType: s.metres ? 'distance' : 'time',
         durationValue: s.metres ? s.metres * 100 : s.seconds * 1000,
         targetType:

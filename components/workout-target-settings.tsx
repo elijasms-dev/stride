@@ -1,30 +1,46 @@
 'use client';
 import { useState } from 'react';
-import { type Plan, dateLabel } from '@/lib/engine';
+import { type Plan, type Profile, type Step, dateLabel } from '@/lib/engine';
+import { targetLabel, type WorkoutTargets } from '@/lib/workout-targets';
+import { validateRecentRace } from '@/lib/fitness-pacing';
+import { todayInZone } from '@/lib/engine';
+import { duration } from '@/lib/workout-names';
+import { parseElapsedTime } from '@/lib/benchmark-input';
 import {
-  TARGET_BANDS,
-  targetBandLabels,
-  targetLabel,
-  benchmarkWorkoutTargets,
-  type WorkoutTargets,
-} from '@/lib/workout-targets';
+  paceSettingsRows,
+  initialPaceSettings,
+  paceSettingsConfig,
+  canOverridePacingRole,
+  type PaceRowDraft,
+} from '@/lib/pace-settings';
+import { type PacingRole } from '@/lib/source-pacing';
 import { Modal, Field, api } from './stride-ui';
 import { BusyButton } from './action-progress';
+import { RecentRaceFields } from './recent-race-fields';
+import { DrawnUnderline, DrawnBracket } from './drawn-ui';
 import type { Action } from './workout-detail';
-import { pacingEvidence } from '@/lib/fitness-pacing';
-import { todayInZone, eventDistanceDisplay } from '@/lib/engine';
-import { elapsedTimeText } from '@/lib/benchmark-input';
-import {
-  initialTargetSettings,
-  targetSettingsConfig,
-} from '@/lib/workout-target-form';
+
 type Preview = {
   plan: Plan;
   version: number;
   effectiveDate: string;
   fingerprint: string;
   protectedCount: number;
+  qualityReview?: { title: string; message: string; nextSteps: string[] };
 };
+const inherited: PaceRowDraft = { mode: 'source', low: '', high: '' };
+const origin = (step: Pick<Step, 'pacing' | 'target'>) =>
+  step.pacing?.method === 'explicit-goal'
+    ? 'Your race goal'
+    : step.pacing?.method === 'same-distance-benchmark'
+      ? 'Your reference result'
+      : step.pacing?.method === 'manual-override' ||
+          step.target?.source === 'manual'
+        ? 'Your personal target'
+        : step.pacing
+          ? 'Programme guidance'
+          : 'Previously saved guidance';
+
 export default function WorkoutTargetSettings({
   plan,
   version,
@@ -39,19 +55,37 @@ export default function WorkoutTargetSettings({
   busy: boolean;
 }) {
   const unit = plan.profile.units;
-  const initial = initialTargetSettings(plan.profile);
-  const [mode, setMode] = useState(initial.mode);
-  const [pace, setPace] = useState(initial.pace);
-  const [hr, setHr] = useState(initial.heartRate);
-  const automaticTargets = benchmarkWorkoutTargets(plan.profile);
-  const evidence = pacingEvidence(
-    plan.profile,
-    todayInZone(plan.profile.timezone),
+  const [profile, setProfile] = useState<Profile>(() =>
+    structuredClone(plan.profile),
+  );
+  const [draft, setDraft] = useState(() =>
+    initialPaceSettings(
+      plan.profile,
+      plan.workouts.filter((w) => w.week >= 0),
+    ),
   );
   const [preview, setPreview] = useState<Preview | null>(null);
   const [config, setConfig] = useState<WorkoutTargets | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showAll, setShowAll] = useState(false);
+  const goal = draft.goalTime.trim()
+    ? parseElapsedTime(draft.goalTime)
+    : undefined;
+  const automaticProfile: Profile = {
+    ...profile,
+    workoutTargets: {
+      mode: 'automatic',
+      ...(goal && Number.isFinite(goal) ? { goalTimeMinutes: goal } : {}),
+      raceScope: `${profile.goal}:${profile.raceDistanceKm ?? ''}`,
+    },
+  };
+  const rows = paceSettingsRows(
+    automaticProfile,
+    plan.workouts.filter((w) => w.week >= 0),
+  );
+  const usesGoal =
+    rows.some((row) => row.role === 'goal-race') || Boolean(draft.goalTime);
   const changed =
     preview?.plan.workouts
       .filter(
@@ -64,21 +98,39 @@ export default function WorkoutTargetSettings({
           a.date.localeCompare(b.date) ||
           (a.startTime ?? '').localeCompare(b.startTime ?? ''),
       ) ?? [];
+  const updateRow = (role: PacingRole, patch: Partial<PaceRowDraft>) => {
+    setDraft((old) => ({
+      ...old,
+      rows: {
+        ...old.rows,
+        [role]: { ...(old.rows[role] ?? inherited), ...patch },
+      },
+    }));
+    setError('');
+  };
+  const evidencePatch = () => ({
+    recentRace: profile.recentRace
+      ? validateRecentRace(profile.recentRace, todayInZone(profile.timezone))
+      : null,
+  });
   async function review() {
     setError('');
     setLoading(true);
     try {
-      const targets = targetSettingsConfig(plan.profile, {
-        mode,
-        pace,
-        heartRate: hr,
-      });
+      const targets = paceSettingsConfig(profile, draft);
+      const pacing = evidencePatch();
       const result = await api<Preview>('/api/plan', {
         method: 'POST',
-        body: JSON.stringify({ action: 'targetsPreview', version, targets }),
+        body: JSON.stringify({
+          action: 'targetsPreview',
+          version,
+          targets,
+          pacing,
+        }),
       });
       setConfig(targets);
       setPreview(result);
+      setShowAll(false);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -88,334 +140,394 @@ export default function WorkoutTargetSettings({
   return (
     <Modal
       open
+      wide
       onClose={onClose}
-      title={preview ? 'Review your targets' : 'Workout targets'}
+      title={preview ? 'Review your training paces' : 'Your training paces'}
       description={
         preview
-          ? 'Your schedule and workout duration stay the same.'
-          : 'Choose how you want your runs guided.'
+          ? 'Review each change before it reaches your upcoming runs.'
+          : 'Your current running, interpreted through your programme.'
       }
       locked={busy || loading}
     >
-      {error && (
-        <p className="notice error" role="alert">
-          {error}
-        </p>
-      )}
-      {!preview ? (
-        <>
-          <div
-            className="target-mode-picker"
-            aria-label="Workout target mode"
-            style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}
-          >
-            {(
-              [
-                [
-                  'automatic',
-                  'Automatic',
-                  plan.profile.recentRace
-                    ? 'From your benchmark'
-                    : 'Effort until a benchmark',
-                ],
-                ['effort', 'Effort', 'How it feels'],
-                ['pace', 'Manual pace', `Time per ${unit}`],
-                ['heart-rate', 'Manual heart rate', 'Beats per minute'],
-              ] as const
-            ).map(([value, label, hint]) => (
+      <div className="pace-settings">
+        {error && (
+          <p className="notice error" role="alert">
+            {error}
+          </p>
+        )}
+        {!preview ? (
+          <>
+            <div className="pace-settings-layout">
+              <aside className="pace-reference">
+                <h3 className="ink-heading">
+                  Start with your running
+                  <DrawnUnderline />
+                </h3>
+                <RecentRaceFields profile={profile} onChange={setProfile} />
+                {usesGoal && (
+                  <Field
+                    label="Your intended race time"
+                    hint="Only sessions that explicitly ask for goal race pace use this. It does not change your current fitness. Enter h:mm:ss or m:ss."
+                  >
+                    <input
+                      value={draft.goalTime}
+                      placeholder="h:mm:ss"
+                      autoComplete="off"
+                      aria-label="Goal finish time"
+                      onChange={(e) =>
+                        setDraft((old) => ({
+                          ...old,
+                          goalTime: e.target.value,
+                        }))
+                      }
+                    />
+                  </Field>
+                )}
+                <p className="pace-reference-note">
+                  A result supplies evidence. Your programme decides where a
+                  numerical target belongs. Comfortable running can stay guided
+                  by feel.
+                </p>
+              </aside>
+              <section
+                className="pace-prescriptions"
+                aria-labelledby="pace-guidance-heading"
+              >
+                <h3 id="pace-guidance-heading">How your runs are guided</h3>
+                <p className="subtle">
+                  These are the instructions used in your plan. Personal changes
+                  apply only to the row you edit.
+                </p>
+                {rows.map((row) => {
+                  const choice = draft.rows[row.role] ?? inherited;
+                  const editable =
+                    canOverridePacingRole(row.role) && !plan.beginner;
+                  const sourceSelected = !editable || choice.mode === 'source';
+                  return (
+                    <article className="pace-prescription" key={row.role}>
+                      <div className="pace-prescription-heading">
+                        <h4>{row.label}</h4>
+                        <span className="pace-origin">
+                          {sourceSelected
+                            ? origin({ pacing: row, target: row.target })
+                            : choice.mode === 'effort'
+                              ? 'Your effort choice'
+                              : 'Your personal target'}
+                        </span>
+                      </div>
+                      {sourceSelected ? (
+                        <>
+                          <div
+                            className={`pace-value ${row.target && row.target.low !== row.target.high ? 'ink-bracketed' : ''}`}
+                          >
+                            {row.target
+                              ? targetLabel(row.target, unit)
+                              : 'By effort'}
+                            {row.target &&
+                              row.target.low !== row.target.high && (
+                                <DrawnBracket />
+                              )}
+                          </div>
+                          <p>{row.guidance}</p>
+                        </>
+                      ) : choice.mode === 'effort' ? (
+                        <p>{row.guidance}</p>
+                      ) : (
+                        <div className="pace-override-fields">
+                          <Field
+                            label={
+                              choice.mode === 'pace'
+                                ? `Pace /${unit}`
+                                : 'Heart rate (bpm)'
+                            }
+                          >
+                            <input
+                              aria-label={`${row.label} target`}
+                              value={choice.low}
+                              placeholder={
+                                choice.mode === 'pace' ? 'm:ss' : 'bpm'
+                              }
+                              inputMode={
+                                choice.mode === 'pace' ? 'text' : 'numeric'
+                              }
+                              onChange={(e) =>
+                                updateRow(row.role, { low: e.target.value })
+                              }
+                            />
+                          </Field>
+                          <Field
+                            label={
+                              choice.mode === 'pace'
+                                ? 'Slower end (optional)'
+                                : 'Upper end (optional)'
+                            }
+                          >
+                            <input
+                              aria-label={`${row.label} upper target`}
+                              value={choice.high}
+                              placeholder="Single target if blank"
+                              inputMode={
+                                choice.mode === 'pace' ? 'text' : 'numeric'
+                              }
+                              onChange={(e) =>
+                                updateRow(row.role, { high: e.target.value })
+                              }
+                            />
+                          </Field>
+                        </div>
+                      )}
+                      <details className="pace-explanation">
+                        <summary>Why this pace?</summary>
+                        <p>{row.reason}</p>
+                        <p>
+                          {row.source.url ? (
+                            <a
+                              href={row.source.url}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              {row.source.title}
+                            </a>
+                          ) : (
+                            row.source.title
+                          )}
+                        </p>
+                        {!sourceSelected && (
+                          <p>
+                            Your personal choice overrides this instruction for
+                            this role. It is not a pace endorsed by the
+                            programme.
+                          </p>
+                        )}
+                      </details>
+                      {editable && (
+                        <div className="pace-row-controls">
+                          <label>
+                            <span className="sr-only">
+                              Guidance for {row.label}
+                            </span>
+                            <select
+                              value={choice.mode}
+                              aria-label={`Guidance for ${row.label}`}
+                              onChange={(e) =>
+                                updateRow(row.role, {
+                                  mode: e.target.value as PaceRowDraft['mode'],
+                                })
+                              }
+                            >
+                              <option value="source">Programme guidance</option>
+                              <option value="effort">Use effort</option>
+                              <option value="pace">Set my pace</option>
+                              <option value="heart-rate">
+                                Set my heart rate
+                              </option>
+                            </select>
+                          </label>
+                          {choice.mode !== 'source' && (
+                            <button
+                              type="button"
+                              className="text-button"
+                              onClick={() =>
+                                updateRow(row.role, { ...inherited })
+                              }
+                            >
+                              Reset this target
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </article>
+                  );
+                })}
+                {Object.values(draft.rows).some(
+                  (row) => row?.mode === 'heart-rate',
+                ) && (
+                  <p className="notice">
+                    Personal heart-rate targets are available in Garmin FIT
+                    downloads. Direct sending through Intervals currently
+                    requires pace or effort targets.
+                  </p>
+                )}
+                {rows.length === 0 && (
+                  <p>
+                    Your next programme will show its applicable pace
+                    instructions here.
+                  </p>
+                )}
+              </section>
+            </div>
+            <div className="form-actions target-form-actions">
               <button
-                key={value}
-                aria-pressed={mode === value}
+                className="secondary-button"
+                onClick={onClose}
+                disabled={loading}
+              >
+                Cancel
+              </button>
+              <BusyButton
+                className="primary-button"
+                busy={loading}
+                busyLabel="Preparing your paces…"
+                disabled={loading}
+                onClick={() => void review()}
+              >
+                Review changes
+              </BusyButton>
+            </div>
+          </>
+        ) : (
+          <>
+            <section className="pace-review-heading">
+              <h3 className="ink-heading">
+                See what changes
+                <DrawnUnderline />
+              </h3>
+              <p>
+                {changed.length} upcoming{' '}
+                {changed.length === 1 ? 'workout' : 'workouts'} will receive
+                updated guidance from {dateLabel(preview.effectiveDate)}.
+              </p>
+              <p className="subtle">
+                Running days, prescribed distances, timed steps and recoveries
+                stay the same. Fixed-distance runs may have a different
+                estimated duration.
+              </p>
+              <p className="subtle">
+                Past and recorded runs, the next seven days and workouts already
+                sent to your watch retain their saved instructions.
+              </p>
+              {preview.protectedCount > 0 && (
+                <p>{preview.protectedCount} upcoming workouts are protected.</p>
+              )}
+            </section>
+            {preview.qualityReview && (
+              <section className="pace-readiness">
+                <h3>{preview.qualityReview.title}</h3>
+                <p>{preview.qualityReview.message}</p>
+                <ul>
+                  {preview.qualityReview.nextSteps.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </section>
+            )}
+            {!changed.length && (
+              <p>
+                The reference and personal choices will be saved. No eligible
+                workout prescriptions change.
+              </p>
+            )}
+            {(showAll ? changed : changed.slice(0, 3)).map((workout) => {
+              const before = plan.workouts.find(
+                (old) => old.id === workout.id,
+              )!;
+              return (
+                <article className="pace-change" key={workout.id}>
+                  <div>
+                    <time dateTime={workout.date}>
+                      {dateLabel(workout.date)}
+                    </time>
+                    <h4>{workout.title}</h4>
+                  </div>
+                  {before.minutes !== workout.minutes && (
+                    <p className="pace-duration-change">
+                      Estimated duration: {duration(before.minutes * 60)} →{' '}
+                      {duration(workout.minutes * 60)}. The prescribed distance
+                      stays the same.
+                    </p>
+                  )}
+                  <dl>
+                    {workout.steps.map((step, index) => {
+                      const old = before.steps[index];
+                      if (
+                        JSON.stringify([step.target, step.pacing]) ===
+                        JSON.stringify([old?.target, old?.pacing])
+                      )
+                        return null;
+                      return (
+                        <div className="pace-change-row" key={index}>
+                          <dt>{step.label}</dt>
+                          <dd>
+                            <span>
+                              <small>Before</small>
+                              {old?.target
+                                ? targetLabel(old.target, unit)
+                                : (old?.pacing?.guidance ??
+                                  old?.effort ??
+                                  'Effort guidance')}
+                              <small>
+                                {old ? origin(old) : 'Saved instruction'}
+                              </small>
+                            </span>
+                            <span>
+                              <small>After</small>
+                              {step.target
+                                ? targetLabel(step.target, unit)
+                                : (step.pacing?.guidance ?? step.effort)}
+                              <small>{origin(step)}</small>
+                            </span>
+                          </dd>
+                        </div>
+                      );
+                    })}
+                  </dl>
+                </article>
+              );
+            })}
+            {changed.length > 3 && (
+              <button
+                className="secondary-button"
+                onClick={() => setShowAll((value) => !value)}
+              >
+                {showAll
+                  ? 'Show fewer changes'
+                  : `View all ${changed.length} changes`}
+              </button>
+            )}
+            <div className="form-actions target-form-actions">
+              <button
+                className="secondary-button"
+                disabled={busy}
                 onClick={() => {
-                  setMode(value);
+                  setPreview(null);
                   setError('');
                 }}
               >
-                {label}
-                <small>{hint}</small>
+                Edit paces
               </button>
-            ))}
-          </div>
-          {mode === 'automatic' ? (
-            <section aria-label="Automatic target source">
-              {automaticTargets ? (
-                <>
-                  <p>
-                    Your{' '}
-                    {eventDistanceDisplay(
-                      plan.profile.recentRace!.distanceKm,
-                      unit,
-                    )}{' '}
-                    {unit} result in{' '}
-                    {elapsedTimeText(plan.profile.recentRace!.timeMinutes)}{' '}
-                    supplies estimated training paces. These are coaching
-                    estimates, not measured zones or guaranteed race times.
-                  </p>
-                  <dl className="target-range-row">
-                    {TARGET_BANDS.map((band) => {
-                      const range = automaticTargets.pace?.[band];
-                      return range ? (
-                        <div key={band}>
-                          <dt>{targetBandLabels[band]}</dt>
-                          <dd>
-                            {targetLabel({ ...range, mode: 'pace' }, unit)}
-                          </dd>
-                        </div>
-                      ) : null;
-                    })}
-                  </dl>
-                  <p className="subtle">
-                    Controlled tempo, threshold and repetitions have separate
-                    ranges. Walking, recoveries, run/walk sessions, hills and
-                    short strides retain their effort cues. These are estimated
-                    training ranges, not a measure of prediction confidence.
-                  </p>
-                  {evidence.notices.map((notice) => (
-                    <p className="subtle" key={notice}>
-                      {notice}
-                    </p>
-                  ))}
-                  <p className="subtle">
-                    If this result does not reflect current conditions or
-                    fitness, choose effort or review manual ranges.
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p>
-                    {plan.profile.recentRace
-                      ? 'This benchmark is outside the supported training-pace model. Runs keep their effort cues.'
-                      : 'No benchmark is saved. Runs use effort cues until you add a recent race or time trial in plan preferences. Automatic mode will then use its estimated paces.'}
-                  </p>
-                  {plan.profile.recentRace &&
-                    evidence.notices.map((notice) => (
-                      <p className="subtle" key={notice}>
-                        {notice}
-                      </p>
-                    ))}
-                </>
-              )}
-            </section>
-          ) : mode === 'effort' ? (
-            <p>
-              Follow the breathing and effort cues in each step. No pace or
-              heart-rate alerts are prescribed.
-            </p>
-          ) : (
-            <>
-              <p>
-                Use ranges from your recent training or coach. Start with easy
-                running; leave any other range blank to keep those sessions on
-                effort.
-              </p>
-              {evidence.notices
-                .filter(
-                  (notice) =>
-                    notice.startsWith('Your manual') ||
-                    notice.startsWith('Your declared') ||
-                    notice.startsWith('Your easy pace'),
-                )
-                .map((notice) => (
-                  <p className="subtle" key={notice}>
-                    {notice}
-                  </p>
-                ))}
-              {plan.profile.workoutTargets?.bandsVersion === undefined &&
-                (plan.profile.workoutTargets?.pace?.tempo ||
-                  plan.profile.workoutTargets?.pace?.interval ||
-                  plan.profile.workoutTargets?.heartRate?.tempo ||
-                  plan.profile.workoutTargets?.heartRate?.interval) && (
-                  <p className="subtle">
-                    Previously shared ranges are shown separately so you can
-                    review threshold and repetition targets for each effort.
-                  </p>
-                )}
-              {mode === 'pace' && (
-                <p className="subtle">
-                  Pace ranges round outward to whole seconds per kilometre for
-                  consistent watch targets. Review shows the exact range in your
-                  units.
-                </p>
-              )}
-              {TARGET_BANDS.map((band, index) => (
-                <div className="target-range-row" key={band}>
-                  <h3>
-                    {targetBandLabels[band]}{' '}
-                    {index === 0 ? (
-                      ''
-                    ) : (
-                      <span className="subtle">· optional</span>
-                    )}
-                  </h3>
-                  {band === 'race' && (
-                    <p className="subtle">
-                      Use the pace or heart rate for this block’s goal. Review
-                      this range when changing race distance.
-                    </p>
-                  )}
-                  <div className="target-range-fields">
-                    {(['low', 'high'] as const).map((bound) => (
-                      <Field
-                        key={bound}
-                        label={`${mode === 'pace' ? (bound === 'low' ? 'Faster' : 'Slower') : bound === 'low' ? 'Lower' : 'Upper'} ${mode === 'pace' ? `/${unit}` : 'bpm'}`}
-                      >
-                        <input
-                          aria-label={`${targetBandLabels[band]} ${bound === 'low' ? 'lower' : 'upper'} ${mode === 'pace' ? 'pace' : 'heart rate'}`}
-                          inputMode={mode === 'pace' ? 'text' : 'numeric'}
-                          autoComplete="off"
-                          placeholder={mode === 'pace' ? 'm:ss' : 'bpm'}
-                          value={(mode === 'pace' ? pace : hr)[band][bound]}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            (mode === 'pace' ? setPace : setHr)((old) => ({
-                              ...old,
-                              [band]: { ...old[band], [bound]: value },
-                            }));
-                            setError('');
-                          }}
-                        />
-                      </Field>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              <p className="subtle">
-                Hills, run/walk sessions, recovery steps, short strides and
-                double-threshold sessions keep their effort cues. Short efforts
-                use effort in heart-rate mode; don’t speed up just to chase a
-                reading.
-              </p>
-              {mode === 'heart-rate' && (
-                <p className="notice">
-                  BPM targets work in Stride and Garmin FIT downloads. Direct
-                  sending of BPM targets through Intervals is not supported yet;
-                  use a FIT download or choose effort or pace for direct
-                  sending.
-                </p>
-              )}
-            </>
-          )}
-          <div className="form-actions target-form-actions">
-            <button
-              className="secondary-button"
-              onClick={onClose}
-              disabled={loading}
-            >
-              Cancel
-            </button>
-            <BusyButton
-              className="primary-button"
-              busy={loading}
-              busyLabel="Preparing your targets…"
-              disabled={loading}
-              onClick={() => void review()}
-            >
-              Review targets
-            </BusyButton>
-          </div>
-        </>
-      ) : (
-        <>
-          <p>
-            {changed.length} upcoming{' '}
-            {changed.length === 1 ? 'workout' : 'workouts'} will use your{' '}
-            {mode === 'automatic'
-              ? automaticTargets
-                ? 'automatic benchmark'
-                : 'automatic effort'
-              : mode === 'heart-rate'
-                ? 'heart-rate'
-                : mode}{' '}
-            settings.
-          </p>
-          {changed.some(
-            (w) =>
-              !w.steps.some((s) => s.metres !== undefined) &&
-              plan.workouts
-                .find((old) => old.id === w.id)
-                ?.steps.some((s) => s.metres !== undefined),
-          ) && (
-            <p className="target-note">
-              Some distance sets need more time at your new pace. Their preview
-              uses timed repetitions to keep your existing session length and
-              recoveries.
-            </p>
-          )}
-          {preview.protectedCount > 0 && (
-            <p className="notice">
-              {preview.protectedCount} upcoming workouts have a watch-delivery
-              record and keep their existing targets. Recorded and past runs
-              also stay unchanged.
-            </p>
-          )}
-          {!changed.length && (
-            <p className="subtle">
-              {JSON.stringify(preview.plan.profile.workoutTargets) ===
-              JSON.stringify(plan.profile.workoutTargets)
-                ? 'Your target preferences are unchanged. Saving will not rewrite your plan.'
-                : 'The target source will be saved for future workouts. No eligible step targets change in this block.'}
-            </p>
-          )}
-          {changed.slice(0, 3).map((w) => (
-            <article className="target-sample" key={w.id}>
-              <small>{dateLabel(w.date)}</small>
-              <strong>{w.title}</strong>
-              <ul>
-                {w.steps.map((s, index) => (
-                  <li key={index}>
-                    {s.label} · {targetLabel(s.target, unit)}
-                  </li>
-                ))}
-              </ul>
-            </article>
-          ))}
-          {changed.length > 3 && (
-            <p className="subtle">
-              The same rules apply to the remaining {changed.length - 3}{' '}
-              workouts.
-            </p>
-          )}
-          <div className="form-actions target-form-actions">
-            <button
-              className="secondary-button"
-              disabled={busy}
-              onClick={() => {
-                setPreview(null);
-                setError('');
-              }}
-            >
-              Edit target choice
-            </button>
-            <BusyButton
-              className="primary-button"
-              busy={busy}
-              busyLabel="Saving your targets…"
-              disabled={busy}
-              onClick={async () => {
-                setError('');
-                try {
-                  if (version !== preview.version)
-                    throw new Error(
-                      'Your plan changed. Review your targets again.',
-                    );
-                  await onAction('targets', {
-                    targets: config,
-                    version: preview.version,
-                    effectiveDate: preview.effectiveDate,
-                    fingerprint: preview.fingerprint,
-                  });
-                  onClose();
-                } catch (e) {
-                  setError((e as Error).message);
-                  setPreview(null);
-                }
-              }}
-            >
-              Save targets
-            </BusyButton>
-          </div>
-        </>
-      )}
+              <BusyButton
+                className="primary-button"
+                busy={busy}
+                busyLabel="Saving your paces…"
+                disabled={busy}
+                onClick={async () => {
+                  setError('');
+                  try {
+                    if (version !== preview.version)
+                      throw new Error(
+                        'Your plan changed. Review your paces again.',
+                      );
+                    await onAction('targets', {
+                      targets: config,
+                      pacing: evidencePatch(),
+                      version: preview.version,
+                      effectiveDate: preview.effectiveDate,
+                      fingerprint: preview.fingerprint,
+                    });
+                    onClose();
+                  } catch (e) {
+                    setError((e as Error).message);
+                    setPreview(null);
+                  }
+                }}
+              >
+                Save training paces
+              </BusyButton>
+            </div>
+          </>
+        )}
+      </div>
     </Modal>
   );
 }

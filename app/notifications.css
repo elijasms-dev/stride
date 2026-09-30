@@ -1,70 +1,61 @@
-.training-notification-bar {
-  margin-bottom: 1rem;
-}
-.training-notification-trigger {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  width: 100%;
-  min-height: 44px;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  color: var(--text-main);
-  text-align: left;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
+.training-notification-bell {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-label);
   cursor: pointer;
 }
-.training-notification-trigger > svg {
-  flex-shrink: 0;
-}
-.training-notification-trigger > svg:first-child {
-  color: var(--warning);
-}
-.training-notification-label {
-  flex: 1;
-  min-width: 0;
-  font-weight: 650;
-  overflow-wrap: anywhere;
-}
-.training-notification-hint {
-  color: var(--text-label);
-}
-.training-notification-trigger:hover,
-.training-notification-trigger[data-popup-open] {
+.training-notification-bell:hover,
+.training-notification-bell[data-popup-open] {
+  border-color: var(--border);
   background: var(--surface-raised);
+  color: var(--text-main);
 }
-.training-notification-trigger[data-popup-open] .training-notification-chevron {
-  transform: rotate(180deg);
+.training-notification-indicator {
+  position: absolute;
+  top: 8px;
+  right: 9px;
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid var(--surface);
+  border-radius: 50%;
+  background: var(--run-quality, #ff7a36);
 }
 .training-notification-panel[data-slot='popover-content'] {
-  width: min(24rem, calc(100vw - 2rem));
+  width: min(24rem, calc(100vw - 1.5rem));
   max-height: min(32rem, var(--available-height));
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 1rem;
+  padding: 0;
   gap: 0;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--surface);
   color: var(--text-main);
-  box-shadow: 0 12px 40px #00000030;
+  font-family: var(--font-journal-sans), sans-serif;
+  box-shadow: 0 12px 40px #00000024;
 }
 .training-notification-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding-bottom: 0.75rem;
+  padding: 0.6rem 0.65rem 0.6rem 1rem;
   border-bottom: 1px solid var(--border);
 }
 .training-notification-heading [data-slot='popover-title'] {
   margin: 0;
-  color: var(--text-label);
-  font-size: 0.875rem;
-  font-weight: 650;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  font-weight: 750;
+  color: var(--text-main);
 }
 .training-notification-close {
   display: grid;
@@ -72,11 +63,11 @@
   flex-shrink: 0;
   width: 44px;
   height: 44px;
-  margin: -0.5rem -0.5rem -0.5rem 0;
+  padding: 0;
   border: 0;
-  border-radius: var(--radius-sm);
+  border-radius: 50%;
   background: transparent;
-  color: var(--text-main);
+  color: var(--text-label);
   cursor: pointer;
 }
 .training-notification-list {
@@ -84,49 +75,79 @@
   margin: 0;
   padding: 0;
 }
-.training-notification-list li {
-  padding-top: 1rem;
+.training-notification-list > li {
+  padding: 1rem;
 }
-.training-notification-list li + li {
-  margin-top: 1rem;
+.training-notification-list > li + li {
   border-top: 1px solid var(--border);
 }
 .training-notification-list h3 {
   margin: 0;
   color: var(--text-main);
-  font-size: 1rem;
+  font-size: 0.9375rem;
   line-height: 1.5;
   font-weight: 750;
+  overflow-wrap: anywhere;
 }
 .training-notification-list p {
-  margin: 0.5rem 0 0.75rem;
+  margin: 0.4rem 0 0.75rem;
   color: var(--text-label);
-  font-size: 1rem;
-  line-height: 1.5;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
 }
 .training-notification-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 44px;
-  padding: 0.625rem 1rem;
+  max-width: 100%;
+  padding: 0.6rem 0.85rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--surface-raised);
   color: var(--text-main);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
   font-weight: 700;
+  text-align: center;
+  white-space: normal;
   cursor: pointer;
 }
 .training-notification-action:hover,
 .training-notification-close:hover {
   background: var(--surface-raised);
-  box-shadow: inset 0 0 0 1px var(--text-label);
+  box-shadow: inset 0 0 0 1px var(--border);
 }
-.training-notification-trigger:focus-visible,
+.training-notification-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+.training-notification-empty svg {
+  color: var(--run-easy, #10b981);
+}
+.training-notification-empty strong {
+  font-size: 0.9375rem;
+  font-weight: 650;
+}
+.training-notification-empty p {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--text-label);
+}
+.training-notification-bell:focus-visible,
 .training-notification-panel button:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 3px;
 }
-@media (max-width: 420px) {
-  .training-notification-hint {
-    display: none;
+@media (prefers-reduced-motion: reduce) {
+  .training-notification-panel[data-slot='popover-content'] {
+    animation: none;
+    transition: none;
   }
 }

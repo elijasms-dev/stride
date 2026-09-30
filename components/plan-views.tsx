@@ -1,20 +1,17 @@
 'use client';
-import { TrainingInsights, WorkoutGuide } from './training';
-import { useState } from 'react';
+import { WorkoutGuide } from './training';
+import { useId, useState } from 'react';
 import { ArrowRight, ChevronRight } from 'lucide-react';
-import {
-  dateLabel,
-  kmDisplay,
-  dayDiff,
-  type Plan,
-  type Workout,
-} from '@/lib/engine';
+import { dateLabel, kmDisplay, type Plan, type Workout } from '@/lib/engine';
 import {
   journalEntries,
   journalSummary,
   runDuration,
 } from '@/lib/journal-view';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { progressChartWeeks } from '@/lib/progress-chart';
+import { DrawnUnderline } from './drawn-ui';
+import { ProgressionChart } from './plan/progression-chart';
 export { FullPlan } from './plan/plan-explorer';
 export function ProgressView({
   today,
@@ -31,9 +28,9 @@ export function ProgressView({
   onExtra: () => void;
   onCorrectExtra: (r: import('@/lib/engine').ExtraRun) => void;
 }) {
-  const [insightsOpen, setInsightsOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
   const [metric, setMetric] = useState('distance');
+  const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
   const [visible, setVisible] = useState(20);
   const entries = journalEntries(plan);
   const records = entries.map((entry) => entry.record);
@@ -44,21 +41,254 @@ export function ProgressView({
       : [],
   );
   const shown = entries.slice(0, visible);
-  const weekly = plan.weeks.map((week) => {
-    const runs = records.filter(
-      (r) => r.date >= week.start && dayDiff(week.start, r.date) < 7,
-    );
-    return {
-      week,
-      runs: runs.length,
-      missing: runs.filter((r) => r.km === null).length,
-      km: runs.reduce((n, r) => n + (r.km ?? 0), 0),
-      minutes: runs.reduce((n, r) => n + r.minutes, 0),
-    };
-  });
+  const weekly = progressChartWeeks(plan, today, !isDemo);
+  const chartId = useId().replace(/:/g, '');
+  const value = (amount: number | null) =>
+    amount === null
+      ? 'Not estimated'
+      : metric === 'distance'
+        ? `${kmDisplay(amount, plan.profile.units)} ${plan.profile.units}`
+        : runDuration(amount);
   const chartMax = Math.max(
     1,
-    ...weekly.map((w) => (metric === 'distance' ? w.km : w.minutes)),
+    ...weekly.map(
+      (week) =>
+        (metric === 'distance' ? week.recorded.km : week.recorded.minutes) ?? 0,
+    ),
+  );
+  const selectedTotals =
+    weekly.find((week) => week.index === selectedWeek) ??
+    weekly.find((week) => week.start <= today && week.end >= today) ??
+    (today < weekly[0]?.start ? weekly[0] : weekly.at(-1));
+  const selectedRecorded = selectedTotals
+    ? metric === 'distance'
+      ? selectedTotals.recorded.km
+      : selectedTotals.recorded.minutes
+    : null;
+  const weekLabel = (week: (typeof weekly)[number]) =>
+    isDemo ? dateLabel(week.start) : `Week ${week.index + 1}`;
+  const recordedChart = (
+    <section
+      className="progression-chart"
+      aria-labelledby="progression-heading"
+    >
+      <div className="progression-chart-heading">
+        <div>
+          <h2 id="progression-heading" className="ink-heading">
+            Your recorded running
+            <DrawnUnderline />
+          </h2>
+          <p>
+            {isDemo
+              ? 'Your last 12 weeks'
+              : 'Completed runs during your current plan'}
+          </p>
+        </div>
+        <Tabs value={metric} onValueChange={setMetric}>
+          <TabsList aria-label="Progression measure">
+            <TabsTrigger value="distance">Distance</TabsTrigger>
+            <TabsTrigger value="time">Time</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+      <div className="progression-legend" aria-label="Chart key">
+        <span>
+          <i className="progression-recorded-key" />
+          Recorded
+        </span>
+        <span className="progression-axis-unit">
+          {metric === 'distance' ? plan.profile.units : 'minutes'} per week
+        </span>
+      </div>
+      <div className="progression-plot-wrap">
+        <div className="progression-y-axis" aria-hidden="true">
+          {[1, 0.75, 0.5, 0.25, 0].map((fraction) => (
+            <span
+              key={fraction}
+              style={{ top: `${((184 - fraction * 174) / 188) * 100}%` }}
+            >
+              {metric === 'distance'
+                ? kmDisplay(chartMax * fraction, plan.profile.units)
+                : Math.round(chartMax * fraction)}
+            </span>
+          ))}
+        </div>
+        <div className="progression-plot-content">
+          <svg
+            className="progression-plot"
+            viewBox="64 12 922 188"
+            // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- Inline SVG requires image semantics for its title and description.
+            role="img"
+            aria-labelledby={`${chartId}-title ${chartId}-description`}
+            preserveAspectRatio="none"
+          >
+            <title id={`${chartId}-title`}>
+              {`Weekly ${metric === 'distance' ? 'distance' : 'running time'}`}
+            </title>
+            <desc id={`${chartId}-description`}>
+              Hatched bars show recorded totals. Use the week selector below for
+              exact values. Unrecorded values have no bar.
+            </desc>
+            <defs>
+              <pattern
+                id={`${chartId}-hatch`}
+                width="7"
+                height="7"
+                patternUnits="userSpaceOnUse"
+                patternTransform="rotate(35)"
+              >
+                <line
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="7"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+              </pattern>
+            </defs>
+            {[0, 0.25, 0.5, 0.75, 1].map((fraction) => (
+              <g key={fraction} className="progression-gridline">
+                <line
+                  x1="64"
+                  x2="986"
+                  y1={196 - fraction * 174}
+                  y2={196 - fraction * 174}
+                />
+              </g>
+            ))}
+            {weekly.map((week, position) => {
+              const slot = 908 / Math.max(1, weekly.length);
+              const center = 72 + (position + 0.5) * slot;
+              const width = Math.min(30, slot * 0.62);
+              const recorded =
+                metric === 'distance'
+                  ? week.recorded.km
+                  : week.recorded.minutes;
+              const selected = selectedTotals?.index === week.index;
+              return (
+                <g key={week.start}>
+                  {selected && (
+                    <rect
+                      className="progression-selected-column"
+                      x={center - slot / 2 + 1}
+                      y="12"
+                      width={slot - 2}
+                      height="188"
+                      rx="4"
+                    />
+                  )}
+                  {recorded !== null && recorded > 0 && (
+                    <rect
+                      className="progression-recorded-bar"
+                      x={center - width / 2}
+                      y={196 - (recorded / chartMax) * 174}
+                      width={width}
+                      height={(recorded / chartMax) * 174}
+                      rx="2"
+                      fill={`url(#${chartId}-hatch)`}
+                    />
+                  )}
+                  {recorded === 0 && (
+                    <circle
+                      className="progression-zero"
+                      cx={center}
+                      cy="196"
+                      r="2.5"
+                    />
+                  )}
+                </g>
+              );
+            })}
+          </svg>
+          <div className="progression-x-axis" aria-hidden="true">
+            {weekly.map((week, position) => {
+              const showLabel = Array.from({ length: 5 }, (_, tick) =>
+                Math.round((tick * (weekly.length - 1)) / 4),
+              ).includes(position);
+              if (!showLabel) return null;
+              const center =
+                72 + ((position + 0.5) * 908) / Math.max(1, weekly.length);
+              return (
+                <span
+                  key={week.start}
+                  style={{ left: `${((center - 64) / 922) * 100}%` }}
+                >
+                  {isDemo
+                    ? dateLabel(week.start, {
+                        day: 'numeric',
+                        month: 'short',
+                      })
+                    : `W${week.index + 1}`}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+      {selectedTotals && (
+        <div className="progression-week-detail">
+          <label className="progression-week-picker">
+            <span>Explore a week</span>
+            <select
+              aria-label="Progression week"
+              value={selectedTotals.index}
+              onChange={(event) => setSelectedWeek(Number(event.target.value))}
+            >
+              {weekly.map((week) => (
+                <option key={week.start} value={week.index}>
+                  {weekLabel(week)} · {dateLabel(week.start)}
+                  {week.phase ? ` · ${week.phase}` : ''}
+                </option>
+              ))}
+            </select>
+          </label>
+          <dl aria-live="polite" aria-atomic="true">
+            <div>
+              <dt>
+                {metric === 'distance' &&
+                selectedTotals.recorded.missingDistances
+                  ? 'Known recorded distance'
+                  : 'Recorded total'}
+              </dt>
+              <dd>
+                {selectedRecorded === null
+                  ? 'Not recorded'
+                  : value(selectedRecorded)}
+              </dd>
+            </div>
+            <div>
+              <dt>Runs logged</dt>
+              <dd>{selectedTotals.recorded.runs}</dd>
+            </div>
+            <div>
+              <dt>Recorded time</dt>
+              <dd>
+                {selectedTotals.recorded.minutes === null
+                  ? 'Not recorded'
+                  : runDuration(selectedTotals.recorded.minutes)}
+              </dd>
+            </div>
+          </dl>
+          {selectedTotals.recorded.missingDistances > 0 &&
+            metric === 'distance' && (
+              <p>
+                {selectedTotals.recorded.missingDistances}{' '}
+                {selectedTotals.recorded.missingDistances === 1
+                  ? 'run has'
+                  : 'runs have'}{' '}
+                no distance recorded. This total is incomplete.
+              </p>
+            )}
+        </div>
+      )}
+      <p className="progression-chart-note">
+        {records.length === 0 ? 'No runs recorded yet. ' : ''}
+        {isDemo
+          ? 'Weeks without a recorded value are left blank.'
+          : 'Recorded on the date you ran. Blank bars mean no recorded value.'}
+      </p>
+    </section>
   );
   return (
     <div className="view-wrapper progress-view">
@@ -72,50 +302,64 @@ export function ProgressView({
           </button>
         )}
       </div>
-      {rated.length > 0 && (
-        <div className="week-rhythm">
-          <span className="eyebrow">Your workout preferences</span>
-          <p>
-            {rated.filter((v) => v === 'yes').length} would repeat ·{' '}
-            {rated.filter((v) => v === 'maybe').length} might change ·{' '}
-            {rated.filter((v) => v === 'no').length} would avoid. From{' '}
-            {rated.length} rated workouts; unanswered runs are excluded.
-          </p>
-        </div>
+      {isDemo ? (
+        recordedChart
+      ) : (
+        <ProgressionChart
+          plan={plan}
+          selected={selectedTotals?.index ?? 0}
+          onSelect={setSelectedWeek}
+        />
       )}
-      <div className="progress-metrics">
-        <div>
-          <span>Runs logged</span>
-          <strong>{totals.count}</strong>
-          <small>Your recorded running</small>
+      <section
+        className="journal-lifetime"
+        aria-labelledby="journal-lifetime-heading"
+      >
+        <div className="journal-lifetime-heading">
+          <h2 id="journal-lifetime-heading">All-time stats</h2>
+          <p>All runs saved in your journal</p>
         </div>
-        <div>
-          <span>Recorded distance</span>
-          <strong>
-            {totals.km === null
-              ? '—'
-              : kmDisplay(totals.km, plan.profile.units)}{' '}
-            {totals.km !== null && <small>{plan.profile.units}</small>}
-          </strong>
-          <small>
-            {totals.missingDistances
-              ? `${totals.missingDistances} ${totals.missingDistances === 1 ? 'run without' : 'runs without'} distance`
-              : totals.count
-                ? 'All logged distances'
-                : 'No distances recorded'}
-          </small>
-        </div>
-        <div>
-          <span>Time running</span>
-          <strong className="journal-time-total">
-            {runDuration(totals.minutes)}
-          </strong>
-          <small>From your recorded runs</small>
-        </div>
-      </div>
+        <dl className="journal-lifetime-stats">
+          <div>
+            <dt>Runs logged</dt>
+            <dd>{totals.count}</dd>
+          </div>
+          <div>
+            <dt>
+              {totals.missingDistances
+                ? 'Known recorded distance'
+                : 'Recorded distance'}
+            </dt>
+            <dd>
+              {totals.km === null
+                ? '—'
+                : kmDisplay(totals.km, plan.profile.units)}
+              {totals.km !== null && <small> {plan.profile.units}</small>}
+            </dd>
+          </div>
+          <div>
+            <dt>Time running</dt>
+            <dd>{runDuration(totals.minutes)}</dd>
+          </div>
+        </dl>
+        {totals.missingDistances > 0 && (
+          <p className="journal-lifetime-note">
+            {totals.missingDistances}{' '}
+            {totals.missingDistances === 1 ? 'run without' : 'runs without'}{' '}
+            distance; time and run counts are included.
+          </p>
+        )}
+      </section>
+      {!isDemo && (
+        <details className="progress-disclosure progress-recorded-disclosure">
+          <summary>
+            Recorded running by week <span>Only completed runs</span>
+          </summary>
+          {recordedChart}
+        </details>
+      )}
       {records.length === 0 ? (
         <div className="empty-panel progress-empty">
-          <EmptyRunChart />
           <div className="progress-empty-copy">
             <h2>Your first run belongs here</h2>
             <p>
@@ -205,69 +449,19 @@ export function ProgressView({
               </button>
             )}
           </section>
-          {!isDemo && (
-            <details className="progress-chart-section journal-chart-disclosure">
-              <summary>View weekly totals</summary>
-              <div className="section-heading">
-                <h3>Training, week by week</h3>
-                <Tabs value={metric} onValueChange={setMetric}>
-                  <TabsList aria-label="Weekly total measure">
-                    <TabsTrigger value="distance">Distance</TabsTrigger>
-                    <TabsTrigger value="time">Time</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
-              <div className="progress-week-bars">
-                {weekly.map(({ week: w, runs, missing, km, minutes }) => {
-                  const actual = metric === 'distance' ? km : minutes;
-                  const unknown =
-                    !runs || (metric === 'distance' && missing === runs);
-                  return (
-                    <div key={w.index}>
-                      <span>
-                        {unknown
-                          ? '—'
-                          : metric === 'distance'
-                            ? kmDisplay(actual, plan.profile.units)
-                            : actual}
-                      </span>
-                      <i
-                        style={{
-                          height: `${unknown ? 0 : (actual / chartMax) * 100}%`,
-                        }}
-                      />
-                      <small>W{w.index + 1}</small>
-                    </div>
-                  );
-                })}
-              </div>
-              <p className="subtle">
-                Actual {metric === 'distance' ? plan.profile.units : 'minutes'}{' '}
-                · weeks of your current plan. Only recorded runs count; a dash
-                means no recorded value. Missing distances are excluded from
-                distance totals.
-              </p>
-            </details>
-          )}
         </>
       )}
-      <details
-        className="progress-disclosure"
-        onToggle={(e) => setInsightsOpen(e.currentTarget.open)}
-      >
-        <summary>
-          Training insights <span>Your last four weeks</span>
-        </summary>
-        {insightsOpen && (
-          <TrainingInsights
-            plan={plan}
-            today={today}
-            isDemo={isDemo}
-            onWorkout={onWorkout}
-            onExtra={onExtra}
-          />
-        )}
-      </details>
+      {rated.length > 0 && (
+        <div className="week-rhythm">
+          <span className="eyebrow">Your workout preferences</span>
+          <p>
+            {rated.filter((v) => v === 'yes').length} would repeat ·{' '}
+            {rated.filter((v) => v === 'maybe').length} might change ·{' '}
+            {rated.filter((v) => v === 'no').length} would avoid. From{' '}
+            {rated.length} rated workouts; unanswered runs are excluded.
+          </p>
+        </div>
+      )}
       <details
         className="progress-disclosure"
         onToggle={(e) => setGuideOpen(e.currentTarget.open)}
@@ -278,51 +472,5 @@ export function ProgressView({
         {guideOpen && <WorkoutGuide plan={plan} onWorkout={onWorkout} />}
       </details>
     </div>
-  );
-}
-function EmptyRunChart() {
-  return (
-    <svg
-      className="empty-run-chart"
-      viewBox="0 0 160 112"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M16 20H148M16 48H148M16 76H148M16 104H148"
-        stroke="currentColor"
-        opacity=".2"
-      />
-      <rect
-        x="28"
-        y="65"
-        width="20"
-        height="39"
-        rx="4"
-        fill="var(--selection-surface)"
-        stroke="currentColor"
-        strokeDasharray="4 4"
-      />
-      <rect
-        x="65"
-        y="44"
-        width="20"
-        height="60"
-        rx="4"
-        fill="var(--selection-surface)"
-        stroke="currentColor"
-        strokeDasharray="4 4"
-      />
-      <rect
-        x="102"
-        y="22"
-        width="20"
-        height="82"
-        rx="4"
-        fill="var(--selection-surface)"
-        stroke="currentColor"
-        strokeDasharray="4 4"
-      />
-    </svg>
   );
 }

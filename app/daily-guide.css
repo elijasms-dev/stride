@@ -84,9 +84,10 @@
   min-height: 48px;
 }
 .daily-guide-tabs [data-slot='tabs-trigger'] {
-  min-width: 0;
-  min-height: 40px;
+  min-width: 44px;
+  min-height: 44px;
   font-size: 0.875rem;
+  color: var(--text-label);
   padding: 8px;
 }
 .daily-guide-tabs [data-slot='tabs-trigger'][data-active] {
@@ -120,7 +121,7 @@
 .guide-sources {
   margin-top: 20px;
   color: var(--text-label);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
 }
 .guide-sources summary {
   min-height: 44px;
@@ -137,6 +138,10 @@
   margin: 8px 0;
 }
 .guide-sources a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
   color: var(--link);
 }
 .day-records > div {
@@ -154,6 +159,6 @@
   }
   .daily-guide-tabs [data-slot='tabs-trigger'] {
     padding-inline: 4px;
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
   }
 }

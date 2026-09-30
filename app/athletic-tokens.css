@@ -57,9 +57,11 @@
   --radius-full: 9999px;
   --space-unit: 0.25rem;
   --header-height: 56px;
-  --nav-min-inset: calc(6rem + env(safe-area-inset-bottom, 0px));
+  --nav-min-inset: 64px;
   --nav-occlusion: var(--nav-min-inset);
-  --content-bottom-inset: max(var(--nav-min-inset), var(--nav-occlusion));
+  --content-bottom-inset: calc(
+    var(--nav-occlusion) + env(safe-area-inset-bottom, 0px) + 16px
+  );
   --z-header: 30;
   --z-navigation: 40;
   --z-toast: 45;
